@@ -67,12 +67,13 @@ export default {
                     class: 'menu-icon-custom'
                 },
                 
-            //   //  {
-            //         link: 'calendar',
-            //         name: 'Calendar',
-            //         tooltip: 'Dashboard',
-            //         icon: 'calendar',
-            //     },
+               {
+                    link: '/calendar/index',
+                    name: 'Calendar',
+                    tooltip: 'calendar',
+                    icon: 'calendar',
+                    class: 'menu-icon-custom'
+                },
                 
                 {
                     link: '',
@@ -126,6 +127,7 @@ export default {
                     name: 'HR Section',
                     tooltip: 'General Service Section',
                     icon: 'users',
+                    class: 'menu-icon-custom',
                     children: [
                         {
                             link: '/human_resource/employees_directory/index',

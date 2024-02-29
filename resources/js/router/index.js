@@ -26,6 +26,9 @@ import dashboard_abstract from "../components/procurement/abstract/index.vue";
 //HR Sect=ion
 import employees_directory from "../components/human_resource/employees_directory/index.vue";
 
+//CALENDAR
+import calendar from "../components/calendar/index.vue";
+
 const routes = [
     {
         path: '/',
@@ -120,20 +123,25 @@ const routes = [
         name:'Abstract of Quotation',
         component:dashboard_abstract
     },
+    // {
+    //     path:'/rictu/ict_ta/index',
+    //     name:'ICT Technical Assistance',
+    //     component:dashboard_ict_ta
+    // },
+    // {
+    //     path:'/rictu/ict_ta/create',
+    //     name:'Create ICT Technical Assistance',
+    //     component:create_ict
+    // },
+    // {
+    //     path:'/human_resource/employees_directory/index',
+    //     name:'Employees Directory',
+    //     component:employees_directory
+    // },
     {
-        path:'/rictu/ict_ta/index',
-        name:'ICT Technical Assistance',
-        component:dashboard_ict_ta
-    },
-    {
-        path:'/rictu/ict_ta/create',
-        name:'Create ICT Technical Assistance',
-        component:create_ict
-    },
-    {
-        path:'/human_resource/employees_directory/index',
-        name:'Employees Directory',
-        component:employees_directory
+        path:'/calendar/index',
+        name:'Calendar',
+        component:calendar
     }
    
    
