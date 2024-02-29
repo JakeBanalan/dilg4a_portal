@@ -23,8 +23,13 @@ import rfq_details from "../components/procurement/rfq/rfq_details.vue";
 //ABSTRACT
 import dashboard_abstract from "../components/procurement/abstract/index.vue";
 
-//HR Sect=ion
+//HR Section
 import employees_directory from "../components/human_resource/employees_directory/index.vue";
+import daily_time_record from "../components/human_resource/daily_time_record/index.vue";
+
+// ICT TA
+import dashboard_ict_ta from "../components/rictu/ict_ta/index.vue";
+import create_ict from "../components/rictu/ict_ta/create.vue";
 
 //CALENDAR
 import calendar from "../components/calendar/index.vue";
@@ -142,6 +147,22 @@ const routes = [
         path:'/calendar/index',
         name:'Calendar',
         component:calendar
+       
+    },
+    {
+        path:'/rictu/ict_ta/create',
+        name:'Create ICT Technical Assistance',
+        component:create_ict
+    },
+    {
+        path:'/human_resource/employees_directory/index',
+        name:'Employees Directory',
+        component:employees_directory
+    },
+    {
+        path:'/human_resource/daily_time_record/index',
+        name:'Daily Time Record',
+        component:daily_time_record
     }
    
    

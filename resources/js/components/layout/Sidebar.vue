@@ -2,10 +2,10 @@
 .menu-icon-custom {
     font-size: 1rem;
     line-height: 1;
-    margin-right: 1rem;
+    margin-right: .50rem;
 }
 .nav-item{
-    font-family: 'Poppins';
+    font-family: 'century gothic';
 }
 .active {
     background-color: #f8f9fa; /* Apply your active background color here */
@@ -45,13 +45,12 @@
         </ul>
     </nav>
 </template>
-
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCartShopping,faGauge,faList,faChartSimple, faClipboardList, faStore,faBook,faAward,faCalendar,faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping,faGauge,faList,faChartSimple, faClipboardList, faStore,faBook,faAward,faCalendar,faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faCartShopping,faGauge,faList,faChartSimple,faClipboardList,faStore,faBook,faAward,faCalendar,faUsers,faAddressBook,faBoxArchive,faUserTie,faPlaneDeparture,faFileMedical);
+library.add(faCartShopping,faGauge,faList,faChartSimple,faClipboardList,faStore,faBook,faAward,faCalendar,faUsers,faAddressBook,faBoxArchive,faUserTie,faPlaneDeparture,faFileMedical,faComputer);
 
 export default {
     name: 'Sidebar',
@@ -74,6 +73,7 @@ export default {
                     icon: 'calendar',
                     class: 'menu-icon-custom'
                 },
+
                 
                 {
                     link: '',
@@ -125,7 +125,7 @@ export default {
                 {
                     link: '',
                     name: 'HR Section',
-                    tooltip: 'General Service Section',
+                    tooltip: 'HR Section',
                     icon: 'users',
                     class: 'menu-icon-custom',
                     children: [
@@ -136,7 +136,7 @@ export default {
                             icon: 'address-book',
                         },
                         {
-                            link: '',
+                            link: '/human_resource/daily_time_record/index',
                             name: 'Daily Time Record',
                             tooltip: 'Buttons',
                             icon: 'clipboard-list',
@@ -180,7 +180,7 @@ export default {
                             link: '/rictu/ict_ta/index',
                             name: 'ICT TA',
                             tooltip: 'Buttons',
-                            icon: 'list',
+                            icon: 'computer',
                         },
                         // {
                         //     link: '/ict/reports/view',

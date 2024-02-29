@@ -1,7 +1,14 @@
 @import url(https://fonts.googleapis.com/css?family=Nunito);
+<<<<<<< HEAD
 @charset "UTF-8"; /*!
  * Bootstrap  v5.3.3 (https://getbootstrap.com/)
  * Copyright 2011-2024 The Bootstrap Authors
+=======
+@charset "UTF-8";
+/*!
+ * Bootstrap  v5.3.0 (https://getbootstrap.com/)
+ * Copyright 2011-2023 The Bootstrap Authors
+>>>>>>> 1a475b73baa5d2a5edefeb15e3f666d9cec1e302
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 :root,

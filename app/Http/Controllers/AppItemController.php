@@ -55,7 +55,6 @@ class AppItemController extends Controller
             item_category.item_category_title as `item_category_title`,
             mode_of_proc.mode_of_proc_title as `mode_of_proc_title`
 
-
         '))
             ->join('source_of_funds', 'tbl_app.source_of_funds_id', '=', 'source_of_funds.id')
             ->join('pmo', 'tbl_app.pmo_id', '=', 'pmo.id')

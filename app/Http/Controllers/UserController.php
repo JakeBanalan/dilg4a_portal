@@ -55,6 +55,7 @@ class UserController extends Controller
     {
             $query = User::selectRaw('
             pmo.pmo_title,
+            pmo.id,
             tblposition.position_title,
             users.name as name,
             users.email as email

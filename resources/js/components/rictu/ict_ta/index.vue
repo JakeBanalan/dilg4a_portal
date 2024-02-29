@@ -48,60 +48,64 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
+
+
                             <div class="card">
                                 <div class="card-body">
-                                    <button class="btn btn-success">
-                                        <router-link style="color:#fff;" :to="{name: 'Create ICT Technical Assistance'}"> Create Request </router-link>
-                                        </button>
-                                </div>
-                            </div>
+                                    <div class="card-title">
+                                        <h4><font-awesome-icon :icon="['fas', 'search']" />&nbsp;ADVANCED FILTER</h4>
+                                    </div>
+                                    <div class="row">
 
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="card-title">
-                                    <h5><font-awesome-icon :icon="['fas', 'search']" />&nbsp;Advanced Filter</h5>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-3">
-                                        <TextInput label="Control Number" v-model="abstract_no" :value="abstract_no" />
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <TextInput label="Requested By" v-model="abstract_no" :value="abstract_no" />
-                                    </div>
-                                    <div class="col-lg-3">
-                                        <div class="form-group">
-                                            <label>Office</label>
-                                            <multiselect v-model="selected" :options="options"> </multiselect>
+                                        <div class="col-lg-3">
+                                            <TextInput label="Control Number" iconValue="calendar" v-model="abstract_no"
+                                                :value="abstract_no" />
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <TextInput label="Requested By" iconValue="user" v-model="abstract_no"
+                                                :value="abstract_no" />
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <div class="form-group">
+                                                <label>Office</label>
+                                                <multiselect v-model="selected" :options="options"> </multiselect>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <TextInput label="Request Type" v-model="abstract_no" :value="abstract_no" />
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <TextInput label="Requested Date" iconValue="calendar" v-model="abstract_no"
+                                                :value="abstract_no" />
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <TextInput label="Quarter" v-model="abstract_no" :value="abstract_no" />
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <TextInput label="Status" iconValue="bars-progress" v-model="abstract_no"
+                                                :value="abstract_no" />
                                         </div>
                                     </div>
-                                    <div class="col-lg-3">
-                                        <TextInput label="Request Type" v-model="abstract_no" :value="abstract_no" />
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <TextInput label="Requested Date" v-model="abstract_no" :value="abstract_no" />
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <TextInput label="Quarter" v-model="abstract_no" :value="abstract_no" />
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <TextInput label="Status" v-model="abstract_no" :value="abstract_no" />
-                                    </div>
-                                </div>
-                                <button type="button" class="btn btn-success" style="float:right;">Filter</button>
-                                <button type="button" class="btn btn-primary mr-3" style="float:right;">Clear</button>
+                                    <button class="btn btn-success" style="background-color:#059886">
+                                        <router-link style="color:#fff;" :to="{ name: 'Create ICT Technical Assistance' }">
+                                            Create Request </router-link>
+                                    </button>
+                                    <button type="button" class="btn btn-success" style="float:right;background-color:#059886">Filter</button>
+                                    <button type="button" class="btn btn-primary mr-3" style="float:right;">Clear</button>
 
-                            </div>
-                        </div>
-                        <div class="card mt-4">
-                            <div class="card-body">
-                                <div class="card-title">
-                                    <h5 class="card-title"><font-awesome-icon
-                                            :icon="['fas', 'list']"></font-awesome-icon>&nbsp;ICT Technical Assistance
-                                        Monitoring
-                                    </h5>
                                 </div>
-                                <div class="table-responsive">
-                                    <ICTTable />
+                            </div>
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <div class="card-title">
+                                        <h5 class="card-title"><font-awesome-icon
+                                                :icon="['fas', 'list']"></font-awesome-icon>&nbsp;ICT Technical Assistance
+                                            Monitoring
+                                        </h5>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <ICTTable />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +114,7 @@
             </div>
         </div>
     </div>
-</div></template>
+</template>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <script>
@@ -135,14 +139,13 @@ export default {
     name: 'ICT Technical Assistance',
     data() {
         return {
-            ict: [],
             abstract_no: null,
             selected: null,
             options: ["A", "b", "c"],
         }
     },
     methods: {
-
+        
     },
     components: {
         Navbar,

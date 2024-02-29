@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const fetchUserData = function (userId) {
+const fetchUserData = function (userId, url) {
     if (window.location.pathname.startsWith('/procurement/rfq')) {
         return axios.get(`../../api/fetchUser/${userId}`)
             .then((response) => {
@@ -12,7 +12,7 @@ const fetchUserData = function (userId) {
                 return null; // or handle the error appropriately
             });
     } else {
-        return axios.get(`../api/fetchUser/${userId}`)
+        return axios.get(`${url}/${userId}`)
             .then((response) => {
                 return response.data;
             }).catch(error => {
@@ -20,10 +20,8 @@ const fetchUserData = function (userId) {
                 return null; // or handle the error appropriately
             });
     }
-
-
-
 };
+
 
 
 const countTotalItem = function (cur_year) {
