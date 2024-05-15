@@ -253,7 +253,21 @@ methods: {
         this.$store.commit('setUserId', 'newUserId');
         console.log('User ID updated:', this.$store.state.userId);
     },
-},
+    fetchUserData() {
+      axios.get('/api/user', {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      })
+      .then(response => {
+        this.user = response.data;
+      })
+      .catch(error => {
+        console.error('Request failed:', error);
+      });
+    }
+  }
+
 
 
 }

@@ -8,19 +8,19 @@
                         period time a user is actively engaged with your website, page or app, etc</p>
                     <div class="d-flex flex-wrap mb-5">
                         <div class="mr-5 mt-3">
-                            <p class="text-muted">Order value</p>
+                            <p class="text-muted">Purchase Request</p>
                             <h3 class="text-primary fs-30 font-weight-medium">12.3k</h3>
                         </div>
                         <div class="mr-5 mt-3">
-                            <p class="text-muted">Orders</p>
+                            <p class="text-muted">RFQ</p>
                             <h3 class="text-primary fs-30 font-weight-medium">14k</h3>
                         </div>
                         <div class="mr-5 mt-3">
-                            <p class="text-muted">Users</p>
+                            <p class="text-muted">Awarrding</p>
                             <h3 class="text-primary fs-30 font-weight-medium">71.56%</h3>
                         </div>
                         <div class="mt-3">
-                            <p class="text-muted">Downloads</p>
+                            <p class="text-muted">Purchase Order</p>
                             <h3 class="text-primary fs-30 font-weight-medium">34040</h3>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
-                        <p class="card-title">Sales Report</p>
+                        <p class="card-title">Monitoring of Customer Satisfaction Survey</p>
                         <a href="#" class="text-info">View all</a>
                     </div>
                     <p class="font-weight-500">The total number of sessions within the date range. It is the
@@ -161,12 +161,12 @@ export default {
                     data: {
                         labels: ["Jan", "Feb", "Mar", "Apr", "May"],
                         datasets: [{
-                            label: 'Offline Sales',
+                            label: 'Pending Survey',
                             data: [480, 230, 470, 210, 330],
                             backgroundColor: '#98BDFF'
                         },
                         {
-                            label: 'Online Sales',
+                            label: 'Completed Survey',
                             data: [400, 340, 550, 480, 170],
                             backgroundColor: '#4B49AC'
                         }

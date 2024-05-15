@@ -9,39 +9,39 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseRequestModel;
+use Laravel\Passport\HasApiTokens; // Import HasApiTokens trait
 
-use Hash;
+
+
+use Illuminate\Support\Facades\Hash;
+
 
 class UserController extends Controller
 {
-    // public function login(Request $request)
-    // {
-    //     $request->validate([
-    //         'email' => 'required|string|email',
-    //         'password' => 'required'
-    //     ]);
-    //     $email = $request->email;
-    //     $password = $request->password;
 
-    //     if (Auth::attempt(['email' => $email, 'password' => $password,])) {
-    //         return response()->json(Auth::user(), 200);
-    //     }
-    //     throw ValidationException::withMessages([
-    //         'email' => ['Username and password are incorrect.' . $password . '' . $email]
-    //     ]);
-    // }
+ 
+
+
     public function login(Request $request)
     {
-        $user = User::where('email', $request->input('email'))
-            ->where('password', $request->input('password'))
+        $hashPass = hash('sha256', $request->password);
+        $user = User::where('username', $request->input('username'))
+            ->where('password', $hashPass)
             ->first();
-
+          
         if ($user) {
+            $token = $user->createToken('auth-token')->plainTextToken;
+
+            User::where('id',$user->id)
+            ->update([
+                'api_token' => $token
+            ]);
             return response()->json([
                 'status' => true,
                 'message' => 'Success',
-                'userId' => $user->id, // Assuming 'id' is the user ID field in your User model
-
+                'api_token' => $token,
+                'user_role' => $user->user_role,
+                'userId' => $user->id, 
             ]);
         } else {
             return response()->json([
@@ -50,14 +50,14 @@ class UserController extends Controller
             ]);
         }
     }
-
+   
     public function fetchUserData($userId)
     {
-            $query = User::selectRaw('
+        $query = User::selectRaw('
             pmo.pmo_title,
             pmo.id,
             tblposition.position_title,
-            users.name as name,
+            CONCAT(users.last_name," ", users.first_name," ",users.middle_name)  as name,
             users.email as email
             ')
             ->leftJoin('pr', 'pr.action_officer', '=', 'users.id')
@@ -84,6 +84,11 @@ class UserController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        $user = Auth::guard('api')->user();
+        if ($user) {
+            $user->tokens()->delete(); // Invalidate all user tokens
+        }
+
+        return response()->json(['message' => 'Successfully logged out'], 200);
     }
 }

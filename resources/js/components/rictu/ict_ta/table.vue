@@ -2,6 +2,10 @@
 td {
     text-align: center;
 }
+
+th {
+    text-align: center;
+}
 </style>
 <template>
     <div>
@@ -10,11 +14,14 @@ td {
                 <tr role="row">
                     <th rowspan="2" style="width:6%!important;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
                         colspan="1" aria-label="ACTIONS: activate to sort column ascending">ACTIONS</th>
-                    <th rowspan="2" style="width:6%!important;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
-                        colspan="1" aria-label="ACTIONS: activate to sort column ascending">SURVEY LINK</th>
+                    <th rowspan="2" style="width:5%!important;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
+                        colspan="1" aria-label="STATUS: activate to sort column ascending">STATUS</th>
                     <th rowspan="2" style="width: 10%;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
                         colspan="1" aria-label="ICT TECHNICAL ASSISTANCE REFERENCE NO.: activate to sort column ascending">
                         ICT TECHNICAL ASSISTANCE REFERENCE NO.</th>
+                    <th rowspan="2" style="width:6%!important;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
+                        colspan="1" aria-label="ACTIONS: activate to sort column ascending">SURVEY LINK</th>
+
                     <th colspan="2" scope="colgroup" style="text-align: center;" rowspan="1">RECEIVED</th>
                     <th rowspan="2" style="width: 10%;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
                         colspan="1" aria-label="NAME OF THE END-USER: activate to sort column ascending"> NAME OF THE
@@ -31,8 +38,7 @@ td {
                     <th colspan="2" scope="colgroup" rowspan="1">COMPLETED</th>
                     <th rowspan="2" style="width: 5%;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
                         colspan="1" aria-label="TYPE OF REQUEST: activate to sort column ascending">TYPE OF REQUEST</th>
-                    <th rowspan="2" style="width:5%!important;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
-                        colspan="1" aria-label="STATUS: activate to sort column ascending">STATUS</th>
+
 
                 </tr>
                 <tr role="row">
@@ -49,25 +55,67 @@ td {
             <tbody>
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
                     <td>
-                        <button class="btn    btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="received_request(ict_data.id)"><font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon></button>
-                        <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"><font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon></button>
-                        <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"><font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon></button>
+                        <div v-if="ict_data.status === 'Received'">
+                            <!-- Render buttons for viewing and opening modal -->
+                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                @click="view_ict_form(ict_data.id)">
+                                <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                            </button>
+                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                @click="openModal(ict_data.id)">
+                                <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
+                            </button>
+                        </div>
+                        <div v-else-if="ict_data.status === 'Completed'">
+                            <!-- Render buttons for viewing and opening modal -->
+                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                @click="view_ict_form(ict_data.id)">
+                                <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                            </button>
+                        </div>
+                        <div v-else>
+                            <!-- Render button for marking as received -->
+                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                @click="received_request(ict_data.id)">
+                                <font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon>
+                            </button>
+                            <!-- Render buttons for viewing and opening modal -->
+                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                @click="view_ict_form(ict_data.id)">
+                                <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                            </button>
+                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                @click="openModal(ict_data.id)">
+                                <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
+                            </button>
+                        </div>
+                        
+                       
+                       
                     </td>
-                    <td> https://ecsm.dilg.gov.ph/?survey=2vgomscuf </td>
-                    <td>R4A-{{ ict_data.control_no }}<br><i>~Request Date: {{ ict_data.requested_date }}</i>~</td>
-                    <td>~</td>
-                    <td>~</td>
+                    <td>{{ ict_data.status }}</td>
+                    <td><b>R4A-{{ ict_data.control_no }}</b><br><i>~Request Date: {{ formatDate(ict_data.requested_date)
+                    }}</i>~</td>
+                    <td v-if="ict_data.status_id == 3"> 
+                        <button class="btn btn-primary mr-1" style="background-color:#059886;color:#fff;" >
+                               <font-awesome-icon :icon="['fas', 'square-poll-vertical']" /> 
+                               <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>
+                            </button>
+                    </td>
+                    <td v-else> ~ </td>
+                    
+
+                    <td> {{ formatDate(ict_data.received_date) }}</td>
+                    <td> {{ formatTime(ict_data.received_date) }}</td>
                     <td>{{ ict_data.requested_by }}</td>
                     <td>{{ ict_data.office }}</td>
-                    <td style="white-space: pre-wrap;text-align:justify;">{{ ict_data.remarks }} </td>
+                    <td style="white-space:normal;text-align:justify;">{{ ict_data.remarks }} </td>
                     <td>{{ ict_data.ict_personnel }}</td>
-                    <td>{{ ict_data.office }}</td>
-                    <td>{{ ict_data.office }}</td>
+                    <td> {{ formatDate(ict_data.completed_date) }}</td>
+                    <td> {{ formatTime(ict_data.completed_date) }}</td>
+                    <td> <span class="badge badge-success">{{ ict_data.request_type }} - {{ ict_data.sub_request_type
+                    }}</span> </td>
 
-
-                    <td> <span class="badge badge-success">{{ ict_data.type_of_request }}</span> </td>
-
-                    <td>{{ ict_data.office }}</td>
 
 
 
@@ -78,30 +126,51 @@ td {
         <Pagination :total="ict_data.length" @pageChange="onPageChange" />
 
     </div>
+    <modal_complete_ta :visible="modalVisible" @close="closeModal" 
+        :id="selected_id"
+        :control_no="control_no"
+        :requested_by="requested_by"
+        :office="office"
+        :request_date="request_date"
+        :request_type="request_type"
+        :sub_request_type="sub_request_type"/>
 </template>
 <script>
 import Pagination from '../../procurement/Pagination.vue';
+import modal_complete_ta from '../modal/modal_complete_ta.vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faEye, faLayerGroup, faCircleCheck } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
 
-library.add(faEye, faLayerGroup, faCircleCheck);
+library.add(faEye, faLayerGroup, faCircleCheck,faSquarePollVertical);
 export default {
     name: 'ict table',
     components: {
         Pagination,
-        FontAwesomeIcon
+        FontAwesomeIcon,
+        modal_complete_ta
     },
     data() {
         return {
             ict_data: [],
             currentPage: 1,
             itemsPerPage: 10,
+            modalVisible: false,
+            selected_id: null,
+
+            id: null,
+            control_no: null,
+            requested_by: null,
+            office:null,
+            request_date:null,
+            request_type:null,
+            sub_request_type:null,
         }
+            
     },
     computed: {
-        
+
         totalPages() {
             return Math.ceil(this.ict_data.length / this.itemsPerPage);
         },
@@ -113,9 +182,46 @@ export default {
     },
     mounted() {
         this.load_ict_request()
+        // load the data when the user click the control_no to be completed
+        // then pass the control_no and id to the modal
+
     },
     methods: {
+        openModal(id) {
+            this.selected_id = id;
+            this.fetch_ict_req_details();
 
+            this.modalVisible = true;
+        },
+        closeModal() {
+            this.modalVisible = false;
+        },
+        formatTime(date) {
+            if (!date || date === '0000-00-00') {
+                return null; // Return null if the date is null or '0000-00-00'
+            } else {
+                const formattedDate = new Date(date).toLocaleString('en-US', {
+
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric'
+                });
+                return formattedDate;
+            }
+        },
+        formatDate(date) {
+            if (!date || date === '0000-00-00') {
+                return null; // Return null if the date is null or '0000-00-00'
+            } else {
+                const formattedDate = new Date(date).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+
+                });
+                return formattedDate;
+            }
+        },
         load_ict_request() {
             axios.get(`../../api/fetch_ict_request`)
                 .then(response => {
@@ -126,14 +232,33 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
+        fetch_ict_req_details() {
+            const id = this.selected_id
+            axios.post(`../../api/fetch_ict_req_details`, {
+                control_id: id
+            })
+                .then(response => {
+                    this.control_no         = response.data.control_no
+                    this.requested_by       = response.data.requested_by
+                    this.office             = response.data.office
+                    this.request_date       = response.data.request_date
+                    this.request_type       = response.data.request_type
+                    this.sub_request_type   = response.data.sub_request_type
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        view_ict_form(id) {
+            this.$router.push({ path: '/rictu/ict_ta/view', query: { id: id } });
+        },
         onPageChange(page) {
             this.currentPage = page;
             // Fetch data for the new page
             this.loadData();
         },
         received_request(id) {
-            console.log(id)
-        const userId = localStorage.getItem('userId');
+            const userId = localStorage.getItem('userId');
 
             axios.post('/api/post_received_ict_request', {
                 control_no_id: id,
@@ -143,16 +268,14 @@ export default {
                 toast.success('Success! This request has been received!', {
                     autoClose: 2000
                 });
-
-                setTimeout(() => {
-                    this.$router.push({ name: 'ICT Technical Assistance' });
-                }, 2000); // Adjust the delay as needed
+           this.load_ict_request();
 
             }).catch((error) => {
 
             })
 
-        }
+        },
+       
     }
 }
 

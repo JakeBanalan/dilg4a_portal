@@ -39,7 +39,7 @@ img {
                                         </div>
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <TextInput label="Control Number" v-model="ict_no" :value="ict_no"
+                                                <TextInput label="Control Number" iconValue="gear" v-model="ict_no" :value="ict_no"
                                                     :readonly="true" />
                                             </div>
 
@@ -65,10 +65,10 @@ img {
                                                     v-model="userData.requested_date" :value="userData.requested_date" />
                                             </div>
                                             <div class="col-lg-6">
-                                                <TextInput label="Agreed Timeline if any:" :readonly="false" />
+                                                <TextInput label="Agreed Timeline if any:" iconValue="check-circle" :readonly="false" />
                                             </div>
                                         </div>
-                                    </div>
+                                </div>
                                 </div>
                             </div>
                             <div class="col-lg-6">
@@ -111,16 +111,16 @@ img {
                                             <div class="col-lg-6 mb-4">
                                                 <div class="form-group">
                                                     <label>TYPE OF REQUEST (CHOOSE THAT ALL APPLY)</label>
-                                                    <vue-multiselect v-model="selectedType" :options="options" label="label"
-                                                        :multiple="false"></vue-multiselect>
+                                                    <multiselect v-model="selectedType" :options="options" label="label"
+                                                        :multiple="false"></multiselect>
                                                 </div>
                                             </div>
                                             <div class="col-lg-6 mb-4">
                                                 <div class="form-group">
                                                     <label>NAME OF SUB REQUEST</label>
-                                                    <vue-multiselect v-model="selectedSubRequest"
+                                                    <multiselect v-model="selectedSubRequest"
                                                         :options="filteredSubRequests" label="label"
-                                                        :multiple="false"></vue-multiselect>
+                                                        :multiple="false"></multiselect>
                                                 </div>
                                             </div>
 
@@ -133,7 +133,7 @@ img {
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-12">
+                            <!-- <div class="col-lg-12">
                                 <div class="card mt-4">
                                     <div class="card-body">
                                         <div class="row">
@@ -149,20 +149,20 @@ img {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-lg-12">
                                 <div class="card mt-4">
                                     <div class="card-body">
 
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <TextInput label="Acceptance of Service Rendered" v-model="acceptance"
+                                                <TextInput label="Acceptance of Service Rendered" iconValue="user" v-model="acceptance"
                                                     :value="userData.name" :readonly="true" />
 
 
                                             </div>
                                             <div class="col-lg-6">
-                                                <TextInput label="ICT Technical Personnel " v-model="ict_personnel" />
+                                                <TextInput label="ICT Technical Personnel " iconValue="user" v-model="ict_personnel" />
                                             </div>
                                         </div>
                                     </div>
@@ -185,6 +185,7 @@ img {
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import Multiselect from 'vue-multiselect'
 
 library.add(faCircleInfo);
 import Navbar from '../../layout/Navbar.vue';
@@ -291,7 +292,6 @@ export default {
         },
         create_ict_ta() {
             const userId = localStorage.getItem('userId');
-            console.log(this.userData.requested_date);
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
                     axios.post('/api/post_create_ict_request', {
@@ -306,7 +306,8 @@ export default {
                         equipment_sn:    this.hardwareInfo.eSerial,
                         type_of_request: this.selectedType.value,
                         subRequest:      this.selectedSubRequest.value,
-                        remarks:         this.remarks
+                        remarks:         this.remarks,
+                        status:          1
 
                     }).then(() => {
                         this.showToatSuccess('Successfully added!');
@@ -362,6 +363,7 @@ export default {
         FooterVue,
         BreadCrumbs,
         FontAwesomeIcon,
+        Multiselect
 
     },
 }

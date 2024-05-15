@@ -36,6 +36,17 @@ class AppItemController extends Controller
             ->limit(1000)
             ->get());
     }
+    public function app_category()
+    {
+        return response()->json(AppItemModel::select('item_category.id','item_category.item_category_title')
+        ->join('item_category', 'item_category.id', '=', 'tbl_app.category_id')
+        ->where('app_year', 2022)
+        ->groupBy('item_category.id','item_category.item_category_title')
+        ->orderBy('item_category.id')
+
+        ->limit(1000)
+        ->get());
+    }
     public function fetchAppData()
     {
         // return response()->json(AppItemModel::all());
@@ -89,5 +100,9 @@ class AppItemController extends Controller
 
         ]);
         $app_item->save();
+    }
+    public function post_complete_ta()
+    {
+        echo 'a';
     }
 }

@@ -3,6 +3,9 @@
 .input-group-prepend{
   height: 40px !important;
 }
+.icon{
+  color:#059886;
+}
 
 </style>
 <template>
@@ -12,7 +15,7 @@
       <div class="input-group-prepend">
         <span class="input-group-text">
           <!-- Add your icon here -->
-          <font-awesome-icon :icon="[ 'fas', iconValue ]" />
+          <font-awesome-icon :icon="[ 'fas', iconValue ]" class="icon" />
         </span>
       </div>
       <input v-bind="$attrs" v-model="internalValue" class="form-control" :placeholder="placeholder" :type="type" :readonly="readonly" />
@@ -23,9 +26,9 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBars, faBarsProgress, faBuilding, faCalendar, faCopyright, faEnvelopeOpenText, faHashtag, faServer, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faBarsProgress, faBuilding, faCalendar, faCheckCircle, faCopyright, faEnvelope, faEnvelopeOpenText, faGear, faHashtag, faPesoSign, faQuestion, faServer, faUser, faUserGear } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faCalendar,faUser,faBarsProgress,faEnvelopeOpenText,faServer,faCopyright,faHashtag,faBuilding,faBars);
+library.add(faCalendar,faUser,faBarsProgress,faEnvelope,faEnvelopeOpenText,faServer,faCopyright,faHashtag,faBuilding,faBars,faGear,faUserGear,faPesoSign,faCheckCircle,faQuestion);
 
 export default {
   components: {

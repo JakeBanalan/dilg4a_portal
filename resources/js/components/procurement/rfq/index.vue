@@ -1,4 +1,18 @@
 <style>
+th,
+td {
+    padding: 8px;
+    /* Optional: Add padding for better spacing */
+    white-space: nowrap;
+    /* Prevent text from wrapping */
+    overflow: hidden;
+    /* Hide overflow content */
+    text-overflow: ellipsis;
+    /* Display ellipsis (...) for overflowed text */
+    max-width: 300px;
+    /* Maximum width of cells */
+}
+
 .profile_img {
     width: 100px;
     height: 100px;
@@ -77,221 +91,143 @@
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <div class="row">
-                        <div class="col-md-12 grid-margin mb-4 stretch-card">
-
-                            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                                <div class="card card-dark-blue">
-                                    <div class="card-body">
-                                        <p class="mb-4">APP Item Encoded</p>
-                                        <p class="fs-30 mb-2">197</p>
-                                        <p>10.00% (as of today)</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                                <div class="card card-dark-blue">
-                                    <div class="card-body">
-                                        <p class="mb-4">APP Item with same Stock No</p>
-                                        <p class="fs-30 mb-2">61344</p>
-                                        <p>22.00% (30 days)</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                                <div class="card card-dark-blue">
-                                    <div class="card-body">
-                                        <p class="mb-4">Newly Encoded App Item</p>
-                                        <p class="fs-30 mb-2">34040</p>
-                                        <p>2.00% (30 days)</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 card-dark-bluecol-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                                <div class="card card-dark-blue">
-                                    <div class="card-body">
-                                        <p class="mb-4">App Item without Office</p>
-                                        <p class="fs-30 mb-2">47033</p>
-                                        <p>0.22% (30 days)</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <StatBox />
                         <div class="col-lg-12 col-md-12 col-sm-12">
-
-                            <button type="button" class="btn btn-success btn-sm" @click="openModal()">Create RFQ</button>
-                            
                             <div class="card">
                                 <div class="card-body">
+                                    <div class="card-title d-flex justify-content-between align-items-center">
+                                        <h5 class="card-title">
+                                            <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Create
+                                            RFQ
+                                        </h5>
+                                        <div class="d-flex">
+                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                                @click="openModal()">
+                                                Create RFQ
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                                Advanced Search
+                                            </button>
+                                        </div>
+                                    </div>
+
                                     <div class="table-responsive">
-                                        <table style="width: 100%;"
-                                            class="table table-striped display expandable-table dataTable no-footer">
+                                        <table class="table table-striped table-bordered">
 
                                             <thead>
-                                                <tr role="row">
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Select All" style="width: 61px;">
-                                                        <input type="checkbox" @change="selectAllRows($event)">
-                                                    </th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 61px;"> PURCHASE REQUEST #</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 61px;"> RFQ #.</th>
+                                                <tr>
+                                                    <th>ACTION</th>
+                                                    <th>STATUS</th>
+                                                    <th>PURCHASE REQUEST #</th>
+                                                    <th>REQUEST FOR QUOTATION #</th>
+                                                    <th>TOTAL AMOUNT</th>
+                                                    <th style="width: 10px !important;">PARTICULARS</th>
+                                                    <th>PR DATE</th>
+                                                    <th>TARGET DATE</th>
+                                                    <th>Created By</th>
 
-
-                                                    <th class="sorting" tabindex="0" aria-controls="example" rowspan="1"
-                                                        colspan="1"
-                                                        aria-label="Policy holder: activate to sort column ascending"
-                                                        style="width: 107px;">TOTAL AMOUNT</th>
-                                                    <th class="sorting" tabindex="0" aria-controls="example" rowspan="1"
-                                                        colspan="1" aria-label="Premium: activate to sort column ascending"
-                                                        style="width: 126px;">
-                                                        PURPOSE</th>
-                                                    <th class="sorting" tabindex="0" aria-controls="example" rowspan="1"
-                                                        colspan="1" aria-label="Status: activate to sort column ascending"
-                                                        style="width: 126px;">PR
-                                                        DATE</th>
-                                                    <th class="sorting" tabindex="0" aria-controls="example" rowspan="1"
-                                                        colspan="1"
-                                                        aria-label="Updated at: activate to sort column ascending"
-                                                        style="width: 93px;">
-                                                        TARGET DATE</th>
-                                                    <th class="details-control sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="" style="width: 100px;">
-                                                        STATUS</th>
-                                                    <th class="details-control sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="" style="width: 4px;"> TIME
-                                                        ELAPSED</th>
-                                                    <th class="details-control sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="" style="width: 4px;">
-                                                        CREATED BY</th>
-                                                    <th class="details-control sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="" style="width: 4px;">
-                                                        ACTION</th>
                                                 </tr>
                                             </thead>
 
                                             <tbody>
                                                 <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
-                                                    <td>
-                                                        <input type="checkbox" @change="selectRow(purchaseRequest.id)">
+                                                    <td v-if="isAdmin">
+                                                        <div v-if="purchaseRequest.status_id == 4">
+                                                            
+                                                            <button class="btn btn-icon mr-1"
+                                                                @click="toGSS(purchaseRequest.id)"
+                                                                style="background-color:#059886;color:#fff;">
+                                                                <font-awesome-icon
+                                                                    :icon="['fas', 'circle-check']"></font-awesome-icon>
+                                                            </button>
+                                                            <button class="btn btn-icon mr-1"
+                                                                style="background-color:#059886;color:#fff;"
+                                                                @click="exportRFQ(purchaseRequest.rfq_id)"> <i
+                                                                    class="ti-download" style="margin-left: -3px;"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 5">
+                                                            
+                                                            <button disabled class="btn btn-icon mr-1"
+                                                                @click="toGSS(purchaseRequest.id)"
+                                                                style="background-color:#059886;color:#fff;">
+                                                                <font-awesome-icon
+                                                                    :icon="['fas', 'circle-check']"></font-awesome-icon>
+                                                            </button>
+                                                            <button class="btn btn-icon mr-1"
+                                                                style="background-color:#059886;color:#fff;"
+                                                                @click="exportRFQ(purchaseRequest.rfq_id)"> <i
+                                                                    class="ti-download" style="margin-left: -3px;"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 6">
+                                                            <button class="btn btn-icon mr-1"
+                                                                @click="viewRFQ(purchaseRequest.id, purchaseRequest.rfq_id)"
+                                                                style="background-color:#059886;color:#fff;">
+                                                                <font-awesome-icon
+                                                                    :icon="['fas', 'eye']"></font-awesome-icon>
+                                                            </button>
+                                                            <button disabled class="btn btn-icon mr-1"
+                                                                @click="toGSS(purchaseRequest.id)"
+                                                                style="background-color:#059886;color:#fff;">
+                                                                <font-awesome-icon
+                                                                    :icon="['fas', 'circle-check']"></font-awesome-icon>
+                                                            </button>
+                                                            <button class="btn btn-icon mr-1"
+                                                                style="background-color:#059886;color:#fff;"
+                                                                @click="exportRFQ(purchaseRequest.rfq_id)"> <i
+                                                                    class="ti-download" style="margin-left: -3px;"></i>
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                     <td>
-                                                        <div class="badge badge-default"
-                                                            @click="$router.push({ path: `/procurement/view_pr/${purchaseRequest.id}` })">
-                                                            <b>{{ purchaseRequest.pr_no }}</b><br><i>~{{
-                                                                purchaseRequest.office
-                                                            }}~</i>
+                                                        <div v-if="purchaseRequest.status_id == 1"
+                                                            class="badge badge-success">{{ purchaseRequest.status }}
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 2"
+                                                            class="badge badge-success">{{ purchaseRequest.status }}
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 3"
+                                                            class="badge badge-success">{{ purchaseRequest.status }}
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 4"
+                                                            class="badge badge-success">{{ purchaseRequest.status
+                                                            }}</div>
+                                                        <div v-if="purchaseRequest.status_id == 5"
+                                                            class="badge badge-success">{{ purchaseRequest.status }}
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 6"
+                                                            class="badge badge-success">{{ purchaseRequest.status }}
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 7"
+                                                            class="badge badge-success">{{ purchaseRequest.status }}
+                                                        </div>
+                                                        <div v-if="purchaseRequest.status_id == 8"
+                                                            class="badge badge-success">{{ purchaseRequest.status }}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="badge badge-default"> <b>{{ purchaseRequest.pr_no
+                                                                }}</b><br><i>~{{ purchaseRequest.office }}~</i>
                                                         </div>
                                                     </td>
                                                     <td>
                                                         <div class="badge badge-default">
-                                                            <b>{{ purchaseRequest.rfq_no }}</b><br><i>~{{
-                                                                purchaseRequest.rfq_date }}~</i>
+                                                            <b>{{ purchaseRequest.rfq_no }}</b><br><i>~RFQ Date: {{
+                                                dateFormat(purchaseRequest.rfq_date) }}~</i>
                                                         </div>
 
                                                     </td>
 
 
                                                     <td>Php. {{ formatAmount(purchaseRequest.app_price) }}</td>
-                                                    <td>{{ purchaseRequest.particulars }}</td>
-                                                    <td>{{ purchaseRequest.pr_date }}</td>
-                                                    <td>{{ purchaseRequest.target_date }}</td>
-                                                    <td>
-                                                        <div v-if="purchaseRequest.status_id == 1"
-                                                            class="badge badge-success">
-                                                            {{
-                                                                purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 2"
-                                                            class="badge badge-primary">
-                                                            {{
-                                                                purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 3"
-                                                            class="badge badge-warning">
-                                                            {{
-                                                                purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 4"
-                                                            class="badge badge-submitted_gss">{{
-                                                                purchaseRequest.status
-                                                            }}</div>
-                                                        <div v-if="purchaseRequest.status_id == 5"
-                                                            class="badge badge-received_gss">{{
-                                                                purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 6"
-                                                            class="badge badge-with-rfq">
-                                                            {{
-                                                                purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 7"
-                                                            class="badge badge-cancelled">{{
-                                                                purchaseRequest.status }}
-                                                        </div>
-                                                    </td>
-                                                    <td>5 minutes ago</td>
+                                                    <td style="width: 10px !important;">{{ purchaseRequest.particulars
+                                                        }}</td>
+                                                    <td>{{ dateFormat(purchaseRequest.pr_date) }}</td>
+                                                    <td>{{ dateFormat(purchaseRequest.target_date) }}</td>
                                                     <td>{{ purchaseRequest.created_by }}</td>
 
-                                                    <td>
-                                                        <div v-if="this.userId == 1"
-                                                            class="template-demo d-flex justify-content-between flex-nowrap">
-                                                            <button type="button"
-                                                                class="btn btn-success btn-rounded btn-icon"
-                                                                @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
-                                                                <i class="ti-eye" style="margin-left: -3px;"></i>
-                                                            </button>
-                                                            <button type="button"
-                                                                class="btn btn-primary btn-rounded btn-icon"
-                                                                @click="toGSS(purchaseRequest.id)">
-                                                                <font-awesome-icon :icon="['fas', 'paper-plane']"
-                                                                    style="margin-left: -3px;" />
-                                                            </button>
 
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-rounded btn-icon">
-                                                                <i class="ti-trash" style="margin-left: -3px;"></i>
-                                                            </button>
-                                                            <button class="btn btn-warning btn-rounded btn-icon">
-                                                                <i class="ti-download"
-                                                                    @click="exportPurchaseRequest(purchaseRequest.id)"
-                                                                    style="margin-left: -3px;"></i>
-                                                            </button>
-                                                        </div>
-
-                                                        <div v-else-if="purchaseRequest.user_id == this.userId"
-                                                            class="template-demo d-flex justify-content-between flex-nowrap">
-                                                            <button type="button"
-                                                                class="btn btn-success btn-rounded btn-icon"
-                                                                @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
-                                                                <i class="ti-eye" style="margin-left: -3px;"></i>
-                                                            </button>
-                                                            <button type="button"
-                                                                class="btn btn-danger btn-rounded btn-icon">
-                                                                <i class="ti-trash" style="margin-left: -3px;"></i>
-
-                                                            </button>
-                                                            <button class="btn btn-warning btn-rounded btn-icon">
-                                                                <i class="ti-download"
-                                                                    @click="exportPurchaseRequest(purchaseRequest.id)"
-                                                                    style="margin-left: -3px;"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div v-else
-                                                            class="template-demo d-flex justify-content-between flex-nowrap">
-                                                            <button type="button"
-                                                                class="btn btn-success btn-rounded btn-icon" title="View PR"
-                                                                @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
-                                                                <i class="ti-eye" style="margin-left: -3px;"></i>
-                                                            </button>
-                                                            <button type="button" class="btn btn-info btn-rounded btn-icon"
-                                                                title="Submit to Budget">
-                                                                <font-awesome-icon :icon="['fas', 'paper-plane']"
-                                                                    style="margin-left: -3px;" />
-                                                            </button>
-
-                                                        </div>
-                                                    </td>
 
                                                 </tr>
                                             </tbody>
@@ -321,6 +257,7 @@ import BreadCrumbs from '../../dashboard_tiles/BreadCrumbs.vue';
 import UserInfo from '../../procurement/user_info.vue';
 import Pagination from '../Pagination.vue';
 import ModalRFQ from './modal/modal_create_rfq.vue';
+import StatBox from '../stat_board.vue';
 
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -328,6 +265,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'; // Import the libra
 import { faEye, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
 import { formatTotalAmount } from '../../../globalMethods';
+import { formatDate } from '../../../globalMethods';
 library.add(faEye, faPaperPlane);
 export default {
     name: 'Request for Quotation',
@@ -337,8 +275,9 @@ export default {
     data() {
         return {
             userId: null,
-            selected:null,
-            options:[],
+            selected: null,
+            options: [],
+            admins: [3174, 2563],
             purchaseRequests: [],
             selectedRows: [],
             currentPage: 1,
@@ -355,7 +294,8 @@ export default {
         UserInfo,
         Pagination,
         FontAwesomeIcon,
-        ModalRFQ
+        ModalRFQ,
+        StatBox
     },
     computed: {
         totalPages() {
@@ -367,21 +307,32 @@ export default {
             return this.purchaseRequests.slice(start, end);
         },
     },
+    created() {
+        this.userId = parseInt(localStorage.getItem('userId'));
+    },
     mounted() {
         this.loadData();
         this.fetchSubmittedPurchaseRequest();
+        this.userId = localStorage.getItem('userId');
+
 
     },
     methods: {
+        isAdmin() {
+            return this.admins.includes(this.userId);
+        },
         async fetchSubmittedPurchaseRequest() {
-      try {
-        const response = await axios.get('../../api/fetchSubmittedPurchaseRequest');
-        // Assuming response.data is an array of objects with 'label' and 'value' properties
-        this.options = response.data.map(item =>  item.pr_no);
-      } catch (error) {
-        console.error('Error fetching submitted purchase requests:', error);
-      }
-    },
+            try {
+                const response = await axios.get('../../api/fetchSubmittedPurchaseRequest');
+                // Assuming response.data is an array of objects with 'label' and 'value' properties
+                this.options = response.data.map(item => item.pr_no);
+            } catch (error) {
+                console.error('Error fetching submitted purchase requests:', error);
+            }
+        },
+        dateFormat(date) {
+            return formatDate(date);
+        },
         openModal() {
             this.modalVisible = true;
         },
@@ -411,7 +362,6 @@ export default {
             axios.post(`../../api/fetchSubmittedtoGSS`)
                 .then(response => {
                     this.purchaseRequests = response.data.data;
-
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -422,25 +372,26 @@ export default {
             // Fetch data for the new page
             this.loadData();
         },
-        viewPr(pr_id,) {
-            this.$router.push(`/procurement/rfq/` + pr_id);
 
-
+        viewRFQ(pr_id, rfq_id) {
+            this.$router.push({ path: '/procurement/rfq', query: { id: rfq_id, pr: pr_id } });
         },
-        exportPurchaseRequest(pr_id) {
-            window.location.href = `../../api/export-purchase-request/${pr_id}?export=true`;
+
+        exportRFQ(rfq_id) {
+            console.log(rfq_id);
+            window.location.href = `../../api/export-rfq/${rfq_id}?export=true`;
         },
         toGSS(id) {
-            const STATUS_SUBMITTED_TO_GSS = 4;
+            const STATUS_RECEIVED_BY_GSS = 5;
             axios.post(`../../api/post_update_status`, {
                 pr_id: id,
-                status: STATUS_SUBMITTED_TO_GSS,
+                status: STATUS_RECEIVED_BY_GSS,
             }
             ).then(() => {
                 toast.success('Successfully submitted to the GSS!', {
                     autoClose: 2000
                 });
-                location.reload();
+                this.loadData();
             }).catch((error) => {
 
             })

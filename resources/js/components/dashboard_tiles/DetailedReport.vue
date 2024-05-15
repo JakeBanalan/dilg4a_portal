@@ -1,13 +1,19 @@
+<style>
+.card-title{
+  color: #059886;
+}
+
+</style>
 <template>
-  <div class="card card_shadow">
+  <div class="card">
     <div class="card-body">
    
       <div class="card">
         <div class="card-body">
-          <p class="card-title">Annual Procurement Plan for F.Y 2023</p>
+          <p class="card-title">
+            <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp; Purchase Request List</p>
           <div class="box-tools">
-            <button @click="toCreatePR()" type="button" class="btn btn-primary btn-icon-text">
-              <i class="ti-plus btn-icon-prepend"></i>
+            <button @click="toCreatePR()" type="button" class="btn btn-outline-primary btn-fw btn-icon-text">
               Create PR
             </button>
           </div>
@@ -39,11 +45,17 @@
 </template>
 <script>
 import procurement_table from '../../components/procurement/procurement_table.vue';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
+import { faList } from '@fortawesome/free-solid-svg-icons';
 
+
+library.add(faList);
 export default {
   name: 'DetailedReport',
   components: {
-    procurement_table
+    procurement_table,
+    FontAwesomeIcon
   },
   mounted() {
   },

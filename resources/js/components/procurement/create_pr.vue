@@ -1,6 +1,14 @@
 <style>
+.select-option {
+  height: 40px;
+}
+
+.date-option {
+  height: 40px;
+}
+
 .container .card {
-  height: 840px;
+  height: auto;
   width: auto;
   background-color: #fff;
   position: relative;
@@ -448,231 +456,56 @@ select {
         <div class="content-wrapper">
           <BreadCrumbs />
           <div class="row">
-            <div class="col-lg-2">
-              <div class="card card_shadow">
-                <div class="card-body" style="height: 320px;text-align: center;">
-                  <img src="../../../assets/logo.png" class="profile_img">
-                  <div class="user_info">
-                    <p>Office:</p>
-                    <p>ORD-RICTU</p>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div class="card">
+                <div class="card-body">
+                  <div class="card-title d-flex justify-content-between align-items-center">
+                    <h5 class="card-title">
+                      <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Create Purchase Request Item
+                    </h5>
                   </div>
-                  <div class="user_info">
-                    <p>Position:</p>
-                    <p>Database Admin</p>
-                  </div>
-                  <div class="user_info">
-                    <p>Cancelled PR:</p>
-                    <p>10</p>
-                  </div>
-                  <div class="user_info">
-                    <p>Total PR's:</p>
-                    <p>10</p>
-                  </div>
-                </div>
-              </div>
-              <div class="card card_shadow" style="margin-top: 10px;">
-                <div class="card-body" style="height: 500px;">
-                  <h5>Supplier Rankings</h5><select class="form-control">
-                    <option>This Week</option>
-                    <option>This Month</option>
-                    <option>This Year</option>
-                  </select>
-                  <div class="card" style="margin-top: 10px;">
-                    <div class="card-body" style="height: 90px;">
-                      <div class="media" style="margin-top: -25px;">
-                        <div style="width: 65px; height: 65px;">
-                          <img src="../../../assets/logo.png" alt="..."
-                            style="margin-top:10px;border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
-                        </div>
-                        <div class="media-body">
-                          <div class="media-content" style="margin-top:5%;">Supplier Title<br>
-                          </div>
-                          <div class="media-content">0955136565</div>
-                          <div class="media-content">Calamba City, Laguna</div>
-                        </div>
-                      </div>
-                      <p class="rank_wrapper rank_banner">1st</p>
+                  <div class="row">
+                    <div class="col-lg-3">
+                      <TextInput label="Purchase Request No." iconValue="circle-question" v-model="purchase_no"
+                        :value="purchase_no" :readonly="true" />
                     </div>
                   </div>
-                  <div class="card" style="margin-top: 10px;">
-                    <div class="card-body" style="height: 90px;">
-                      <div class="media" style="margin-top: -25px;">
-                        <div style="width: 65px; height: 65px;">
-                          <img src="../../../assets/logo.png" alt="..."
-                            style="border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
-                        </div>
-                        <div class="media-body">
-                          <div class="media-content"><small>Supplier Title</small><br></div>
-                          <div class="media-content" style="margin-top:-1%;"></div>
-                          <div class="media-content" style="margin-top:-2%;"></div>
-                        </div>
-                      </div>
-                      <p class="rank_wrapper rank_banner2">2nd</p>
+                  <div class="row">
+                    <div class="col-lg-3">
+                      <SelectInput label="Office" v-model="prData.pmo" class="select-option">
+                        <option v-for="option in pmo" :key="option.value" :value="option.value">{{ option.label }}
+                        </option>
+                      </SelectInput>
+                      
+
                     </div>
-                  </div>
-                  <div class="card" style="margin-top: 10px;">
-                    <div class="card-body" style="height: 90px;">
-                      <div class="media" style="margin-top: -25px;">
-                        <div style="width: 65px; height: 65px;">
-                          <img src="../../../assets/logo.png" alt="..."
-                            style="border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
-                        </div>
-                        <div class="media-body">
-                          <div class="media-content"><small>Supplier Title</small><br></div>
-                          <div class="media-content" style="margin-top:-1%;"></div>
-                          <div class="media-content" style="margin-top:-2%;"></div>
-                        </div>
-                      </div>
-                      <p class="rank_wrapper rank_banner3">3rd</p>
+                    <div class="col-lg-3">
+                      <SelectInput label="Procurement Type" v-model="prData.pr_type" class="select-option">
+                        <option v-for="option in pr_type" :key="option.value" :value="option.value">{{ option.label }}
+                        </option>
+                      </SelectInput>
+                    </div>
+                    <div class="col-lg-3">
+                      <TextInput class="date-option" v-model="prData.pr_date" label="PR Date"
+                        iconValue="circle-question" type="date" />
+                    </div>
+                    <div class="col-lg-3">
+                      <TextInput class="date-option" v-model="prData.target_date" label="Target Date"
+                        iconValue="circle-question" type="date" />
+                    </div>
+                    <div class="col-lg-12 mt-4">
+                      <TextAreaInput label="Particulars" v-model="prData.particulars" />
+                    </div>
+                    <div class="col-lg-12">
+                      <button class="btn btn-outline-primary" style="float:right;"
+                        @click="post_create_pr();">Create</button>
                     </div>
                   </div>
 
                 </div>
               </div>
+
             </div>
-            <div class="col-md-10 grid-margin mb-4 stretch-card">
-              <div class="container">
-                <div class="card" style="margin-left: -2%;">
-                  <div class="form">
-                    <div class="left-side">
-                      <div class="left-heading">
-                        <h3>{{current_step}}Create Purchase Request</h3>
-                      </div>
-                      <div class="steps-content">
-                        <h3>
-                          Step <span class="step-number">{{ formnumber + 1 }}</span>
-                        </h3>
-                        <p v-for="(content, index) in stepNumContent" :key="index"
-                          :class="{ 'step-number-content': true, active: index === formnumber, 'd-none': index !== formnumber, }">
-                          {{ content }} </p>
-                      </div>
-                      <ul class="progress-barv2" style="background-color: #30476 !important">
-                        <li v-for="(step, index) in steps" :key="index" :class="{ active: index === formnumber }">
-                          {{ step }}
-                        </li>
-                      </ul>
-                    </div>
-                    <div class="right-side">
-
-
-                      <div v-for="(main, index) in mainForms" :key="index" class="main"
-                        :class="{ active: index === formnumber }">
-                        <small><i class="fa fa-smile-o"></i></small>
-                        <div class="text">
-                          <h2>{{ main }}</h2>
-                          <p>{{ stepNumContent[index] }}</p>
-                        </div>
-                        <!-- Your existing form inputs go here -->
-                        <!-- Your form inputs go here -->
-                        <div class="input-text" :style="{ display: shouldDisplayInput(0) }">
-                          <div class="input-div" v-if="index === 0">
-                            <input v-model="purchase_no" type="text" :readonly="isPurchaseNoEditable" />
-                          </div>
-                        </div>
-
-                        <!-- Step #1 -->
-                        <div class="row">
-                          <div class="col-md-12 col-sm-12 col-xs-12 col-lg-6">
-                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
-                              <label for="Office">Office</label>
-                              <select class="form-control" v-model="purchaseRequestData.pmo">
-                                <option v-for="option in pmo" :key="option.value" :value="option.value">{{ option.label
-                                }}</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
-                              <label for="exampleInputPassword1">Procurement Type</label>
-                              <select class="form-control" v-model="purchaseRequestData.pr_type">
-                                <option v-for="option in procurementType" :key="option.value" :value="option.value">{{
-                                  option.label
-                                }}</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
-                              <label for="exampleInputPassword1">Purchase Request Date</label>
-                              <input type="date" v-model="purchaseRequestData.pr_date" class="form-control" required />
-                            </div>
-                          </div>
-                          <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
-                              <label for="exampleInputPassword1">Target Date</label>
-                              <input type="date" v-model="purchaseRequestData.target_date" class="form-control"
-                                required />
-                            </div>
-                          </div>
-                          <div class="col-lg-12">
-                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
-                              <label for="exampleInputPassword1">Particulars</label>
-                              <textarea v-model="purchaseRequestData.particulars" class="form-control"> </textarea>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="input-text" :style="{ display: shouldDisplayInput(2) }">
-                          <div class="input-div" v-if="index === 2">
-                            <p v-if="index === 2" class="pull-right" style="margin-top:-30px;">My Cart: {{
-                              getSelectedItemCount() }}</p>
-
-                            <input type="text" v-model="searchValue" class="form-control" name="" id="" />
-                            <div v-if="searchResultsCount !== null">
-                              <p>{{ searchResultsCount }} result(s) found.</p>
-                            </div>
-                            <div class="row" style="height: 500px;overflow-y:auto">
-
-                              <div class="col-lg-4 d-none d-lg-block" v-for="item in item_title" :key="item.id">
-                                <div :class="{ 'card': true, 'selected': isSelected(item.id) }"
-                                  style="height: 10% !important;">
-                                  <img @click="toggleItemSelection(item.id)" src="../../../assets/proc1.jpg"
-                                    class="card-img-top" alt="Sunset Over the Sea" />
-                                  <p style="text-align: center;margin-top:-40px;font-weight: bolder;"> {{ item.sn }}
-                                    <br>{{ shorten(item.item_title, 11) }}
-                                  </p>
-                                  <p style="margin-top: -10px;text-align:center">Php. {{ item.app_price }}</p>
-                                </div>
-                              </div>
-
-
-                            </div>
-
-
-
-
-                          </div>
-                        </div>
-
-
-                        <div class="col-lg-12" :style="{ display: shouldDisplayInput(3) }">
-                          <div class="input-div" v-if="index === 3">
-                            <div class="table-responsive">
-                              <dtable :data="pr_data" :columns="tableColumns" />
-                          </div>
-                          </div>
-                        </div>
-
-
-
-                        <div class="buttons button_space">
-
-                          <button class="btn btn-primary back_button" @click="backStep" v-if="index > 0"> Back </button>
-                          <div v-if="index === 2"> <button class="btn btn-primary next_button" @click="nextStepAndFetchDetails"> Next Steps</button> </div>
-                          <button v-if="index == 1" @click="nextStep" class="btn btn-primary"> Next Steps </button>
-                          <button class="btn btn-success next_button" @click="updatePurchaseRequestDetails" v-if="index === 1"> Save as Draft </button>
-                          <button class="btn btn-info next_button" @click="savePurchaseNo" v-if="(index === 0)"> Reserved PR No </button>
-                          <button class="btn btn-success submit_button" @click="submitForm" v-if="index === mainForms.length - 1"> {{ index === mainForms.length - 1 ? 'Print Preview' : 'Save as Draft' }} </button>
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
           </div>
         </div>
         <FooterVue />
@@ -691,52 +524,42 @@ import dtable from "./table.vue";
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
+import { faCircleCheck, faCircleInfo, faEye, faLayerGroup, faList, faPesoSign, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import TextAreaInput from '../micro/TextAreaInput.vue';
+import SelectInput from "../micro/SelectInput.vue";
+
+
+
+library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign, faQuestionCircle);
 
 export default {
+  name: 'create_pr',
   data() {
     return {
-
+      modalVisible: false,
       purchase_no: null,
-      userId:null,
-      isPurchaseNoEditable: true, // Set initially as editable
-      searchResultsCount: null,
-      formnumber: 0,
-      searchValue: '',
-      item_title: [],
-      selectedItems: [],
-      pr_data: [],
-
-      tableColumns: ['serial_no', 'procurement', 'unit', 'description', 'app_price', 'action'],
-
-      formData: Array.from({ length: 4 }, () => ({})),
-      purchaseRequestData: {
+      purchase_id: null,
+      prData: {
         pmo: null,
         pr_type: null,
         pr_date: null,
         target_date: null,
         particulars: null
       },
-      steps: [
-        "Generate Purchase Request No.",
-        "Purchase Request Information",
-        "Choose APP Item",
-        "Reviewing Cart",
+      pmo: [
+        { value: '15', label: 'ORD' },
+        { value: '1', label: 'ORD-Legal' },
+        { value: '2', label: 'ORD-Planning' },
+        { value: '3', label: 'LGMED-MBRTG' },
+        { value: '4', label: 'LGCDD-PDMU' },
+        { value: '5', label: 'FAD' },
+        { value: '6', label: 'ORD-RICTU' },
+        { value: '7', label: 'LGCDD' },
+        { value: '8', label: 'LGMED' },
       ],
-      mainForms: [
-        "Generate Purchase Request No.",
-        "Purchase Request Information",
-        "Choose APP Item",
-        "Review your cart",
-        // Add more forms as needed
-      ],
-      stepNumContent: [
-        "Enter your personal information to get closer to companies.",
-        "Get to know better by adding your diploma, certificate, and education life.",
-        "Help companies get to know you better by telling them about your past experiences.",
-        "Add your profile picture and let companies find you fast.",
-        // Add more content as needed
-      ],
-      procurementType: [
+      pr_type: [
         { value: '1', label: 'Catering Services' },
         { value: '2', label: 'Meals, Venue and Accomodation' },
         { value: '3', label: 'Repair and Maintenance' },
@@ -744,294 +567,19 @@ export default {
         { value: '5', label: 'Other Services' },
         { value: '6', label: 'Reimbursement and Petty Cash' }
       ],
-      pmo: [
-        { value: '1', label: 'ORD' },
-        { value: '2', label: 'FAD' },
-        { value: '3', label: 'LGMED' },
-        { value: '4', label: 'LGCDD' },
-      ]
-    };
+    }
   },
-  // 
   created() {
     this.userId = localStorage.getItem('userId');
   },
   computed: {
-    isSelected: function () {
-      const selectedSet = new Set(this.selectedItems);
-      return function (itemId) {
-        return selectedSet.has(itemId);
-      };
-    },
-    item_title: function () {
-      var app_item = this.item_title;
-      var searchValue = this.searchValue.trim().toLowerCase();
-
-      if (!searchValue) {
-        this.searchResultsCount = null;
-
-        return app_item;
-      }
-      // Use Array.filter to filter items based on search criteria
-      var filteredItems = app_item.filter(function (item) {
-        return (
-          item.item_title.toLowerCase().indexOf(searchValue) !== -1 ||
-          item.sn.toLowerCase().indexOf(searchValue) !== -1
-        );
-      });
-
-      this.searchResultsCount = filteredItems.length;
-      return filteredItems;
-
-    },
-    shouldDisplayInput() {
-
-      return index => (this.formnumber === index ? '' : 'none');
-
-    },
 
   },
   mounted() {
-    // this.fetchAppData();
     this.generatePurchaseRequestNo();
-    this.fetchAppItem();
-    
-   
-    
-
 
   },
-
   methods: {
-    openModal() {
-      this.isModalOpen = true;
-    },
-    closeModal() {
-      this.isModalOpen = false;
-    },
-    shorten: function (string, len) {
-      return string.substring(0, len + string.substring(len - 1).indexOf(' '));
-
-    },
-    
-   
-    nextStep() {
-      if (!this.validateForm()) {
-        return false;
-      }
-
-      if (this.formnumber < this.mainForms.length - 1) {
-        this.formnumber++;
-        console.log(this.formnumber);
-
-      } else if (this.formnumber === 3) {
-        // Call fetchCartDetails when the form is at index 3
-        this.generatePurchaseRequestNo();
-      } else {
-
-      }
-
-    },
-    nextStepAndFetchDetails() {
-      this.nextStep(); // Call your existing nextStep logic
-      this.fetchPRId().then((id) => {
-        axios.get(`../../api/viewPurchaseRequest/${id}}`).then((res) => {
-                this.pr_data = res.data;
-
-               
-            }).catch((error) => { console.error("Error fetching data:", error); });
-      });
-      
-    },
-    backStep() {
-      if (this.formnumber > 0) {
-        this.formnumber--;
-      }
-    },
-    submitForm() {
-      toast.success('Successfully save!', {
-        autoClose: 1000,
-      });
-      this.formnumber++;
-    },
-    validateForm() {
-      // Implement your form validation logic
-      return true; // For simplicity, always return true in this example
-    },
-    toggleItemSelection(itemId) {
-      // Check if the item is already selected
-      const index = this.selectedItems.indexOf(itemId);
-      if (index !== -1) {
-        // If selected, remove it from the array
-        this.selectedItems.splice(index, 1);
-        this.removePrItems(itemId);
-      } else {
-        // If not selected, add it to the array
-        this.selectedItems.push(itemId);
-        //add the selected item id
-        this.addPrItems(itemId);
-
-      }
-
-
-    },
-    addPrItems(selectedItemIds) {
-      // Call fetchPRId to get the ID
-      this.fetchPRId().then((id) => {
-        // Make an API call to your server to add the selected items to the database
-        axios.post('/api/post_insert_pritem', {
-          id: id,
-          pr_no: this.purchase_no,
-          itemIds: selectedItemIds,
-          status: 1,
-          step: 3
-        })
-          .then((response) => {
-            // Handle the success response
-            toast.success('Items added to the database:', {
-              autoClose: 100
-            });
-          })
-          .catch((error) => {
-            // Handle the error
-            console.error('Error adding items to the database:', error);
-          });
-      });
-    },
-    fetchAppItem() {
-      axios
-        .get('../api/appitems')
-        .then(response => {
-          this.item_title = response.data;
-        })
-        .catch(error => {
-          console.log(error.response);
-        });
-    },
-    fetchPRId() {
-      const pr_no = this.$route.params.id;
-      // Return the promise from axios.get
-      return axios.get(`/api/get_purchase_request_details?pr_no=${pr_no}`)
-        .then((response) => {
-          // Return the value from the response data
-          return response.data.id;
-        })
-        .catch((error) => {
-          console.error(error);
-          // Throw the error to propagate it to the next catch block if needed
-          throw error;
-        });
-    },
-    removePrItems(selectedItemIds) {
-      // Make an API call to your server to remove the selected items from the database
-      axios.post('/api/post_remove_pritem', { itemIds: selectedItemIds })
-        .then((response) => {
-          // Handle the success response
-          toast.success('Items removed from the database:', {
-            autoClose: 100
-          });
-        })
-        .catch((error) => {
-          // Handle the error
-          console.error('Error removing items from the database:', error);
-        });
-    },
-    getSelectedItemCount() {
-      return this.selectedItems.length;
-    },
-    //feth data
-    fetchAppData() {
-      let btn = null;
-      axios.get('../api/fetchAppData').then((response) => {
-        $('#item_table').DataTable({
-          retrieve: true,
-          data: response.data,
-          ordering: false,
-          paging: true,
-          pageLength: 10,
-          columns: [
-            { data: 'sn' },
-            {
-              data: 'item_category_title',
-              render: function (data, type, row) {
-                // Limit the item_category_title to 5 characters
-                if (type === 'display') {
-                  return data.length > 5 ? data.substr(0, 40) + '...' : data;
-                }
-                return data;
-              }
-            },
-            {
-              data: null,
-              orderable: false,
-              render: function (data) {
-                return '<label class="badge badge-success" @click="deletePid(' + data.id + ')">Add Item Description</label>';
-              },
-            },
-            { data: 'price' },
-            {
-              data: null,
-              orderable: false,
-              render: function (data) {
-                return '<label class="badge badge-success" @click="deletePid(' + data.id + ')">Add to Cart</label>';
-              },
-            },
-          ],
-        });
-      }).catch((error) => console.log(error));
-    },
-    nextStep() {
-      if (!this.validateForm()) {
-        return false;
-      }
-
-      if (this.formnumber < this.mainForms.length - 1) {
-        this.formnumber++;
-      }
-
-    },
-    fetchCartDetails() {
-      this.fetchPRId().then((id) => {
-        axios.post('/api/fetchCart', { id: id }).then((response) => {
-          $('#cart_table').DataTable({
-            retrieve: true,
-            data: response.data,
-            ordering: false,
-            paging: true,
-            pageLength: 10,
-            columns: [
-              { data: 'serial_no' },
-              {
-                data: 'procurement',
-                render: function (data, type, row) {
-                  // Limit the 'procurement' text to 40 characters and add ellipsis
-                  if (type === 'display') {
-                    return data.length > 40 ? data.substr(0, 40) + '...' : data;
-                  }
-                  return data;
-                },
-              }, { data: 'unit' },
-              { data: 'description' },
-              { data: 'app_price' },
-              // Edit button
-              {
-                data:null,
-              render: function (data, type, row) {
-                if (type === 'display') {
-                  return '<button class="btn btn-sm btn-primary">Edit</button>';
-                }
-                return data;
-              },
-            }
-          
-
-            ],
-          });
-        }).catch((error) => console.log(error));
-      });
-
-
-    },
     generatePurchaseRequestNo: async function () {
       try {
         const response = await axios.get('../api/generatePurchaseRequestNo');
@@ -1042,105 +590,56 @@ export default {
         const purchaseNoFromApi = response.data[0].pr_count;
         const formattedSequence = purchaseNoFromApi.toString().padStart(5, '0');
 
-        // set the draft pr no of the user
         if (this.$route.query.pr_no) {
           this.purchase_no = this.$route.query.pr_no;
         } else {
           this.purchase_no = `${purchaseNoFormat}-${formattedSequence}`;
         }
-        // localStorage.setItem('prId', response.data.userId);
-
-        //this.fetchCartDetails();
-        // this.fetchPurchaseRequestDetails();
+        this.purchase_id = response.data[0].pr_count;
       } catch (error) {
         console.error('Error fetching data', error);
       }
     },
-    //show data
-    fetchPurchaseRequestDetails() {
-      const pr_no = this.$route.params.id;
-      // Return the promise from axios.get
-      return axios.get(`/api/get_purchase_request_details?pr_no=${pr_no}`)
-        .then((response) => {
-          // Update purchaseRequestData with the fetched values
-          this.purchaseRequestData.pmo = response.data.pmo;
-          this.purchaseRequestData.pr_type = response.data.type;
-          this.purchaseRequestData.pr_date = response.data.pr_date;
-          this.purchaseRequestData.target_date = response.data.target_date;
-          this.purchaseRequestData.particulars = response.data.purpose;
-        })
-        .catch((error) => {
-          console.log('Error fetching purchase request details:', error);
-        });
-    },
-    //step 1
-    savePurchaseNo() {
-      // Check if purchase_no is not empty and the field is not editable
-      if (this.purchase_no) {
-        axios
-          .post('/api/post_insert_purchaseNo', {
-            pr_no: this.purchase_no,
-            status: 1,
-            step: 1,
-            user: this.userId,
-            updated_at: null,
-            created_at: null,
-          })
-          .then(() => {
-            toast.success('Successfully added!', {
-              autoClose: 100,
-            });
-
-            this.formnumber++;
-            setTimeout(() => {
-              this.$router.push({
-                name: 'Create Purchase Request Item with ID',
-                params: { id: this.purchase_no },
-              });
-            }, 2000); // Adjust the delay as needed
-          })
-          .catch((error) => {
-            // Handle error
-          });
-      } else {
-        // Show error message or handle validation failure
-        toast.error('Please enter a valid Purchase Request No.');
-      }
-    },
-
-    //step 2
-    updatePurchaseRequestDetails() {
-      axios.post('/api/post_update_purchaseRequestDetails', {
+    post_create_pr() {
+      axios.post('/api/post_create_purchaseRequest', {
+        created_by: this.userId,
         pr_no: this.purchase_no,
-        pmo: this.purchaseRequestData.pmo,
-        type: this.purchaseRequestData.pr_type,
-        pr_date: this.purchaseRequestData.pr_date,
-        target_date: this.purchaseRequestData.target_date,
-        purpose: this.purchaseRequestData.particulars,
-        step: 2
+        pmo: this.prData.pmo,
+        type: this.prData.pr_type,
+        pr_date: this.prData.pr_date,
+        target_date: this.prData.target_date,
+        purpose: this.prData.particulars
       }
       ).then(() => {
-
+        const purchaseId = this.purchase_id; // Assuming your API returns the inserted purchase ID
+        console.log(purchaseId);
         toast.success('Successfully added!', {
-          autoClose: 100
+          autoClose: 1000
         });
-
-
-
+        setTimeout(() => {
+          this.$router.push({ path: `/procurement/select_purchase_item/${purchaseId}` });
+        }, 1000);
 
       }).catch((error) => {
-
       })
-    }
-
+    },
+    openModal() {
+      this.modalVisible = true;
+    },
+    closeModal() {
+      this.modalVisible = false;
+    },
   },
+
   components: {
     Navbar,
     Sidebar,
     FooterVue,
     BreadCrumbs,
     item_table,
-    dtable
+    dtable,
+    TextAreaInput,
+    SelectInput
   },
 };
 </script>

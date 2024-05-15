@@ -1,0 +1,1141 @@
+<style>
+.container .card {
+  height: auto;
+  width: auto;
+  background-color: #fff;
+  position: relative;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+  border-radius: 20px;
+}
+
+.container .card .form {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.container .card .left-side {
+  width: 35%;
+  background-color: #304767;
+  height: 100%;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  padding: 20px 30px;
+  box-sizing: border-box;
+}
+
+/*left-side-start*/
+.left-heading {
+  color: #fff;
+}
+
+.steps-content {
+  margin-top: 30px;
+  color: #fff;
+}
+
+.steps-content p {
+  font-size: 12px;
+  margin-top: 15px;
+}
+
+.progress-barv2 {
+  list-style: none;
+  /*color:#fff;*/
+  margin-top: 30px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  counter-reset: container 0;
+}
+
+.progress-barv2 li {
+  position: relative;
+  margin-left: 40px;
+  margin-top: 50px;
+  counter-increment: container 1;
+  color: #4f6581;
+}
+
+.progress-barv2 li::before {
+  content: counter(container);
+  line-height: 25px;
+  text-align: center;
+  position: absolute;
+  height: 25px;
+  width: 25px;
+  border: 1px solid #4f6581;
+  border-radius: 50%;
+  left: -40px;
+  top: -5px;
+  z-index: 10;
+  background-color: #304767;
+}
+
+.progress-barv2 li::after {
+  content: "";
+  position: absolute;
+  height: 90px;
+  width: 2px;
+  background-color: #4f6581;
+  z-index: 1;
+  left: -27px;
+  top: -70px;
+}
+
+.progress-barv2 li.active::after {
+  background-color: #fff;
+}
+
+.progress-barv2 li:first-child:after {
+  display: none;
+}
+
+/*.progress-barv2 li:last-child:after{*/
+/*  display:none;  */
+/*}*/
+.progress-barv2 li.active::before {
+  color: #fff;
+  border: 1px solid #fff;
+}
+
+.progress-barv2 li.active {
+  color: #fff;
+}
+
+.d-none {
+  display: none;
+}
+
+/*left-side-end*/
+.container .card .right-side {
+  width: 100% !important;
+  background-color: #fff;
+  height: 100%;
+  border-radius: 20px;
+}
+
+/*right-side-start*/
+.main {
+  display: none;
+}
+
+.active {
+  display: block;
+}
+
+.main {
+  padding: 10px;
+}
+
+.main small {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2px;
+  height: 30px;
+  width: 30px;
+  background-color: #ccc;
+  border-radius: 50%;
+  color: yellow;
+  font-size: 19px;
+}
+
+.text {
+  margin-top: 20px;
+}
+
+.congrats {
+  text-align: center;
+}
+
+.text p {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #cbced4;
+}
+
+.input-text {
+  margin: 30px 0;
+  display: flex;
+  gap: 20px;
+}
+
+.input-text .input-div {
+  width: 100%;
+  position: relative;
+}
+
+input[type="text"] {
+  width: 100%;
+  height: 40px;
+  border: none;
+  outline: 0;
+  border-radius: 5px;
+  border: 1px solid #cbced4;
+  gap: 20px;
+  box-sizing: border-box;
+  padding: 0px 10px;
+}
+
+select {
+  width: 100%;
+  height: 40px;
+  border: none;
+  outline: 0;
+  border-radius: 5px;
+  border: 1px solid #cbced4;
+  gap: 20px;
+  box-sizing: border-box;
+  padding: 0px 10px;
+}
+
+.input-text .input-div span {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 14px;
+  transition: all 0.5s;
+}
+
+.input-div input:focus~span,
+.input-div input:valid~span {
+  top: -15px;
+  left: 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.input-div span {
+  top: -15px;
+  left: 6px;
+  font-size: 10px;
+}
+
+/* .buttons button {
+  height: 40px;
+  width: 100px;
+  border: none;
+  border-radius: 5px;
+  background-color: #0075ff;
+  font-size: 12px;
+  color: #fff;
+  cursor: pointer;
+} */
+
+
+
+.button_space {
+  display: flex;
+  gap: 20px;
+}
+
+.button_space button:nth-child(1) {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid#000;
+}
+
+.user_card {
+  margin-top: 20px;
+  margin-bottom: 40px;
+  height: 200px;
+  width: 100%;
+  border: 1px solid #c7d3d9;
+  border-radius: 10px;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.user_card span {
+  height: 80px;
+  width: 100%;
+  background-color: #dfeeff;
+}
+
+.circle {
+  position: absolute;
+  top: 40px;
+  left: 60px;
+}
+
+.circle span {
+  height: 70px;
+  width: 70px;
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.circle span img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.social {
+  display: flex;
+  position: absolute;
+  top: 100px;
+  right: 10px;
+}
+
+.social span {
+  height: 30px;
+  width: 30px;
+  border-radius: 7px;
+  background-color: #fff;
+  border: 1px solid #cbd6dc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;
+  color: #cbd6dc;
+}
+
+.social span i {
+  cursor: pointer;
+}
+
+.heart {
+  color: red !important;
+}
+
+.share {
+  color: red !important;
+}
+
+.user_name {
+  position: absolute;
+  top: 110px;
+  margin: 10px;
+  padding: 0 30px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.user_name h3 {
+  color: #4c5b68;
+}
+
+.detail {
+  /*margin-top:10px;*/
+  display: flex;
+  justify-content: space-between;
+  margin-right: 50px;
+}
+
+.detail p {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.detail p a {
+  text-decoration: none;
+  color: blue;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #7ac142;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #fff;
+  stroke-miterlimit: 10;
+  margin: 10% auto;
+  box-shadow: inset 0px 0px 0px #7ac142;
+  animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes scale {
+
+  0%,
+  100% {
+    transform: none;
+  }
+
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #7ac142;
+  }
+}
+
+.warning {
+  border: 1px solid red !important;
+}
+
+/*right-side-end*/
+@media (max-width: 750px) {
+  .container {
+    height: scroll;
+  }
+
+  .container .card {
+    max-width: 350px;
+    height: auto !important;
+    margin: 30px 0;
+  }
+
+  .container .card .right-side {
+    width: 100%;
+  }
+
+  .input-text {
+    /* display: block; */
+  }
+
+  .input-text .input-div {
+    /* margin-top: 20px; */
+  }
+
+  .container .card .left-side {
+    display: none;
+  }
+}
+
+.selected img {
+  border: 2px solid #007bff;
+  /* Change the border color as needed */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  /* Change the box shadow as needed */
+}
+</style>
+
+<template>
+  <div class="container-scroller">
+    <Navbar></Navbar>
+    <div class="container-fluid page-body-wrapper">
+      <Sidebar />
+      <div class="main-panel">
+        <div class="content-wrapper">
+          <BreadCrumbs />
+          <div class="row">
+            <div class="col-lg-2">
+              <div class="card card_shadow">
+                <div class="card-body" style="height: 320px;text-align: center;">
+                  <img src="../../../assets/logo.png" class="profile_img">
+                  <div class="user_info">
+                    <p>Office:</p>
+                    <p>ORD-RICTU</p>
+                  </div>
+                  <div class="user_info">
+                    <p>Position:</p>
+                    <p>Database Admin</p>
+                  </div>
+                  <div class="user_info">
+                    <p>Cancelled PR:</p>
+                    <p>10</p>
+                  </div>
+                  <div class="user_info">
+                    <p>Total PR's:</p>
+                    <p>10</p>
+                  </div>
+                </div>
+              </div>
+              <div class="card card_shadow" style="margin-top: 10px;">
+                <div class="card-body" style="height: 500px;">
+                  <h5>Supplier Rankings</h5><select class="form-control">
+                    <option>This Week</option>
+                    <option>This Month</option>
+                    <option>This Year</option>
+                  </select>
+                  <div class="card" style="margin-top: 10px;">
+                    <div class="card-body" style="height: 90px;">
+                      <div class="media" style="margin-top: -25px;">
+                        <div style="width: 65px; height: 65px;">
+                          <img src="../../../assets/logo.png" alt="..."
+                            style="margin-top:10px;border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
+                        </div>
+                        <div class="media-body">
+                          <div class="media-content" style="margin-top:5%;">Supplier Title<br>
+                          </div>
+                          <div class="media-content">0955136565</div>
+                          <div class="media-content">Calamba City, Laguna</div>
+                        </div>
+                      </div>
+                      <p class="rank_wrapper rank_banner">1st</p>
+                    </div>
+                  </div>
+                  <div class="card" style="margin-top: 10px;">
+                    <div class="card-body" style="height: 90px;">
+                      <div class="media" style="margin-top: -25px;">
+                        <div style="width: 65px; height: 65px;">
+                          <img src="../../../assets/logo.png" alt="..."
+                            style="border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
+                        </div>
+                        <div class="media-body">
+                          <div class="media-content"><small>Supplier Title</small><br></div>
+                          <div class="media-content" style="margin-top:-1%;"></div>
+                          <div class="media-content" style="margin-top:-2%;"></div>
+                        </div>
+                      </div>
+                      <p class="rank_wrapper rank_banner2">2nd</p>
+                    </div>
+                  </div>
+                  <div class="card" style="margin-top: 10px;">
+                    <div class="card-body" style="height: 90px;">
+                      <div class="media" style="margin-top: -25px;">
+                        <div style="width: 65px; height: 65px;">
+                          <img src="../../../assets/logo.png" alt="..."
+                            style="border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
+                        </div>
+                        <div class="media-body">
+                          <div class="media-content"><small>Supplier Title</small><br></div>
+                          <div class="media-content" style="margin-top:-1%;"></div>
+                          <div class="media-content" style="margin-top:-2%;"></div>
+                        </div>
+                      </div>
+                      <p class="rank_wrapper rank_banner3">3rd</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="col-md-10 grid-margin mb-4 stretch-card">
+              <div class="container">
+                <div class="card" style="margin-left: -2%;">
+                  <div class="form">
+                    <div class="left-side">
+                      <div class="left-heading">
+                        <h3>{{current_step}}Create Purchase Request</h3>
+                      </div>
+                      <div class="steps-content">
+                        <h3>
+                          Step <span class="step-number">{{ formnumber + 1 }}</span>
+                        </h3>
+                        <p v-for="(content, index) in stepNumContent" :key="index"
+                          :class="{ 'step-number-content': true, active: index === formnumber, 'd-none': index !== formnumber, }">
+                          {{ content }} </p>
+                      </div>
+                      <ul class="progress-barv2" style="background-color: #30476 !important">
+                        <li v-for="(step, index) in steps" :key="index" :class="{ active: index === formnumber }">
+                          {{ step }}
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="right-side">
+
+
+                      <div v-for="(main, index) in mainForms" :key="index" class="main"
+                        :class="{ active: index === formnumber }">
+                        <small><i class="fa fa-smile-o"></i></small>
+                        <div class="text">
+                          <h2>{{ main }}</h2>
+                          <p>{{ stepNumContent[index] }}</p>
+                        </div>
+                        <!-- Your existing form inputs go here -->
+                        <!-- Your form inputs go here -->
+                        <div class="input-text" :style="{ display: shouldDisplayInput(0) }">
+                          <div class="input-div" v-if="index === 0">
+                            <input v-model="purchase_no" type="text" :readonly="isPurchaseNoEditable" />
+                          </div>
+                        </div>
+
+                        <!-- Step #1 -->
+                        <div class="row">
+                          <div class="col-md-12 col-sm-12 col-xs-12 col-lg-6">
+                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
+                              <label for="Office">Office</label>
+                              <select class="form-control" v-model="purchaseRequestData.pmo">
+                                <option v-for="option in pmo" :key="option.value" :value="option.value">{{ option.label
+                                }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
+                              <label for="exampleInputPassword1">Procurement Type</label>
+                              <select class="form-control" v-model="purchaseRequestData.pr_type">
+                                <option v-for="option in procurementType" :key="option.value" :value="option.value">{{
+                                  option.label
+                                }}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
+                              <label for="exampleInputPassword1">Purchase Request Date</label>
+                              <input type="date" v-model="purchaseRequestData.pr_date" class="form-control" required />
+                            </div>
+                          </div>
+                          <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
+                              <label for="exampleInputPassword1">Target Date</label>
+                              <input type="date" v-model="purchaseRequestData.target_date" class="form-control"
+                                required />
+                            </div>
+                          </div>
+                          <div class="col-lg-12">
+                            <div class="form-group" :style="{ display: shouldDisplayInput(1) }">
+                              <label for="exampleInputPassword1">Particulars</label>
+                              <textarea v-model="purchaseRequestData.particulars" class="form-control"> </textarea>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="input-text" :style="{ display: shouldDisplayInput(2) }">
+                          <div class="input-div" v-if="index === 2">
+                            <p v-if="index === 2" class="pull-right" style="margin-top:-30px;">My Cart: {{
+                              getSelectedItemCount() }}</p>
+
+                            <input type="text" v-model="searchValue" class="form-control" name="" id="" />
+                            <div v-if="searchResultsCount !== null">
+                              <p>{{ searchResultsCount }} result(s) found.</p>
+                            </div>
+                            <div class="row" style="height: 500px;overflow-y:auto">
+
+                              <div class="col-lg-4 d-none d-lg-block" v-for="item in item_title" :key="item.id">
+                                <div :class="{ 'card': true, 'selected': isSelected(item.id) }"
+                                  style="height: 10% !important;">
+                                  <img @click="toggleItemSelection(item.id)" src="../../../assets/proc1.jpg"
+                                    class="card-img-top" alt="Sunset Over the Sea" />
+                                  <p style="text-align: center;margin-top:-40px;font-weight: bolder;"> {{ item.sn }}
+                                    <br>{{ shorten(item.item_title, 11) }}
+                                  </p>
+                                  <p style="margin-top: -10px;text-align:center">Php. {{ item.app_price }}</p>
+                                </div>
+                              </div>
+
+
+                            </div>
+
+
+
+
+                          </div>
+                        </div>
+
+
+                        <div class="col-lg-12" :style="{ display: shouldDisplayInput(3) }">
+                          <div class="input-div" v-if="index === 3">
+                            <div class="table-responsive">
+                              <dtable :data="pr_data" :columns="tableColumns" />
+                          </div>
+                          </div>
+                        </div>
+
+
+
+                        <div class="buttons button_space">
+
+                          <button class="btn btn-primary back_button" @click="backStep" v-if="index > 0"> Back </button>
+                          <div v-if="index === 2"> <button class="btn btn-primary next_button" @click="nextStepAndFetchDetails"> Next Steps</button> </div>
+                          <button v-if="index == 1" @click="nextStep" class="btn btn-primary"> Next Steps </button>
+                          <button class="btn btn-success next_button" @click="updatePurchaseRequestDetails" v-if="index === 1"> Save as Draft </button>
+                          <button class="btn btn-info next_button" @click="savePurchaseNo" v-if="(index === 0)"> Reserved PR No </button>
+                          <button class="btn btn-success submit_button" @click="submitForm" v-if="index === mainForms.length - 1"> {{ index === mainForms.length - 1 ? 'Print Preview' : 'Save as Draft' }} </button>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <FooterVue />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import Navbar from "../layout/Navbar.vue";
+import Sidebar from "../layout/Sidebar.vue";
+import FooterVue from "../layout/Footer.vue";
+import BreadCrumbs from "../dashboard_tiles/BreadCrumbs.vue";
+import item_table from "./item_table.vue";
+import dtable from "./table.vue";
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
+export default {
+  data() {
+    return {
+
+      purchase_no: null,
+      userId:null,
+      isPurchaseNoEditable: true, // Set initially as editable
+      searchResultsCount: null,
+      formnumber: 0,
+      searchValue: '',
+      item_title: [],
+      selectedItems: [],
+      pr_data: [],
+
+      tableColumns: ['serial_no', 'procurement', 'unit', 'description', 'app_price', 'action'],
+
+      formData: Array.from({ length: 4 }, () => ({})),
+      purchaseRequestData: {
+        pmo: null,
+        pr_type: null,
+        pr_date: null,
+        target_date: null,
+        particulars: null
+      },
+      steps: [
+        "Generate Purchase Request No.",
+        "Purchase Request Information",
+        "Choose APP Item",
+        "Reviewing Cart",
+      ],
+      mainForms: [
+        "Generate Purchase Request No.",
+        "Purchase Request Information",
+        "Choose APP Item",
+        "Review your cart",
+        // Add more forms as needed
+      ],
+      stepNumContent: [
+        "Enter your personal information to get closer to companies.",
+        "Get to know better by adding your diploma, certificate, and education life.",
+        "Help companies get to know you better by telling them about your past experiences.",
+        "Add your profile picture and let companies find you fast.",
+        // Add more content as needed
+      ],
+      procurementType: [
+        { value: '1', label: 'Catering Services' },
+        { value: '2', label: 'Meals, Venue and Accomodation' },
+        { value: '3', label: 'Repair and Maintenance' },
+        { value: '4', label: 'Supplies, Materials and Devices' },
+        { value: '5', label: 'Other Services' },
+        { value: '6', label: 'Reimbursement and Petty Cash' }
+      ],
+      pmo: [
+        { value: '1', label: 'ORD' },
+        { value: '2', label: 'FAD' },
+        { value: '3', label: 'LGMED' },
+        { value: '4', label: 'LGCDD' },
+      ]
+    };
+  },
+  // 
+  created() {
+    this.userId = localStorage.getItem('userId');
+  },
+  computed: {
+    isSelected: function () {
+      const selectedSet = new Set(this.selectedItems);
+      return function (itemId) {
+        return selectedSet.has(itemId);
+      };
+    },
+    item_title: function () {
+      var app_item = this.item_title;
+      var searchValue = this.searchValue.trim().toLowerCase();
+
+      if (!searchValue) {
+        this.searchResultsCount = null;
+
+        return app_item;
+      }
+      // Use Array.filter to filter items based on search criteria
+      var filteredItems = app_item.filter(function (item) {
+        return (
+          item.item_title.toLowerCase().indexOf(searchValue) !== -1 ||
+          item.sn.toLowerCase().indexOf(searchValue) !== -1
+        );
+      });
+
+      this.searchResultsCount = filteredItems.length;
+      return filteredItems;
+
+    },
+    shouldDisplayInput() {
+
+      return index => (this.formnumber === index ? '' : 'none');
+
+    },
+
+  },
+  mounted() {
+    // this.fetchAppData();
+    this.generatePurchaseRequestNo();
+    this.fetchAppItem();
+  },
+
+  methods: {
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
+    shorten: function (string, len) {
+      return string.substring(0, len + string.substring(len - 1).indexOf(' '));
+
+    },
+    
+   
+    nextStep() {
+      if (!this.validateForm()) {
+        return false;
+      }
+
+      if (this.formnumber < this.mainForms.length - 1) {
+        this.formnumber++;
+        console.log(this.formnumber);
+
+      } else if (this.formnumber === 3) {
+        // Call fetchCartDetails when the form is at index 3
+        this.generatePurchaseRequestNo();
+      } else {
+
+      }
+
+    },
+    nextStepAndFetchDetails() {
+      this.nextStep(); // Call your existing nextStep logic
+      this.fetchPRId().then((id) => {
+        axios.get(`../../api/viewPurchaseRequest/${id}}`).then((res) => {
+                this.pr_data = res.data;
+
+               
+            }).catch((error) => { console.error("Error fetching data:", error); });
+  });
+      
+      },
+    backStep() {
+      if (this.formnumber > 0) {
+        this.formnumber--;
+      }
+    },
+    submitForm() {
+      toast.success('Successfully save!', {
+        autoClose: 1000,
+      });
+      this.formnumber++;
+    },
+    validateForm() {
+      // Implement your form validation logic
+      return true; // For simplicity, always return true in this example
+    },
+    toggleItemSelection(itemId) {
+      // Check if the item is already selected
+      const index = this.selectedItems.indexOf(itemId);
+      if (index !== -1) {
+        // If selected, remove it from the array
+        this.selectedItems.splice(index, 1);
+        this.removePrItems(itemId);
+      } else {
+        // If not selected, add it to the array
+        this.selectedItems.push(itemId);
+        //add the selected item id
+        this.addPrItems(itemId);
+
+      }
+
+
+    },
+    addPrItems(selectedItemIds) {
+      // Call fetchPRId to get the ID
+      this.fetchPRId().then((id) => {
+        // Make an API call to your server to add the selected items to the database
+        axios.post('/api/post_insert_pritem', {
+          id: id,
+          pr_no: this.purchase_no,
+          itemIds: selectedItemIds,
+          status: 1,
+          step: 3
+        })
+          .then((response) => {
+            // Handle the success response
+            toast.success('Items added to the database:', {
+              autoClose: 100
+            });
+          })
+          .catch((error) => {
+            // Handle the error
+            console.error('Error adding items to the database:', error);
+          });
+      });
+    },
+    fetchAppItem() {
+      axios
+        .get('../api/appitems')
+        .then(response => {
+          this.item_title = response.data;
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
+    },
+    fetchPRId() {
+      const pr_no = this.$route.params.id;
+      // Return the promise from axios.get
+      return axios.get(`/api/get_purchase_request_details?pr_no=${pr_no}`)
+        .then((response) => {
+          // Return the value from the response data
+          return response.data.id;
+        })
+        .catch((error) => {
+          console.error(error);
+          // Throw the error to propagate it to the next catch block if needed
+          throw error;
+        });
+    },
+    removePrItems(selectedItemIds) {
+      // Make an API call to your server to remove the selected items from the database
+      axios.post('/api/post_remove_pritem', { itemIds: selectedItemIds })
+        .then((response) => {
+          // Handle the success response
+          toast.success('Items removed from the database:', {
+            autoClose: 100
+          });
+        })
+        .catch((error) => {
+          // Handle the error
+          console.error('Error removing items from the database:', error);
+        });
+    },
+    getSelectedItemCount() {
+      return this.selectedItems.length;
+    },
+    //feth data
+    fetchAppData() {
+      let btn = null;
+      axios.get('../api/fetchAppData').then((response) => {
+        $('#item_table').DataTable({
+          retrieve: true,
+          data: response.data,
+          ordering: false,
+          paging: true,
+          pageLength: 10,
+          columns: [
+            { data: 'sn' },
+            {
+              data: 'item_category_title',
+              render: function (data, type, row) {
+                // Limit the item_category_title to 5 characters
+                if (type === 'display') {
+                  return data.length > 5 ? data.substr(0, 40) + '...' : data;
+                }
+                return data;
+              }
+            },
+            {
+              data: null,
+              orderable: false,
+              render: function (data) {
+                return '<label class="badge badge-success" @click="deletePid(' + data.id + ')">Add Item Description</label>';
+              },
+            },
+            { data: 'price' },
+            {
+              data: null,
+              orderable: false,
+              render: function (data) {
+                return '<label class="badge badge-success" @click="deletePid(' + data.id + ')">Add to Cart</label>';
+              },
+            },
+          ],
+        });
+      }).catch((error) => console.log(error));
+    },
+    nextStep() {
+      if (!this.validateForm()) {
+        return false;
+      }
+
+      if (this.formnumber < this.mainForms.length - 1) {
+        this.formnumber++;
+      }
+
+    },
+    fetchCartDetails() {
+      this.fetchPRId().then((id) => {
+        axios.post('/api/fetchCart', { id: id }).then((response) => {
+          $('#cart_table').DataTable({
+            retrieve: true,
+            data: response.data,
+            ordering: false,
+            paging: true,
+            pageLength: 10,
+            columns: [
+              { data: 'serial_no' },
+              {
+                data: 'procurement',
+                render: function (data, type, row) {
+                  // Limit the 'procurement' text to 40 characters and add ellipsis
+                  if (type === 'display') {
+                    return data.length > 40 ? data.substr(0, 40) + '...' : data;
+                  }
+                  return data;
+                },
+              }, { data: 'unit' },
+              { data: 'description' },
+              { data: 'app_price' },
+              // Edit button
+              {
+                data:null,
+              render: function (data, type, row) {
+                if (type === 'display') {
+                  return '<button class="btn btn-sm btn-primary">Edit</button>';
+                }
+                return data;
+              },
+            }
+          
+
+            ],
+          });
+        }).catch((error) => console.log(error));
+      });
+
+
+    },
+    generatePurchaseRequestNo: async function () {
+      try {
+        const response = await axios.get('../api/generatePurchaseRequestNo');
+        const currentDate = new Date();
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-indexed
+        const purchaseNoFormat = `${year}-${month}`;
+        const purchaseNoFromApi = response.data[0].pr_count;
+        const formattedSequence = purchaseNoFromApi.toString().padStart(5, '0');
+
+        // set the draft pr no of the user
+        if (this.$route.query.pr_no) {
+          this.purchase_no = this.$route.query.pr_no;
+        } else {
+          this.purchase_no = `${purchaseNoFormat}-${formattedSequence}`;
+        }
+        // localStorage.setItem('prId', response.data.userId);
+
+        //this.fetchCartDetails();
+        // this.fetchPurchaseRequestDetails();
+      } catch (error) {
+        console.error('Error fetching data', error);
+      }
+    },
+    //show data
+    fetchPurchaseRequestDetails() {
+      const pr_no = this.$route.params.id;
+      // Return the promise from axios.get
+      return axios.get(`/api/get_purchase_request_details?pr_no=${pr_no}`)
+        .then((response) => {
+          // Update purchaseRequestData with the fetched values
+          this.purchaseRequestData.pmo = response.data.pmo;
+          this.purchaseRequestData.pr_type = response.data.type;
+          this.purchaseRequestData.pr_date = response.data.pr_date;
+          this.purchaseRequestData.target_date = response.data.target_date;
+          this.purchaseRequestData.particulars = response.data.purpose;
+        })
+        .catch((error) => {
+          console.log('Error fetching purchase request details:', error);
+        });
+    },
+    //step 1
+    savePurchaseNo() {
+      // Check if purchase_no is not empty and the field is not editable
+      if (this.purchase_no) {
+        axios
+          .post('/api/post_insert_purchaseNo', {
+            pr_no: this.purchase_no,
+            status: 1,
+            step: 1,
+            user: this.userId,
+            updated_at: null,
+            created_at: null,
+          })
+          .then(() => {
+            toast.success('Successfully added!', {
+              autoClose: 100,
+            });
+
+            this.formnumber++;
+            setTimeout(() => {
+              this.$router.push({
+                name: 'Create Purchase Request Item with ID',
+                params: { id: this.purchase_no },
+              });
+            }, 2000); // Adjust the delay as needed
+          })
+          .catch((error) => {
+            // Handle error
+          });
+      } else {
+        // Show error message or handle validation failure
+        toast.error('Please enter a valid Purchase Request No.');
+      }
+    },
+
+    //step 2
+    updatePurchaseRequestDetails() {
+      axios.post('/api/post_update_purchaseRequestDetails', {
+        pr_no: this.purchase_no,
+        pmo: this.purchaseRequestData.pmo,
+        type: this.purchaseRequestData.pr_type,
+        pr_date: this.purchaseRequestData.pr_date,
+        target_date: this.purchaseRequestData.target_date,
+        purpose: this.purchaseRequestData.particulars,
+        step: 2
+      }
+      ).then(() => {
+
+        toast.success('Successfully added!', {
+          autoClose: 100
+        });
+
+
+
+
+      }).catch((error) => {
+
+      })
+    }
+
+  },
+  components: {
+    Navbar,
+    Sidebar,
+    FooterVue,
+    BreadCrumbs,
+    item_table,
+    dtable
+  },
+};
+</script>

@@ -1,3 +1,8 @@
+<style>
+.navbar {
+    background-color: black;
+}
+</style>
 <template>
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
         <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
@@ -83,7 +88,7 @@
                             <i class="ti-settings text-primary"></i>
                             Settings
                         </a>
-                        <a class="dropdown-item">
+                        <a class="dropdown-item" @click="logout">
                             <i class="ti-power-off text-primary"></i>
                             Logout
                         </a>
@@ -109,6 +114,29 @@ export default {
     components: {
 
     },
+    methods: {
+        logout() {
+            const apiToken = localStorage.getItem('api_token');
 
+            axios.post('/api/logout', null, {
+                headers: {
+                    Authorization: `Bearer ${apiToken}`
+                }
+            })
+                .then(() => {
+                    // Clear local storage and any other cached data
+                    localStorage.removeItem('api_token');
+
+                    // Redirect to the login page or another appropriate page
+                    // For example, if using Vue Router:
+                    this.$router.push('/');
+                })
+                .catch(error => {
+                    console.error('Logout failed:', error);
+                });
+        }
+
+
+    }
 }
 </script>

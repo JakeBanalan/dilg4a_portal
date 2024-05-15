@@ -34,6 +34,29 @@ const countTotalItem = function (cur_year) {
         });
 };
 
+
+const countICTRequest = function (url, cur_year) {
+    return axios.get(`${url}/${cur_year}`)
+        .then((response) => {
+            return response.data[0].ict
+
+        }).catch(error => {
+            console.error('Error totalItem  data:', error);
+            return null; // or handle the error appropriately
+        });
+};
+
+const count = function (url, status) {
+    return axios.get(`${url}/${status}`)
+        .then((response) => {
+            return response.data[0]
+
+        }).catch(error => {
+            console.error('Error totalItem  data:', error);
+            return null; // or handle the error appropriately
+        });
+};
+
 const countCancelledPR = function (userId) {
     if (window.location.pathname.startsWith('/procurement/rfq')) {
         return axios.get(`../../api/countCancelledPR/${userId}`)
@@ -132,17 +155,42 @@ const updatePurchaseRequestStatus = function (pr_id, STATUS_SUBMITTED_TO_GSS) {
         });
 };
 
+const formatDecimal = function (value) {
+    return value.toFixed(2)
+
+}
+
+const formatDate= function (date) {
+    if (!date || date === '0000-00-00') {
+        return null; // Return null if the date is null or '0000-00-00'
+    } else {
+        const formattedDate = new Date(date).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+
+        });
+        return formattedDate;
+    }
+}
+
+
 
 
 
 
 export {
-     fetchUserData, 
-     countTotalItem, 
-     countCancelledPR, 
-     countUserTotalPR, 
-     fetchAppItem, 
-     fetchCartItemInfo, 
-     formatTotalAmount, 
-     updatePurchaseRequestStatus,
-     fetchICTData };
+    fetchUserData,
+    countTotalItem,
+    countICTRequest,
+    count,
+    countCancelledPR,
+    countUserTotalPR,
+    fetchAppItem,
+    fetchCartItemInfo,
+    formatTotalAmount,
+    updatePurchaseRequestStatus,
+    fetchICTData,
+    formatDecimal,
+    formatDate
+};

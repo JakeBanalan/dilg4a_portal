@@ -1,6 +1,6 @@
 <template>
   <div class="table-container">
-    <table class="table table-striped display expandable-table dataTable no-footer" role="grid"
+    <table class="table table-striped table-bordered"
       style="table-layout: fixed;">
       <thead>
         <tr>
