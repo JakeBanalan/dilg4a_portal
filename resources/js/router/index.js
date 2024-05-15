@@ -32,7 +32,7 @@ import dashboard_ict_ta from "../components/rictu/ict_ta/index.vue";
 import create_ict from "../components/rictu/ict_ta/create.vue";
 
 //CALENDAR
-import calendar from "../components/calendar/index.vue";
+import calendar from "../components/calendar/index.vue"
 
 const routes = [
     {
@@ -128,31 +128,22 @@ const routes = [
         name:'Abstract of Quotation',
         component:dashboard_abstract
     },
-    // {
-    //     path:'/rictu/ict_ta/index',
-    //     name:'ICT Technical Assistance',
-    //     component:dashboard_ict_ta
-    // },
-    // {
-    //     path:'/rictu/ict_ta/create',
-    //     name:'Create ICT Technical Assistance',
-    //     component:create_ict
-    // },
-    // {
-    //     path:'/human_resource/employees_directory/index',
-    //     name:'Employees Directory',
-    //     component:employees_directory
-    // },
     {
-        path:'/calendar/index',
-        name:'Calendar',
-        component:calendar
-       
+        path:'/rictu/ict_ta/index',
+        name:'ICT Technical Assistance',
+        component:dashboard_ict_ta
     },
     {
         path:'/rictu/ict_ta/create',
         name:'Create ICT Technical Assistance',
         component:create_ict
+    },
+
+    {
+        path:'/calendar/index',
+        name:'Calendar',
+        component:calendar
+       
     },
     {
         path:'/human_resource/employees_directory/index',

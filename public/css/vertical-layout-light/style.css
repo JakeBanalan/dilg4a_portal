@@ -30603,4 +30603,29 @@ div.tagsinput span.tag a {
   }
 }
 
+/* FULL CALENDAR  CSS =============================== */
+.fc .fc-button-primary{
+  background-color: #059886;
+  border-color: #059886 #059886 #03675a;
+}
+
+.fc .fc-button{
+  margin-left: 5px !important;
+}
+
+:root{
+  --fc-button-border-color: #059886;
+  --fc-button-hover-bg-color: #06bda7;
+  --fc-button-hover-border-color: #06bda7;
+  --fc-button-active-bg-color: #047365;
+  --fc-button-active-border-color: #047365;
+}
+
+.fc .fc-event{
+  border: 0;
+  color: #ffffff;
+  padding: 0;
+}
+
+
 /*# sourceMappingURL=../maps/vertical-layout-light/style.css.map */

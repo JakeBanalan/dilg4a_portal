@@ -5,6 +5,7 @@ use App\Http\Controllers\AppItemController;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\RFQController;
 use App\Http\Controllers\RICTUController;
+use App\Http\Controllers\CalendarController;
 
 use App\Models\AppItemModel;
 use App\Models\PurchaseRequestItemModel;
@@ -91,6 +92,14 @@ Route::middleware('api')->group(function () {
     Route::get('fetchUser/{userId}',[UserController::class, 'fetchUserData']);
 });
 
+Route::middleware('api')->group(function () {
+    Route::get('fetchEventData',[CalendarController::class, 'fetchEventData']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchEventDetails',[CalendarController::class, 'fetchEventDetails']);
+});
+
 
 Route::post('login',[UserController::class,'login']);
 Route::post('post_add_appItem',[AppItemController::class,'post_add_appItem']);
@@ -116,11 +125,19 @@ Route::post('post_create_rfq',[RFQController::class,'post_create_rfq']);
 //ICT TA
 
 
+//C A L E N D A R 
+Route::post('PostEventData',[CalendarController::class,'PostEventData']);
+Route::post('PostUpdateEvent',[CalendarController::class,'PostUpdateEvent']);
+
+
+
+
 // E X P O R T
 // routes/web.php or routes/api.php
 Route::middleware('api')->group(function () {
     Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
 });
+
 
 
 
