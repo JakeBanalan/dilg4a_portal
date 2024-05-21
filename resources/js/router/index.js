@@ -29,9 +29,6 @@
     import awarding from "../components/procurement/abstract/panel/awarding.vue";
     import quotation from "../components/procurement/abstract/panel/quotation.vue";
 
-//HR Section
-import employees_directory from "../components/human_resource/employees_directory/index.vue";
-import daily_time_record from "../components/human_resource/daily_time_record/index.vue";
     // PURCHASE ORDER
     import create_po from "../components/procurement/purchase-order/panel/create.vue";
 

@@ -93,7 +93,7 @@
         <FooterVue />
       </div>
     </div>
-    <EventModal :visible="modalVisible" :mode="mode" @close="closeModal" @save="saveEventData" :eventDetails="eventDetails" />
+    <EventModal :visible="modalVisible" :mode="mode" @close="closeModal" @save="saveEventData" :fetchAuthor="fetchAuthor" :eventDetails="eventDetails" />
   </div>
 </template>
 
@@ -111,9 +111,9 @@ import axios from 'axios';
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import { compareByFieldSpecs } from "@fullcalendar/core/internal";
-import { faMonument } from "@fortawesome/free-solid-svg-icons";
-import { formatDate } from "@fullcalendar/core";
+// import { compareByFieldSpecs } from "@fullcalendar/core/internal";
+// import { faMonument } from "@fortawesome/free-solid-svg-icons";
+// import { formatDate } from "@fullcalendar/core";
 
 export default {
   components: {
@@ -129,6 +129,7 @@ export default {
     return {
       modalVisible: false,
       events:[],
+      posted_by:null,
       eventDetails: {
         title: "",
         start: "",
@@ -155,6 +156,7 @@ export default {
         // editable: true,
         // nextDayThreshold: '13:00:00',
         events:[],
+        dayMaxEvents:2,
         customButtons: {
           AddEvent: {
             text: '+ Add Event',
@@ -167,7 +169,7 @@ export default {
   },
   created(){
     this.FetchData();
-    // this.FetchDetails();
+    this.fetchAuthor();
   },
   computed: {
     FormattedFDate(){
@@ -199,6 +201,13 @@ export default {
   }
   },
   methods: {
+    fetchAuthor() {
+      const userId = localStorage.getItem('userId');
+        this.$fetchUserData(userId, '../../../../api/fetchUser')
+            .then(emp_data => {
+                this.posted_by = emp_data.name
+            });
+    },
     ClearEvents(){
       this.eventDetails= {
         title: "",
@@ -214,19 +223,16 @@ export default {
     },
     closeModal() {
       this.modalVisible = false
-      // console.log(this.mode);
-
-      // console.log("close");
     },
     openModal(mode){
       this.mode = mode;
       this.modalVisible = true
-      // console.log("open");
-      console.log(this.mode);
 
     },
     handleCustomButtonClick() {
+      // console.log(this.posted_by)
       this.ClearEvents()
+      this.eventDetails.postedBy = this.posted_by;
       this.openModal('add')
       // this.modalVisible = true
     },
@@ -240,7 +246,7 @@ export default {
               allDay:true
             }));
             this.calendarOptions.events = events
-            console.log(this.calendarOptions.events);
+            // console.log(this.calendarOptions.events);
           })
           .catch(error => {
             console.error('Error Fetching items:', error);
@@ -297,7 +303,7 @@ export default {
         })
         .catch(error => {
           console.error('error saving data',error);
-        console.log(formData);
+        // console.log(formData);
 
         })
       }else{
@@ -315,7 +321,7 @@ export default {
           console.error('error saving data', error)
         })
       }
-    }
+    },
   }
 };
 </script>
@@ -333,8 +339,8 @@ time.icon {
   border-radius: 0.6em;
   box-shadow: 0 1px 0 #bdbdbd, 0 2px 0 #fff, 0 3px 0 #bdbdbd, 0 4px 0 #fff, 0 5px 0 #bdbdbd, 0 0 0 1px #bdbdbd;
   overflow: hidden;
-  -webkit-backface-visibility: hidden;
-  -webkit-transform: rotate(0deg) skewY(0deg);
+  backface-visibility: hidden;
+  transform: rotate(0deg) skewY(0deg);
   transform-origin: 50% 10%;
 }
 
