@@ -22,7 +22,7 @@ class CalendarController extends Controller
             'events.id',
             'events.office',
             'events.title',
-            'tblpersonneldivision.DIVISION_COLOR as color',
+            'pmo.DIVISION_COLOR as color',
             'events.description',
             'events.venue',
             'events.enp',
@@ -43,10 +43,10 @@ class CalendarController extends Controller
             'events.isSent',
             DB::raw("DATE_FORMAT(events.start, '%Y-%m-%dT%H:%i:%s') as start"),
             DB::raw("DATE_FORMAT(events.end, '%Y-%m-%dT%H:%i:%s') as end"),
-            DB::raw("CONCAT(tblemployeeinfo.LAST_M, ', ', tblemployeeinfo.FIRST_M) AS fname")
+            DB::raw("CONCAT(users.last_name, ', ', users.first_name) AS fname")
         )
-            ->leftjoin('tblpersonneldivision', 'DIVISION_N', '=', 'events.office')
-            ->leftjoin('tblemployeeinfo', 'EMP_N', '=', 'events.postedby')
+            ->leftjoin('pmo', 'pmo.id', '=', 'events.office')
+            ->leftjoin('users', 'users.id', '=', 'events.postedby')
             ->get();
 
         return response()->json($EventData);

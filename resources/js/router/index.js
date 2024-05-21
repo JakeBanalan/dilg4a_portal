@@ -38,6 +38,8 @@
 
     //HR Section
     import employees_directory from "../components/human_resource/employees_directory/index.vue";
+    import daily_time_record from "../components/human_resource/daily_time_record/index.vue";
+
 
     // ICT TA
     import dashboard_ict_ta from "../components/rictu/ict_ta/index.vue";
@@ -53,12 +55,6 @@
             name: 'Login',
             component: LoginComponent,
 
-        },
-        {
-            path:'/calendar/index',
-            name:'Calendar',
-            component:calendar
-           
         },
         {
             path: '/sign-in',
@@ -89,6 +85,31 @@
                 });
             }
 
+        },
+        {
+            path:'/calendar/index',
+            name:'Calendar',
+            component:calendar,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+           
         },
         {
             path: '/procurement/index',
