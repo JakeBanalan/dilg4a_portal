@@ -12,8 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
-class CalendarController extends Controller
-{
+class CalendarController extends Controller{
 
     public function fetchEventData()
     {
@@ -23,6 +22,8 @@ class CalendarController extends Controller
             'events.office',
             'events.title',
             'pmo.DIVISION_COLOR as color',
+            // 'events.start',
+            // 'events.end',
             'events.description',
             'events.venue',
             'events.enp',
@@ -41,14 +42,16 @@ class CalendarController extends Controller
             'events.code_series',
             'events.event_reminder',
             'events.isSent',
-            DB::raw("DATE_FORMAT(events.start, '%Y-%m-%dT%H:%i:%s') as start"),
-            DB::raw("DATE_FORMAT(events.end, '%Y-%m-%dT%H:%i:%s') as end"),
+            DB::raw("DATE_FORMAT(events.start, '%Y-%m-%d') as start"),
+            DB::raw("DATE_FORMAT(events.end, '%Y-%m-%d') as end"),
             DB::raw("CONCAT(users.last_name, ', ', users.first_name) AS fname")
-        )
+            )
             ->leftjoin('pmo', 'pmo.id', '=', 'events.office')
             ->leftjoin('users', 'users.id', '=', 'events.postedby')
             ->get();
-
+        // $sql =
+        //  $EventData->toSql();
+        // dd($sql);
         return response()->json($EventData);
     }
 
@@ -88,5 +91,33 @@ class CalendarController extends Controller
                 // 'posteddate' => Carbon::now(),
                 // 'remarks' => $request->input('remarks'),
             ]);
+
+    }
+
+    public function post_create_event(Request $request)
+    {
+        $rfq = new CalendarModel([
+            'id'            => null,
+            'office'         => $request->input('office'),
+            'title'          => $request->input('title'),
+            'color' => $request->input('color'),
+            'start'  => $request->input('start'),
+            'end'    =>  $request->input('end'),
+            'description'    =>  $request->input('description'),
+            'venue' => $request->input('venue'),
+            'enp' => $request->input('enp'),
+            'postedby' => $request->input('postedby'),
+            'remarks' => $request->input('participants')
+
+        ]);
+
+
+
+
+
+        $rfq->save();
+
+        return response()->json(['message' => 'RFQ created successfully', 'sql_query' => $rfq], 201);
     }
 }
+

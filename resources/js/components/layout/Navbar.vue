@@ -29,7 +29,7 @@
                 </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">
-                <li class="nav-item dropdown">
+                <!-- <li class="nav-item dropdown">
                     <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
                         data-toggle="dropdown">
                         <i class="icon-bell mx-0"></i>
@@ -78,7 +78,7 @@
                             </div>
                         </a>
                     </div>
-                </li>
+                </li> -->
                 <li class="nav-item nav-profile dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
                         <img src="../../../../assets/images/logo.png" alt="profile" />
@@ -86,7 +86,7 @@
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
                         <a class="dropdown-item">
                             <i class="ti-settings text-primary"></i>
-                            Settings
+                           <router-link :to="`/settings/update/${userId}`" style="text-decoration:none;color:inherit;">Settings</router-link>
                         </a>
                         <a class="dropdown-item" @click="logout">
                             <i class="ti-power-off text-primary"></i>
@@ -111,8 +111,16 @@
 
 export default {
     name: 'Navbar',
+    data() {
+        return {
+            userId:null
+        }
+    },
     components: {
 
+    },
+    created(){
+        this.userId = localStorage.getItem('userId');
     },
     methods: {
         logout() {

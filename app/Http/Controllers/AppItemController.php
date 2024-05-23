@@ -71,7 +71,8 @@ class AppItemController extends Controller
             ->join('pmo', 'tbl_app.pmo_id', '=', 'pmo.id')
             ->join('item_category', 'tbl_app.category_id', '=', 'item_category.id')
             ->join('mode_of_proc', 'tbl_app.mode', '=', 'mode_of_proc.id')
-            ->join('item_unit', 'tbl_app.unit_id', '=', 'item_unit.id');
+            ->join('item_unit', 'tbl_app.unit_id', '=', 'item_unit.id')
+            ->where('tbl_app.app_year',2024);
         // Print the SQL query
         // $sql = $app_item->toSql();
         // dd($sql);

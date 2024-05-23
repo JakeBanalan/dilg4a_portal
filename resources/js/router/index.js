@@ -1,5 +1,6 @@
     import { createRouter, createWebHistory } from "vue-router";
 
+    import calendar from "../components/calendar/index.vue";
     import LoginForm from "../components/LoginForm.vue";
     import ExampleComponent from "../components/ExampleComponent.vue";
     import DashboardComponent from "../components/DashboardComponent.vue";
@@ -48,6 +49,8 @@
 
     //calendar
     import calendar from "../components/calendar/index.vue";
+    // settings
+    import settingPanel from "../components/settings/update.vue";
     // import _ from "lodash";
     const routes = [
         {
@@ -60,6 +63,31 @@
             path: '/sign-in',
             name: 'sign-in',
             component: LoginForm
+        },
+        {
+            path: '/calendar/index',
+            name: 'Calendar',
+            component: calendar,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
         },
         {
             path: '/dashboard',
@@ -690,6 +718,30 @@
             path: '/human_resource/employees_directory/index',
             name: 'Employees Directory',
             component: employees_directory,
+              meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+        },
+        {
+            path: '/settings/update/:id',
+            name: 'Settings',
+            component: settingPanel,
               meta: {
                 requiresAuth: true
             },

@@ -35,38 +35,117 @@ class RICTUController extends Controller
                 ->get()
         );
     }
-
-    public function fetch_ict_request(Request $request)
+    public function getICTData($id)
     {
+         $query = RICTUModel::select(RICTUModel::raw('
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.control_no AS control_no,
+            u.username AS requested_by,
+            u.user_role as role,
+            tbl_technicalassistance.request_date AS requested_date,
+            time(tbl_technicalassistance.request_date) AS requested_time,
+            MONTH(tbl_technicalassistance.request_date) AS month,
+            YEAR(tbl_technicalassistance.request_date) AS YEAR,
+            tbl_technicalassistance.received_date AS received_date,
+            tbl_technicalassistance.completed_date AS completed_date,
+            tbl_technicalassistance.remarks AS remarks,
+             tbl_technicalassistance.ict_officer_remarks AS ict_officer_remarks,
+            cl.link AS css_link,
+            p.pmo_title AS office,
+            itr.request_type AS request_type,
+            c.TITLE AS sub_request_type,
+            ip.ict_personnel AS ict_personnel,
+            is.status AS status,
+            is.id AS status_id
+        '))
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+            ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+            ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
+            ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
+            ->where('tbl_technicalassistance.id', $id)
+
+            ->orderBy('id', 'DESC');
+    $data = $query->first(); // Use first() instead of get() to retrieve a single result
+    return response()->json($data);
+    }
+
+    public function fetch_ict_request(Request $request,$status)
+    {
+   
+        
         $page = $request->query('page');
         $itemsPerPage = $request->query('itemsPerPage', 500);
 
+        if ($status == 6) {
         
-            $ictQuery = RICTUModel::select([
-                DB::raw('MAX(tbl_technicalassistance.id) as id'),
-                DB::raw('MAX(tbl_technicalassistance.control_no) as control_no'),
-                DB::raw('MAX(u.username) as requested_by'),
-                DB::raw('MAX(tbl_technicalassistance.request_date) as requested_date'),
-                DB::raw('MAX(tbl_technicalassistance.received_date) as received_date'),
-                DB::raw('MAX(tbl_technicalassistance.completed_date) as completed_date'),
-                DB::raw('MAX(tbl_technicalassistance.remarks) as remarks'),
-                DB::raw('MAX(cl.link) as css_link'),
-                DB::raw('MAX(p.pmo_title) as office'),
-                DB::raw('MAX(itr.request_type) as request_type'),
-                DB::raw('MAX(c.TITLE) as sub_request_type'),
-                DB::raw('MAX(ip.ict_personnel) as ict_personnel'),
-                DB::raw('MAX(is.status) as status'),
-                DB::raw('MAX(is.id) as status_id')
-            ])
-                ->join('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-                ->join('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
-                ->join('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
-                ->join('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-                ->join('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-                ->join('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
-                ->join('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
-                ->orderBy('id', 'DESC')
-                ->groupBy('tbl_technicalassistance.id');
+            $ictQuery = RICTUModel::select(RICTUModel::raw('
+                tbl_technicalassistance.id AS id,
+                tbl_technicalassistance.id AS id,
+                tbl_technicalassistance.control_no AS control_no,
+                u.username AS requested_by,
+                u.user_role as role,
+                tbl_technicalassistance.request_date AS requested_date,
+                time(tbl_technicalassistance.request_date) AS requested_time,
+                MONTH(tbl_technicalassistance.request_date) AS month,
+                YEAR(tbl_technicalassistance.request_date) AS YEAR,
+                tbl_technicalassistance.received_date AS received_date,
+                tbl_technicalassistance.completed_date AS completed_date,
+                tbl_technicalassistance.remarks AS remarks,
+                cl.link AS css_link,
+                p.pmo_title AS office,
+                itr.request_type AS request_type,
+                c.TITLE AS sub_request_type,
+                ip.ict_personnel AS ict_personnel,
+                is.status AS status,
+                is.id AS status_id
+            '))
+                ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+                ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+                ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
+                ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+                ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+                ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
+                ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
+                ->orderBy('id', 'DESC');
+        }else{
+            $ictQuery = RICTUModel::select(RICTUModel::raw('
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.control_no AS control_no,
+            u.username AS requested_by,
+            u.user_role as role,
+            tbl_technicalassistance.request_date AS requested_date,
+            time(tbl_technicalassistance.request_date) AS requested_time,
+            MONTH(tbl_technicalassistance.request_date) AS month,
+            YEAR(tbl_technicalassistance.request_date) AS YEAR,
+            tbl_technicalassistance.received_date AS received_date,
+            tbl_technicalassistance.completed_date AS completed_date,
+            tbl_technicalassistance.remarks AS remarks,
+            cl.link AS css_link,
+            p.pmo_title AS office,
+            itr.request_type AS request_type,
+            c.TITLE AS sub_request_type,
+            ip.ict_personnel AS ict_personnel,
+            is.status AS status,
+            is.id AS status_id
+        '))
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+            ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+            ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
+            ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
+            ->where('tbl_technicalassistance.status_id', $status)
+
+            ->orderBy('id', 'DESC');
+        }
+                 // Apply status filter if provided
+
         // $sql = $ictQuery->toSql();
         // echo $sql;
         // exit();
@@ -79,25 +158,50 @@ class RICTUController extends Controller
     public function post_create_ict_request(Request $request)
     {
 
+      
         $requestedDate = $request->input('requested_date');
         $month = Carbon::parse($requestedDate)->format('m');
-        $ict_opts = new RICTUModel([
-            'control_no'            => $request->input('control_no'),
-            'request_by'            => $request->input('requested_by'),
-            'request_date'          => $request->input('requested_date'),
-            'office_id'             => $request->input('pmo'),
-            'unit_id'               => $request->input('email'),
-            'equipment_type'        => $request->input('equipment_type'),
-            'brand'                 => $request->input('brand'),
-            'property_no'           => $request->input('property_no'),
-            'serial_no'             => $request->input('equipment_sn'),
-            'request_type_category_id' => $request->input('type_of_request'),
-            'request_type_id'       => $request->input('subRequest'),
-            'assign_ict_officer'    => 0,
-            'status_id'             => self::STATUS_DRAFT,
-            'remarks'               => $request->input('remarks'),
-            'css_link'              => $month
-        ]);
+        $req = $request->input('type_of_request');
+        if($req == 9)
+        {
+            $ict_opts = new RICTUModel([
+                'control_no'            => $request->input('control_no'),
+                'request_by'            => $request->input('requested_by'),
+                'request_date'          => $request->input('requested_date'),
+                'office_id'             => $request->input('pmo'),
+                'unit_id'               => $request->input('email'),
+                'equipment_type'        => $request->input('equipment_type'),
+                'brand'                 => $request->input('brand'),
+                'property_no'           => $request->input('property_no'),
+                'serial_no'             => $request->input('equipment_sn'),
+                'others'                => $request->input('subRequest'),
+                'request_type_category_id' => 37,
+                'request_type_id'       => $request->input('type_of_request'),
+                'assign_ict_officer'    => 0,
+                'status_id'             => self::STATUS_DRAFT,
+                'remarks'               => $request->input('remarks'),
+                'css_link'              => $month
+            ]);
+        }else{
+            $ict_opts = new RICTUModel([
+                'control_no'            => $request->input('control_no'),
+                'request_by'            => $request->input('requested_by'),
+                'request_date'          => $request->input('requested_date'),
+                'office_id'             => $request->input('pmo'),
+                'unit_id'               => $request->input('email'),
+                'equipment_type'        => $request->input('equipment_type'),
+                'brand'                 => $request->input('brand'),
+                'property_no'           => $request->input('property_no'),
+                'serial_no'             => $request->input('equipment_sn'),
+                'request_type_category_id' => $request->input('subRequest'),
+                'request_type_id'       => $request->input('type_of_request'),
+                'assign_ict_officer'    => 0,
+                'status_id'             => self::STATUS_DRAFT,
+                'remarks'               => $request->input('remarks'),
+                'css_link'              => $month
+            ]);
+        }
+        
         $ict_opts->save();
     }
 

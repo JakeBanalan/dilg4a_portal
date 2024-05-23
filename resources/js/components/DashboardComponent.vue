@@ -183,6 +183,11 @@
             <!-- main-panel ends -->
         </div>
         <!-- page-body-wrapper ends -->
+        <NotifModal 
+        :visible="modalVisible" 
+        :show="showChangePasswordModal"
+        @close="closeModal" />
+
     </div>
 </template>
 
@@ -207,6 +212,7 @@ import ProcurementDetails from "./dashboard_tiles/ProcurementDetails.vue";
 import DetailedReport from "./dashboard_tiles/DetailedReport.vue";
 import ICTTechnicalReport from "./dashboard_tiles/ICTTechnicalReport.vue";
 import AdvancedTable from "./dashboard_tiles/AdvancedTable.vue";
+import NotifModal from "./NotifModal.vue";
 
 
 export default {
@@ -220,7 +226,8 @@ export default {
         ProcurementDetails,
         DetailedReport,
         ICTTechnicalReport,
-        AdvancedTable
+        AdvancedTable,
+        NotifModal
     },
     data() {
         return {
@@ -235,6 +242,13 @@ export default {
             face5: face5,
             face6: face6,
             pageTitle: 'Dashboard',
+            modalVisible: false,
+            showChangePasswordModal: false,
+            isUpdatedPassword:null,
+            user:null
+
+
+
         }
     },
     // Dashboard component
@@ -246,7 +260,21 @@ export default {
     // Call the updateUserId method
     // this.updateUserId();
 },
+mounted() {
+    this.fetchUserData();
+
+   
+    
+
+},
 methods: {
+    checkAndShowModal() {
+      // If the password is not updated, show the modal
+      
+    },
+        closeModal() {
+            this.modalVisible = false;
+        },
     // Example of using a mutation (if needed)
     updateUserId() {
         // Update user ID using a munptation
@@ -256,11 +284,16 @@ methods: {
     fetchUserData() {
       axios.get('/api/user', {
         headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem('token')
+          'Authorization': 'Bearer ' + localStorage.getItem('api_token')
         }
       })
       .then(response => {
         this.user = response.data;
+        if (this.user.isUpdatedPassword == 0) {
+        this.modalVisible = true;
+        this.showChangePasswordModal = true;
+      }
+
       })
       .catch(error => {
         console.error('Request failed:', error);

@@ -56,7 +56,7 @@
 
         <tbody>
             <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
-                <td v-if="isAdmin">
+                <td v-if="this.role == 'admin'">
                     <div v-if="purchaseRequest.status_id == 1">
                         <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)"> <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon> </button>
                         <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="toBudget(purchaseRequest.id)"> <font-awesome-icon :icon="['fas', 'share-square']" style="margin-left: -3px;" /> </button>
@@ -91,6 +91,10 @@
                         <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)"> <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon> </button>
                        
                     </div>
+               </td>
+               <td v-else>
+                <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)"> <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon> </button>
+                <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="exportPurchaseRequest(purchaseRequest.id)"> <font-awesome-icon :icon="['fas', 'download']" style="margin-left: -3px;" /> </button>
                </td>
         
                 <td>
@@ -149,6 +153,7 @@ export default {
     data() {
         return {
             userId:null,
+            roll:null,
             purchaseRequests: [],
             admins: [3174,2563],
             currentPage: 1,
@@ -171,6 +176,8 @@ export default {
     },
     created() {
         this.userId = parseInt(localStorage.getItem('userId'));
+        this.role = localStorage.getItem('user_role');
+        
 
     },
     mounted() {

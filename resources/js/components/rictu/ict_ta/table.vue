@@ -19,6 +19,9 @@ th {
                     <th rowspan="2" style="width: 10%;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
                         colspan="1" aria-label="ICT TECHNICAL ASSISTANCE REFERENCE NO.: activate to sort column ascending">
                         ICT TECHNICAL ASSISTANCE REFERENCE NO.</th>
+                        <th rowspan="2" style="width: 10%;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
+                        colspan="1" aria-label="ISSUE/CONCERN: activate to sort column ascending"> ISSUE/CONCERN</th>
+
                     <th rowspan="2" style="width:6%!important;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
                         colspan="1" aria-label="ACTIONS: activate to sort column ascending">SURVEY LINK</th>
 
@@ -30,8 +33,7 @@ th {
                         colspan="1"
                         aria-label="OFFICE/SERVICE/ BUREAU DIVISION/SECTIO N/UNIT: activate to sort column ascending">
                         OFFICE/SERVICE/<br> BUREAU<br> DIVISION/SECTIO<br> N/UNIT</th>
-                    <th rowspan="2" style="width: 10%;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
-                        colspan="1" aria-label="ISSUE/CONCERN: activate to sort column ascending"> ISSUE/CONCERN</th>
+                 
                     <th rowspan="2" style="width: 10%;" class="sorting" tabindex="0" aria-controls="ict_monitoring"
                         colspan="1" aria-label="TECHNICAL PERSONNEL ASSIGNED: activate to sort column ascending"> TECHNICAL
                         PERSONNEL ASSIGNED</th>
@@ -54,7 +56,7 @@ th {
             </thead>
             <tbody>
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
-                    <td>
+                    <td v-if="this.role == 'admin'">
                         <div v-if="ict_data.status === 'Received'">
                             <!-- Render buttons for viewing and opening modal -->
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
@@ -93,9 +95,18 @@ th {
                        
                        
                     </td>
+                    <td v-else>
+                        <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                        @click="view_ict_form(ict_data.id)">
+                        <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                    </button>
+                    </td>
+
                     <td>{{ ict_data.status }}</td>
-                    <td><b>R4A-{{ ict_data.control_no }}</b><br><i>~Request Date: {{ formatDate(ict_data.requested_date)
+                    <td><b>{{ ict_data.control_no }}</b><br><i>~Request Date: {{ formatDate(ict_data.requested_date)
                     }}</i>~</td>
+                    <td style="white-space:normal;">{{ ict_data.remarks }} </td>
+
                     <td v-if="ict_data.status_id == 3"> 
                         <button class="btn btn-primary mr-1" style="background-color:#059886;color:#fff;" >
                                <font-awesome-icon :icon="['fas', 'square-poll-vertical']" /> 
@@ -109,7 +120,6 @@ th {
                     <td> {{ formatTime(ict_data.received_date) }}</td>
                     <td>{{ ict_data.requested_by }}</td>
                     <td>{{ ict_data.office }}</td>
-                    <td style="white-space:normal;text-align:justify;">{{ ict_data.remarks }} </td>
                     <td>{{ ict_data.ict_personnel }}</td>
                     <td> {{ formatDate(ict_data.completed_date) }}</td>
                     <td> {{ formatTime(ict_data.completed_date) }}</td>
@@ -154,6 +164,7 @@ export default {
     data() {
         return {
             ict_data: [],
+            role:null,
             currentPage: 1,
             itemsPerPage: 10,
             modalVisible: false,
@@ -169,6 +180,10 @@ export default {
         }
             
     },
+    created() {
+    this.role = localStorage.getItem('user_role');
+    console.log(this.role);
+    },
     computed: {
 
         totalPages() {
@@ -181,7 +196,7 @@ export default {
         },
     },
     mounted() {
-        this.load_ict_request()
+        this.load_ict_request(6)
         // load the data when the user click the control_no to be completed
         // then pass the control_no and id to the modal
 
@@ -222,11 +237,12 @@ export default {
                 return formattedDate;
             }
         },
-        load_ict_request() {
-            axios.get(`../../api/fetch_ict_request`)
+       
+        load_ict_request(status) {
+            const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
+            axios.get(url)
                 .then(response => {
                     this.ict_data = response.data.data;
-                    console.log(this.ict_data);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -268,7 +284,7 @@ export default {
                 toast.success('Success! This request has been received!', {
                     autoClose: 2000
                 });
-           this.load_ict_request();
+           this.load_ict_request(6);
 
             }).catch((error) => {
 

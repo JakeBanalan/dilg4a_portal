@@ -1,7 +1,6 @@
 <template>
     <div class="row">
         <div class="col-md-6 grid-margin stretch-card">
-            <div class="card tale-bg">
                 <div class="card-people mt-auto">
                     <img :src="dashboard_img1" alt="people">
                     <!-- <div class="weather-info">
@@ -16,7 +15,6 @@
                         </div>
                     </div> -->
                 </div>
-            </div>
         </div>
         <div class="col-md-6 grid-margin transparent">
             <div class="row">

@@ -23,6 +23,7 @@ class RICTUModel extends Model
         'office_id',
         'request_type_category_id',
         'request_type_id',
+        'others',
         'ict_officer_remarks',
         'remarks',
         'assign_ict_officer',

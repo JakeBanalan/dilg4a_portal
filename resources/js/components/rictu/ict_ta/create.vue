@@ -19,6 +19,11 @@ img {
     width: 50px;
     height: 50px;
 }
+
+.img-header {
+    width: 150px !important;
+    height: 150px !important;
+}
 </style>
 <template>
     <div class="container-scroller">
@@ -30,7 +35,50 @@ img {
                     <BreadCrumbs />
                     <form @submit.prevent="create_ict_ta()">
                         <div class="row">
-                            <div class="col-lg-6">
+                            <div class="col-lg-9">
+                                <img :src="dilg_logo" class="img-header" align="left">
+                                <h1 style="font-family:'Times New Roman', Times, serif;font-size:24px;"> Republic of the
+                                    Philippines</h1>
+                                <h2 style="font-family:'Times New Roman', Times, serif;font-size:30px;font-weight:bold">
+                                    Department of the Interior and Local Government</h2>
+                                <h2 style="font-family:'Times New Roman', Times, serif; font-weight:bolder;"><u> ICT
+                                        TECHNICAL ASSISTANCE REQUEST FORM</u></h2><br><br>
+                                <h3 style="font-family:'Times New Roman', Times, serif;font-size:20px;">NOTE: FILL-UP
+                                    THIS FORM AND PLEASE WRITE LEGIBLY. (* - REQUIRED)</h3>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="box box-primary box-solid dropbox" style="border:1px solid black;">
+                                    <div class="box-header with-border"
+                                        style="background-color: #000;padding:2px;color:#fff;">
+                                        <h6 class="box-title">Document Code</h6>
+                                    </div>
+                                    <div class="box-header with-border"
+                                        style="color:black;padding:2px;text-align:center;">
+                                        <h6 class="box-title">FM-QP-DILG-ISTMS-RO-17-01</h6>
+                                    </div>
+                                    <div class="box-header with-border"
+                                        style="background-color: #000;padding:2px;color:#fff;">
+                                        <h6 class="box-title" style="text-align: center;">Rev No. Eff. Date Page</h6>
+                                    </div>
+                                    <div class="box-header with-border" style="background-color:#fff;padding:2px;">
+                                        <h6 class="box-title">00 06.15.21 1 of 1</h6>
+                                    </div>
+
+                                </div>
+                                <div class="box box-primary box-solid dropbox" style="border:1px solid black;">
+                                    <div class="box-header with-border" style="background-color: #000;color:#fff;">
+                                        <h4 class="box-title">ICT Technical Assistance Reference Number</h4>
+                                    </div>
+                                    <center><span style="text-align:center;color:red;font-weight:bold;font-size:24px;">
+                                            {{ ict_no }}
+                                        </span></center>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6 mt-4">
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="card-title">
@@ -38,59 +86,68 @@ img {
                                                     class="mr-2"></font-awesome-icon>TECHNICAL ASSISTANCE FORM</h4>
                                         </div>
                                         <div class="row">
+
                                             <div class="col-lg-6">
-                                                <TextInput label="Control Number" iconValue="gear" v-model="ict_no" :value="ict_no"
-                                                    :readonly="true" />
+                                                <input type="hidden" v-model="ict_no" />
+                                                <TextInput label="Requested Date:" iconValue="calendar" type="date"
+                                                    style="height: 40px !important;" v-model="requested_date"
+                                                    :readonly="true" :value="requested_date" />
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <TextInput label="Time:" iconValue="calendar" type="text"
+                                                    style="height: 40px !important;" v-model="requested_time"
+                                                    :readonly="true" :value="formatTime(requested_time)" />
+                                            </div>
+                                            <div class="col-lg-12 mt-4">
+                                                <TextInput label="Requested By:" iconValue="user"
+                                                    v-model="userData.name" :value="userData.name" :readonly="true" />
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <TextInput label="Office/Service/Bureau/Section/Division/Unit:"
+                                                    iconValue="building" :value="userData.pmo_title" :readonly="true" />
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <TextInput label="Contact Number/E-mail:" iconValue="envelope-open-text"
+                                                    :value="userData.email" :readonly="true" />
+                                            </div>
+                                            <div class="col-lg-12">
+                                                <TextInput label="Agreed Timeline if any:" iconValue="check-circle"
+                                                    :readonly="false" />
                                             </div>
 
 
-                                            <div class="col-lg-6">
-                                                <TextInput label="Requested By" iconValue="user" v-model="userData.name"
-                                                    :value="userData.name" :readonly="true" />
-                                            </div>
+
 
                                         </div>
-                                        <div class="row">
 
-                                            
-                                            <div class="col-lg-6">
-                                                <TextInput label="Office" iconValue="building" :value="userData.pmo_title" :readonly="true" />
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <TextInput label="Contact Number/E-mail" iconValue="envelope-open-text" :value="userData.email"
-                                                    :readonly="true" />
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <TextInput label="Requested Date" iconValue="calendar" type="date" style="height: 40px !important;"
-                                                    v-model="userData.requested_date" :value="userData.requested_date" />
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <TextInput label="Agreed Timeline if any:" iconValue="check-circle" :readonly="false" />
-                                            </div>
-                                        </div>
-                                </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-6">
+                            <div class="col-lg-6 mt-4">
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="card-title">
                                             <h4><font-awesome-icon :icon="['fas', 'circle-info']"
-                                                    class="mr-2"></font-awesome-icon>HARDWARE INFORMATION</h4>
+                                                    class="mr-2"></font-awesome-icon>HARDWARE INFORMATION (if needed)
+                                            </h4>
                                         </div>
                                         <div class="row">
 
-                                            <div class="col-lg-6">
-                                                <TextInput label="Equipment Type" iconValue="server" v-model="hardwareInfo.etype" />
+                                            <div class="col-lg-12">
+                                                <TextInput label="Equipment Type:" iconValue="server"
+                                                    v-model="hardwareInfo.etype" />
                                             </div>
-                                            <div class="col-lg-6">
-                                                <TextInput label="Brand/Model" iconValue="copyright" v-model="hardwareInfo.brand" />
+                                            <div class="col-lg-12">
+                                                <TextInput label="Brand/Model:" iconValue="copyright"
+                                                    v-model="hardwareInfo.brand" />
                                             </div>
-                                            <div class="col-lg-6">
-                                                <TextInput label="Property Number" iconValue="bars" v-model="hardwareInfo.pNumber" />
+                                            <div class="col-lg-12">
+                                                <TextInput label="Property No:" iconValue="bars"
+                                                    v-model="hardwareInfo.pNumber" />
                                             </div>
-                                            <div class="col-lg-6">
-                                                <TextInput label="Equipment Serial Number" iconValue="hashtag" v-model="hardwareInfo.eSerial" />
+                                            <div class="col-lg-12">
+                                                <TextInput label="Equipment SN:" iconValue="hashtag"
+                                                    v-model="hardwareInfo.eSerial" />
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="form-group" style="height: 70px;">
@@ -117,10 +174,12 @@ img {
                                             </div>
                                             <div class="col-lg-6 mb-4">
                                                 <div class="form-group">
-                                                    <label>NAME OF SUB REQUEST</label>
-                                                    <multiselect v-model="selectedSubRequest"
-                                                        :options="filteredSubRequests" label="label"
-                                                        :multiple="false"></multiselect>
+                                                    <label v-if="!isOthersType">NAME OF SUB REQUEST</label>
+                                                    <multiselect v-if="!isOthersType" v-model="selectedSubRequest"
+                                                        :options="filteredSubRequests" label="label" :multiple="false">
+                                                    </multiselect>
+                                                    <label v-else>PLEASE SPECIFY</label>
+                                                    <TextInput v-else label="Please Specify" iconValue="hashtag" v-model="selectedSubRequest" />
                                                 </div>
                                             </div>
 
@@ -156,13 +215,14 @@ img {
 
                                         <div class="row">
                                             <div class="col-lg-6">
-                                                <TextInput label="Acceptance of Service Rendered" iconValue="user" v-model="acceptance"
-                                                    :value="userData.name" :readonly="true" />
+                                                <TextInput label="Acceptance of Service Rendered" iconValue="user"
+                                                    v-model="acceptance" :value="userData.name" :readonly="true" />
 
 
                                             </div>
                                             <div class="col-lg-6">
-                                                <TextInput label="ICT Technical Personnel " iconValue="user" v-model="ict_personnel" />
+                                                <TextInput label="ICT Technical Personnel " iconValue="user"
+                                                    v-model="ict_personnel" />
                                             </div>
                                         </div>
                                     </div>
@@ -193,11 +253,13 @@ import Sidebar from '../../layout/Sidebar.vue';
 import FooterVue from '../../layout/Footer.vue';
 import BreadCrumbs from '../../dashboard_tiles/BreadCrumbs.vue';
 import { toast } from "vue3-toastify";
+import logo from "../../../../assets/logo.png";
 
 export default {
     name: 'Create ICT Technical Assistance',
     data() {
         return {
+            dilg_logo: logo,
             folderId: '1AmuHQn3YkNEEVdR3RbpijsaX9NKT1oub', // Replace 'YOUR_FOLDER_ID' with the ID of your target folder
             accessToken: null,
             remarks: null,
@@ -214,11 +276,18 @@ export default {
                 pNumber: null,
                 eSerial: null,
             },
+            requested_date: new Date().toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            }).split('/').reverse().join('-'),
+            requested_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), // Set current time        
             userData: {
                 name: null,
                 pmo_title: null,
                 email: null,
-                requested_date: null
+                // Set current date in dd/mm/yyyy format
+
             },
             options: [
                 { label: 'DESKTOP/LAPTOP REPAIR', value: 1 },
@@ -272,42 +341,64 @@ export default {
     computed: {
 
         filteredSubRequests() {
-            if (!this.selectedType) {
+            if (!this.selectedType || this.selectedType.value === 9) {
                 return [];
             }
             return this.sub_request.filter(item => item.type === this.selectedType.value);
-        }
+        },
+        isOthersType() {
+            return this.selectedType && this.selectedType.value === 9;
+        },
     },
 
     mounted() {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
 
+
     },
     methods: {
+        formatDate(date) {
+            if (!date) return '';
+            const [year, month, day] = date.split('-');
+            return `${day}/${month}/${year}`;
+        },
+        formatTime(time) {
+            if (!time) return '';
+            const [hours, minutes] = time.split(':');
+            let hour = parseInt(hours);
+            if (hour >= 12) {
+                if (hour > 12) {
+                    hour -= 12;
+                }
+            }
+            return `${hour}:${minutes}:${new Date().getSeconds()}`;
+        },
         showToatSuccess(message) {
             toast.success(message, {
                 autoClose: 1000,
             });
         },
         create_ict_ta() {
+            const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
+
             const userId = localStorage.getItem('userId');
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
                     axios.post('/api/post_create_ict_request', {
-                        control_no:     this.ict_no,
-                        requested_by:   userId,
-                        requested_date: this.userData.requested_date,
-                        pmo:             emp_data.id,
-                        email:           emp_data.email,
-                        equipment_type:  this.hardwareInfo.etype,
-                        brand:           this.hardwareInfo.brand,
-                        property_no:     this.hardwareInfo.pNumber,
-                        equipment_sn:    this.hardwareInfo.eSerial,
+                        control_no: this.ict_no,
+                        requested_by: userId,
+                        requested_date: this.requested_date + ' ' + this.formatTime(this.requested_time), // Combine date and time
+                        pmo: emp_data.id,
+                        email: emp_data.email,
+                        equipment_type: this.hardwareInfo.etype,
+                        brand: this.hardwareInfo.brand,
+                        property_no: this.hardwareInfo.pNumber,
+                        equipment_sn: this.hardwareInfo.eSerial,
                         type_of_request: this.selectedType.value,
-                        subRequest:      this.selectedSubRequest.value,
-                        remarks:         this.remarks,
-                        status:          1
+                        subRequest: selectedRequest,
+                        remarks: this.remarks,
+                        status: 1
 
                     }).then(() => {
                         this.showToatSuccess('Successfully added!');
@@ -346,7 +437,7 @@ export default {
                 const formattedSequence = ict_no.toString().padStart(4, '0');
 
                 // set the draft pr no of the user
-                this.ict_no = `${ict_no_format}-${month}-${formattedSequence}`;
+                this.ict_no = `R4A-${ict_no_format}-${month}-${formattedSequence}`;
 
                 // localStorage.setItem('prId', response.data.userId);
 

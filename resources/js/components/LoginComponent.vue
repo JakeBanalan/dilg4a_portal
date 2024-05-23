@@ -36,7 +36,7 @@
                     <div class="col-md-12 header-margin">
                         <!-- <img :src="header" class="" style="width:1200px;margin-bottom:600px;"/> -->
 
-                        <button type="button" class="btn custom-btn btn-outline-primary btn-fw btn-icon-text blinking_btn"
+                        <button type="button" class="btn custom-btn btn-outline-primary btn-fw btn-icon-text"
                             style="top:-40px !important;margin-left:265px;">
                             ONLINE PORTAL
                         </button>
@@ -518,7 +518,8 @@ export default {
                         localStorage.setItem('userId', response.data.userId);
                         localStorage.setItem('user_role', response.data.user_role);
                         localStorage.setItem('api_token', response.data.api_token);
-                        console.log(response.data.api_token);
+                        localStorage.setItem('isUpdatedPassword', response.data.isUpdatedPassword);
+console.log(response.data.isUpdatedPassword);
 
                         this.showSuccessNotification('You are logged in');
                         setTimeout(() => {

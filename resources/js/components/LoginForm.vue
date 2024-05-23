@@ -131,11 +131,11 @@ export default {
                     localStorage.setItem('userId', response.data.userId);
                     localStorage.setItem('user_role', response.data.user_role);
                     localStorage.setItem('api_token', response.data.api_token);
-
+                   
 
                     this.showSuccessNotification('You are logged in');
                     setTimeout(() => {
-                        this.$router.push({ name: 'Dashboard' });
+                        // this.$router.push({ name: 'Dashboard' });
                     }, 1000);
                 } else {
                     this.showFailedNotification('Login Failed');
