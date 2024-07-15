@@ -95,6 +95,7 @@ export default {
         }
     },
     props: {
+        //admin
         menuItems: {
             type: Array,
             default: () => [
@@ -272,6 +273,34 @@ export default {
                         // },
                     ]
                 },
+                {
+                    link: '',
+                    name: 'QMS',
+                    tooltip: 'Calendar',
+                    icon: 'computer',
+                    class: 'menu-icon-custom',
+
+                    children: [
+                        {
+                            link: '/qms/quality_procedure/index',
+                            name: 'Quality Procedures',
+                            tooltip: 'Buttons',
+                            icon: 'clipboard-list',
+                        },
+                        {
+                            link: '/qms/process_owner/index',
+                            name: 'Process Owners',
+                            tooltip: 'Buttons',
+                            icon: 'clipboard-list',
+                        },
+                        {
+                            link: '/qms/reports_submission/index',
+                            name: 'Reports Submission',
+                            tooltip: 'Buttons',
+                            icon: 'clipboard-list',
+                        },
+                    ]
+                },
                 // {
                 //     link: '/settings/update/',
                 //     name: 'Settings',
@@ -282,6 +311,7 @@ export default {
 
             ],
         },
+        //user
         userItems: {
             type: Array,
             default: () => [
@@ -350,7 +380,24 @@ export default {
                       
                     
                     ]
-                }
+                },
+                {
+                    link: '',
+                    name: 'QMS',
+                    tooltip: 'Calendar',
+                    icon: 'computer',
+                    class: 'menu-icon-custom',
+
+                    children: [
+                       
+                        {
+                            link: '/qms/reports_submission/index',
+                            name: 'Reports Submission',
+                            tooltip: 'Buttons',
+                            icon: 'clipboard-list',
+                        },
+                    ]
+                },
 
             ],
         },

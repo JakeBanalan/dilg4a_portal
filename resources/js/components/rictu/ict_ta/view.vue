@@ -157,10 +157,21 @@
                                             <TextInput label="Request Category" iconValue="hashtag"
                                             v-model="data.others"  :value="data.others" disabled />
                                         </div>
-                                        <div class="col-lg-6 mb-4" v-else>
+                                        <div class="col-lg-6 mb-4" v-else-if="data.req_id = 7">
+                                            
                                             <TextInput label="Request Category" iconValue="hashtag"
                                             v-model="data.sub_request_type"  :value="data.sub_request_type" disabled />
+                                            <TextInput label="Web Apps/Website Access" iconValue="hashtag"
+                                            v-model="data.website_access"  :value="data.website_access" disabled />
                                         </div>
+                                        <div class="col-lg-6 mb-4" v-else-if="data.req_id = 4">
+                                            
+                                            <TextInput label="Request Category" iconValue="hashtag"
+                                            v-model="data.sub_request_type"  :value="data.sub_request_type" disabled />
+                                            <TextInput label="Others (please specify):" iconValue="hashtag"
+                                            v-model="data.others"  :value="data.others_software" disabled />
+                                        </div>
+                                       
 
                                         <div class="col-lg-6">
                                             <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "

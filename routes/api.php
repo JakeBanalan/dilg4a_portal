@@ -12,9 +12,10 @@ use App\Http\Controllers\HRSController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\PositionController;
-
-
-
+use App\Http\Controllers\QMSController;
+use App\Http\Controllers\QMSQuarterlyExportController;
+use App\Http\Controllers\QMSMonthlyExportController;
+use App\Http\Controllers\QMSQuarterlyLNDController;
 use App\Models\AppItemModel;
 use App\Models\PurchaseRequestItemModel;
 use App\Models\PurchaseRequestModel;
@@ -32,6 +33,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -41,7 +43,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/authenticated', function (Request $request) {
         return response()->json(['authenticated' => true]);
     });
-    
+
     // // Other protected routes...
 });
 // Route::get('/authenticated', function (Request $request) {
@@ -126,19 +128,19 @@ Route::middleware('api')->group(function () {
 
 
 Route::middleware('api')->group(function () {
-    Route::get('countICTRequest/{cur_year}', [RICTUController::class,'countICTRequest']);
+    Route::get('countICTRequest/{cur_year}', [RICTUController::class, 'countICTRequest']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countDRAFT/{status}', [RICTUController::class,'countDRAFT']);
+    Route::get('countDRAFT/{status}', [RICTUController::class, 'countDRAFT']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countPurchaseRequestStatistics/{cur_year}', [PurchaseRequestController::class,'countPurchaseRequestStatistics']);
+    Route::get('countPurchaseRequestStatistics/{cur_year}', [PurchaseRequestController::class, 'countPurchaseRequestStatistics']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('getActiveAccounts', [HRSController::class,'getActiveAccounts']);
+    Route::get('getActiveAccounts', [HRSController::class, 'getActiveAccounts']);
 });
 
 Route::middleware('api')->group(function () {
@@ -172,29 +174,89 @@ Route::middleware('api')->group(function () {
     Route::get('viewRFQItems/{id}', [RFQController::class, 'viewRFQItems']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('fetchUser/{userId}',[UserController::class, 'fetchUserData']);
+    Route::get('fetchUser/{userId}', [UserController::class, 'fetchUserData']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('getICTData/{id}',[RICTUController::class, 'getICTData']);
+    Route::get('getICTData/{id}', [RICTUController::class, 'getICTData']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('getUserDetails/{id}',[UserController::class, 'getUserDetails']);
+    Route::get('getUserDetails/{id}', [UserController::class, 'getUserDetails']);
 });
 
 
 
 Route::middleware('api')->group(function () {
-    Route::get('getPosition',[PositionController::class, 'getPosition']);
+    Route::get('getPosition', [PositionController::class, 'getPosition']);
+});
+
+//CALENDAR GET
+Route::middleware('api')->group(function () {
+    Route::get('fetchEventData', [CalendarController::class, 'fetchEventData']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('fetchEventData',[CalendarController::class, 'fetchEventData']);
+    Route::get('fetchEventDetails', [CalendarController::class, 'fetchEventDetails']);
+});
+
+
+//QMS GET
+Route::middleware('api')->group(function () {
+    Route::get('fetchProcessOwner', [QMSController::class, 'fetchProcessOwner']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('fetchEventDetails',[CalendarController::class, 'fetchEventDetails']);
+    Route::get('fetchAllUser', [QMSController::class, 'fetchAllUser']);
 });
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQualityProcedure', [QMSController::class, 'fetchQualityProcedure']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchEntryData/{id}', [QMSController::class, 'fetchEntryData']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQualityObjectives/{id}', [QMSController::class, 'fetchQualityObjectives']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('UpdateQualityObjectives/{id}/{qoeID}', [QMSController::class, 'UpdateQualityObjectives']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQPdata/{qp_code_id}', [QMSController::class, 'fetchQPdata']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQoprData/{id}', [QMSController::class, 'fetchQoprData']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQoprEntryData/{id}', [QMSController::class, 'fetchQoprEntryData']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQOPR', [QMSController::class, 'fetchQOPR']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQOPRUserData/{id}/{qoe_id}', [QMSController::class, 'fetchQOPRUserData']);
+});
+Route::middleware('api')->group(function () {
+
+    Route::get('fetchQuarterData/{id}/{qoe_id}', [QMSController::class, 'fetchQuarterData']);
+});
+
+Route::middleware('api')->group(function () {
+
+    Route::get('fetchMonthlyData/{id}/{qoe_id}', [QMSController::class, 'fetchMonthlyData']);
+});
+
+
+
+
 
 Route::post('/logout', [UserController::class, 'logout']);
 
@@ -204,19 +266,19 @@ Route::post('/logout', [UserController::class, 'logout']);
 //     // Clear any other cached data or session information if necessary
 //     return response()->json(['message' => 'Successfully logged out']);
 // })->middleware('auth:api');
-Route::post('login',[UserController::class,'login']);
+Route::post('login', [UserController::class, 'login']);
 // Route::post('logout',[UserController::class,'logout']);
 
 
-Route::post('updateUserDetails',[UserController::class,'updateUserDetails']);
-Route::post('post_add_appItem',[AppItemController::class,'post_add_appItem']);
-Route::post('post_create_ict_request',[RICTUController::class,'post_create_ict_request']);
-Route::post('post_update_cart',[PurchaseRequestController::class,'post_update_cart']);
-Route::post('post_insert_pritem',[PurchaseRequestController::class,'post_insert_pritem']);
-Route::post('post_remove_pritem',[PurchaseRequestController::class,'post_remove_pritem']);
-Route::post('post_insert_purchaseNo',[PurchaseRequestController::class,'post_insert_purchaseNo']);
-Route::post('post_create_purchaseRequest',[PurchaseRequestController::class,'post_create_purchaseRequest']);
-Route::post('post_update_purchaseRequestDetailsForm',[PurchaseRequestController::class,'post_update_purchaseRequestDetailsForm']);
+Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
+Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
+Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
+Route::post('post_update_cart', [PurchaseRequestController::class, 'post_update_cart']);
+Route::post('post_insert_pritem', [PurchaseRequestController::class, 'post_insert_pritem']);
+Route::post('post_remove_pritem', [PurchaseRequestController::class, 'post_remove_pritem']);
+Route::post('post_insert_purchaseNo', [PurchaseRequestController::class, 'post_insert_purchaseNo']);
+Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
+Route::post('post_update_purchaseRequestDetailsForm', [PurchaseRequestController::class, 'post_update_purchaseRequestDetailsForm']);
 Route::post('fetchCart', [PurchaseRequestController::class, 'fetchCart']);
 Route::post('fetchPurchaseReqData', [PurchaseRequestController::class, 'fetchPurchaseReqData']);
 Route::post('fetchSubmittedtoGSS', [PurchaseRequestController::class, 'fetchSubmittedtoGSS']);
@@ -228,35 +290,50 @@ Route::post('fetch_supplier_quotation', [SupplierController::class, 'fetch_suppl
 Route::post('fetch_supplier_title', [SupplierController::class, 'fetch_supplier_title']);
 Route::post('post_supplier_quote', [SupplierController::class, 'post_supplier_quote']);
 Route::post('post_create_abstract', [AbstractController::class, 'post_create_abstract']);
-Route::post('post_create_po',[PurchaseOrderController::class,'post_create_po']);
-Route::post('total_amount', [PurchaseRequestController::class, 'total_amount']);    
+Route::post('post_create_po', [PurchaseOrderController::class, 'post_create_po']);
+Route::post('total_amount', [PurchaseRequestController::class, 'total_amount']);
 // Route::post('post_update_status', 'PurchaseRequestController@post_update_status')->name('post.update.status');
-Route::post('post_update_status',[PurchaseRequestController::class,'post_update_status']);
-Route::post('post_addCode',[PurchaseRequestController::class,'post_addCode']);
-Route::post('fetch_ict_req_details',[RICTUController::class,'fetch_ict_req_details']);
+Route::post('post_update_status', [PurchaseRequestController::class, 'post_update_status']);
+Route::post('post_addCode', [PurchaseRequestController::class, 'post_addCode']);
+Route::post('fetch_ict_req_details', [RICTUController::class, 'fetch_ict_req_details']);
 
 
-Route::post('post_complete',[CRUDController::class,'post_complete']);
-Route::post('post_received_ict_request',[CRUDController::class,'post_received_ict_request']);
-Route::post('getSmallestQuotationsForItems',[SupplierController::class,'getSmallestQuotationsForItems']);
+Route::post('post_complete', [CRUDController::class, 'post_complete']);
+Route::post('post_received_ict_request', [CRUDController::class, 'post_received_ict_request']);
+Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSmallestQuotationsForItems']);
 
 
 
 
 // R F Q
-Route::post('post_create_rfq',[RFQController::class,'post_create_rfq']);
+Route::post('post_create_rfq', [RFQController::class, 'post_create_rfq']);
 
 //CALENDAR
 //C A L E N D A R 
-Route::post('PostEventData',[CalendarController::class,'PostEventData']);
-Route::post('PostUpdateEvent',[CalendarController::class,'PostUpdateEvent']);
-Route::post('post_create_event',[CalendarController::class,'post_create_event']);
+Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
+Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
+Route::post('post_create_event', [CalendarController::class, 'post_create_event']);
 
 
 
 //C A L E N D A R 
-Route::post('PostEventData',[CalendarController::class,'PostEventData']);
-Route::post('PostUpdateEvent',[CalendarController::class,'PostUpdateEvent']);
+Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
+Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
+
+
+//QMS POST
+Route::post('DeleteProcessOwner', [QMSController::class, 'DeleteProcessOwner']);
+Route::post('addProcessOwner', [QMSController::class, 'addProcessOwner']);
+Route::post('postQualityProcedure', [QMSController::class, 'postQualityProcedure']);
+Route::post('postQualityObjectives', [QMSController::class, 'postQualityObjectives']);
+Route::post('postUpdateQualityObjectives', [QMSController::class, 'postUpdateQualityObjectives']);
+Route::post('DeleteQualityObjective', [QMSController::class, 'DeleteQualityObjective']);
+Route::post('deleteQualityProcedure', [QMSController::class, 'deleteQualityProcedure']);
+Route::post('postReportEntry', [QMSController::class, 'postReportEntry']);
+Route::post('submitReport', [QMSController::class, 'submitReport']);
+Route::post('deleteRS', [QMSController::class, 'deleteRS']);
+Route::post('saveQuarterData', [QMSController::class, 'saveQuarterData']);
+Route::post('saveMonthlyData', [QMSController::class, 'saveMonthlyData']);
 
 
 
@@ -276,9 +353,19 @@ Route::middleware('api')->group(function () {
 });
 
 
+Route::middleware('api')->group(function () {
+    Route::get('generate-report/{sy}/{sq}/{rt}', [RICTUController::class, 'generate']);
+});
 
 
+Route::middleware('api')->group(function () {
+    Route::get('generateReportQ/{id}', [QMSQuarterlyExportController::class, 'generateReport']);
+});
 
+Route::middleware('api')->group(function () {
+    Route::get('generateReportM/{id}', [QMSMonthlyExportController::class, 'generateReport']);
+});
 
-
-
+Route::middleware('api')->group(function () {
+    Route::get('generateReportQLND/{id}', [QMSQuarterlyLNDController::class, 'generateReport']);
+});

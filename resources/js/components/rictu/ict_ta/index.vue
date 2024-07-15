@@ -111,6 +111,9 @@ h5 {
                                             <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;ICT Technical Assistance Monitoring
                                         </h5>
                                         <div class="d-flex">
+                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="openModal()">
+                                                Generate Report
+                                            </button>
                                             <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
                                                 <router-link class="router-class" style="color:#059886;" :to="{ name: 'Create ICT Technical Assistance' }">
                                                     Create Request
@@ -133,6 +136,8 @@ h5 {
                 </div>
             </div>
         </div>
+        <modal_export :visible="modalVisible" @close="closeModal" />
+
     </div>
 </template>
 
@@ -154,6 +159,7 @@ import TextInput from '../../micro/TextInput.vue';
 import ICTTable from './table.vue';
 import Multiselect from 'vue-multiselect'
 import StatBoard from './stat_board';
+import modal_export from  '../modal/modal_generate_report.vue';
 
 import axios from 'axios';
 
@@ -175,7 +181,9 @@ export default {
             province: [{ label: "Cavite", value: "Cavite" }, { label: "Laguna", value: "Laguna" }, { label: "Batangas", value: "Batangas" }, { label: "Rizal", value: "Rizal" }, { label: "Quezon", value: "Quezon" }, { label: "Lucena City", value: "Lucena City" }],
             quarter: [{ label: '1st Quarter', value: '1st Quarter' }, { label: '2nd Quarter', value: '2nd Quarter' }, { label: '3rd Quarter', value: '3rd Quarter' }, { label: '4th Quarter', value: '4th Quarter' }],
             status: [{label:'All',value:6},{label:'Draft',value:1},{label:'Received',value:2},{label:'Completed',value:3},{label:'Rated',value:4}],
-            isCardVisible: false
+            isCardVisible: false,
+            modalVisible: false,
+
 
         }
     },
@@ -183,6 +191,12 @@ export default {
     methods: {
         toggleCard() {
             this.isCardVisible = !this.isCardVisible;
+        },
+        openModal() {
+            this.modalVisible = true;
+        },
+        closeModal() {
+            this.modalVisible = false;
         },
         filter(){
             const status = this.selected_status.value;
@@ -206,7 +220,8 @@ export default {
         TextInput,
         ICTTable,
         Multiselect,
-        StatBoard
+        StatBoard,
+        modal_export
 
     },
 }

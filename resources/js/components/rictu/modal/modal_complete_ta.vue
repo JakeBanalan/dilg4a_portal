@@ -1,7 +1,7 @@
 <template>
     <div v-if="visible" class="modal-background">
         <div class="modal fade show" tabindex="-1" style="display: block;">
-            <div class="modal-dialog" style="margin-top: 20px; display: flex; align-items: center;">
+            <div class="modal-dialog" style="margin-top: 5%; display: flex; align-items: center;">
                 <div class="modal-content" style="width: 150%; margin-bottom: 5%;">
                     <div class="modal-header">
                         <div

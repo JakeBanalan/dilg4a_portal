@@ -9,7 +9,7 @@
       </thead>
       <tbody>
         <tr v-for="item in data" :key="item.id">
-          <td v-for="column in columns" :key="column" style="width: calc(100% / {{ columns.length }}); white-space: normal;">
+          <td v-for="column in columns" :key="column" style="white-space: normal; width: calc(100% / {{ columns.length }}); ">
             <!-- Check if the column is 'ACTION' -->
             <template v-if="column === 'app_price'">
               <div class="template-demo">

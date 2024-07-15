@@ -166,29 +166,41 @@ img {
 
                                         <div class="row">
                                             <div class="col-lg-6 mb-4">
-                                                <div class="form-group">
-                                                    <label>TYPE OF REQUEST (CHOOSE THAT ALL APPLY)</label>
-                                                    <multiselect v-model="selectedType" :options="options" label="label"
-                                                        :multiple="false"></multiselect>
-                                                </div>
+                                              <div class="form-group">
+                                                <label>TYPE OF REQUEST (CHOOSE THAT ALL APPLY)</label>
+                                                <multiselect v-model="selectedType" :options="options" label="label" :multiple="false"></multiselect>
+                                              </div>
                                             </div>
                                             <div class="col-lg-6 mb-4">
-                                                <div class="form-group">
-                                                    <label v-if="!isOthersType">NAME OF SUB REQUEST</label>
-                                                    <multiselect v-if="!isOthersType" v-model="selectedSubRequest"
-                                                        :options="filteredSubRequests" label="label" :multiple="false">
-                                                    </multiselect>
-                                                    <label v-else>PLEASE SPECIFY</label>
-                                                    <TextInput v-else label="Please Specify" iconValue="hashtag" v-model="selectedSubRequest" />
+                                              <div class="form-group">
+                                                <label v-if="!isOthersType">NAME OF SUB REQUEST</label>
+                                                <multiselect v-if="!isOthersType" v-model="selectedSubRequest" :options="filteredSubRequests" label="label" :multiple="false">
+                                                </multiselect>
+                                                
+                                                <label v-else>PLEASE SPECIFY</label>
+                                                <TextInput v-else label="Please Specify" iconValue="hashtag" v-model="selectedSubRequest" />
+                                                <div v-if="isPortalSystem">
+                                                    <TextInput label="Please specify what portal:" iconValue="hashtag" v-model="portal_system" />
                                                 </div>
+                                                <div v-else>
+                                                    
+                                                </div>
+                                                <div v-if="internetConnect">
+                                                    <TextInput label="Please specify what website:" iconValue="hashtag" v-model="website_access" />
+                                                </div>
+                                                <div v-else>
+                                                    
+                                                </div>
+                                              </div>
                                             </div>
-
+                                            
                                             <div class="col-lg-12">
-                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
-                                                    v-model="remarks" />
-
+                                              <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): " v-model="remarks" />
                                             </div>
-                                        </div>
+                                            
+                                            <!-- Conditionally Render the Desktop Component -->
+                                            
+                                          </div>
                                     </div>
                                 </div>
                             </div>
@@ -339,17 +351,23 @@ export default {
         }
     },
     computed: {
-
-        filteredSubRequests() {
-            if (!this.selectedType || this.selectedType.value === 9) {
-                return [];
-            }
-            return this.sub_request.filter(item => item.type === this.selectedType.value);
-        },
-        isOthersType() {
-            return this.selectedType && this.selectedType.value === 9;
-        },
+    filteredSubRequests() {
+      if (!this.selectedType || this.selectedType.value === 9) {
+        return [];
+      }
+      return this.sub_request.filter(item => item.type === this.selectedType.value);
     },
+    isOthersType() {
+      return this.selectedType && this.selectedType.value === 9;
+    },
+    isPortalSystem() {
+      return this.selectedSubRequest && 
+             (this.selectedSubRequest.value == 13 || this.selectedSubRequest.value == 17);
+    },
+    internetConnect(){
+        return this.selectedSubRequest && this.selectedSubRequest.value == 26;
+    }
+  },
 
     mounted() {
         this.generateICTControlNo();
@@ -380,8 +398,10 @@ export default {
             });
         },
         create_ict_ta() {
+            // console.log(this);
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
-
+            const portal_system = (this.selectedType.value == 4 ) ? this.portal_system: null;
+            const web_acess = (this.selectedType.value == 7 ) ? this.website_access : null;
             const userId = localStorage.getItem('userId');
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
@@ -398,13 +418,15 @@ export default {
                         type_of_request: this.selectedType.value,
                         subRequest: selectedRequest,
                         remarks: this.remarks,
+                        portal_sys:portal_system,
+                        web_access: web_acess,
                         status: 1
 
                     }).then(() => {
-                        this.showToatSuccess('Successfully added!');
+                        this.showToatSuccess('Successfully created!');
                         setTimeout(() => {
                             this.$router.push({ name: 'ICT Technical Assistance' });
-                        }, 2000); // Adjust the delay as needed
+                        }, 1000); // Adjust the delay as needed
 
                     }).catch((error) => {
 

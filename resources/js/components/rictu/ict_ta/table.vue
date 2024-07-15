@@ -182,7 +182,7 @@ export default {
     },
     created() {
     this.role = localStorage.getItem('user_role');
-    console.log(this.role);
+    console.log(new Date());
     },
     computed: {
 

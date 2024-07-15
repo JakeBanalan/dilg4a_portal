@@ -22,8 +22,6 @@ class CalendarController extends Controller{
             'events.office',
             'events.title',
             'pmo.DIVISION_COLOR as color',
-            // 'events.start',
-            // 'events.end',
             'events.description',
             'events.venue',
             'events.enp',
@@ -44,30 +42,41 @@ class CalendarController extends Controller{
             'events.isSent',
             DB::raw("DATE_FORMAT(events.start, '%Y-%m-%d') as start"),
             DB::raw("DATE_FORMAT(events.end, '%Y-%m-%d') as end"),
-            DB::raw("CONCAT(users.last_name, ', ', users.first_name) AS fname")
+            DB::raw("CONCAT(users.last_name, ' ', users.first_name, ' ', users.middle_name) AS fname")
             )
             ->leftjoin('pmo', 'pmo.id', '=', 'events.office')
             ->leftjoin('users', 'users.id', '=', 'events.postedby')
             ->get();
-        // $sql =
-        //  $EventData->toSql();
-        // dd($sql);
+
+        // Initialize an array to store the transformed events
+        $eventArray = [];
+
+        // Iterate over each event and transform the remarks field
+        foreach ($EventData as $event) {
+            // Remove commas and split the remarks field into an array
+            $event->remarks = array_map('trim', explode(',', $event->remarks));
+            // Add the transformed event to the array
+            $eventArray[] = $event;
+}
+
+            // dd($EventData);
         return response()->json($EventData);
     }
 
     public function PostEventData(Request $request)
     {
         $postEvent = new CalendarModel([
-            // 'office' => $request->input('office'),
-            'title' => $request->input('title'),
-            'start' => $request->input('start'),
-            'end' => $request->input('end'),
+            'id'          => null,
+            'office'      => $request->input('office'),
+            'title'       => $request->input('title'),
+            'color'       => $request->input('color'),
+            'start'       => $request->input('start'),
+            'end'         => $request->input('end'),
             'description' => $request->input('description'),
-            // 'venue' => $request->input('venue'),
-            'enp' => $request->input('enp'),
-            // 'postedby' => $request->input('userid'),
-            // 'posteddate' => Carbon::now(),
-            // 'remarks' => $request->input('remarks'),
+            'venue'       => $request->input('venue'),
+            'enp'         => $request->input('enp'),
+            'postedby'    => $request->input('postedby'),
+            'remarks'     => $request->input('remarks')
 
 
         ]);
@@ -81,43 +90,44 @@ class CalendarController extends Controller{
     {
         CalendarModel::where('id', $request->input('id'))
             ->update([
-                'title' => $request->input('title'),
-                'start' => $request->input('start'),
-                'end' => $request->input('end'),
+                // 'office'      => $request->input('office'),
+                'title'       => $request->input('title'),
+                // 'color'       => $request->input('color'),
+                'start'       => $request->input('start'),
+                'end'         => $request->input('end'),
                 'description' => $request->input('description'),
-                // 'venue' => $request->input('venue'),
-                'enp' => $request->input('enp'),
-                // 'postedby' => $request->input('userid'),
-                // 'posteddate' => Carbon::now(),
-                // 'remarks' => $request->input('remarks'),
+                'venue'       => $request->input('venue'),
+                'enp'         => $request->input('enp'),
+                // 'postedby'    => $request->input('postedby'),
+                'remarks'     => $request->input('remarks')
             ]);
 
     }
 
-    public function post_create_event(Request $request)
-    {
-        $rfq = new CalendarModel([
-            'id'            => null,
-            'office'         => $request->input('office'),
-            'title'          => $request->input('title'),
-            'color' => $request->input('color'),
-            'start'  => $request->input('start'),
-            'end'    =>  $request->input('end'),
-            'description'    =>  $request->input('description'),
-            'venue' => $request->input('venue'),
-            'enp' => $request->input('enp'),
-            'postedby' => $request->input('postedby'),
-            'remarks' => $request->input('participants')
+    // public function post_create_event(Request $request)
+    // {
+    //     $rfq = new CalendarModel([
+    //         'id'            => null,
+    //         'office'         => $request->input('office'),
+    //         'title'          => $request->input('title'),
+    //         'color' => $request->input('color'),
+    //         'start'  => $request->input('start'),
+    //         'end'    =>  $request->input('end'),
+    //         'description'    =>  $request->input('description'),
+    //         'venue' => $request->input('venue'),
+    //         'enp' => $request->input('enp'),
+    //         'postedby' => $request->input('postedby'),
+    //         'remarks' => $request->input('remarks')
 
-        ]);
-
-
+    //     ]);
 
 
 
-        $rfq->save();
 
-        return response()->json(['message' => 'RFQ created successfully', 'sql_query' => $rfq], 201);
-    }
+
+    //     $rfq->save();
+
+    //     return response()->json(['message' => 'RFQ created successfully', 'sql_query' => $rfq], 201);
+    // }
 }
 

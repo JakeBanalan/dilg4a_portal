@@ -1,0 +1,574 @@
+<template>
+    <div class="container-scroller">
+        <Navbar />
+        <div class="container-fluid page-body-wrapper">
+            <Sidebar />
+            <div class="main-panel">
+                <form class="formQOR" @submit.prevent="updateQuarterRating">
+
+                    <div class="content-wrapper">
+                        <BreadCrumbs />
+                        <div class="card">
+                            <div class="card-body">
+
+                                <div class="card-title d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">
+                                        <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;QMS Quality
+                                        Procedures
+                                    </h5>
+                                    <div class="d-flex">
+                                        <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Submit
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Target (%):</label>
+                                            <input type="text" class="form-control" v-model="form.target_percentage"
+                                                id="target_percentage" disabled />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Objectives Met?:</label>
+                                            <br>
+                                            <label class="switch">
+                                                <input type="checkbox" v-model="form.is_gap_analysis" checked
+                                                    @change="toggleGapAnalysis">
+                                                <span class="slider round">
+                                                    <span class="slider-text off">No</span>
+                                                    <span class="slider-text on">Yes</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Quality Objective:</label>
+
+                                            <textarea rows="3" col="100" style="height:110px !important;" id="objective"
+                                                class="form-control" v-model="form.objective" disabled></textarea>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Gap Analysis:</label>    
+                                            <textarea rows="3" col="100" style="height:110px !important;"
+                                                id="gap_analysis" class="form-control" v-model="form.gap_analysis"
+                                                :disabled="form.is_gap_analysis"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- INDICATOR 1 -->
+                        <div class="card" style="margin-top:1%;" v-if="form.indicator_a !== null && form.formula == null">
+                            <div class="card-body">
+                                <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
+                                    <thead>
+                                        <tr style="background-color: #367fa9; color: white;">
+                                            <th class="text-center" colspan="13">Indicator A: {{ form.indicator_a }}
+                                            </th>
+                                        </tr>
+                                        <tr style="background-color: #ffa500a3;">
+                                            <th class="text-center" width="7.5%">ANNUAL</th>
+                                            <th class="text-center" width="7.5%">REMARKS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q1">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q2">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- INDICATOR 1 ELSE-->
+                        <div class="card" style="margin-top:1%;" v-else="">
+                            <div class="card-body">
+                                <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
+                                    <thead>
+                                        <tr style="background-color: #367fa9; color: white;">
+                                            <th class="text-center" colspan="13">Indicator A: {{ form.indicator_b }}
+                                            </th>
+                                        </tr>
+                                        <tr style="background-color: #ffa500a3;">
+                                            <th class="text-center" width="7.5%">1ST QUARTER</th>
+                                            <th class="text-center" width="7.5%">2ND QUARTER</th>
+                                            <th class="text-center" width="7.5%">3RD QUARTER</th>
+                                            <th class="text-center" width="7.5%">4TH QUARTER</th>
+                                            <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="hidden" class="form-control"
+                                                    >
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q1">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q2">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q3">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q4">
+                                            </td>
+                                            <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- INDICATOR 2 -->
+                        <div class="card" style="margin-top:1%;" v-if="form.indicator_b !== null">
+                            <div class="card-body">
+                                <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
+                                    <thead>
+                                        <tr style="background-color: #367fa9; color: white;">
+                                            <th class="text-center" colspan="13">Indicator B: {{ form.indicator_b }}
+                                            </th>
+                                        </tr>
+                                        <tr style="background-color: #ffa500a3;">
+                                            <th class="text-center" width="7.5%">1ST QUARTER</th>
+                                            <th class="text-center" width="7.5%">2ND QUARTER</th>
+                                            <th class="text-center" width="7.5%">3RD QUARTER</th>
+                                            <th class="text-center" width="7.5%">4TH QUARTER</th>
+                                            <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="hidden" class="form-control"
+                                                    >
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q1">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q2">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q3">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q4">
+                                            </td>
+                                            <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- INDICATOR 3 -->
+                        <div class="card" style="margin-top:1%;" v-if="form.indicator_c !== null">
+                            <div class="card-body">
+                                <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
+                                    <thead>
+                                        <tr style="background-color: #367fa9; color: white;">
+                                            <th class="text-center" colspan="13">Indicator C: {{ form.indicator_c }}
+                                            </th>
+                                        </tr>
+                                        <tr style="background-color: #ffa500a3;">
+                                            <th class="text-center" width="7.5%">1ST QUARTER</th>
+                                            <th class="text-center" width="7.5%">2ND QUARTER</th>
+                                            <th class="text-center" width="7.5%">3RD QUARTER</th>
+                                            <th class="text-center" width="7.5%">4TH QUARTER</th>
+                                            <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="hidden" class="form-control"
+                                                    >
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q1">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q2">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q3">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q4">
+                                            </td>
+                                            <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- INDICATOR 4 -->
+                        <div class="card" style="margin-top:1%;" v-if="form.indicator_d !== null">
+                            <div class="card-body">
+                                <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
+                                    <thead>
+                                        <tr style="background-color: #367fa9; color: white;">
+                                            <th class="text-center" colspan="13">Indicator D: {{ form.indicator_d }}
+                                            </th>
+                                        </tr>
+                                        <tr style="background-color: #ffa500a3;">
+                                            <th class="text-center" width="7.5%">1ST QUARTER</th>
+                                            <th class="text-center" width="7.5%">2ND QUARTER</th>
+                                            <th class="text-center" width="7.5%">3RD QUARTER</th>
+                                            <th class="text-center" width="7.5%">4TH QUARTER</th>
+                                            <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="hidden" class="form-control"
+                                                    >
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q1">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q2">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q3">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q4">
+                                            </td>
+                                            <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- INDICATOR 5: FORMULA -->
+                        <div class="card" style="margin-top:1%;" v-if="form.formula !== null">
+                            <div class="card-body">
+                                <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
+                                    <thead>
+                                        <tr style="background-color: #367fa9; color: white;">
+                                            <th class="text-center" colspan="13">Formula: {{ form.formula }}
+                                            </th>
+                                        </tr>
+                                        <tr style="background-color: #ffa500a3;">
+                                            <th class="text-center" width="7.5%">1ST QUARTER</th>
+                                            <th class="text-center" width="7.5%">2ND QUARTER</th>
+                                            <th class="text-center" width="7.5%">3RD QUARTER</th>
+                                            <th class="text-center" width="7.5%">4TH QUARTER</th>
+                                            <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="hidden" class="form-control"
+                                                    >
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q1">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q2">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q3">
+                                            </td>
+                                            <td class="text-center" width="7.5%">
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q4">
+                                            </td>
+                                            <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+
+                <FooterVue />
+            </div>
+        </div>
+    </div>
+</template>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
+<script>
+import Multiselect from 'vue-multiselect';
+import Navbar from "../../layout/Navbar.vue";
+import Sidebar from "../../layout/Sidebar.vue";
+import FooterVue from "../../layout/Footer.vue";
+import BreadCrumbs from "../../dashboard_tiles/BreadCrumbs.vue";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import Pagination from '../../procurement/Pagination.vue';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { toast } from "vue3-toastify";
+
+
+
+
+import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash, faPenToSquare, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import axios, { Axios } from 'axios';
+library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash, faPenToSquare, faFolderOpen);
+
+
+export default {
+    components: {
+        Multiselect,
+        Navbar,
+        Sidebar,
+        FooterVue,
+        BreadCrumbs,
+        Pagination,
+        FontAwesomeIcon
+    },
+    data() {
+        return {
+
+            quarterData: [
+                { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
+                { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
+                { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
+                { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
+                { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' }
+            ],
+
+            form: {
+                target_percentage: '',
+                objective: '',
+                gap_analysis: '',
+                indicator_b: '',
+                indicator_c: '',
+                indicator_d: '',
+                indicator_e: '',
+                formula: ''
+            }
+        }
+    },
+    props: {
+        // form: Object
+        // is_new: String
+    },
+    created() {
+        this.fetchQOPRUserData();
+        this.fetchData();
+        // console.log(this.quarterData)
+    },
+
+    methods: {
+        toggleGapAnalysis() {
+            if (this.form.is_gap_analysis) {
+                this.form.gap_analysis = '';
+            }
+        },
+        fetchQOPRUserData() {
+            let qoe_id = this.$route.params.qoe_id1;
+            let id = this.$route.params.id;
+            console.log("tbl_qoe ID:", qoe_id)
+            console.log("tbl_qop_report ID:", id)
+            axios.get(`/api/fetchQOPRUserData/${id}/${qoe_id}`)
+                .then(response => {
+                    // console.log(response.data)
+                    if (Array.isArray(response.data) && response.data.length > 0) {
+                        this.form = response.data[0];
+                    } else {
+                        console.error("Unexpected response format:", response.data);
+                    }
+                    // this.form = response.data
+                    // console.log(this.form[0])
+                    // console.log(response.data)
+                })
+                .catch(error => {
+                    console.error('Error Fetching items:', error)
+                })
+        },
+        updateQuarterRating() {
+            if (this.form.is_gap_analysis === true) {
+                this.form.is_gap_analysis = '1';
+            } else {
+                this.form.is_gap_analysis = '0';
+            }
+            // console.log(this.form);
+            // console.log(this.quarterData);
+            // Assuming you have Axios installed and imported
+            axios.post(`/api/saveQuarterData`, {
+                quarterData: this.quarterData,
+                formData: this.form
+            })
+                .then(response => {
+                    console.log('Updated successfully:', response);
+                    // Optionally, handle success response
+                    toast.success('Report Successfully Submitted!', {
+                        autoClose: 1000
+                    });
+                    this.fetchQOPRUserData();
+                    this.fetchData();
+                })
+                .catch(error => {
+                    console.error('Error updating:', error);
+                    // Optionally, handle error response
+                });
+        },
+        fetchData() {
+            // Assuming you fetch data and update quarterData
+            let qoe_id = this.$route.params.qoe_id1;
+            let id = this.$route.params.id;
+
+            axios.get(`/api/fetchQuarterData/${id}/${qoe_id}`)
+                .then(response => {
+                    console.log(response.data.quarters)
+                    this.quarterData = response.data.quarters; // Update quarterData with fetched values
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+
+    }
+
+
+};
+</script>
+
+<style>
+td {
+    text-align: center;
+}
+
+th {
+    text-align: center;
+}
+
+/* Custom styles for text overflow with ellipsis */
+.multiselect__tags {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.multiselect__tag {
+    display: inline-flex;
+    align-items: center;
+    max-width: 150px;
+    /* Adjust the width as needed */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: 2px;
+    /* Adjust margin as needed */
+}
+
+.multiselect__tag span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.multiselect__tag-icon {
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 70px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: #2196F3;
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(36px);
+    -ms-transform: translateX(36px);
+    transform: translateX(36px);
+}
+
+.slider .slider-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    line-height: 34px;
+    color: white;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.slider .slider-text.on {
+    left: 38%;
+    transform: translateX(-50%);
+    display: none;
+}
+
+.slider .slider-text.off {
+    right: 40%;
+    transform: translateX(50%);
+}
+
+input:checked+.slider .slider-text.on {
+    display: block;
+}
+
+input:checked+.slider .slider-text.off {
+    display: none;
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+</style>

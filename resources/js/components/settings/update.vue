@@ -24,7 +24,7 @@
                         <div class="col-lg-3 mt-4">
                             <div class="card">
                                 <div class="card-body">
-                                    <button class="btn btn-outline-primary col-lg-12">Account Details</button>
+                                    <button class="btn btn-outline-primary col-lg-12 active">Account Details</button>
                                     <button class="btn btn-outline-primary col-lg-12 mt-2">Profile Details</button>
                                     <button class="btn btn-outline-primary col-lg-12 mt-2">Information</button>
                                     <button class="btn btn-outline-primary col-lg-12 mt-2">Office/Position</button>
@@ -196,7 +196,7 @@ export default {
                 { value: '8', label: 'LGMED' },
                 { value: '10', label: 'CAVITE'},
                 { value: '11', label: 'LAGUNA'},
-                { value: '16', label: 'BATANGAS'},
+                { value: '9', label: 'BATANGAS'},
                 { value: '13', label: 'RIZAL'},
                 { value: '12', label: 'QUEZON'},
                 { value: '14', label: 'LUCENA CITY'},

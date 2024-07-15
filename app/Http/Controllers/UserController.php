@@ -56,6 +56,7 @@ class UserController extends Controller
     public function fetchUserData($userId)
     {
         $query = User::selectRaw('
+            users.id,
             pmo.pmo_title,
             pmo.id,
             DIVISION_COLOR,
@@ -164,6 +165,8 @@ class UserController extends Controller
 
         return response()->json(['message' => 'User details updated successfully']);
     }
+
+
 
 
 

@@ -27,14 +27,15 @@ class CRUDController extends Controller
                 'ict_officer_remarks' => $req->input('recommendation'),
                 'status_id' => self::STATUS_COMPLETED
             ]);
-        return response()->json(['message' => 'Update successfully']);
+        return response()->json(['message' => 'Update successfully']);  
     }
     
     public function post_received_ict_request(Request $request)
     {
         RICTUModel::where('id', $request->input('control_no_id'))
             ->update([
-                'received_date' => DB::raw('CURRENT_TIMESTAMP'),
+                'received_date' => Carbon::now('Asia/Manila')->format('Y-m-d H:i:s'),
+                'started_date'  => Carbon::now('Asia/Manila')->format('Y-m-d H:i:s'),
                 'assign_ict_officer' => $request->input('cur_user'),
                 'status_id' => self::STATUS_RECEIVED
             ]);

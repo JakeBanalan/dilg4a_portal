@@ -10,77 +10,33 @@
             <div class="col-md-9 grid-margin stretch-card">
               <div class="card">
                 <div class="card-body">
-                  <FullCalendar class="calendar" :options="calendarOptions" :events="events"/>
+                  <FullCalendar :options="calendarOptions" :events="events" />
                 </div>
               </div>
             </div>
             <!--CARDS - Activity Bar-->
             <div class="col-md-3 grid-margin">
-              <!-- <div class="card" style="margin-bottom: 0.5em;">
-                <div class="card-body">
-
-                  <div class="row justify-content-center">
-                    <div class="form-check col" style="display: flex; margin-left: 2em;">
-                      <input type="checkbox" class="form-check-input">
-                      <label class="form-check-label" style="margin-left: 0.5em;">Cavite</label>
-                    </div>
-
-                    <div class="form-check col" style="display: flex; margin-left: 2em;">
-                      <input type="checkbox" class="form-check-input">
-                      <label class="form-check-label" style="margin-left: 0.5em;">Laguna</label>
-                    </div>
-                  </div>
-
-                  <div class="row justify-content-center">
-                    <div class="form-check col" style="display: flex; margin-left: 2em;">
-                      <input type="checkbox" class="form-check-input">
-                      <label class="form-check-label" style="margin-left: 0.5em;">Batangas</label>
-                    </div>
-
-                    <div class="form-check col" style="display: flex; margin-left: 2em;">
-                      <input type="checkbox" class="form-check-input">
-                      <label class="form-check-label" style="margin-left: 0.5em;">Rizal</label>
-                    </div>
-                  </div>
-
-                  <div class="row justify-content-center">
-                    <div class="form-check col" style="display: flex; margin-left: 2em;">
-                      <input type="checkbox" class="form-check-input">
-                      <label class="form-check-label" style="margin-left: 0.5em;">Quezon</label>
-                    </div>
-
-                    <div class="form-check col" style="display: flex; margin-left: 2em;">
-                      <input type="checkbox" class="form-check-input">
-                      <label class="form-check-label" style="margin-left: 0.5em;">Lucena</label>
-                    </div>
-                  </div>
-
-                  <div class="row justify-content-center">
-                    <div class="form-check col" style="display: flex; margin-left: 2em;">
-                      <input type="checkbox" class="form-check-input">
-                      <label class="form-check-label" style="margin-left: 0.5em;">Regional Office</label>
-                    </div>
-                  </div>
-
-                </div>
-              </div> -->
 
               <div class="card" style="max-height: 770px !important; overflow:hidden;">
-                <div class="card-body" style="overflow-y:scroll;" >
+                <div class="card-body" style="overflow-y:scroll;">
                   <p class="card-title">Upcoming Events</p>
-                  <div class="d-flex align-items-center pb-3 pt-3 border-bottom" v-for="(events,i) in UpcomingEvents" :key="i">
+                  <div class="d-flex align-items-center pb-3 pt-3 border-bottom" v-for="(events, i) in UpcomingEvents"
+                    :key="i">
                     <div class="move-calendar ms-3">
                       <span style="display: inline-block;">
                         <time class="icon">
-                          <em>{{FormattedDay(events.start)}}</em>
-                          <strong>{{FormattedMonth(events.start)}}</strong>
-                          <span>{{FormattedDate(events.start)}}</span>
+                          <em>{{ FormattedDay(events.start) }}</em>
+                          <strong>{{ FormattedMonth(events.start) }}</strong>
+                          <span>{{ FormattedDate(events.start) }}</span>
                         </time>
                       </span>
                     </div>
                     <div class="ms-3" style="padding-left: 0.3em;">
-                      <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" class="mb-0">{{events.title}}</h6>
-                      <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{FormattedFDate(events.start) }} - {{ FormattedFDate(events.end) }}</small>
+                      <h6
+                        style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                        class="mb-0">{{ events.title }}</h6>
+                      <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{ FormattedFDate(events.start) }} -
+                        {{ FormattedFDate(events.end) }}</small>
                     </div>
                   </div>
 
@@ -93,7 +49,8 @@
         <FooterVue />
       </div>
     </div>
-    <EventModal :visible="modalVisible" :mode="mode" @close="closeModal" @save="saveEventData" :fetchAuthor="fetchAuthor" :eventDetails="eventDetails" />
+    <EventModal :visible="modalVisible" :mode="mode" @close="closeModal" @save="saveEventData"
+      :fetchAuthor="fetchAuthor" :eventDetails="eventDetails" />
   </div>
 </template>
 
@@ -128,35 +85,36 @@ export default {
   data() {
     return {
       modalVisible: false,
-      events:[],
-      posted_by:null,
+      events: [],
+      posted_by: null,
       eventDetails: {
         title: "",
         start: "",
         end: "",
         office: "",
-        description:"",
-        venue:"",
-        enp:"",
-        postedBy:"",
-        remarks:""
+        description: "",
+        venue: "",
+        enp: "",
+        postedBy: "",
+        remarks: ""
       },
-      mode:'',
+      mode: '',
+      userId: null,
       // isEdit:false,
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin],
-        initialView: 'dayGridMonth',
+        // initialView: 'dayGridMonth',
         headerToolbar: {
           start: 'title',
           center: '',
           end: 'AddEvent prev next today'
         },
         eventClick: this.handleEventClick,
-        selectable: true,
+        // selectable: true,
         // editable: true,
         // nextDayThreshold: '13:00:00',
-        events:[],
-        dayMaxEvents:2,
+        // events: [],
+        dayMaxEvents: 2,
         customButtons: {
           AddEvent: {
             text: '+ Add Event',
@@ -164,67 +122,67 @@ export default {
           },
         },
       }
-
     }
   },
-  created(){
+  created() {
+    this.userId = localStorage.getItem('userId');
     this.FetchData();
     this.fetchAuthor();
   },
   computed: {
-    FormattedFDate(){
-      return function(DateString){
+    FormattedFDate() {
+      return function (DateString) {
         return moment(DateString).format('MMMM DD, YYYY');
       };
     },
     FormattedMonth() {
-      return function(DateString){
-      return moment(DateString).format('MMMM');
-    };
-  },
+      return function (DateString) {
+        return moment(DateString).format('MMMM');
+      };
+    },
     FormattedDate() {
-      return function(DateString){
-      return moment(DateString).format('DD');
-    };
-  },
-  FormattedDay() {
-      return function(DateString){
-      return moment(DateString).format('dddd');
-    };
-  },
-  UpcomingEvents(){
-    const currentDate = new Date();
-    return this.events.filter(events =>{
-      const eventDate = new Date(events.start);
-      return eventDate >= currentDate;
-    })
-  }
+      return function (DateString) {
+        return moment(DateString).format('DD');
+      };
+    },
+    FormattedDay() {
+      return function (DateString) {
+        return moment(DateString).format('dddd');
+      };
+    },
+    UpcomingEvents() {
+      const currentDate = new Date();
+      return this.events.filter(events => {
+        const eventDate = new Date(events.start);
+        return eventDate >= currentDate;
+      })
+    }
   },
   methods: {
     fetchAuthor() {
       const userId = localStorage.getItem('userId');
-        this.$fetchUserData(userId, '../../../../api/fetchUser')
-            .then(emp_data => {
-                this.posted_by = emp_data.name
-            });
+      this.$fetchUserData(userId, '../../../../api/fetchUser')
+        .then(emp_data => {
+          this.posted_by = emp_data.name
+        });
     },
-    ClearEvents(){
-      this.eventDetails= {
+    ClearEvents() {
+      this.eventDetails = {
         title: "",
         start: "",
         end: "",
         office: "",
-        description:"",
-        venue:"",
-        enp:"",
-        postedBy:"",
-        remarks:""
+        description: "",
+        venue: "",
+        enp: "",
+        postedBy: "",
+        remarks: ""
       }
     },
     closeModal() {
       this.modalVisible = false
     },
-    openModal(mode){
+    openModal(mode) {
       this.mode = mode;
       this.modalVisible = true
 
@@ -237,89 +195,122 @@ export default {
       // this.modalVisible = true
     },
     FetchData() {
-        //fullcalendar events
-        // Assuming you're using axios for data fetching
-        const response = axios.get(`/api/fetchEventData`)
-          .then(response => {
-            const events = response.data.map(event => ({
-              ...event,
-              allDay:true
-            }));
-            this.calendarOptions.events = events
-            // console.log(this.calendarOptions.events);
-          })
-          .catch(error => {
-            console.error('Error Fetching items:', error);
-          });
-          
-          //event list
-          const response1 = axios.get(`/api/fetchEventData`)
-          .then(response1 => {
-            const events = response1.data.map(event => ({
-              ...event,
-              allDay:true
-            }));
-            this.events = events
-          })
-          .catch(error => {
-            console.error('Error Fetching items:', error);
-          });
-        const events = response1.data; // Adjust this according to your API response structure
-        return events;
+      //fullcalendar events
+      // Assuming you're using axios for data fetching
+      const response = axios.get(`/api/fetchEventData`)
+        .then(response => {
+          const events = response.data.map(event => ({
+            ...event,
+            allDay: true
+          }));
+          this.calendarOptions.events = events
+          // console.log(events);
+        })
+        .catch(error => {
+          console.error('Error Fetching items:', error);
+        });
+
+      //event list
+      const response1 = axios.get(`/api/fetchEventData`)
+        .then(response1 => {
+          const events = response1.data.map(event => ({
+            ...event,
+            allDay: true
+          }));
+          this.events = events
+        })
+        .catch(error => {
+          console.error('Error Fetching items:', error);
+        });
+      const events = response1.data; // Adjust this according to your API response structure
+      return events;
     },
     handleEventClick(arg) {
-      const {id, title , start, end, office, description, venue, enp, fname, remarks} = this.events.find(
+      const { id, title, start, end, office, description, venue, enp, fname, remarks } = this.events.find(
         event => event.id === +arg.event.id
       );
       this.eventDetails = {
-        id:id,
-        allDay:true,
+        id: id,
+        allDay: true,
         title: title,
         start: start,
         end: end,
         office: office,
-        description:description,
-        venue:venue,
-        enp:enp,
-        postedBy:fname,
-        remarks:remarks
+        description: description,
+        venue: venue,
+        enp: enp,
+        postedBy: fname,
+        remarks: remarks
       }
       this.openModal('edit')
-      // console.log(this.eventDetails);
+      // console.log(arg);
     },
     saveEventData(formData) {
       // Here you can insert the formData into your database or perform any other actions
       // console.log(formData); // For demonstration, just log the form data
 
-      if(this.mode == 'add'){
+      if (this.mode == 'add') {
         // console.log(formData)
-        axios.post('/api/PostEventData', formData)
-        .then(response =>{
-          toast.success('Event Added!', {
-          autoClose: 1000
-        });
-        this.FetchData()
-        this.closeModal()
-        })
-        .catch(error => {
-          console.error('error saving data',error);
-        // console.log(formData);
+        this.$fetchUserData(this.userId, '/api/fetchUser')
+          .then(emp_data => {
+            this.eventDetails.postedBy = emp_data.name
+            // console.log(emp_data)
+            axios.post('/api/PostEventData',
+              {
+                postedby: this.userId,
+                office: emp_data.id,
+                title: this.eventDetails.title,
+                color: emp_data.DIVISION_COLOR,
+                start: this.eventDetails.start,
+                end: this.eventDetails.end,
+                description: this.eventDetails.description,
+                venue: this.eventDetails.venue,
+                remarks: this.eventDetails.remarks.join(', '),
+                enp: this.eventDetails.enp,
+              }
+            )
+              .then(() => {
+                toast.success('Event Added!', {
+                  autoClose: 1000
+                });
+              });
+            this.FetchData()
+            this.closeModal()
+          })
+          .catch(error => {
+            console.error('error saving data', error);
+            // console.log(formData);
 
-        })
-      }else{
+          })
+      } else {
+        console.log(formData)
         // const response = axios.
         // console.log('edit');
-        axios.post('/api/PostUpdateEvent', formData)
-        .then(response => {
-          toast.success('Event Updated!', {
-          autoClose: 1000
-        });
-        this.FetchData()
-        this.closeModal()
-        })
-        .catch(error =>{
-          console.error('error saving data', error)
-        })
+        axios.post('/api/PostUpdateEvent', 
+        {
+                id: formData.id,
+                postedby: this.userId,
+                // office: emp_data.id,
+                title: this.eventDetails.title,
+                // color: emp_data.DIVISION_COLOR,
+                start: this.eventDetails.start,
+                end: this.eventDetails.end,
+                description: this.eventDetails.description,
+                venue: this.eventDetails.venue,
+                remarks: this.eventDetails.remarks.join(', '),
+                enp: this.eventDetails.enp,
+              }
+        )
+          .then(() => {
+            toast.success('Event Updated!', {
+              autoClose: 1000
+            });
+            this.FetchData()
+            this.closeModal()
+          })
+          .catch(error => {
+            console.error('error saving data', error)
+          })
       }
     },
   }
@@ -430,5 +421,4 @@ time.icon span {
 div::-webkit-scrollbar {
   display: none;
 }
-
 </style>

@@ -1,6 +1,5 @@
     import { createRouter, createWebHistory } from "vue-router";
 
-    import calendar from "../components/calendar/index.vue";
     import LoginForm from "../components/LoginForm.vue";
     import ExampleComponent from "../components/ExampleComponent.vue";
     import DashboardComponent from "../components/DashboardComponent.vue";
@@ -49,6 +48,25 @@
 
     //calendar
     import calendar from "../components/calendar/index.vue";
+
+    //QMS
+    import qms_process_owner from "../components/qms/process_owner/index.vue";
+    import qms_quality_procedure from "../components/qms/quality_procedure/index.vue";
+    import qms_report_submission from "../components/qms/reports_submission/index.vue";
+    import qms_report_submission_view from "../components/qms/reports_submission/rs_entry.vue";
+    import qms_report_submission_update from "../components/qms/reports_submission/rs_update.vue";
+    import qms_quality_procedure_view from   "../components/qms/quality_procedure/qp_entry.vue";
+    import qms_quality_procedure_update from "../components/qms/quality_procedure/qp_update.vue";
+    import qms_quality_objective_entry from "../components/qms/quality_procedure/qp_objectives_entry.vue";
+    import qms_quality_objective_update from "../components/qms/quality_procedure/qp_objectives_update.vue";
+    import qms_report_submission_quarterly_entry from "../components/qms/reports_submission/rs_obj_entries.vue";
+    import qms_report_submission_monthly_entry from "../components/qms/reports_submission/rs_monthly_entries.vue";
+    import qms_report_submission_quarterly_lnd_entry from "../components/qms/reports_submission/rs_quarterly_lnd_entries.vue";
+
+    
+    
+
+
     // settings
     import settingPanel from "../components/settings/update.vue";
     // import _ from "lodash";
@@ -665,6 +683,303 @@
                     next({ name: 'Login' });
                 });
             }
+        },
+        {
+            path: '/qms/process_owner/index',
+            name: 'Process Owner',
+            component: qms_process_owner,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
+        },
+        {
+            path: '/qms/quality_procedure/index',
+            name: 'Quality Procedures',
+            component: qms_quality_procedure,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
+        },    
+        {
+            path: '/qms/quality_procedure/qp_update/:id',
+            //PAG MAY PARAMETER NA ID PRE GANITO ANG PAG RROUTE
+            name: 'Update QP',
+            component: qms_quality_procedure_update,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+        },  
+        {
+            path: '/qms/quality_procedure/qp_entry', // eto yon kanina
+            name: 'Quality Procedure',
+            component: qms_quality_procedure_view,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+        },
+        {
+            path: '/qms/quality_procedure/qp_objectives_entry/:id', // eto yon kanina
+            name: 'Quality Objectives',
+            component: qms_quality_objective_entry,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+        },
+        {
+            path: '/qms/quality_procedure/qp_objectives_update/:id/:qoe_id', // eto yon kanina
+            name: 'Update Quality Objectives',
+            component: qms_quality_objective_update,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+        },          
+        {
+            path: '/qms/reports_submission/index',
+            name: 'Reports Submission',
+            component: qms_report_submission,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
+        },
+        {
+            path: '/qms/reports_submission/rs_entry',
+            name: 'Submit Report',
+            component: qms_report_submission_view,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
+        },
+        {
+            path: '/qms/reports_submission/rs_update/:id',
+            name: 'Submit Report Submission',
+            component: qms_report_submission_update,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
+        },
+        {
+            path: '/qms/reports_submission/rs_obj_entries/:id/:qoe_id1',
+            name: 'Submit Quarterly Report ',
+            component: qms_report_submission_quarterly_entry,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
+        },
+        {
+            path: '/qms/reports_submission/rs_monthly_entries/:id/:qoe_id1', 
+            name: 'Submit Monthly Report ',
+            component: qms_report_submission_monthly_entry,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
+        },
+        {
+            path: '/qms/reports_submission/rs_quarterly_lnd_entries/:id/:qoe_id1', 
+            name: 'Submit Quarterly(Learning and Development) Report ',
+            component: qms_report_submission_quarterly_lnd_entry,
+            meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
+
         },
         {
             path: '/budget/fundsource',
