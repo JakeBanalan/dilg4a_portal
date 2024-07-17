@@ -166,41 +166,47 @@ img {
 
                                         <div class="row">
                                             <div class="col-lg-6 mb-4">
-                                              <div class="form-group">
-                                                <label>TYPE OF REQUEST (CHOOSE THAT ALL APPLY)</label>
-                                                <multiselect v-model="selectedType" :options="options" label="label" :multiple="false"></multiselect>
-                                              </div>
+                                                <div class="form-group">
+                                                    <label>TYPE OF REQUEST (CHOOSE THAT ALL APPLY)</label>
+                                                    <multiselect v-model="selectedType" :options="options" label="label"
+                                                        :multiple="false"></multiselect>
+                                                </div>
                                             </div>
                                             <div class="col-lg-6 mb-4">
-                                              <div class="form-group">
-                                                <label v-if="!isOthersType">NAME OF SUB REQUEST</label>
-                                                <multiselect v-if="!isOthersType" v-model="selectedSubRequest" :options="filteredSubRequests" label="label" :multiple="false">
-                                                </multiselect>
-                                                
-                                                <label v-else>PLEASE SPECIFY</label>
-                                                <TextInput v-else label="Please Specify" iconValue="hashtag" v-model="selectedSubRequest" />
-                                                <div v-if="isPortalSystem">
-                                                    <TextInput label="Please specify what portal:" iconValue="hashtag" v-model="portal_system" />
+                                                <div class="form-group">
+                                                    <label v-if="!isOthersType">NAME OF SUB REQUEST</label>
+                                                    <multiselect v-if="!isOthersType" v-model="selectedSubRequest"
+                                                        :options="filteredSubRequests" label="label" :multiple="false">
+                                                    </multiselect>
+
+                                                    <label v-else>PLEASE SPECIFY</label>
+                                                    <TextInput v-else label="Please Specify" iconValue="hashtag"
+                                                        v-model="selectedSubRequest" />
+                                                    <div v-if="isPortalSystem">
+                                                        <TextInput label="Please specify what portal:"
+                                                            iconValue="hashtag" v-model="portal_system" />
+                                                    </div>
+                                                    <div v-else>
+
+                                                    </div>
+                                                    <div v-if="internetConnect">
+                                                        <TextInput label="Please specify what website:"
+                                                            iconValue="hashtag" v-model="website_access" />
+                                                    </div>
+                                                    <div v-else>
+
+                                                    </div>
                                                 </div>
-                                                <div v-else>
-                                                    
-                                                </div>
-                                                <div v-if="internetConnect">
-                                                    <TextInput label="Please specify what website:" iconValue="hashtag" v-model="website_access" />
-                                                </div>
-                                                <div v-else>
-                                                    
-                                                </div>
-                                              </div>
                                             </div>
-                                            
+
                                             <div class="col-lg-12">
-                                              <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): " v-model="remarks" />
+                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
+                                                    v-model="remarks" />
                                             </div>
-                                            
+
                                             <!-- Conditionally Render the Desktop Component -->
-                                            
-                                          </div>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -242,7 +248,7 @@ img {
                             </div>
                             <div class="col-lg-12">
                                 <button type="submit" class="btn btn-success mt-4" style="width: 100%;"
-                                    @click="uploadFile">Save</button>
+                                    @click="create_ict_ta" :disabled="isSaving" variant="primary">Save</button>
                             </div>
                         </div>
                     </form>
@@ -271,6 +277,7 @@ export default {
     name: 'Create ICT Technical Assistance',
     data() {
         return {
+            isSaving: false,
             dilg_logo: logo,
             folderId: '1AmuHQn3YkNEEVdR3RbpijsaX9NKT1oub', // Replace 'YOUR_FOLDER_ID' with the ID of your target folder
             accessToken: null,
@@ -351,23 +358,23 @@ export default {
         }
     },
     computed: {
-    filteredSubRequests() {
-      if (!this.selectedType || this.selectedType.value === 9) {
-        return [];
-      }
-      return this.sub_request.filter(item => item.type === this.selectedType.value);
+        filteredSubRequests() {
+            if (!this.selectedType || this.selectedType.value === 9) {
+                return [];
+            }
+            return this.sub_request.filter(item => item.type === this.selectedType.value);
+        },
+        isOthersType() {
+            return this.selectedType && this.selectedType.value === 9;
+        },
+        isPortalSystem() {
+            return this.selectedSubRequest &&
+                (this.selectedSubRequest.value == 13 || this.selectedSubRequest.value == 17);
+        },
+        internetConnect() {
+            return this.selectedSubRequest && this.selectedSubRequest.value == 26;
+        }
     },
-    isOthersType() {
-      return this.selectedType && this.selectedType.value === 9;
-    },
-    isPortalSystem() {
-      return this.selectedSubRequest && 
-             (this.selectedSubRequest.value == 13 || this.selectedSubRequest.value == 17);
-    },
-    internetConnect(){
-        return this.selectedSubRequest && this.selectedSubRequest.value == 26;
-    }
-  },
 
     mounted() {
         this.generateICTControlNo();
@@ -394,14 +401,16 @@ export default {
         },
         showToatSuccess(message) {
             toast.success(message, {
-                autoClose: 1000,
+                autoClose: 1500,
             });
         },
         create_ict_ta() {
             // console.log(this);
+            if (this.isSaving) return; // prevent multiple clicks
+            this.isSaving = true;
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
-            const portal_system = (this.selectedType.value == 4 ) ? this.portal_system: null;
-            const web_acess = (this.selectedType.value == 7 ) ? this.website_access : null;
+            const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
+            const web_acess = (this.selectedType.value == 7) ? this.website_access : null;
             const userId = localStorage.getItem('userId');
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
@@ -418,27 +427,28 @@ export default {
                         type_of_request: this.selectedType.value,
                         subRequest: selectedRequest,
                         remarks: this.remarks,
-                        portal_sys:portal_system,
+                        portal_sys: portal_system,
                         web_access: web_acess,
                         status: 1
 
                     }).then(() => {
+                        this.isSaving = true;
                         this.showToatSuccess('Successfully created!');
                         setTimeout(() => {
+                            this.$router.push({ path: '/rictu/ict_ta/index' })
                             this.$router.push({ name: 'ICT Technical Assistance' });
-                        }, 1000); // Adjust the delay as needed
+                        }, 800); // Adjust the delay as needed
 
                     }).catch((error) => {
-
+                        this.isSaving = false; // reset the flag on error
                     })
                 })
                 .catch(error => {
                     console.error('Error fetching user data:', error);
+                    this.isSaving = false; // reset the flag on error
                 });
-
-
-
         },
+
         fetchEndUserInfo() {
             const userId = localStorage.getItem('userId');
             axios.get(`../../../api/fetchUser/${userId}`)

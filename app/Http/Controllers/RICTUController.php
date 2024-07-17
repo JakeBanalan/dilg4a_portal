@@ -3,13 +3,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Models\RICTUModel;
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 
 
@@ -278,13 +282,13 @@ class RICTUController extends Controller
         );
     }
 
-    public  function generate($selectedYear,$selectedQuarter,$requestType)
+
+
+    public function generate($selectedYear, $selectedQuarter, $requestType)
     {
-     
         $monthRange = '';
         $quarter = '';
-        $rt = ($requestType == 1) ? 'PML': 'PSL';
-
+        $rt = ($requestType == 1) ? 'PML' : 'ICT-TA-Monitoring-Log-Sheet';
 
         switch ($selectedQuarter) {
             case '1':
@@ -313,33 +317,46 @@ class RICTUController extends Controller
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
+        // Set title and headers on the first sheet
+        $sheet->setCellValue('C7', $quarter);
+        $sheet->setCellValue('E7', $selectedYear);
+
         $query = RICTUModel::select(RICTUModel::raw('
-            tbl_technicalassistance.id as id,
-            tbl_technicalassistance.control_no as control_no,
-            CONCAT(u.first_name, " ", u.last_name) AS requested_by,
-            TIME(tbl_technicalassistance.started_date) as started_time,
-            TIME(tbl_technicalassistance.completed_date) as completed_time,
-            tbl_technicalassistance.request_date as request_date,
-            tbl_technicalassistance.started_date as started_date,
-            tbl_technicalassistance.completed_date as completed_date,
-            tbl_technicalassistance.remarks as remarks,
-            p.pmo_title as office,
-            ip.ict_personnel as ict_personnel,
-            itr.request_type as request_type
-        '))
+        tbl_technicalassistance.id as id,
+        tbl_technicalassistance.control_no as control_no,
+        CONCAT(u.first_name, " ", u.last_name) AS requested_by,
+        TIME(tbl_technicalassistance.started_date) as started_time,
+        TIME(tbl_technicalassistance.completed_date) as completed_time,
+        tbl_technicalassistance.request_date as request_date,
+        tbl_technicalassistance.started_date as started_date,
+        tbl_technicalassistance.completed_date as completed_date,
+        tbl_technicalassistance.remarks as remarks,
+        p.pmo_title as office,
+        ip.ict_personnel as ict_personnel,
+        itr.request_type as request_type
+    '))
             ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
             ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
             ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->whereYear('tbl_technicalassistance.request_date', '=', $selectedYear)
-            ->whereRaw('MONTH(tbl_technicalassistance.request_date) IN ' . $monthRange . '')
+            ->whereRaw('MONTH(tbl_technicalassistance.request_date) IN ' . $monthRange)
             ->get();
 
+        $row = 10;
 
-        $row = '10';
-        $sheet->setCellValue('C7',$quarter);
+        // Define the style array for borders
+        $styleArray = [
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
 
-        foreach ($query as $data) {
+        foreach ($query as $index => $data) {
+            $sheet->setCellValue('A' . $row, $index + 1);
             $sheet->setCellValue('B' . $row, $data['control_no']);
             $sheet->setCellValue('C' . $row, $data['started_date']);
             $sheet->setCellValue('D' . $row, $data['started_time']);
@@ -351,11 +368,35 @@ class RICTUController extends Controller
             $sheet->setCellValue('L' . $row, $data['completed_time']);
             $sheet->setCellValue('M' . $row, '');
             $sheet->getRowDimension($row)->setRowHeight(45);
+
+            try {
+                // Apply the border style to the current row
+                $sheet->getStyle("A{$row}:M{$row}")->applyFromArray($styleArray);
+                // Apply green background color to Cell K
+                $sheet->getStyle("K{$row}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('92D050');
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'Error applying styles: ' . $e->getMessage()
+                ], 500);
+            }
+
             $row++;
         }
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $fileName = $rt.'-'.$quarter.'-'.$selectedYear.'.xlsx';
-        $writer->save($fileName);
-        return response()->download($fileName)->deleteFileAfterSend(true);
+
+        // // Calculate the row for the signatories
+        // $signatoryRow = $row + 3; // leave one row of space after the data
+
+        // // Add the signatories
+        // $sheet->setCellValue('F' . $signatoryRow, 'MAYBELLINE M. MONTEIRO');
+        // $sheet->setCellValue('F' . ($signatoryRow + 1), 'PROCESS OWNER');
+        // $sheet->setCellValue('H' . $signatoryRow, 'DARRELL I. DIZON');
+        // $sheet->setCellValue('H' . ($signatoryRow + 1), 'Division Chief (CO)/ Regional Deputy QMR');
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = $rt . '-' . $quarter . '-' . $selectedYear . '.xlsx';
+        $filePath = storage_path('app/public/' . $fileName);
+        $writer->save($filePath);
+
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
 }

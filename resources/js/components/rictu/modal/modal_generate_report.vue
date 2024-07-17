@@ -138,10 +138,11 @@ export default {
             const rt = this.report_type;
             const sq = this.selected_quarter;
             const sy = this.selected_year;
-            window.location.href = `../../api/generate-report/${sy}/${sq}/${rt}?export=true`;
+            const url = `../../api/generate-report/${sy}/${sq}/${rt}?export=true`;
+            window.open(url, '_blank');
             this.showToatSuccess('Successfully downloaded!');
             setTimeout(() => {
-               location.reload();
+                location.reload();
             }, 1000); // Adjust the delay as needed
         }
 

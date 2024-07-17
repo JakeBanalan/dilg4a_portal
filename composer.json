@@ -14,6 +14,7 @@
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.4",
         "maatwebsite/excel": "^1.1",
+        "maennchen/zipstream-php": " ^2.4",
         "phpoffice/phpspreadsheet": "^1.12"
     },
     "require-dev": {
