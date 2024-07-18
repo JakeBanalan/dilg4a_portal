@@ -356,8 +356,8 @@ class RICTUController extends Controller
         ];
 
         // Set the column widths
-        $sheet->getColumnDimension('I')->setWidth(40);
-        $sheet->getColumnDimension('J')->setWidth(40);
+        // $sheet->getColumnDimension('I')->setWidth(6.5);
+        // $sheet->getColumnDimension('J')->setWidth(6.5);
 
         foreach ($query as $index => $data) {
             $sheet->setCellValue('A' . $row, $index + 1);
