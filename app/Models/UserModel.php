@@ -25,8 +25,12 @@ class UserModel extends Authenticatable
         'gender',
         'birthdate',
         'contact_details',
-        'email'
-
+        'email',
+        'employment_status',
+        'code',
+        'user_role',
+        'username',
+        'password'
     ];
 
 }
