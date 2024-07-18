@@ -418,6 +418,15 @@ class RICTUController extends Controller
         $sheet->getStyle('E' . ($signatoryRow + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
         $sheet->getStyle('E' . $signatoryRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
+        // Apply background color to "Prepared By" section
+        $sheet->getStyle('E' . $signatoryRow . ':F' . $signatoryRow)
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('000000');
+
+        // Apply font color to "Prepared By" section
+        $sheet->getStyle('E' . $signatoryRow . ':F' . $signatoryRow)
+            ->getFont()->getColor()->setARGB('FFFFFF');
+
         // Set "Noted By" section
         $sheet->mergeCells('H' . $signatoryRow . ':J' . $signatoryRow);
         $sheet->setCellValue('H' . $signatoryRow, 'NOTED BY:');
@@ -432,6 +441,15 @@ class RICTUController extends Controller
         $sheet->getStyle('H' . $signatoryRow . ':J' . ($signatoryRow + 4))->applyFromArray($signatoryStyleArray);
         $sheet->getStyle('H' . ($signatoryRow + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
         $sheet->getStyle('H' . $signatoryRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        // Apply background color to "Noted By" section
+        $sheet->getStyle('H' . $signatoryRow . ':J' . $signatoryRow)
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('000000');
+
+        // Apply font color to "Noted By" section
+        $sheet->getStyle('H' . $signatoryRow . ':J' . $signatoryRow)
+            ->getFont()->getColor()->setARGB('FFFFFF');
 
 
         $writer = new Xlsx($spreadsheet);
