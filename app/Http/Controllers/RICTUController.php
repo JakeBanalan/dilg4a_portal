@@ -355,10 +355,6 @@ class RICTUController extends Controller
             ],
         ];
 
-        // Set the column widths
-        // $sheet->getColumnDimension('I')->setWidth(6.5);
-        // $sheet->getColumnDimension('J')->setWidth(6.5);
-
         foreach ($query as $index => $data) {
             $sheet->setCellValue('A' . $row, $index + 1);
             $sheet->setCellValue('B' . $row, $data['control_no']);
@@ -371,7 +367,7 @@ class RICTUController extends Controller
             $sheet->setCellValue('K' . $row, $data['completed_date']);
             $sheet->setCellValue('L' . $row, $data['completed_time']);
             $sheet->setCellValue('M' . $row, '');
-            $sheet->getRowDimension($row)->setRowHeight(45);
+            $sheet->getRowDimension($row)->setRowHeight(60);
 
             try {
                 // Apply the border style to the current row
