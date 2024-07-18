@@ -367,7 +367,7 @@ class RICTUController extends Controller
             $sheet->setCellValue('K' . $row, $data['completed_date']);
             $sheet->setCellValue('L' . $row, $data['completed_time']);
             $sheet->setCellValue('M' . $row, '');
-            $sheet->getRowDimension($row)->setRowHeight(45);
+            $sheet->getRowDimension($row)->setRowHeight(60);
 
             try {
                 // Apply the border style to the current row
@@ -383,14 +383,74 @@ class RICTUController extends Controller
             $row++;
         }
 
-        // // Calculate the row for the signatories
-        // $signatoryRow = $row + 3; // leave one row of space after the data
+        // Calculate the row for the signatories
+        $signatoryRow = $row + 3; // leave one row of space after the data
 
-        // // Add the signatories
-        // $sheet->setCellValue('F' . $signatoryRow, 'MAYBELLINE M. MONTEIRO');
-        // $sheet->setCellValue('F' . ($signatoryRow + 1), 'PROCESS OWNER');
-        // $sheet->setCellValue('H' . $signatoryRow, 'DARRELL I. DIZON');
-        // $sheet->setCellValue('H' . ($signatoryRow + 1), 'Division Chief (CO)/ Regional Deputy QMR');
+        // Define the signatory style array
+        $signatoryStyleArray = [
+            'font' => [
+                'bold' => true,
+            ],
+            'alignment' => [
+                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+            ],
+            'borders' => [
+                'outline' => [
+                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ];
+
+        // Set "Prepared By" section
+        $sheet->mergeCells('E' . $signatoryRow . ':F' . $signatoryRow);
+        $sheet->setCellValue('E' . $signatoryRow, 'PREPARED BY:');
+        $sheet->mergeCells('E' . ($signatoryRow + 1) . ':F' . ($signatoryRow + 2));
+        $sheet->setCellValue('E' . ($signatoryRow + 1), 'MAYBELLINE M. MONTEIRO');
+        $sheet->mergeCells('E' . ($signatoryRow + 3) . ':F' . ($signatoryRow + 4));
+        $sheet->setCellValue('E' . ($signatoryRow + 3), 'Process Owner');
+
+        // Apply style to "Prepared By" section
+        $sheet->getStyle('E' . $signatoryRow . ':F' . ($signatoryRow))->applyFromArray($signatoryStyleArray);
+        $sheet->getStyle('E' . $signatoryRow . ':F' . ($signatoryRow + 2))->applyFromArray($signatoryStyleArray);
+        $sheet->getStyle('E' . $signatoryRow . ':F' . ($signatoryRow + 4))->applyFromArray($signatoryStyleArray);
+        $sheet->getStyle('E' . ($signatoryRow + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
+        $sheet->getStyle('E' . $signatoryRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        // Apply background color to "Prepared By" section
+        $sheet->getStyle('E' . $signatoryRow . ':F' . $signatoryRow)
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('000000');
+
+        // Apply font color to "Prepared By" section
+        $sheet->getStyle('E' . $signatoryRow . ':F' . $signatoryRow)
+            ->getFont()->getColor()->setARGB('FFFFFF');
+
+        // Set "Noted By" section
+        $sheet->mergeCells('H' . $signatoryRow . ':J' . $signatoryRow);
+        $sheet->setCellValue('H' . $signatoryRow, 'NOTED BY:');
+        $sheet->mergeCells('H' . ($signatoryRow + 1) . ':J' . ($signatoryRow + 2));
+        $sheet->setCellValue('H' . ($signatoryRow + 1), 'DARRELL I. DIZON');
+        $sheet->mergeCells('H' . ($signatoryRow + 3) . ':J' . ($signatoryRow + 4));
+        $sheet->setCellValue('H' . ($signatoryRow + 3), 'Regional Quality Management Representative');
+
+        // Apply style to "Noted By" section
+        $sheet->getStyle('H' . $signatoryRow . ':J' . ($signatoryRow))->applyFromArray($signatoryStyleArray);
+        $sheet->getStyle('H' . $signatoryRow . ':J' . ($signatoryRow + 2))->applyFromArray($signatoryStyleArray);
+        $sheet->getStyle('H' . $signatoryRow . ':J' . ($signatoryRow + 4))->applyFromArray($signatoryStyleArray);
+        $sheet->getStyle('H' . ($signatoryRow + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
+        $sheet->getStyle('H' . $signatoryRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+        // Apply background color to "Noted By" section
+        $sheet->getStyle('H' . $signatoryRow . ':J' . $signatoryRow)
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('000000');
+
+        // Apply font color to "Noted By" section
+        $sheet->getStyle('H' . $signatoryRow . ':J' . $signatoryRow)
+            ->getFont()->getColor()->setARGB('FFFFFF');
+
 
         $writer = new Xlsx($spreadsheet);
         $fileName = $rt . '-' . $quarter . '-' . $selectedYear . '.xlsx';
