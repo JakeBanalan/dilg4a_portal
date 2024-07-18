@@ -28,6 +28,11 @@
                                     <button class="btn btn-outline-primary col-lg-12 mt-2">Profile Details</button>
                                     <button class="btn btn-outline-primary col-lg-12 mt-2">Information</button>
                                     <button class="btn btn-outline-primary col-lg-12 mt-2">Office/Position</button>
+
+                                    <div class="d-flex align-items-center pb-3 pt-3 border-top" style="margin-top:2em;">
+                                    <button class="btn btn-outline-danger col-lg-12 mt-2">Block</button>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -221,6 +226,9 @@ export default {
         this.getPosition();
     },
     methods: {
+        toggleCard() {
+            this.isCardVisible = !this.isCardVisible;
+        },
         getUserDetails() {
             axios.get(`../../api/getUserDetails/${this.user_id}`)
                 .then((response) => {

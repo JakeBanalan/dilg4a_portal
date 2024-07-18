@@ -16,6 +16,8 @@ use App\Http\Controllers\QMSController;
 use App\Http\Controllers\QMSQuarterlyExportController;
 use App\Http\Controllers\QMSMonthlyExportController;
 use App\Http\Controllers\QMSQuarterlyLNDController;
+use App\Http\Controllers\UserManagementController;
+
 use App\Models\AppItemModel;
 use App\Models\PurchaseRequestItemModel;
 use App\Models\PurchaseRequestModel;
@@ -255,6 +257,11 @@ Route::middleware('api')->group(function () {
 });
 
 
+//USER MANAGEMENT GET
+Route::middleware('api')->group(function () {
+    Route::get('fetchEmployeeData', [UserManagementController::class, 'fetchEmployeeData']);
+});
+
 
 
 
@@ -334,6 +341,9 @@ Route::post('submitReport', [QMSController::class, 'submitReport']);
 Route::post('deleteRS', [QMSController::class, 'deleteRS']);
 Route::post('saveQuarterData', [QMSController::class, 'saveQuarterData']);
 Route::post('saveMonthlyData', [QMSController::class, 'saveMonthlyData']);
+
+//U S E R  M A N A G E M E N T
+
 
 
 

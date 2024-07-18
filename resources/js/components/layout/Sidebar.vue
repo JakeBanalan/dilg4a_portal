@@ -301,13 +301,13 @@ export default {
                         },
                     ]
                 },
-                // {
-                //     link: '/settings/update/',
-                //     name: 'Settings',
-                //     tooltip: 'Setings',
-                //     icon: 'gear',
-                //     class: 'menu-icon-custom',
-                // }
+                {
+                    link: '/settings/user-management/',
+                    name: 'Settings',
+                    tooltip: 'Setings',
+                    icon: 'gear',
+                    class: 'menu-icon-custom',
+                }
 
             ],
         },
