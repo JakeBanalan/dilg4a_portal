@@ -17,6 +17,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 
 
@@ -285,6 +286,33 @@ class RICTUController extends Controller
         );
     }
 
+    public function countHardwareRequest()
+    {
+        // Replace 'your_connection' with your actual database connection logic
+        $hardwareCount = RICTUModel::select(DB::raw('COUNT(*) AS hardware_count'))
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+            ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7]) // Use whereIn for multiple values
+            ->first();
+
+        // No need to reassign, directly return the count property
+        return response()->json(['hardware_count' => $hardwareCount->hardware_count]);
+    }
+
+    public function countSoftwareRequest()
+    {
+        // Replace 'your_connection' with your actual database connection logic
+        $softwareCount = RICTUModel::select(DB::raw('COUNT(*) AS software_count'))
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+            ->whereIn('c.REQUEST_ID', [4, 5, 8,]) // Use whereIn for multiple values
+            ->first();
+
+        // No need to reassign, directly return the count property
+        return response()->json(['software_count' => $softwareCount->software_count]);
+    }
 
 
     public function generate($selectedYear, $selectedQuarter, $requestType)

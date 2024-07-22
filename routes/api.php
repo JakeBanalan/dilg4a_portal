@@ -138,6 +138,15 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('countHardwareRequest', [RICTUController::class, 'countHardwareRequest']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('countSoftwareRequest', [RICTUController::class, 'countSoftwareRequest']);
+});
+
+
+Route::middleware('api')->group(function () {
     Route::get('countPurchaseRequestStatistics/{cur_year}', [PurchaseRequestController::class, 'countPurchaseRequestStatistics']);
 });
 
