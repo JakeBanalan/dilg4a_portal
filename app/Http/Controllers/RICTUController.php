@@ -294,6 +294,7 @@ class RICTUController extends Controller
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
             ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7]) // Use whereIn for multiple values
+            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
             ->first();
 
         // No need to reassign, directly return the count property
@@ -308,6 +309,7 @@ class RICTUController extends Controller
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
             ->whereIn('c.REQUEST_ID', [4, 5, 8,]) // Use whereIn for multiple values
+            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
             ->first();
 
         // No need to reassign, directly return the count property
