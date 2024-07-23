@@ -71,7 +71,7 @@
                     <div>
                         <p class="mb-4">Hardware Request</p>
                         <p class="fs-30 mb-2">{{ this.ict_hardware }}</p>
-                        <p>{{ this.$formatDecimal((this.ict_hardware / 300) * 100) }}% as of today</p>
+                        <p>{{ this.$formatDecimal((this.ict_hardware / 500) * 100) }}% as of this year</p>
                     </div>
                     <div>
                         <font-awesome-icon :icon="['fas', 'computer']" class="fa-6x" />
@@ -85,7 +85,7 @@
                     <div>
                         <p class="mb-4">Software Request</p>
                         <p class="fs-30 mb-2">{{ this.ict_software }}</p>
-                        <p>{{ this.$formatDecimal((this.ict_software / 300) * 100) }}% as of today</p>
+                        <p>{{ this.$formatDecimal((this.ict_software / 500) * 100) }}% as of this year</p>
                     </div>
                     <div>
                         <font-awesome-icon :icon="['fas', 'gear']" class="fa-6x" />
