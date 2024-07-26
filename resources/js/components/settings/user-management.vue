@@ -367,7 +367,7 @@ export default {
             data: response.data,
             columns: [
               { data: 'employee_no' },
-              { data: 'username' },
+              { data: 'pmo_title' },
               { data: 'username' },
               { data: 'name' },
               { data: 'username' },
