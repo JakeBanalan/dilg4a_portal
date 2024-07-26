@@ -61,7 +61,7 @@ th {
                             <!-- Render buttons for viewing and opening modal -->
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
                                 @click="view_ict_form(ict_data.id)">
-                                <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                                <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon >
                             </button>
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
                                 @click="openModal(ict_data.id)">
@@ -78,16 +78,16 @@ th {
                         <div v-else>
                             <!-- Render button for marking as received -->
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="received_request(ict_data.id)">
+                                @click="received_request(ict_data.id)" title="Confirm">
                                 <font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon>
                             </button>
                             <!-- Render buttons for viewing and opening modal -->
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="view_ict_form(ict_data.id)">
+                                @click="view_ict_form(ict_data.id)" title="Show">
                                 <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                             </button>
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="openModal(ict_data.id)">
+                                @click="openModal(ict_data.id)" title="Complete">
                                 <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
                             </button>
                         </div>

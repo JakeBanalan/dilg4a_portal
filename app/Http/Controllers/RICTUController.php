@@ -8,12 +8,16 @@ use App\Models\RICTUModel;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
 
 
@@ -282,6 +286,35 @@ class RICTUController extends Controller
         );
     }
 
+    public function countHardwareRequest()
+    {
+        // Replace 'your_connection' with your actual database connection logic
+        $hardwareCount = RICTUModel::select(DB::raw('COUNT(*) AS hardware_count'))
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+            ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7]) // Use whereIn for multiple values
+            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
+            ->first();
+
+        // No need to reassign, directly return the count property
+        return response()->json(['hardware_count' => $hardwareCount->hardware_count]);
+    }
+
+    public function countSoftwareRequest()
+    {
+        // Replace 'your_connection' with your actual database connection logic
+        $softwareCount = RICTUModel::select(DB::raw('COUNT(*) AS software_count'))
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+            ->whereIn('c.REQUEST_ID', [4, 5, 8,]) // Use whereIn for multiple values
+            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
+            ->first();
+
+        // No need to reassign, directly return the count property
+        return response()->json(['software_count' => $softwareCount->software_count]);
+    }
 
 
     public function generate($selectedYear, $selectedQuarter, $requestType)
@@ -354,19 +387,21 @@ class RICTUController extends Controller
                 ],
             ],
         ];
-
+        $dateFormat = 'mm/dd/yyyy';
         foreach ($query as $index => $data) {
             $sheet->setCellValue('A' . $row, $index + 1);
             $sheet->setCellValue('B' . $row, $data['control_no']);
-            $sheet->setCellValue('C' . $row, $data['started_date']);
+            $sheet->setCellValue('C' . $row, Date::PHPToExcel($data['started_date']));
+            $sheet->getStyle('C' . $row)->getNumberFormat()->setFormatCode($dateFormat);
             $sheet->setCellValue('D' . $row, $data['started_time']);
             $sheet->setCellValue('E' . $row, $data['requested_by']);
             $sheet->setCellValue('F' . $row, $data['office']);
             $sheet->setCellValue('G' . $row, $data['remarks']);
             $sheet->setCellValue('H' . $row, $data['ict_personnel']);
-            $sheet->setCellValue('K' . $row, $data['completed_date']);
+            $sheet->setCellValue('K' . $row, Date::PHPToExcel($data['completed_date']));
+            $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode($dateFormat);
             $sheet->setCellValue('L' . $row, $data['completed_time']);
-            $sheet->setCellValue('M' . $row, '');
+            $sheet->setCellValue('M' . $row, '=INT(K' . $row . '-C' . $row . ')&" Days, "&HOUR(K' . $row . '-C' . $row . ')&" Hours and  "&MINUTE(K' . $row . '-C' . $row . ')&" Minutes"');
             $sheet->getRowDimension($row)->setRowHeight(60);
 
             try {
@@ -392,12 +427,12 @@ class RICTUController extends Controller
                 'bold' => true,
             ],
             'alignment' => [
-                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
             ],
             'borders' => [
                 'outline' => [
-                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                    'borderStyle' => Border::BORDER_THIN,
                     'color' => ['argb' => '000000'],
                 ],
             ],
@@ -415,12 +450,12 @@ class RICTUController extends Controller
         $sheet->getStyle('E' . $signatoryRow . ':F' . ($signatoryRow))->applyFromArray($signatoryStyleArray);
         $sheet->getStyle('E' . $signatoryRow . ':F' . ($signatoryRow + 2))->applyFromArray($signatoryStyleArray);
         $sheet->getStyle('E' . $signatoryRow . ':F' . ($signatoryRow + 4))->applyFromArray($signatoryStyleArray);
-        $sheet->getStyle('E' . ($signatoryRow + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
-        $sheet->getStyle('E' . $signatoryRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('E' . ($signatoryRow + 1))->getAlignment()->setVertical(Alignment::VERTICAL_BOTTOM);
+        $sheet->getStyle('E' . $signatoryRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         // Apply background color to "Prepared By" section
         $sheet->getStyle('E' . $signatoryRow . ':F' . $signatoryRow)
-            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getFill()->setFillType(Fill::FILL_SOLID)
             ->getStartColor()->setARGB('000000');
 
         // Apply font color to "Prepared By" section
@@ -439,12 +474,12 @@ class RICTUController extends Controller
         $sheet->getStyle('H' . $signatoryRow . ':J' . ($signatoryRow))->applyFromArray($signatoryStyleArray);
         $sheet->getStyle('H' . $signatoryRow . ':J' . ($signatoryRow + 2))->applyFromArray($signatoryStyleArray);
         $sheet->getStyle('H' . $signatoryRow . ':J' . ($signatoryRow + 4))->applyFromArray($signatoryStyleArray);
-        $sheet->getStyle('H' . ($signatoryRow + 1))->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM);
-        $sheet->getStyle('H' . $signatoryRow)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+        $sheet->getStyle('H' . ($signatoryRow + 1))->getAlignment()->setVertical(Alignment::VERTICAL_BOTTOM);
+        $sheet->getStyle('H' . $signatoryRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
 
         // Apply background color to "Noted By" section
         $sheet->getStyle('H' . $signatoryRow . ':J' . $signatoryRow)
-            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getFill()->setFillType(Fill::FILL_SOLID)
             ->getStartColor()->setARGB('000000');
 
         // Apply font color to "Noted By" section
