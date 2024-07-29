@@ -70,6 +70,8 @@
     // settings
     import settingPanel from "../components/settings/user-management.vue";
     import UpdateUserPanel from "../components/settings/update.vue";
+    import CreateUserPanel from "../components/settings/create.vue";
+
 
     // import _ from "lodash";
     const routes = [
@@ -1102,7 +1104,32 @@
                     next({ name: 'Login' });
                 });
             }
+        },
+        {
+            path: '/settings/create',
+            name: 'Create User',
+            component: CreateUserPanel,
+              meta: {
+                requiresAuth: true
+            },
+            beforeEnter: (to, from, next) => {
+                const token = localStorage.getItem('api_token');
+                axios.get('/api/authenticated',{
+                    params:{
+                        api_token: token
+                    }
+                }).then(response => {
+                    if (response.data.authenticated) {
+                        next();
+                    } else {
+                        next({ name: 'Login' });
+                    }
+                }).catch(() => {
+                    next({ name: 'Login' });
+                });
+            }
         }
+        
 
 
 

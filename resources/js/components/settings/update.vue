@@ -13,11 +13,9 @@
                                 <div class="card-body">
                                     <div class="card-title d-flex justify-content-between align-items-center">
                                         <h5 class="card-title">
-                                            <font-awesome-icon :icon="['fas', 'circle-info']"></font-awesome-icon>&nbsp;ATTENTION
+                                            <font-awesome-icon :icon="['fas', 'circle-info']"></font-awesome-icon> Update User Info: {{ data.name }}
                                         </h5>
                                     </div>
-                                    All users are required to update their account password and details to ensure the security and accuracy of our records. Please log in to your account and complete the update process at your earliest convenience. Thank you for your cooperation.
-
                                 </div>
                             </div>
                         </div>
@@ -32,7 +30,7 @@
                                     <div class="d-flex align-items-center pb-3 pt-3 border-top" style="margin-top:2em;">
                                     <button class="btn btn-outline-danger col-lg-12 mt-2">Block</button>
                                     </div>
-
+                                    <button class="btn btn-outline-primary col-lg-12 mt-2" @click="viewUserMan">Back</button>
                                 </div>
                             </div>
                         </div>
@@ -226,6 +224,9 @@ export default {
         this.getPosition();
     },
     methods: {
+        viewUserMan(){
+            this.$router.push({ path: `/settings/user-management` });
+        },
         toggleCard() {
             this.isCardVisible = !this.isCardVisible;
         },
