@@ -225,6 +225,10 @@
                                         @click="toggleCard()" style="float:right;">
                                         Advanced Search
                                     </button>
+                                    <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                        @click="createUser()" style="float:right;">
+                                        Create User
+                                    </button>
                                     <div class="table-responsive">
                                         <user_table />
                                     </div>
@@ -354,36 +358,58 @@ export default {
         this.fetchEmployeeData();
     },
     methods: {
+        createUser(){
+            this.$router.push({ path: `/settings/create` });
+        },
+        UpdateUser(id) {
+            this.$router.push({ path: `/settings/update/${id}` });
+        },
         toggleCard() {
             this.isCardVisible = !this.isCardVisible;
         },
-        fetchEmployeeData(){
+        fetchEmployeeData() {
+            const vm = this; // Save Vue instance context
             axios.get('../../api/fetchEmployeeData')
-        .then((response) => {
-          // Update data table with fetched employee data
-          console.log(response.data);
-          $('#employee_table').DataTable({
-            destroy: true, // Destroy existing DataTable instance
-            data: response.data,
-            columns: [
-              { data: 'employee_no' },
-              { data: 'username' },
-              { data: 'username' },
-              { data: 'name' },
-              { data: 'username' },
-              { data: 'email' },
-              { data: 'contact_details' },
-              {
-                data: null, orderable: false, render: function (data) {
-                  return '<label class="badge badge-info" @click="deletePid(' + data.id + ')">View</label>';
-                },
-              }
-            ]
-          });
-        })
-        .catch((error) => {
-          console.error('Error fetching employee data:', error);
-        });
+                .then((response) => {
+                    // Update data table with fetched employee data
+                    console.log(response.data);
+                    $('#employee_table').DataTable({
+                        destroy: true, // Destroy existing DataTable instance
+                        data: response.data,
+                        pageLength: 20,
+                        bLengthChange: false,
+                        bInfo: false,
+                        filter: false,
+                        columns: [
+                            { data: 'employee_no' },
+                            { data: 'pmo_title' },
+                            { data: 'username' },
+                            { data: 'name' },
+                            { data: 'username' },
+                            { data: 'email' },
+                            { data: 'contact_details' },
+                            {
+                                data: null, orderable: false, render: function (data) {
+                                    return '<button type="button" class="btn btn-info btn-update" data-id="' + data.id + '">View</button>';
+                                },
+                            }
+                        ]
+                    });
+
+                    //   $(row).find('.btn-update').on('click', function () {
+                    //   const id = $(this).data('id');
+                    //   vm.UpdateUser(id); // Call the Vue method
+                    // });
+
+                    $('#employee_table tbody').on('click', 'button', function () {
+                        const id = $(this).data('id');
+                        vm.UpdateUser(id);
+                    });
+
+                })
+                .catch((error) => {
+                    console.error('Error fetching employee data:', error);
+                });
         }
     },
 

@@ -28,6 +28,7 @@ class UserManagementController extends Controller
             users.middle_name as middle_name,
             pmo.pmo_title,
             pmo.id as pmo_id,
+            pmo.pmo_title,
             tblposition.position_title,
             users.email as email,
             users.ext_name,

@@ -198,10 +198,32 @@ export default {
 
         }
     },
-    created() {
-        this.role = localStorage.getItem('user_role');
+
+    mounted() {
+        this.fetchData(); // fetch data initially
+        this.timer = setInterval(this.fetchData, 60000); // fetch data every 30 seconds
     },
+
+
     methods: {
+        async fetchData() {
+            // code to fetch data from API or database
+            axios.get('../../api/fetch_ict_request')
+                .then(response => {
+                    this.ict_data = response.data.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        
+        cancelAutoUpdate() {
+            clearInterval(this.timer);
+        },
+
+        beforeDestroy() {
+            this.cancelAutoUpdate();
+        },
         toggleCard() {
             this.isCardVisible = !this.isCardVisible;
         },

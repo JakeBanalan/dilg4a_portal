@@ -98,7 +98,8 @@ class UserController extends Controller
             users.pmo_id,
             users.position_id,
             p.pmo_title as office,
-            pos.POSITION_TITLE as position
+            pos.POSITION_TITLE as position,
+            CONCAT(users.first_name," ", users.middle_name," ",users.last_name)  as name
 
             ')
             ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
