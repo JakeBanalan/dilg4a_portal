@@ -71,7 +71,7 @@ th {
                         <div v-else-if="ict_data.status === 'Completed'">
                             <!-- Render buttons for viewing and opening modal -->
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="view_ict_form(ict_data.id)">
+                                @click="view_ict_form(ict_data.id)" title="Show">
                                 <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                             </button>
                         </div>

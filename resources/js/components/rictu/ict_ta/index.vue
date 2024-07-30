@@ -119,16 +119,17 @@ h5 {
                                             Technical Assistance Monitoring
                                         </h5>
                                         <div class="d-flex">
+
                                             <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
-                                                @click="openModal()">
+                                                @click="openModal()" v-if="this.role == 'admin'">
                                                 Generate Report
                                             </button>
-                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
                                                 <router-link class="router-class" style="color:#059886;"
                                                     :to="{ name: 'Create ICT Technical Assistance' }">
                                                     Create Request
                                                 </router-link>
-                                            </button>
+                                            </button> -->
                                             <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
                                                 @click="toggleCard()">
                                                 Advanced Search
@@ -178,7 +179,7 @@ export default {
     name: 'ICT Technical Assistance',
     data() {
         return {
-
+            role: null,
             abstract_no: null,
             selected: null,
             value: null,
@@ -195,35 +196,12 @@ export default {
             isCardVisible: false,
             modalVisible: false,
 
-
         }
     },
-
-    mounted() {
-        this.fetchData(); // fetch data initially
-        this.timer = setInterval(this.fetchData, 60000); // fetch data every 30 seconds
+    created() {
+        this.role = localStorage.getItem('user_role');
     },
-
-
     methods: {
-        async fetchData() {
-            // code to fetch data from API or database
-            axios.get('../../api/fetch_ict_request')
-                .then(response => {
-                    this.ict_data = response.data.data;
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        },
-        
-        cancelAutoUpdate() {
-            clearInterval(this.timer);
-        },
-
-        beforeDestroy() {
-            this.cancelAutoUpdate();
-        },
         toggleCard() {
             this.isCardVisible = !this.isCardVisible;
         },
