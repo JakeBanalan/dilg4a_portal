@@ -267,9 +267,13 @@ class RICTUController extends Controller
     }
     public function countICTRequest($cur_year)
     {
-        return response()->json(RICTUModel::select(RICTUModel::raw('count(*) as ict'))
+        $userId = auth()->user(); // Get the ID of the currently logged-in user
+        $totalRequests = DB::table('tbl_technicalassistance')
+            ->where('request_by', $userId)
             ->whereYear('created_at', $cur_year)
-            ->get());
+            ->count();
+  
+        return response()->json(['request_count' => $totalRequests]);
     }
 
     public function countDRAFT()

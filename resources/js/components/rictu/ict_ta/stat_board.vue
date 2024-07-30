@@ -118,8 +118,8 @@
                 </div>
                 <div class="requests-info">
                     <div class="request-card all-requests">
-                        <p>All Requests</p>
-                        <p class="count">{{ this.ict_total }}</p>
+                        <p>User Requests</p>
+                        <p class="count">{{ this.request_count }}</p>
                     </div>
                     <div class="request-card completed">
                         <p>Completed Requests</p>
@@ -135,7 +135,8 @@
                     </div>
                 </div>
                 <div class="contact-info">
-                    <p style="font-size: 1rem !important; ">Still having problem? Contact RICTU at local 7406 or dilg4a.it@gmail.com</p>
+                    <p style="font-size: 1rem !important; ">Still having problem? Contact RICTU at local 7406 or
+                        dilg4a.it@gmail.com</p>
                 </div>
             </div>
 
@@ -149,7 +150,7 @@ export default {
     data() {
         return {
             role: null,
-            ict_total: null,
+            request_count: 0,
             ict_draft: null,
             ict_received: null,
             ict_completed: null,
@@ -164,10 +165,10 @@ export default {
         this.role = localStorage.getItem('user_role');
     },
     mounted() {
-        this.$countICTRequest('/api/countICTRequest', 2024)
-            .then(ict_data => { this.ict_total = ict_data; })
-            .catch(error => { console.error(error) })
-
+        const currentYear = 2024;
+        this.$countUserRequests('/api/countUserRequests', currentYear)
+            .then(request_count => { this.request_count = request_count; })
+            .catch(error => { console.error(error); });
         // Separate call for hardware count
         this.fetchHardwareCount();
         // Separate call for software count
@@ -179,16 +180,6 @@ export default {
                 this.ict_completed = data.completed;
             })
             .catch(error => { console.error(error) })
-
-
-
-        // this.$countICTRequest('/api/countICTRequest', 2024)
-        // .then(ict_data => { this.ict_data.ict_total = ict_data; })
-        // .catch(error => { console.error(error) })
-
-        // this.$countICTRequest('/api/countICTRequest', 2024)
-        // .then(ict_data => { this.ict_data.ict_total = ict_data; })
-        // .catch(error => { console.error(error) })
     },
 
     methods: {
@@ -210,6 +201,23 @@ export default {
                 })
                 .catch(error => {
                     console.error('Error fetching hardware count:', error);
+                });
+        },
+        $countUserRequests(url, year) {
+            return fetch(url + '/' + year, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.request_count !== undefined) {
+                        return data.request_count;
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
                 });
         }
     },
