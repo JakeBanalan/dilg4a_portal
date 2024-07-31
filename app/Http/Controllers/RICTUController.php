@@ -268,8 +268,6 @@ class RICTUController extends Controller
     }
     public function countICTRequest($userId, $cur_year)
     {
-        Log::info('User ID: ' . $userId); // Log the user ID
-        Log::info('Current Year: ' . $cur_year); // Log the year
 
         $requestCount = RICTUModel::where('request_by', $userId)
             ->whereYear('created_at', $cur_year)
