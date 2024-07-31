@@ -109,7 +109,7 @@
         <div class="stat col-md-12">
             <div class="content">
                 <div class="technical-assistance">
-                    <p style="font-weight: 600; ">Need ICT Technical Assistance?</p>
+                    <p style="font-weight: 600;">Need ICT Technical Assistance?</p>
                     <button class="submit-request">
                         <router-link class="submit-request" :to="{ name: 'Create ICT Technical Assistance' }">
                             Submit a Request
@@ -118,30 +118,29 @@
                 </div>
                 <div class="requests-info">
                     <div class="request-card all-requests">
-                        <p>User Requests</p>
-                        <p class="count">{{ this.request_count }}</p>
+                        <p style="font-size: 1rem; font-weight: bold;">User Requests</p>
+                        <p class="count">{{ this.ict_total }}</p>
                     </div>
                     <div class="request-card completed">
-                        <p>Completed Requests</p>
+                        <p style="font-size: 1rem; font-weight: bold;">Completed Requests</p>
                         <p class="count">{{ this.ict_completed }}</p>
                     </div>
                     <div class="request-card ongoing">
-                        <p>Ongoing Requests</p>
+                        <p style="font-size: 1rem; font-weight: bold;">Ongoing Requests</p>
                         <p class="count">{{ this.ict_received }}</p>
                     </div>
                     <div class="request-card pending">
-                        <p>Pending Request</p>
+                        <p style="font-size: 1rem; font-weight: bold;">Pending Request</p>
                         <p class="count">{{ this.ict_draft }}</p>
                     </div>
                 </div>
                 <div class="contact-info">
-                    <p style="font-size: 1rem !important; ">Still having problem? Contact RICTU at local 7406 or
-                        dilg4a.it@gmail.com</p>
+                    <p style="font-size: 1rem !important;">
+                        Still having problems? Contact RICTU at local 7406 or dilg4a.it@gmail.com
+                    </p>
                 </div>
             </div>
-
         </div>
-
     </div>
 </template>
 
@@ -149,84 +148,73 @@
 export default {
     data() {
         return {
+            user_id: null,
             role: null,
-            request_count: 0,
+            ict_total: 0,
             ict_draft: null,
             ict_received: null,
             ict_completed: null,
             ict_returned: null,
             ict_hardware: null,
             ict_software: null,
-
-        }
+        };
     },
     created() {
-        const userId = localStorage.getItem('userId');
+        this.user_id = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
     },
     mounted() {
-        const currentYear = 2024;
-        this.$countUserRequests('/api/countUserRequests', currentYear)
-            .then(request_count => { this.request_count = request_count; })
-            .catch(error => { console.error(error); });
-        // Separate call for hardware count
+        this.fetchICTRequestCount();
         this.fetchHardwareCount();
-        // Separate call for software count
         this.fetchSoftwareCount();
-        this.$count('/api/countDRAFT', 1)
-            .then(data => {
-                this.ict_draft = data.draft;
-                this.ict_received = data.received;
-                this.ict_completed = data.completed;
-            })
-            .catch(error => { console.error(error) })
+        this.fetchDraftData();
     },
-
     methods: {
-        fetchHardwareCount() {
-            // Assuming you have a way to make an API call to your backend
-            axios.get('/api/countHardwareRequest') // Replace with actual API endpoint
+        fetchICTRequestCount() {
+            axios.get(`/api/countICTRequest/${this.user_id}/2024`)
                 .then(response => {
-                    this.ict_hardware = response.data.hardware_count; // Assuming the response has 'hardware_count' property
+                    this.ict_total = response.data.ict;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+        fetchHardwareCount() {
+            axios.get(`/api/countHardwareRequest/${this.user_id}`)
+                .then(response => {
+                    this.ict_hardware = response.data.hardware_count;
                 })
                 .catch(error => {
                     console.error('Error fetching hardware count:', error);
                 });
         },
         fetchSoftwareCount() {
-            // Assuming you have a way to make an API call to your backend
-            axios.get('/api/countSoftwareRequest') // Replace with actual API endpoint
+            axios.get(`/api/countSoftwareRequest/${this.user_id}`)
                 .then(response => {
-                    this.ict_software = response.data.software_count; // Assuming the response has 'software_count' property
+                    this.ict_software = response.data.software_count;
                 })
                 .catch(error => {
-                    console.error('Error fetching hardware count:', error);
+                    console.error('Error fetching software count:', error);
                 });
         },
-        $countUserRequests(url, year) {
-            return fetch(url + '/' + year, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.request_count !== undefined) {
-                        return data.request_count;
-                    } else {
-                        throw new Error('Invalid response format');
-                    }
+        fetchDraftData() {
+            axios.get(`/api/countDRAFT/${this.user_id}`)
+                .then(response => {
+                    this.ict_draft = response.data[0].draft;
+                    this.ict_received = response.data[0].received;
+                    this.ict_completed = response.data[0].completed;
+                    this.ict_returned = response.data[0].returned;
+                })
+                .catch(error => {
+                    console.error(error);
                 });
-        }
+        },
     },
-
-
-}
+};
 </script>
 
 <style scoped>
+/* Add your styles here */
 .container {
     display: flex;
     flex-direction: column;
@@ -262,7 +250,6 @@ export default {
 
 .technical-assistance {
     margin-bottom: 20px;
-
 }
 
 .technical-assistance p {
@@ -289,8 +276,8 @@ export default {
 .request-card {
     padding: 20px;
     border-radius: 5px;
-    width: 200px;
-    height: 120px;
+    width: calc(15vw - 15px);
+    height: 130px;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -300,8 +287,8 @@ export default {
 }
 
 .request-card .count {
-    margin-top: 15px;
-    font-size: 3.5rem;
+    margin-top: 30px;
+    font-size: 4.5rem;
     font-weight: bold;
 }
 
@@ -312,7 +299,7 @@ export default {
 
 .completed {
     color: white;
-    background-color: #efdb92;
+    background-color: #efcd51;
 }
 
 .ongoing {

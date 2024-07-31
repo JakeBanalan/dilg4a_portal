@@ -9,6 +9,7 @@ use App\Models\RICTUModel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -265,18 +266,19 @@ class RICTUController extends Controller
             return response()->json(['error' => 'Request not found'], 404);
         }
     }
-    public function countICTRequest($cur_year)
+    public function countICTRequest($userId, $cur_year)
     {
-        $userId = auth()->user(); // Get the ID of the currently logged-in user
-        $totalRequests = DB::table('tbl_technicalassistance')
-            ->where('request_by', $userId)
+        Log::info('User ID: ' . $userId); // Log the user ID
+        Log::info('Current Year: ' . $cur_year); // Log the year
+
+        $requestCount = RICTUModel::where('request_by', $userId)
             ->whereYear('created_at', $cur_year)
             ->count();
-  
-        return response()->json(['request_count' => $totalRequests]);
+
+        return response()->json(['ict' => $requestCount]);
     }
 
-    public function countDRAFT()
+    public function countDRAFT($userId)
     {
         return response()->json(
             RICTUModel::select(
@@ -285,40 +287,41 @@ class RICTUController extends Controller
                 RICTUModel::raw('COUNT(CASE WHEN status_id = 3 THEN 1 END) as completed'),
                 RICTUModel::raw('COUNT(CASE WHEN status_id = 4 THEN 1 END) as returned')
             )
+                ->where('request_by', $userId)
                 ->whereYear('created_at', 2024)
                 ->get()
         );
     }
 
-    public function countHardwareRequest()
+
+    public function countHardwareRequest($userId)
     {
-        // Replace 'your_connection' with your actual database connection logic
         $hardwareCount = RICTUModel::select(DB::raw('COUNT(*) AS hardware_count'))
             ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-            ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7]) // Use whereIn for multiple values
-            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
+            ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7])
+            ->where('request_by', $userId)  // Filter by user ID
+            ->whereYear('created_at', 2024)
             ->first();
 
-        // No need to reassign, directly return the count property
         return response()->json(['hardware_count' => $hardwareCount->hardware_count]);
     }
 
-    public function countSoftwareRequest()
+    public function countSoftwareRequest($userId)
     {
-        // Replace 'your_connection' with your actual database connection logic
         $softwareCount = RICTUModel::select(DB::raw('COUNT(*) AS software_count'))
             ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-            ->whereIn('c.REQUEST_ID', [4, 5, 8,]) // Use whereIn for multiple values
-            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
+            ->whereIn('c.REQUEST_ID', [4, 5, 8])
+            ->where('request_by', $userId)  // Filter by user ID
+            ->whereYear('created_at', 2024)
             ->first();
 
-        // No need to reassign, directly return the count property
         return response()->json(['software_count' => $softwareCount->software_count]);
     }
+
 
 
     public function generate($selectedYear, $selectedQuarter, $requestType)

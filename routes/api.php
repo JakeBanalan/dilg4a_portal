@@ -130,19 +130,16 @@ Route::middleware('api')->group(function () {
 
 
 Route::middleware('api')->group(function () {
-    Route::get('countICTRequest/{cur_year}', [RICTUController::class, 'countICTRequest']);
+    Route::get('/countICTRequest/{userId}/{cur_year}', [RICTUController::class, 'countICTRequest']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countDRAFT/{status}', [RICTUController::class, 'countDRAFT']);
+    Route::get('/countDRAFT/{userId}', [RICTUController::class, 'countDRAFT']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countHardwareRequest', [RICTUController::class, 'countHardwareRequest']);
-});
-
-Route::middleware('api')->group(function () {
-    Route::get('countSoftwareRequest', [RICTUController::class, 'countSoftwareRequest']);
+    Route::get('/countHardwareRequest/{userId}', [RICTUController::class, 'countHardwareRequest']);
+    Route::get('/countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
 });
 
 

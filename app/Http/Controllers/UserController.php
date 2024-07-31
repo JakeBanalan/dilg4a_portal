@@ -169,12 +169,6 @@ class UserController extends Controller
 
 
 
-
-
-
-
-
-
     public function logout()
     {
         $user = Auth::guard('api')->user();
