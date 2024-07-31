@@ -97,7 +97,7 @@
         </div>
     </div> -->
 
-    <div v-if="this.role == 'admin'">
+    <div v-if="this.role == 'user'">
         <div class="container col-md-12">
             <div class="header">
                 <h1>
@@ -119,6 +119,51 @@
                 <div class="requests-info">
                     <div class="request-card all-requests">
                         <p style="font-size: 1rem; font-weight: bold;">User Requests</p>
+                        <p class="count">{{ this.ict_total }}</p>
+                    </div>
+                    <div class="request-card completed">
+                        <p style="font-size: 1rem; font-weight: bold;">Completed Requests</p>
+                        <p class="count">{{ this.ict_completed }}</p>
+                    </div>
+                    <div class="request-card ongoing">
+                        <p style="font-size: 1rem; font-weight: bold;">Ongoing Requests</p>
+                        <p class="count">{{ this.ict_received }}</p>
+                    </div>
+                    <div class="request-card pending">
+                        <p style="font-size: 1rem; font-weight: bold;">Pending Request</p>
+                        <p class="count">{{ this.ict_draft }}</p>
+                    </div>
+                </div>
+                <div class="contact-info">
+                    <p style="font-size: 1rem !important;">
+                        Still having problems? Contact RICTU at local 7406 or dilg4a.it@gmail.com
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div v-if="this.role == 'admin'">
+        <div class="container col-md-12">
+            <div class="header">
+                <h1>
+                    QP-DILG-ISTMS-RO-17: Provision of Preventive Maintenance and Technical Assistance on Information and
+                    Communications Technology (ICT) Resources
+                </h1>
+            </div>
+        </div>
+        <div class="stat col-md-12">
+            <div class="content">
+                <div class="technical-assistance">
+                    <p style="font-weight: 600;">Need ICT Technical Assistance?</p>
+                    <button class="submit-request">
+                        <router-link class="submit-request" :to="{ name: 'Create ICT Technical Assistance' }">
+                            Submit a Request
+                        </router-link>
+                    </button>
+                </div>
+                <div class="requests-info">
+                    <div class="request-card all-requests">
+                        <p style="font-size: 1rem; font-weight: bold;">Total Requests</p>
                         <p class="count">{{ this.ict_total }}</p>
                     </div>
                     <div class="request-card completed">
