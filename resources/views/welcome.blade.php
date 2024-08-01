@@ -23,7 +23,7 @@
     <link href="{{ asset('js/select.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/vertical-layout-light/style.css') }}" rel="stylesheet">
 
-    
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <!-- 
     // import "datatables.net-bs4";
     // import "datatables.net-bs4/css/dataTables.bootstrap4.min.css"; -->

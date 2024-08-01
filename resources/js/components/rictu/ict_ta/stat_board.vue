@@ -155,10 +155,8 @@
             <div class="content">
                 <div class="technical-assistance">
                     <p style="font-weight: 600;">Need ICT Technical Assistance?</p>
-                    <button class="submit-request">
-                        <router-link class="submit-request" :to="{ name: 'Create ICT Technical Assistance' }">
-                            Submit a Request
-                        </router-link>
+                    <button class="submit-request" @click="$router.replace({ path: '/rictu/ict_ta/create' })">
+                        Submit a Request
                     </button>
                 </div>
                 <div class="requests-info">
