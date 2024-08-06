@@ -110,10 +110,8 @@
             <div class="content">
                 <div class="technical-assistance">
                     <p style="font-weight: 600;">Need ICT Technical Assistance?</p>
-                    <button class="submit-request">
-                        <router-link class="submit-request" :to="{ name: 'Create ICT Technical Assistance' }">
-                            Submit a Request
-                        </router-link>
+                    <button class="submit-request" @click="$router.replace({ path: '/rictu/ict_ta/create' })">
+                        Submit a Request
                     </button>
                 </div>
                 <div class="requests-info">
@@ -162,19 +160,19 @@
                 <div class="requests-info">
                     <div class="request-card all-requests">
                         <p style="font-size: 1rem; font-weight: bold;">Total Requests</p>
-                        <p class="count">{{ this.ict_total }}</p>
+                        <p class="count">{{ ict_adminTotal }}</p> <!-- Remove 'this.' -->
                     </div>
                     <div class="request-card completed">
                         <p style="font-size: 1rem; font-weight: bold;">Completed Requests</p>
-                        <p class="count">{{ this.ict_completed }}</p>
+                        <p class="count">{{ ict_adminCompleted }}</p>
                     </div>
                     <div class="request-card ongoing">
                         <p style="font-size: 1rem; font-weight: bold;">Ongoing Requests</p>
-                        <p class="count">{{ this.ict_received }}</p>
+                        <p class="count">{{ ict_adminReceived }}</p>
                     </div>
                     <div class="request-card pending">
                         <p style="font-size: 1rem; font-weight: bold;">Pending Request</p>
-                        <p class="count">{{ this.ict_draft }}</p>
+                        <p class="count">{{ ict_adminDraft }}</p>
                     </div>
                 </div>
                 <div class="contact-info">
@@ -194,12 +192,19 @@ export default {
             user_id: null,
             role: null,
             ict_total: 0,
-            ict_draft: null,
-            ict_received: null,
-            ict_completed: null,
-            ict_returned: null,
-            ict_hardware: null,
-            ict_software: null,
+            ict_draft: 0,
+            ict_received: 0,
+            ict_completed: 0,
+            ict_returned: 0,
+            ict_hardware: 0,
+            ict_software: 0,
+            ict_adminTotal: 0,
+            ict_adminDraft: 0,
+            ict_adminReceived: 0,
+            ict_adminCompleted: 0,
+            ict_adminReturned: 0,
+            ict_adminHardware: 0,
+            ict_adminSoftware: 0,
         };
     },
     created() {
@@ -211,8 +216,38 @@ export default {
         this.fetchHardwareCount();
         this.fetchSoftwareCount();
         this.fetchDraftData();
+        this.fetchICTAdminCount();
+        this.fetchICTAdminDraft();
+
     },
     methods: {
+        fetchICTAdminCount() {
+            // Fetch total ICT requests
+            axios.get(`/api/totalCountICTRequest/2024`)
+                .then(response => {
+                    console.log(response.data); // Log the response to check the structure
+                    this.ict_adminTotal = response.data.ictTotal;
+                })
+                .catch(error => {
+                    console.error('Error fetching ICT admin total:', error);
+                });
+        },
+
+        fetchICTAdminDraft() {
+            // Fetch draft data
+            axios.get('/api/totalCountDraft')
+                .then(response => {
+                    const data = response.data;
+                    this.ict_adminDraft = response.data[0].draft;
+                    this.ict_adminReceived = response.data[0].received;
+                    this.ict_adminCompleted = response.data[0].completed;
+                    this.ict_adminReturned = response.data[0].returned;
+                })
+                .catch(error => {
+                    console.error('Error fetching draft data:', error);
+                });
+
+        },
         fetchICTRequestCount() {
             axios.get(`/api/countICTRequest/${this.user_id}/2024`)
                 .then(response => {

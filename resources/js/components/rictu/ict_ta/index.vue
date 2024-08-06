@@ -198,7 +198,9 @@ export default {
 
         }
     },
-
+    created() {
+        this.role = localStorage.getItem('user_role');
+    },
 
     methods: {
         toggleCard() {

@@ -74,6 +74,10 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetch_ict_perUser/{status}/{userID}', [RICTUController::class, 'fetch_ict_perUser']);
+});
+
+Route::middleware('api')->group(function () {
     Route::get('load_abstract_data', [AbstractController::class, 'load_abstract_data']);
 });
 
@@ -126,6 +130,14 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('countTotalItem/{cur_year}', [AppItemController::class, 'countTotalItem']);
+});
+
+Route::middleware('api')->group(function(){
+    Route::get('/totalCountICTRequest/{year}', [RICTUController::class, 'totalCountICTrequest']);
+});
+
+Route::middleware('api')->group(function(){
+    Route::get('/totalCountDraft', [RICTUController::class, 'totalCountDraft']);
 });
 
 

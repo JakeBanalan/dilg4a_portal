@@ -59,67 +59,61 @@ th {
                         aria-label="TIME: activate to sort column ascending">TIME</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody v-if="role === 'admin' || role === 'user'">
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
-                    <td v-if="this.role == 'admin'">
-                        <div v-if="ict_data.status === 'Received'">
-                            <!-- Render buttons for viewing and opening modal -->
+                    <td>
+                        <!-- Buttons based on ICT request status -->
+                        <template v-if="role === 'admin'">
+                            <div v-if="ict_data.status === 'Received'">
+                                <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                    @click="view_ict_form(ict_data.id)" aria-label="View Details">
+                                    <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                                </button>
+                                <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                    @click="openModal(ict_data.id)" aria-label="Open Modal">
+                                    <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
+                                </button>
+                            </div>
+                            <div v-else-if="ict_data.status === 'Completed'">
+                                <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                    @click="view_ict_form(ict_data.id)" aria-label="View Details">
+                                    <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                                </button>
+                            </div>
+                            <div v-else-if="ict_data.status === 'Draft'">
+                                <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                    @click="received_request(ict_data.id)" aria-label="Confirm Request">
+                                    <font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon>
+                                </button>
+                                <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                                    @click="view_ict_form(ict_data.id)" aria-label="View Details">
+                                    <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                                </button>
+                            </div>
+                        </template>
+                        <template v-else-if="role === 'user'">
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="view_ict_form(ict_data.id)">
+                                @click="view_ict_form(ict_data.id)" aria-label="View Details">
                                 <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                             </button>
-                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="openModal(ict_data.id)">
-                                <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
-                            </button>
-                        </div>
-                        <div v-else-if="ict_data.status === 'Completed'">
-                            <!-- Render buttons for viewing and opening modal -->
-                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="view_ict_form(ict_data.id)" title="Show">
-                                <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
-                            </button>
-                        </div>
-                        <div v-else>
-                            <!-- Render button for marking as received -->
-                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="received_request(ict_data.id)" title="Confirm">
-                                <font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon>
-                            </button>
-                            <!-- Render buttons for viewing and opening modal -->
-                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="view_ict_form(ict_data.id)" title="Show">
-                                <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
-                            </button>
-                            <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="openModal(ict_data.id)" title="Complete">
-                                <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
-                            </button>
-                        </div>
-
-
-
-                    </td>
-                    <td v-else>
-                        <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                            @click="view_ict_form(ict_data.id)">
-                            <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
-                        </button>
+                        </template>
                     </td>
 
                     <td>{{ ict_data.status }}</td>
-                    <td><b>{{ ict_data.control_no }}</b><br><i>~Request Date: {{ formatDate(ict_data.requested_date)
-                            }}</i>~</td>
-                    <td style="white-space:normal;">{{ ict_data.remarks }} </td>
+                    <td>
+                        <b>{{ ict_data.control_no }}</b>
+                        <br>
+                        <i>~Request Date: {{ formatDate(ict_data.requested_date) }}</i>~
+                    </td>
+                    <td style="white-space:normal;">{{ ict_data.remarks }}</td>
 
-                    <td v-if="ict_data.status_id == 3">
+                    <td v-if="ict_data.status_id === 3">
                         <button class="btn btn-primary mr-1" style="background-color:#059886;color:#fff;">
                             <font-awesome-icon :icon="['fas', 'square-poll-vertical']" />
                             <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>
                         </button>
                     </td>
                     <td v-else> ~ </td>
-
 
                     <td> {{ formatDate(ict_data.received_date) }}</td>
                     <td> {{ formatTime(ict_data.received_date) }}</td>
@@ -128,15 +122,14 @@ th {
                     <td>{{ ict_data.ict_personnel }}</td>
                     <td> {{ formatDate(ict_data.completed_date) }}</td>
                     <td> {{ formatTime(ict_data.completed_date) }}</td>
-                    <td> <span class="badge badge-success">{{ ict_data.request_type }} - {{ ict_data.sub_request_type
-                            }}</span> </td>
-
-
-
-
-
+                    <td>
+                        <span class="badge badge-success">
+                            {{ ict_data.request_type }} - {{ ict_data.sub_request_type }}
+                        </span>
+                    </td>
                 </tr>
             </tbody>
+
         </table>
         <Pagination :total="ict_data.length" @pageChange="onPageChange" />
 
@@ -163,6 +156,7 @@ export default {
     },
     data() {
         return {
+            user_id: null,
             ict_data: [],
             role: null,
             currentPage: 1,
@@ -181,6 +175,7 @@ export default {
 
     },
     created() {
+        this.user_id = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
         console.log(new Date());
     },
@@ -196,12 +191,21 @@ export default {
         },
     },
     mounted() {
-        this.load_ict_request(6)
+        this.fetchRequests(this.role, 6);
         // load the data when the user click the control_no to be completed
         // then pass the control_no and id to the modal
 
     },
     methods: {
+        fetchRequests(role, status) {
+            if (role === 'admin') {
+                this.load_ict_request(status);
+            } else if (role === 'user') {
+                this.load_ict_perUser_request(status);
+            } else {
+                console.error('Unknown role');
+            }
+        },
         openModal(id) {
             this.selected_id = id;
             this.fetch_ict_req_details();
@@ -248,6 +252,17 @@ export default {
                     console.error('Error fetching data:', error);
                 });
         },
+        load_ict_perUser_request(status) {
+            const url = status ? `../../api/fetch_ict_perUser/${status}/${this.user_id}` : `../../api/fetch_ict_perUser/6/${this.user_id}`;
+            axios.get(url)
+                .then(response => {
+                    this.ict_data = response.data.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        },
+        //For Complete Modal
         fetch_ict_req_details() {
             const id = this.selected_id
             axios.post(`../../api/fetch_ict_req_details`, {
