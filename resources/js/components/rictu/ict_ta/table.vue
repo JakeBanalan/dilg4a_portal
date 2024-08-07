@@ -107,7 +107,7 @@ th {
                     </td>
                     <td style="white-space:normal;">{{ ict_data.remarks }}</td>
 
-                    <td v-if="ict_data.status_id === 3">
+                    <td v-if="ict_data.status === 'Completed'">
                         <button class="btn btn-primary mr-1" style="background-color:#059886;color:#fff;">
                             <font-awesome-icon :icon="['fas', 'square-poll-vertical']" />
                             <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>

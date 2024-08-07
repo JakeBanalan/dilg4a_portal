@@ -91,7 +91,6 @@ class RICTUController extends Controller
     public function fetch_ict_request(Request $request, $status)
     {
 
-
         $page = $request->query('page');
         $itemsPerPage = $request->query('itemsPerPage', 500);
 
@@ -155,14 +154,8 @@ class RICTUController extends Controller
                 ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
                 ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
                 ->where('tbl_technicalassistance.status_id', $status)
-
                 ->orderBy('id', 'DESC');
         }
-        // Apply status filter if provided
-
-        // $sql = $ictQuery->toSql();
-        // echo $sql;
-        // exit();
         $ict = $ictQuery->paginate($itemsPerPage, ['*'], 'page', $page);
 
         return response()->json($ict);
