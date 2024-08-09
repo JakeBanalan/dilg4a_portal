@@ -192,7 +192,7 @@ Route::middleware('api')->group(function () {
     Route::get('getICTData/{id}', [RICTUController::class, 'getICTData']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('getUserDetails/{id}', [UserController::class, 'getUserDetails']);
+    Route::get('getUserDetails/{id}', [UserManagementController::class, 'getUserDetails']);
 });
 
 
@@ -269,6 +269,22 @@ Route::middleware('api')->group(function () {
 //USER MANAGEMENT GET
 Route::middleware('api')->group(function () {
     Route::get('fetchEmployeeData', [UserManagementController::class, 'fetchEmployeeData']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('getProvinces', [UserManagementController::class, 'getProvinces']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('getCityMun/{provID}', [UserManagementController::class, 'getCityMun']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('getAllCityMun', [UserManagementController::class, 'getAllCityMun']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('getOffice', [UserManagementController::class, 'getOffice']);
 });
 
 
@@ -352,7 +368,7 @@ Route::post('saveQuarterData', [QMSController::class, 'saveQuarterData']);
 Route::post('saveMonthlyData', [QMSController::class, 'saveMonthlyData']);
 
 //U S E R  M A N A G E M E N T
-
+Route::post('PostUser', [UserManagementController::class, 'PostUser']);
 
 
 

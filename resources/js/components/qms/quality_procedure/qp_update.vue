@@ -252,7 +252,7 @@ export default {
             axios.get('/api/fetchProcessOwner')
                 .then(response => {
                     this.ProcessOwner = response.data.map(ProcessOwner => ProcessOwner.fname);
-                    // console.log(response.data.map(ProcessOwner=>ProcessOwner.fname))
+                    // console.log(response.data)
                 })
                 .catch(error => {
                     console.error('Error Fetching items:', error);

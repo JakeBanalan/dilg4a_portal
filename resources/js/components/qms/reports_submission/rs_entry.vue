@@ -165,7 +165,7 @@ export default {
             let qp_code_id = arg.value
             axios.get(`/api/fetchQPdata/${qp_code_id}`)
                 .then(response => {
-                    console.log(response.data[0].frequency_monitoring)
+                    // console.log(response.data[0].frequency_monitoring)
                     if (response.data[0].frequency_monitoring === 'Monthly') {
                         this.period_covered = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                     } else if (response.data[0].frequency_monitoring === 'Quarterly' || response.data[0].frequency_monitoring === 'Quarterly (Learning and Development)') {

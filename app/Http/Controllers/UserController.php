@@ -134,34 +134,38 @@ class UserController extends Controller
 
         // Hash the password if it is provided
         // Check if input password is provided and not empty
-        if (!empty($request->input('password'))) {
-            $hashedPassword = hash('sha256', $request->input('password'));
+        if (!empty($request->password)) {
+            $hashedPassword = hash('sha256', $request->password);
         } else {
             // If password is not provided or empty, retrieve the existing hashed password
-            $existingUser = User::find($request->input('id'));
+            $existingUser = User::find($request->id);
             $hashedPassword = $existingUser->password;
         }
 
         // Update the user record
-        User::where('id', $request->input('id'))
+        User::where('id', $request->id)
             ->update([
-                'employee_no' => $request->input('employee_no'),
-                'pmo_id' => $request->input('pmo_id'),
-                'position_id' => $request->input('position_id'),
-                // 'province' => $request->input('province'),
-                // 'city' => $request->input('city'),
+                'employee_no' => $request->employee_no,
+                'pmo_id' => 1,
+                'position_id'             => $request->position_id,
+                'office'              => $request->office,
+                'province'               => $request->province,
+                'citymun'               => $request->citymun,
+                'division'              => $request->division,
+                'section'        => $request->section,
                 'isUpdatedPassword' => 1,
-                'employment_status' => $request->input('employment_status'),
-                'first_name' => $request->input('first_name'),
-                'middle_name' => $request->input('middle_name'),
-                'last_name' => $request->input('last_name'),
-                'ext_name' => $request->input('ext_name'),
-                'birthdate' => $request->input('birthdate'),
-                'gender' => $request->input('gender'),
-                'contact_details' => $request->input('contact_details'),
-                'email' => $request->input('email'),
-                'username' => $request->input('username'),
+                'employment_status'      => $request->employment_status,
+                'first_name'           => $request->first_name,
+                'middle_name'         => $request->middle_name,
+                'last_name'         => $request->last_name,
+                'ext_name'         => $request->ext_name,
+                'birthdate'         => $request->birthdate,
+                'gender'         => $request->gender,
+                'contact_details'         => $request->contact_details,
+                'email'         => $request->email,
+                'username'         => $request->username,
                 'password' => $hashedPassword,
+
             ]);
 
         return response()->json(['message' => 'User details updated successfully']);

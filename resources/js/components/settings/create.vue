@@ -7,13 +7,13 @@
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <div class="row">
-                        <StatBox />
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-title d-flex justify-content-between align-items-center">
                                         <h5 class="card-title">
-                                            <font-awesome-icon :icon="['fas', 'circle-info']"></font-awesome-icon> CREATE USER ACCOUNT
+                                            <font-awesome-icon :icon="['fas', 'circle-info']"></font-awesome-icon>
+                                            CREATE USER ACCOUNT
                                         </h5>
                                     </div>
                                 </div>
@@ -30,108 +30,168 @@
                                     <div class="d-flex align-items-center pb-3 pt-3 border-top" style="margin-top:2em;">
                                     <button class="btn btn-outline-danger col-lg-12 mt-2">Block</button>
                                     </div> -->
-                                    <button class="btn btn-outline-primary col-lg-12 mt-2" @click="viewUserMan">Back</button>
+                                    <button class="btn btn-outline-primary col-lg-12 mt-2"
+                                        @click="viewUserMan">Back</button>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-9 col-md-6 col-sm-6 mt-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="card-title d-flex justify-content-between align-items-center">
-                                        <h5 class="card-title">
-                                            <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;User
-                                            Details
-                                        </h5>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-6">
-                                            <TextInput label="Employee ID No." iconValue="circle-info"
-                                                v-model="data.employee_no" :readonly="false">
-                                            </TextInput>
-                                            <div class="form-group">
-                                                <label for="Office">Office</label>
-                                                <select class="form-control" v-model="data.pmo_id">
-                                                    <option v-for="option in office" :key="option.value">
-                                                        {{ option.label }}
-                                                    </option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="Position">Position</label>
-                                                <select class="form-control" v-model="data.position_id">
-                                                    <option v-for="option in position" :key="option.value"
-                                                        >
-                                                        {{ option.label }}
-                                                    </option>
-                                                </select>
-                                            </div>
+                            <form class="UserForm" @submit.prevent="PostUser">
 
-                                            <TextInput label="Province" iconValue="circle-info" 
-                                                 :readonly="true" />
-                                            <TextInput label="City/Municipality" iconValue="circle-info"
-                                                  :readonly="true" />
-                                            <TextInput label="Barangay" iconValue="circle-info" 
-                                                 :readonly="true" />
-                                                <div class="form-group mt-2">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="card-title d-flex justify-content-between align-items-center">
+                                            <h5 class="card-title">
+                                                <font-awesome-icon
+                                                    :icon="['fas', 'list']"></font-awesome-icon>&nbsp;User
+                                                Details
+                                            </h5>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6">
+
+                                                <div class="form-group">
+                                                    <label for="Employee ID No.">Employee ID No.</label>
+                                                    <input type="text" class="form-control" id="coverage"
+                                                        v-model="data.employee_no" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Office">Office</label>
+                                                    <Multiselect @update:modelValue="OfficeSelect" :options="office"
+                                                        track-by="value" v-model="data.office" :multiple="false"
+                                                        label="label" :searchable="false" placeholder="Office">
+                                                    </Multiselect>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Province">Province</label>
+                                                    <Multiselect @update:modelValue="provinceSelect" :options="province"
+                                                        track-by="value" v-model="data.province" :multiple="false"
+                                                        label="label" :searchable="false" placeholder="Province"
+                                                        :disabled="isOfficeDisabled">
+                                                    </Multiselect>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="City/Municipality">City/Municipality</label>
+                                                    <Multiselect :options="citymun" track-by="value"
+                                                        v-model="data.citymun" :multiple="false" label="label"
+                                                        :searchable="false" placeholder="City/Municipality"
+                                                        :disabled="isProvinceDisabled">
+                                                    </Multiselect>
+                                                </div>
+
+                                                <div class="form-group">
                                                     <label for="Employment Status">Employment Status</label>
-                                                    <select class="form-control" v-model="data.employment_status">
-                                                        <option v-for="option in emp_status" :key="option.value"
-                                                           >
-                                                            {{ option.label }}
-                                                        </option>
-                                                    </select>
+                                                    <Multiselect :options="emp_status" track-by="value"
+                                                        v-model="data.employment_status" :multiple="false" label="label"
+                                                        :searchable="false" placeholder="Employment Status">
+                                                    </Multiselect>
                                                 </div>
 
-                                        </div>
-                                        <div class="col-lg-6">
-                                            <TextInput label="First Name" iconValue="circle-info"
-                                                v-model="data.first_name"  :readonly="false" />
-                                            <TextInput label="Middle Name" iconValue="circle-info"
-                                                v-model="data.middle_name"
-                                                :readonly="false" />
-                                            <TextInput label="Last Name" iconValue="circle-info"
-                                                v-model="data.last_name" :readonly="false" />
-                                            <TextInput label="Extension Name" iconValue="circle-info" v-model="data.ext_name"
-                                                 :readonly="false" />
-                                            <TextInput label="Birth Date" type="date" iconValue="circle-info" style="height: 40px;"
-                                                v-model="data.birthdate"  :readonly="false" /><br>
-                        
-                                                <div class="form-group mt-2">
+                                                <div class="form-group">
+                                                    <label for="Position">Position</label>
+                                                    <Multiselect :options="position" track-by="value"
+                                                        v-model="data.position_id" :multiple="false" label="label"
+                                                        :searchable="false" placeholder="Position">
+                                                    </Multiselect>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Position">Division</label>
+                                                    <Multiselect :options="division" track-by="value"
+                                                        v-model="data.division" :multiple="false" label="label"
+                                                        :searchable="false" placeholder="Division">
+                                                    </Multiselect>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Position">Section</label>
+                                                    <Multiselect :options="section" track-by="value"
+                                                        v-model="data.section" :multiple="false" label="label"
+                                                        :searchable="false" placeholder="Section">
+                                                    </Multiselect>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-lg-6">
+
+                                                <div class="form-group">
+                                                    <label for="First Name">First Name</label>
+                                                    <input type="text" class="form-control" id="FirstName"
+                                                        v-model="data.first_name" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Middle Name">Middle Name</label>
+                                                    <input type="text" class="form-control" id="MiddleName"
+                                                        v-model="data.middle_name" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Last Name">Last Name</label>
+                                                    <input type="text" class="form-control" id="LastName"
+                                                        v-model="data.last_name" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Extension Name">Extension Name</label>
+                                                    <input type="text" class="form-control" id="ExtensionName"
+                                                        v-model="data.ext_name" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Birth Date">Birth Date</label>
+                                                    <input type="date" class="form-control" id="BirthDate"
+                                                        v-model="data.birthdate" />
+                                                </div>
+
+                                                <div class="form-group">
                                                     <label for="Gender">Gender</label>
-                                                    <select class="form-control" v-model="data.gender">
-                                                        <option v-for="option in gender_opts" :key="option.value"
-                                                            >
-                                                            {{ option.label }}
-                                                        </option>
-                                                    </select>
+                                                    <Multiselect :options="gender_opts" track-by="value"
+                                                        v-model="data.gender" :multiple="false" label="label"
+                                                        :searchable="false" placeholder="Position">
+                                                    </Multiselect>
                                                 </div>
-                                            <TextInput label="Mobilephone" iconValue="circle-info"
-                                                v-model="data.contact_details" 
-                                                :readonly="false" />
+
+                                                <div class="form-group">
+                                                    <label for="Mobilephone">Mobilephone</label>
+                                                    <input type="text" class="form-control" id="Mobilephone"
+                                                        v-model="data.contact_details" />
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="Mobilephone">Email Address</label>
+                                                    <input type="text" class="form-control" id="Mobilephone"
+                                                        v-model="data.email" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="card mt-4">
-                                <div class="card-body">
-                                    <div class="card-title d-flex justify-content-between align-items-center">
-                                        <h5 class="card-title">
-                                            <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Account
-                                            Details
-                                        </h5>
-                                    </div>
-                                    <div class="col-lg-12">
-                                        <TextInput label="Email" iconValue="circle-info" v-model="data.email"
-                                            :value="data.email" :readonly="false" />
-                                        <TextInput label="Username" iconValue="circle-info" v-model="data.username"
-                                            :value="data.username" :readonly="false" />
-                                        <TextInput label="Password" iconValue="circle-info" type="password" v-model="data.password" value=""
-                                            :readonly="false" style="height:40px;" /><br>
-                                        <button class="btn btn-outline-primary" @click="updateUserDetails();" >Update</button>
+                                <div class="card mt-4">
+                                    <div class="card-body">
+                                        <div class="card-title d-flex justify-content-between align-items-center">
+                                            <h5 class="card-title">
+                                                <font-awesome-icon
+                                                    :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Account
+                                                Details
+                                            </h5>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <TextInput label="Username" iconValue="user" v-model="data.username"
+                                                :value="data.username" :readonly="false" />
+                                            <TextInput label="Password" iconValue="key" type="password"
+                                                v-model="data.password" value="" :readonly="false"
+                                                style="height:40px;" />
+                                            <br>
+                                            <button type="submit" class="btn btn-outline-primary">Save</button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -141,6 +201,7 @@
 
 </template>
 <script>
+import Multiselect from 'vue-multiselect';
 import Navbar from '../layout/Navbar.vue';
 import Sidebar from '../layout/Sidebar.vue';
 import FooterVue from '../layout/Footer.vue';
@@ -152,24 +213,27 @@ import SelectInput from "../micro/SelectInput.vue";
 
 
 import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
-import { faCircleCheck, faCircleInfo, faDownload, faEye, faLayerGroup, faList, faPesoSign, faSearch, faUndo } from '@fortawesome/free-solid-svg-icons';
+import { faCircleCheck, faCircleInfo, faDownload, faEye, faLayerGroup, faList, faPesoSign, faSearch, faUndo, faAt, faUser, faKey } from '@fortawesome/free-solid-svg-icons';
 
 import { toast } from "vue3-toastify";
 
-library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign, faDownload, faSearch, faUndo);
+library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign, faDownload, faSearch, faUndo, faAt, faUser, faKey);
 export default {
     name: 'Settings',
     data() {
         return {
+            isOfficeDisabled: true,
+            isProvinceDisabled: true,
             user_id: null,
             data: {
-                id:this.user_id,
                 employee_no: '',
-                pmo_id: '',
+                // pmo_id: '',
                 position_id: '',
                 province: '',
-                city: '',
-                barangay: '',
+                citymun: '',
+                office: '',
+                section: '',
+                division: '',
                 employment_status: '',
                 first_name: '',
                 middle_name: '',
@@ -182,36 +246,41 @@ export default {
                 username: '',
                 password: '',
             },
-            position:[],
-            post:{
-                POSITION_C: '',
-            },
-            office: [
-                { value: '15', label: 'ORD' },
-                { value: '1', label: 'ORD-Legal' },
-                { value: '2', label: 'ORD-Planning' },
-                { value: '3', label: 'LGMED-MBRTG' },
-                { value: '4', label: 'LGCDD-PDMU' },
-                { value: '5', label: 'FAD' },
-                { value: '6', label: 'ORD-RICTU' },
-                { value: '7', label: 'LGCDD' },
-                { value: '8', label: 'LGMED' },
-                { value: '10', label: 'CAVITE'},
-                { value: '11', label: 'LAGUNA'},
-                { value: '9', label: 'BATANGAS'},
-                { value: '13', label: 'RIZAL'},
-                { value: '12', label: 'QUEZON'},
-                { value: '14', label: 'LUCENA CITY'},
+            position: [],
+            province: [],
+            citymun: [],
+            office: [],
+            division: [
+                { value: 'LGCDD', label: 'Local Government Capacity Development Division' },
+                { value: 'LGMED', label: 'Local Government Monitoring and Evaluation Division' },
+                { value: 'FAD', label: 'Finance and Administrative Division' },
+                { value: 'ORD', label: 'Office of the Regional Director' },
             ],
-            gender_opts:[
-                {value: 'M', label: 'Male'},
-                {value: 'F', label: 'Female'},
+            section: [
+                { value: 'MBRTG', label: 'Manila Bay Rehabilitation Task Group' },
+                { value: 'PDMU', label: 'Project Development Management Unit' },
+                { value: 'Accounting', label: 'Accounting Section' },
+                { value: 'Budget', label: 'Budget Section' },
+                { value: 'Cash', label: 'Cash Section' },
+                { value: 'HRS', label: 'Human Resources Section' },
+                { value: 'GSS', label: 'General Supplies Section' },
+                { value: 'Records', label: 'Records Section' },
+                { value: 'Planning', label: 'Planning Unit' },
+                { value: 'RICTU', label: 'Regional Information and Communication Technology Unit' },
+                { value: 'LGMES', label: 'Local Government Monitoring and Evaluation Section' },
+                { value: 'LGCDS', label: 'Local Government Capacity Development Section' },
+                { value: 'FAS', label: 'Finance and Administrative Section' },
+                { value: 'OPD', label: 'Office of the Provincial Director' },
             ],
-            emp_status:[
-                {value:'1',label: 'Permanent'},
-                {value:'2',label: 'Contract of Service'},
-                {value:'3',label: 'Job Order'},
-                {value:'4',label: 'Consultant'}
+            gender_opts: [
+                { value: 'M', label: 'Male' },
+                { value: 'F', label: 'Female' },
+            ],
+            emp_status: [
+                { value: '1', label: 'Permanent' },
+                { value: '2', label: 'Contract of Service' },
+                { value: '3', label: 'Job Order' },
+                { value: '4', label: 'Consultant' }
             ]
         }
     },
@@ -219,49 +288,120 @@ export default {
         this.user_id = this.$route.params.id;
     },
     mounted() {
-        this.getUserDetails();
         this.getPosition();
+        this.getProvinces();
+        this.getOffice();
+    },
+    computed: {
+
     },
     methods: {
-        viewUserMan(){
-            this.$router.push({ path: `/settings/user-management` });
-        },
-        toggleCard() {
-            this.isCardVisible = !this.isCardVisible;
-        },
-        getUserDetails() {
-            axios.get(`../../api/getUserDetails/${this.user_id}`)
+        PostUser() {
+            // console.log(this.data);
+            let data = this.data;
+            let province = data.province.value;
+            let citymun = data.citymun.value;
+            let office = data.office.value;
+            let section = data.section.value;
+            let division = data.division.value;
+            let employment_status = data.employment_status.value;
+            axios.post(`../../api/PostUser`,
+                {
+                    employee_no: data.employee_no,
+                    position_id: data.position_id.value,
+                    province: province,
+                    citymun: citymun,
+                    office: office,
+                    section: section,
+                    division: division,
+                    employment_status: employment_status,
+                    first_name: data.first_name,
+                    middle_name: data.middle_name,
+                    last_name: data.last_name,
+                    ext_name: data.ext_name,
+                    birthdate: data.birthdate,
+                    gender: data.gender.value,
+                    contact_details: data.contact_details,
+                    email: data.email,
+                    username: data.username,
+                    password: data.password,
+                }
+            )
                 .then((response) => {
-                    this.data = response.data
+                    toast.success('User Added successfully!', {
+                        autoClose: 100
+                    });
+                }).catch(error => {
+                    toast.error('Error Adding user', {
+                        autoClose: 100
+                    });
+                });
+        },
+        OfficeSelect(arg) {
+            if (arg.value === 1) {
+                this.isOfficeDisabled = true;
+                this.isProvinceDisabled = true;
+            } else if (arg.value === 2) {
+                this.isOfficeDisabled = false;
+                this.isProvinceDisabled = true;
+            } else {
+                this.isOfficeDisabled = false;
+                this.isProvinceDisabled = false;
+            }
+        },
+        provinceSelect(arg) {
+            let provID = arg.value;
+            axios.get(`../../api/getCityMun/${provID}`)
+                .then((response) => {
+                    console.log(response.data)
+                    this.citymun = response.data.map(item => ({
+                        value: item.id,
+                        label: item.citymun
+                    }));
                 }).catch(error => {
                     return null;
-                });
+                })
+        },
+        viewUserMan() {
+            this.$router.push({ path: `/settings/user-management` });
+        },
+        getOffice() {
+            axios.get(`../../api/getOffice`)
+                .then((response) => {
+                    console.log(response.data)
+                    this.office = response.data.map(item => ({
+                        value: item.id,
+                        label: item.office
+                    }));
+                }).catch(error => {
+                    return null;
+                })
+        },
+        getProvinces() {
+            axios.get(`../../api/getProvinces`)
+                .then((response) => {
+                    this.province = response.data.map(item => ({
+                        value: item.id,
+                        label: item.province
+                    }));
+                }).catch(error => {
+                    return null;
+                })
         },
         getPosition() {
-        axios.get(`../../api/getPosition`)
-            .then((response) => {
-                this.position = response.data.map(item => ({
-                    value: item.POSITION_C,
-                    label: item.POSITION_TITLE
-                }));
-            }).catch(error => {
-                console.error('Error fetching positions:', error);
-            });
-    },
-    updateUserDetails() {
-            axios.post(`../../api/updateUserDetails`, this.data)
+            axios.get(`../../api/getPosition`)
                 .then((response) => {
-                    toast.success('User details updated successfully!', {
-                    autoClose: 100
-                });
+                    this.position = response.data.map(item => ({
+                        value: item.POSITION_C,
+                        label: item.POSITION_TITLE
+                    }));
                 }).catch(error => {
-                    toast.error('Error updating user details', {
-                    autoClose: 100
-                });
+                    console.error('Error fetching positions:', error);
                 });
         }
     },
     components: {
+        Multiselect,
         Navbar,
         Sidebar,
         FooterVue,
@@ -270,3 +410,51 @@ export default {
     }
 }
 </script>
+<style>
+.multiselect--disabled {
+    background-color: #f5f5f5;
+    /* Light gray background */
+    border-color: #ccc;
+    /* Lighter border */
+    color: #999;
+    /* Disabled text color */
+    cursor: not-allowed;
+    /* Change cursor to indicate disabled state */
+}
+
+.multiselect--disabled .multiselect__single,
+.multiselect--disabled .multiselect__placeholder {
+    color: #999;
+    /* Disabled text color */
+}
+
+.multiselect--disabled .multiselect__tag {
+    background-color: #e0e0e0;
+    /* Light gray tag background */
+    color: #999;
+    /* Disabled tag text color */
+}
+
+.multiselect--disabled .multiselect__tag-icon {
+    display: none;
+    /* Hide remove icon for tags in disabled state */
+}
+
+.multiselect--disabled .multiselect__tags {
+    border: none;
+    /* Remove border from tags container */
+    background-color: #F4F4F4;
+    border-radius: 5px;
+}
+
+.multiselect--disabled .multiselect__select {
+    border: none;
+    /* Remove border from tags container */
+    opacity: 0;
+}
+
+.multiselect--disabled .multiselect__input {
+    display: none;
+    /* Hide input field when disabled */
+}
+</style>

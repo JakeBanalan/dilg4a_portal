@@ -30,7 +30,14 @@ class UserModel extends Authenticatable
         'code',
         'user_role',
         'username',
-        'password'
+        'password',
+        'office',
+        'province',
+        'citymun',
+        'is_activated',
+        'code',
+        'section',
+        'division'
     ];
 
 }

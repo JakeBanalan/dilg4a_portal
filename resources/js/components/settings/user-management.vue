@@ -379,7 +379,7 @@ export default {
                         pageLength: 20,
                         bLengthChange: false,
                         bInfo: false,
-                        filter: false,
+                        filter: true,
                         columns: [
                             { data: 'employee_no' },
                             { data: 'pmo_title' },
