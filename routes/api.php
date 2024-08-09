@@ -74,6 +74,10 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetch_ict_perUser/{status}/{userID}', [RICTUController::class, 'fetch_ict_perUser']);
+});
+
+Route::middleware('api')->group(function () {
     Route::get('load_abstract_data', [AbstractController::class, 'load_abstract_data']);
 });
 
@@ -128,21 +132,26 @@ Route::middleware('api')->group(function () {
     Route::get('countTotalItem/{cur_year}', [AppItemController::class, 'countTotalItem']);
 });
 
+Route::middleware('api')->group(function(){
+    Route::get('/totalCountICTRequest/{year}', [RICTUController::class, 'totalCountICTrequest']);
+});
+
+Route::middleware('api')->group(function(){
+    Route::get('/totalCountDraft', [RICTUController::class, 'totalCountDraft']);
+});
+
 
 Route::middleware('api')->group(function () {
-    Route::get('countICTRequest/{cur_year}', [RICTUController::class, 'countICTRequest']);
+    Route::get('/countICTRequest/{userId}/{cur_year}', [RICTUController::class, 'countICTRequest']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countDRAFT/{status}', [RICTUController::class, 'countDRAFT']);
+    Route::get('/countDRAFT/{userId}', [RICTUController::class, 'countDRAFT']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countHardwareRequest', [RICTUController::class, 'countHardwareRequest']);
-});
-
-Route::middleware('api')->group(function () {
-    Route::get('countSoftwareRequest', [RICTUController::class, 'countSoftwareRequest']);
+    Route::get('/countHardwareRequest/{userId}', [RICTUController::class, 'countHardwareRequest']);
+    Route::get('/countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
 });
 
 

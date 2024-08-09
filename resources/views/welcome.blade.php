@@ -8,51 +8,75 @@
     <title>QMS Centris</title>
 
     <!-- Fonts -->
-    <link id="googleFonts" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800%7CShadows+Into+Light&amp;display=swap" rel="stylesheet" type="text/css">   
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <link id="googleFonts"
+        href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800%7CShadows+Into+Light&amp;display=swap"
+        rel="stylesheet" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
 
-    
     <link href="{{ asset('vendors/css/vendor.bundle.base.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendors/feather/feather.css')}}" rel="stylesheet">
+    <link href="{{ asset('vendors/feather/feather.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/datatablesnet-bs4/dataTables.bootstrap4.css') }}" rel="stylesheet">
- 
+
     <link href="{{ asset('vendors/select2/select2.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('vendors/select2-bootstrap-theme/select2-bootstrap.min.css') }}" rel="stylesheet">  
+    <link href="{{ asset('vendors/select2-bootstrap-theme/select2-bootstrap.min.css') }}" rel="stylesheet">
 
     <link href="{{ asset('js/select.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/vertical-layout-light/style.css') }}" rel="stylesheet">
 
-    
-    <!-- 
-    // import "datatables.net-bs4";
-    // import "datatables.net-bs4/css/dataTables.bootstrap4.min.css"; -->
-    <!-- Styles -->
-   
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 </head>
 
 <body class="antialiased">
     <div id="app">
-        <app />
+        {{-- <ul>
+            <li v-for="message in messages" :key="message.id">
+                @{{ message }}
+            </li>
+        </ul> --}}
     </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ asset('vendors/chart.js/Chart.min.js') }}"></script>
+    <script src="{{ asset('vendors/datatables.net/jquery.dataTables.js') }}"></script>
+    <script src="{{ asset('vendors/datatablesnet-bs4/dataTables-bootstrap4.js') }}"></script>
+    <script src="{{ asset('js/dataTables.select.min.js') }}"></script>
+    <script src="{{ asset('js/Chart.roundedBarCharts.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/chart.js') }}"></script>
+    <script src="{{ asset('js/off-canvas.js') }}"></script>
+    <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
+    <script src="{{ asset('js/template.js') }}"></script>
+    <script src="{{ asset('js/settings.js') }}"></script>
+    <script src="{{ asset('js/todolist.js') }}"></script>
+
+    {{-- <script>
+        // Enable pusher logging - don't include this in production
+        Pusher.logToConsole = true;
+
+        var pusher = new Pusher('29d53f8816252d29de52', {
+            cluster: 'ap1'
+        });
+
+        var channel = pusher.subscribe('my-channel');
+        channel.bind('my-event', function(data) {
+            alert('New request sent: ' + JSON.stringify(data));
+            app.messages.push(JSON.stringify(data));
+        });
+
+        // Vue application
+        const app = new Vue({
+            el: 'app',
+            data: {
+                messages: [],
+            },
+        });
+    </script> --}}
 </body>
 
 </html>
-<script src="{{ asset('/js/app.js') }}"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-<script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
-<script src="{{ asset('vendors/chart.js/Chart.min.js') }}"></script>
-<script src="{{ asset('vendors/datatables.net/jquery.dataTables.js') }}"></script>
-<script src="{{ asset('vendors/datatablesnet-bs4/dataTables-bootstrap4.js') }}"></script>
-<script src="{{ asset('js/dataTables.select.min.js') }}"></script>
-<script src="{{ asset('js/Chart.roundedBarCharts.js') }}"></script>
-
-<script src="{{ asset('js/app.js') }}"></script>
-<script src="{{ asset('js/chart.js') }}"></script>
-<script src="{{ asset('js/off-canvas.js') }}"></script>
-<script src="{{ asset('js/hoverable-collapse.js') }}"></script>
-<script src="{{ asset('js/template.js') }}"></script>
-<script src="{{ asset('js/settings.js') }}"></script>
-<script src="{{ asset('js/todolist.js') }}"></script>
-

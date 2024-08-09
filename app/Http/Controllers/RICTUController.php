@@ -3,12 +3,14 @@
 
 namespace App\Http\Controllers;
 
+use MyEvent;
 use Carbon\Carbon;
-use App\Models\RICTUModel;
 
+use App\Models\RICTUModel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -89,7 +91,6 @@ class RICTUController extends Controller
     public function fetch_ict_request(Request $request, $status)
     {
 
-
         $page = $request->query('page');
         $itemsPerPage = $request->query('itemsPerPage', 500);
 
@@ -153,18 +154,90 @@ class RICTUController extends Controller
                 ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
                 ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
                 ->where('tbl_technicalassistance.status_id', $status)
-
                 ->orderBy('id', 'DESC');
         }
-        // Apply status filter if provided
-
-        // $sql = $ictQuery->toSql();
-        // echo $sql;
-        // exit();
         $ict = $ictQuery->paginate($itemsPerPage, ['*'], 'page', $page);
 
         return response()->json($ict);
     }
+
+    public function fetch_ict_perUser(Request $request, $status, $userID)
+    {
+        $page = $request->query('page');
+        $itemsPerPage = $request->query('itemsPerPage', 500);
+
+        if ($status == 6) {
+
+            $ictQuery = RICTUModel::select(RICTUModel::raw('
+                tbl_technicalassistance.id AS id,
+                tbl_technicalassistance.control_no AS control_no,
+                CONCAT(u.first_name," ",u.last_name) AS requested_by,
+                u.user_role as role,
+                tbl_technicalassistance.request_date AS requested_date,
+                time(tbl_technicalassistance.request_date) AS requested_time,
+                MONTH(tbl_technicalassistance.request_date) AS month,
+                YEAR(tbl_technicalassistance.request_date) AS YEAR,
+                tbl_technicalassistance.received_date AS received_date,
+                tbl_technicalassistance.completed_date AS completed_date,
+                tbl_technicalassistance.remarks AS remarks,
+                cl.link AS css_link,
+                p.pmo_title AS office,
+                itr.request_type AS request_type,
+                c.TITLE AS sub_request_type,
+                ip.ict_personnel AS ict_personnel,
+                is.status AS status,
+                is.id AS status_id
+            '))
+                ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+                ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+                ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
+                ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+                ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+                ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
+                ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
+                ->where('tbl_technicalassistance.request_by', $userID)
+                ->orderBy('id', 'DESC');
+        } else {
+            $ictQuery = RICTUModel::select(RICTUModel::raw('
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.control_no AS control_no,
+            u.username AS requested_by,
+            u.user_role as role,
+            tbl_technicalassistance.request_date AS requested_date,
+            time(tbl_technicalassistance.request_date) AS requested_time,
+            MONTH(tbl_technicalassistance.request_date) AS month,
+            YEAR(tbl_technicalassistance.request_date) AS YEAR,
+            tbl_technicalassistance.received_date AS received_date,
+            tbl_technicalassistance.completed_date AS completed_date,
+            tbl_technicalassistance.remarks AS remarks,
+            cl.link AS css_link,
+            p.pmo_title AS office,
+            itr.request_type AS request_type,
+            c.TITLE AS sub_request_type,
+            ip.ict_personnel AS ict_personnel,
+            is.status AS status,
+            is.id AS status_id
+        '))
+                ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+                ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+                ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
+                ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+                ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+                ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
+                ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
+                ->where('tbl_technicalassistance.status_id', $status)
+                ->orderBy('id', 'DESC');
+        }
+
+        $ict = $ictQuery->paginate($itemsPerPage, ['*'], 'page', $page);
+
+        return response()->json($ict);
+    }
+
+
+
+
 
 
     public function post_create_ict_request(Request $request)
@@ -265,14 +338,41 @@ class RICTUController extends Controller
             return response()->json(['error' => 'Request not found'], 404);
         }
     }
-    public function countICTRequest($cur_year)
+    public function countICTRequest($userId, $cur_year)
     {
-        return response()->json(RICTUModel::select(RICTUModel::raw('count(*) as ict'))
+
+        $requestCount = RICTUModel::where('request_by', $userId)
             ->whereYear('created_at', $cur_year)
-            ->get());
+            ->count();
+
+        return response()->json(['ict' => $requestCount]);
     }
 
-    public function countDRAFT()
+    public function countDRAFT($userId)
+    {
+        return response()->json(
+            RICTUModel::select(
+                RICTUModel::raw('COUNT(CASE WHEN status_id = 1 THEN 1 END) as draft'),
+                RICTUModel::raw('COUNT(CASE WHEN status_id = 2 THEN 1 END) as received'),
+                RICTUModel::raw('COUNT(CASE WHEN status_id = 3 THEN 1 END) as completed'),
+                RICTUModel::raw('COUNT(CASE WHEN status_id = 4 THEN 1 END) as returned')
+            )
+                ->where('request_by', $userId)
+                ->whereYear('created_at', 2024)
+                ->get()
+        );
+    }
+
+    public function totalCountICTrequest($year)
+    {
+        $count = RICTUModel::select(RICTUModel::raw('count(*) as ictTotal'))
+            ->whereYear('created_at', $year)
+            ->first(); // Use first() to get a single record
+
+        return response()->json(['ictTotal' => $count->ictTotal]);
+    }
+
+    public function totalCountDraft()
     {
         return response()->json(
             RICTUModel::select(
@@ -286,35 +386,35 @@ class RICTUController extends Controller
         );
     }
 
-    public function countHardwareRequest()
+
+    public function countHardwareRequest($userId)
     {
-        // Replace 'your_connection' with your actual database connection logic
         $hardwareCount = RICTUModel::select(DB::raw('COUNT(*) AS hardware_count'))
             ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-            ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7]) // Use whereIn for multiple values
-            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
+            ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7])
+            ->where('request_by', $userId)  // Filter by user ID
+            ->whereYear('created_at', 2024)
             ->first();
 
-        // No need to reassign, directly return the count property
         return response()->json(['hardware_count' => $hardwareCount->hardware_count]);
     }
 
-    public function countSoftwareRequest()
+    public function countSoftwareRequest($userId)
     {
-        // Replace 'your_connection' with your actual database connection logic
         $softwareCount = RICTUModel::select(DB::raw('COUNT(*) AS software_count'))
             ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-            ->whereIn('c.REQUEST_ID', [4, 5, 8,]) // Use whereIn for multiple values
-            ->whereYear('created_at', 2024)  // Filter requests created in the year 2024
+            ->whereIn('c.REQUEST_ID', [4, 5, 8])
+            ->where('request_by', $userId)  // Filter by user ID
+            ->whereYear('created_at', 2024)
             ->first();
 
-        // No need to reassign, directly return the count property
         return response()->json(['software_count' => $softwareCount->software_count]);
     }
+
 
 
     public function generate($selectedYear, $selectedQuarter, $requestType)
