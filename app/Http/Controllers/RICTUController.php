@@ -368,7 +368,7 @@ class RICTUController extends Controller
         $count = RICTUModel::select(RICTUModel::raw('count(*) as ictTotal'))
             ->whereYear('created_at', $year)
             ->first(); // Use first() to get a single record
-
+            
         return response()->json(['ictTotal' => $count->ictTotal]);
     }
 

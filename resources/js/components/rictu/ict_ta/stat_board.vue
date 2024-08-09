@@ -223,9 +223,9 @@ export default {
     methods: {
         fetchICTAdminCount() {
             // Fetch total ICT requests
-            axios.get(`/api/totalCountICTRequest/2024`)
+            axios.get(`../../api/totalCountICTRequest/2024`)
                 .then(response => {
-                    console.log(response.data); // Log the response to check the structure
+                    // console.log(response.data); // Log the response to check the structure
                     this.ict_adminTotal = response.data.ictTotal;
                 })
                 .catch(error => {
@@ -235,8 +235,9 @@ export default {
 
         fetchICTAdminDraft() {
             // Fetch draft data
-            axios.get('/api/totalCountDraft')
+            axios.get('../../api/totalCountDraft')
                 .then(response => {
+                    // console.log(response.data)
                     const data = response.data;
                     this.ict_adminDraft = response.data[0].draft;
                     this.ict_adminReceived = response.data[0].received;
