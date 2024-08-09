@@ -149,10 +149,10 @@ Route::middleware('api')->group(function () {
     Route::get('/countDRAFT/{userId}', [RICTUController::class, 'countDRAFT']);
 });
 
-Route::middleware('api')->group(function () {
-    Route::get('/countHardwareRequest/{userId}', [RICTUController::class, 'countHardwareRequest']);
-    Route::get('/countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
-});
+// Route::middleware('api')->group(function () {
+//     Route::get('/countHardwareRequest/{userId}', [RICTUController::class, 'countHardwareRequest']);
+//     Route::get('/countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
+// });
 
 
 Route::middleware('api')->group(function () {
