@@ -257,24 +257,24 @@ export default {
                     console.error(error);
                 });
         },
-        fetchHardwareCount() {
-            axios.get(`/api/countHardwareRequest/${this.user_id}`)
-                .then(response => {
-                    this.ict_hardware = response.data.hardware_count;
-                })
-                .catch(error => {
-                    console.error('Error fetching hardware count:', error);
-                });
-        },
-        fetchSoftwareCount() {
-            axios.get(`/api/countSoftwareRequest/${this.user_id}`)
-                .then(response => {
-                    this.ict_software = response.data.software_count;
-                })
-                .catch(error => {
-                    console.error('Error fetching software count:', error);
-                });
-        },
+        // fetchHardwareCount() {
+        //     axios.get(`/api/countHardwareRequest/${this.user_id}`)
+        //         .then(response => {
+        //             this.ict_hardware = response.data.hardware_count;
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching hardware count:', error);
+        //         });
+        // },
+        // fetchSoftwareCount() {
+        //     axios.get(`/api/countSoftwareRequest/${this.user_id}`)
+        //         .then(response => {
+        //             this.ict_software = response.data.software_count;
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching software count:', error);
+        //         });
+        // },
         fetchDraftData() {
             axios.get(`/api/countDRAFT/${this.user_id}`)
                 .then(response => {
