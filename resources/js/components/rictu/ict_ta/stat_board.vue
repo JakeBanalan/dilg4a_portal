@@ -213,11 +213,11 @@ export default {
     },
     mounted() {
         this.fetchICTRequestCount();
-        this.fetchHardwareCount();
-        this.fetchSoftwareCount();
         this.fetchDraftData();
         this.fetchICTAdminCount();
         this.fetchICTAdminDraft();
+        // this.fetchHardwareCount();
+        // this.fetchSoftwareCount();
 
     },
     methods: {
@@ -257,6 +257,18 @@ export default {
                     console.error(error);
                 });
         },
+        fetchDraftData() {
+            axios.get(`/api/countDRAFT/${this.user_id}`)
+                .then(response => {
+                    this.ict_draft = response.data[0].draft;
+                    this.ict_received = response.data[0].received;
+                    this.ict_completed = response.data[0].completed;
+                    this.ict_returned = response.data[0].returned;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
         // fetchHardwareCount() {
         //     axios.get(`/api/countHardwareRequest/${this.user_id}`)
         //         .then(response => {
@@ -275,18 +287,6 @@ export default {
         //             console.error('Error fetching software count:', error);
         //         });
         // },
-        fetchDraftData() {
-            axios.get(`/api/countDRAFT/${this.user_id}`)
-                .then(response => {
-                    this.ict_draft = response.data[0].draft;
-                    this.ict_received = response.data[0].received;
-                    this.ict_completed = response.data[0].completed;
-                    this.ict_returned = response.data[0].returned;
-                })
-                .catch(error => {
-                    console.error(error);
-                });
-        },
     },
 };
 </script>
