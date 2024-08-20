@@ -237,7 +237,7 @@ export default {
             // Fetch draft data
             axios.get('../../api/totalCountDraft')
                 .then(response => {
-                    // console.log(response.data)
+                    // console.log('test',response.data);
                     const data = response.data;
                     this.ict_adminDraft = response.data[0].draft;
                     this.ict_adminReceived = response.data[0].received;
