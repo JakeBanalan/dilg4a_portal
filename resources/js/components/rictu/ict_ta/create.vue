@@ -260,6 +260,7 @@ img {
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../../../../../public/vendors/select2/select2.min.css"></style>
 <script>
+import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
@@ -380,15 +381,8 @@ export default {
     mounted() {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
-
-
     },
     methods: {
-        formatDate(date) {
-            if (!date) return '';
-            const [year, month, day] = date.split('-');
-            return `${day}/${month}/${year}`;
-        },
         formatTime(time) {
             if (!time) return '';
             const [hours, minutes] = time.split(':');
@@ -412,16 +406,14 @@ export default {
             // Validation: Check if remarks is not empty
             if (!this.remarks || this.remarks.trim() === '') {
                 if (!this.toastShown) {
-                    this.isSaving = false;
                     this.toastShown = true;
-                    toast.error("Please fill out the 'ADDITIONAL INFORMATION/REMARKS' field.", {
+                    toast.error("Please fill out the 'REMARKS.'", {
                         autoClose: 2500,
                     });
                 }
                 return;
             }
 
-            this.toastShown = false;
             this.isSaving = true;
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
             const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
@@ -432,7 +424,7 @@ export default {
                     axios.post('/api/post_create_ict_request', {
                         control_no: this.ict_no,
                         requested_by: userId,
-                        requested_date: this.requested_date + ' ' + this.formatTime(this.requested_time), // Combine date and time
+                        requested_date: this.requested_date + ' ' + this.formatTime(this.requested_time),
                         pmo: emp_data.id,
                         email: emp_data.email,
                         equipment_type: this.hardwareInfo.etype,
@@ -445,14 +437,16 @@ export default {
                         portal_sys: portal_system,
                         web_access: web_acess,
                         status: 1
-
                     }).then(() => {
-                        this.isSaving = true;
-                        this.showToatSuccess('Successfully created!');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'TA Created',
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then((result) => { });
                         setTimeout(() => {
                             this.$router.push({ path: '/rictu/ict_ta/index' });
-                        }, 800);
-
+                        });
                     }).catch((error) => {
                         this.isSaving = false; // reset the flag on error
                     })
@@ -462,7 +456,6 @@ export default {
                     this.isSaving = false; // reset the flag on error
                 });
         },
-
         fetchEndUserInfo() {
             const userId = localStorage.getItem('userId');
             axios.get(`../../../api/fetchUser/${userId}`)

@@ -42,7 +42,7 @@
         "select2": "^4.1.0-rc.0",
         "store": "^2.0.12",
         "stores": "^1.0.0",
-        "sweetalert2": "^11.13.1",
+        "sweetalert2": "^11.14.1",
         "vue-gapi": "^2.1.2",
         "vue-moment": "^4.1.0",
         "vue-multiselect": "^3.0.0-beta.3",
