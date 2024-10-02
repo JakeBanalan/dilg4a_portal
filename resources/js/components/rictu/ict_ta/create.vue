@@ -440,7 +440,7 @@ export default {
                     }).then(() => {
                         Swal.fire({
                             icon: 'success',
-                            title: 'TA Created',
+                            title: 'TA Created!',
                             showConfirmButton: false,
                             timer: 1500
                         }).then((result) => { });
