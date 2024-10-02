@@ -200,7 +200,7 @@ img {
                                             </div>
 
                                             <div class="col-lg-12">
-                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
+                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS *(REQUIRED): "
                                                     v-model="remarks" />
                                             </div>
 
@@ -289,6 +289,7 @@ export default {
             ict_no: null,
             selectedType: null,
             selectedSubRequest: null,
+            toastShown: false,
             hardwareInfo: {
                 etype: null,
                 brand: null,
@@ -407,6 +408,20 @@ export default {
         create_ict_ta() {
             // console.log(this);
             if (this.isSaving) return; // prevent multiple clicks
+
+            // Validation: Check if remarks is not empty
+            if (!this.remarks || this.remarks.trim() === '') {
+                if (!this.toastShown) {
+                    this.isSaving = false;
+                    this.toastShown = true;
+                    toast.error("Please fill out the 'ADDITIONAL INFORMATION/REMARKS' field.", {
+                        autoClose: 2500,
+                    });
+                }
+                return;
+            }
+
+            this.toastShown = false;
             this.isSaving = true;
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
             const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
@@ -435,9 +450,8 @@ export default {
                         this.isSaving = true;
                         this.showToatSuccess('Successfully created!');
                         setTimeout(() => {
-                            this.$router.push({ path: '/rictu/ict_ta/index' })
-                            this.$router.push({ name: 'ICT Technical Assistance' });
-                        }, 800); // Adjust the delay as needed
+                            this.$router.push({ path: '/rictu/ict_ta/index' });
+                        }, 800);
 
                     }).catch((error) => {
                         this.isSaving = false; // reset the flag on error

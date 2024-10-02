@@ -56,7 +56,7 @@ class RICTUController extends Controller
             tbl_technicalassistance.others_software AS others_software,
             tbl_technicalassistance.website_access AS website_access,
             tbl_technicalassistance.control_no AS control_no,
-            u.username AS requested_by,
+            CONCAT(u.first_name," ",u.last_name) AS requested_by,
             u.user_role as role,
             tbl_technicalassistance.request_date AS requested_date,
             time(tbl_technicalassistance.request_date) AS requested_time,
