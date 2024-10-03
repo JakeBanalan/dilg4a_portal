@@ -100,7 +100,7 @@ img {
                                             </div>
                                             <div class="col-lg-12 mt-4">
                                                 <TextInput label="Requested By:" iconValue="user"
-                                                    v-model="userData.name" :value="userData.name" :readonly="true" />
+                                                v-model="userData.name" :value="userData.name" :readonly="true" />
                                             </div>
                                             <div class="col-lg-12">
                                                 <TextInput label="Office/Service/Bureau/Section/Division/Unit:"
@@ -276,6 +276,7 @@ import logo from "../../../../assets/logo.png";
 
 export default {
     name: 'Create ICT Technical Assistance',
+    components: { Multiselect },
     data() {
         return {
             isSaving: false,
@@ -377,12 +378,19 @@ export default {
             return this.selectedSubRequest && this.selectedSubRequest.value == 26;
         }
     },
-
     mounted() {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
     },
     methods: {
+        // async fetchUsers() {
+        //     try {
+        //         const response = await axios.get('/api/getAllUsers');
+        //         this.users = response.data;
+        //     } catch (error) {
+        //         console.error(error);
+        //     }
+        // },
         formatTime(time) {
             if (!time) return '';
             const [hours, minutes] = time.split(':');
@@ -399,7 +407,7 @@ export default {
                 autoClose: 1500,
             });
         },
-        create_ict_ta() {
+        async create_ict_ta() {
             // console.log(this);
             if (this.isSaving) return; // prevent multiple clicks
 

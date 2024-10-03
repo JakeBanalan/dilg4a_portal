@@ -139,7 +139,9 @@ Route::middleware('api')->group(function(){
 Route::middleware('api')->group(function(){
     Route::get('/totalCountDraft', [RICTUController::class, 'totalCountDraft']);
 });
-
+// Route::middleware('api')->group(function(){
+//     Route::get('/getAllUsers', [RICTUController::class, 'getAllUsers']);
+// });
 
 Route::middleware('api')->group(function () {
     Route::get('/countICTRequest/{userId}/{cur_year}', [RICTUController::class, 'countICTRequest']);

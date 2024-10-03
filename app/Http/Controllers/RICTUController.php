@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use MyEvent;
 use Carbon\Carbon;
 
+use App\Models\UserModel;
 use App\Models\RICTUModel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -45,6 +46,15 @@ class RICTUController extends Controller
                 ->get()
         );
     }
+
+    // public function getAllUsers()
+    // {
+    //     $users = UserModel::all(); // Fetch all users
+    //     foreach ($users as &$user) {
+    //         $user->first_name . " " . $user->last_name;
+    //     }
+    //     return response()->json($users);
+    // }
     public function getICTData($id)
     {
         $query = RICTUModel::select(RICTUModel::raw('
