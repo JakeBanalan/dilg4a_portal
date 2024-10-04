@@ -55,17 +55,25 @@
     <script src="{{ asset('js/settings.js') }}"></script>
     <script src="{{ asset('js/todolist.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        // Enable pusher logging - don't include this in production
-        Pusher.logToConsole = true;
-    
+        // Initialize Pusher
         var pusher = new Pusher('29d53f8816252d29de52', {
             cluster: 'ap1'
         });
-    
-        var channel = pusher.subscribe('ict-ta-channel');
-        channel.bind('new-ict-ta', function(data) {
-            if (localStorage.getItem('user_role') === 'admin') {
+
+        // Vue application
+        const app = new Vue({
+            el: 'app', // Make sure to use '#' if 'app' is an ID
+            data: {
+                messages: [],
+            },
+        });
+
+        // Subscribe to the ICT TA channel for admin notifications
+        if (localStorage.getItem('user_role') === 'admin') {
+            var channel = pusher.subscribe('ict-ta-channel');
+            channel.bind('new-ict-ta', function(data) {
                 // Show SweetAlert notification
                 Swal.fire({
                     title: 'New Request',
@@ -79,18 +87,47 @@
                         window.location.href = '/rictu/ict_ta/index';
                     }
                 });
-            }
-        });
-    
-        // Vue application
-        const app = new Vue({
-            el: 'app', // Make sure to use '#' if 'app' is an ID
-            data: {
-                messages: [],
-            },
-        });
+            });
+        }
+
+        // Subscribe to the Received TA channel for user notifications
+        if (localStorage.getItem('user_role') === 'user') {
+            var channel = pusher.subscribe('received-ta-channel');
+            channel.bind('received-ict-ta', function(data) {
+                // Show SweetAlert notification
+                Swal.fire({
+                    title: 'Your Request has been Received',
+                    icon: 'info',
+                    confirmButtonText: 'Okay'
+                }).then((result) => {
+                    // Check if the user clicked the confirm button
+                    if (result.isConfirmed) {
+                        // Reload the page
+                        location.reload();
+                    }
+                });
+            });
+        }
+
+         // Subscribe to the Completed TA channel for user notifications
+         if (localStorage.getItem('user_role') === 'user') {
+            var channel = pusher.subscribe('completed-ta-channel');
+            channel.bind('completed-ict-ta', function(data) {
+                // Show SweetAlert notification
+                Swal.fire({
+                    title: 'Your Request has been Completed',
+                    icon: 'info',
+                    confirmButtonText: 'Okay'
+                }).then((result) => {
+                    // Check if the user clicked the confirm button
+                    if (result.isConfirmed) {
+                        // Reload the page
+                        location.reload();
+                    }
+                });
+            });
+        }
     </script>
-    
 
 </body>
 
