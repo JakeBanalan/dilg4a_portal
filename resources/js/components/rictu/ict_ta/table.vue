@@ -191,7 +191,7 @@ export default {
     created() {
         this.user_id = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
-        this.surveyLinkDisabled = localStorage.getItem('surveyCompleted') === 'true';
+        this.surveyLinkDisabled = localStorage.getItem('surveyCompleted') === 'true'; // Correct initialization
         console.log(new Date());
     },
     computed: {
@@ -214,7 +214,7 @@ export default {
     methods: {
         surveyCompleted(link) {
             localStorage.setItem('surveyCompleted', 'true');
-            this.surveyLinkDisabled = false; // Disable the survey link button
+            this.surveyLinkDisabled = true; // Disable the survey link button
             window.open(link, '_blank'); // Open the survey link in a new tab
         },
         fetchRequests(role, status) {

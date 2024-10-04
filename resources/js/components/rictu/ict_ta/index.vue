@@ -130,10 +130,10 @@ h5 {
                                                     Create Request
                                                 </router-link>
                                             </button> -->
-                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                            <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
                                                 @click="toggleCard()">
                                                 Advanced Search
-                                            </button>
+                                            </button> -->
                                         </div>
                                     </div>
 
