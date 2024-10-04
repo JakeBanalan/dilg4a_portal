@@ -39,7 +39,6 @@ class RICTUController extends Controller
         return response()->json(RICTUModel::select('')
             ->limit(1000)
             ->get());
-        event(new NewRecordCreated($ict_opts));
     }
     public function generateICTControlNo()
     {
