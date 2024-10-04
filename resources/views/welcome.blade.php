@@ -29,11 +29,11 @@
 
 <body class="antialiased">
     <div id="app">
-        {{-- <ul>
+        <ul>
             <li v-for="message in messages" :key="message.id">
-                @{{ message }}
+
             </li>
-        </ul> --}}
+        </ul>
     </div>
 
     <!-- Scripts -->
@@ -54,29 +54,44 @@
     <script src="{{ asset('js/template.js') }}"></script>
     <script src="{{ asset('js/settings.js') }}"></script>
     <script src="{{ asset('js/todolist.js') }}"></script>
-
-    {{-- <script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
         // Enable pusher logging - don't include this in production
         Pusher.logToConsole = true;
-
+    
         var pusher = new Pusher('29d53f8816252d29de52', {
             cluster: 'ap1'
         });
-
-        var channel = pusher.subscribe('my-channel');
-        channel.bind('my-event', function(data) {
-            alert('New request sent: ' + JSON.stringify(data));
-            app.messages.push(JSON.stringify(data));
+    
+        var channel = pusher.subscribe('ict-ta-channel');
+        channel.bind('new-ict-ta', function(data) {
+            if (localStorage.getItem('user_role') === 'admin') {
+                // Show SweetAlert notification
+                Swal.fire({
+                    title: 'New Request',
+                    text: 'A new request has been created.', // You can add more details if needed
+                    icon: 'info',
+                    confirmButtonText: 'Okay'
+                }).then((result) => {
+                    // Check if the user clicked the confirm button
+                    if (result.isConfirmed) {
+                        // Redirect to the specified path
+                        window.location.href = '/rictu/ict_ta/index';
+                    }
+                });
+            }
         });
-
+    
         // Vue application
         const app = new Vue({
-            el: 'app',
+            el: 'app', // Make sure to use '#' if 'app' is an ID
             data: {
                 messages: [],
             },
         });
-    </script> --}}
+    </script>
+    
+
 </body>
 
 </html>

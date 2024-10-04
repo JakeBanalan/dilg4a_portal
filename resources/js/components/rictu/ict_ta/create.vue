@@ -100,7 +100,7 @@ img {
                                             </div>
                                             <div class="col-lg-12 mt-4">
                                                 <TextInput label="Requested By:" iconValue="user"
-                                                v-model="userData.name" :value="userData.name" :readonly="true" />
+                                                    v-model="userData.name" :value="userData.name" :readonly="true" />
                                             </div>
                                             <div class="col-lg-12">
                                                 <TextInput label="Office/Service/Bureau/Section/Division/Unit:"
@@ -408,7 +408,6 @@ export default {
             });
         },
         async create_ict_ta() {
-            // console.log(this);
             if (this.isSaving) return; // prevent multiple clicks
 
             // Validation: Check if remarks is not empty
@@ -422,17 +421,19 @@ export default {
                 return;
             }
 
-            this.isSaving = true;
+            this.isSaving = true; // Set saving flag
+
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
             const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
-            const web_acess = (this.selectedType.value == 7) ? this.website_access : null;
+            const web_access = (this.selectedType.value == 7) ? this.website_access : null;
             const userId = localStorage.getItem('userId');
+
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
                     axios.post('/api/post_create_ict_request', {
                         control_no: this.ict_no,
                         requested_by: userId,
-                        requested_date: this.requested_date + ' ' + this.formatTime(this.requested_time),
+                        requested_date: `${this.requested_date} ${this.formatTime(this.requested_time)}`,
                         pmo: emp_data.id,
                         email: emp_data.email,
                         equipment_type: this.hardwareInfo.etype,
@@ -443,7 +444,7 @@ export default {
                         subRequest: selectedRequest,
                         remarks: this.remarks,
                         portal_sys: portal_system,
-                        web_access: web_acess,
+                        web_access: web_access,
                         status: 1
                     }).then(() => {
                         Swal.fire({
@@ -451,17 +452,22 @@ export default {
                             title: 'TA Created!',
                             showConfirmButton: false,
                             timer: 1500
-                        }).then((result) => { });
+                        });
                         setTimeout(() => {
                             this.$router.push({ path: '/rictu/ict_ta/index' });
-                        });
+                        }, 1500); // Make sure to set a delay before redirect
                     }).catch((error) => {
-                        this.isSaving = false; // reset the flag on error
-                    })
+                        console.error('Error creating ICT request:', error);
+                        toast.error("Failed to create ICT request. Please try again.", {
+                            autoClose: 2500,
+                        });
+                    }).finally(() => {
+                        this.isSaving = false; // Reset the flag whether success or error
+                    });
                 })
                 .catch(error => {
                     console.error('Error fetching user data:', error);
-                    this.isSaving = false; // reset the flag on error
+                    this.isSaving = false; // Reset the flag on error
                 });
         },
         fetchEndUserInfo() {
