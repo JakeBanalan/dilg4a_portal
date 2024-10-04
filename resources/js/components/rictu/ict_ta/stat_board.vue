@@ -110,7 +110,7 @@
             <div class="content">
                 <div class="technical-assistance">
                     <p style="font-weight: 600;">Need ICT Technical Assistance?</p>
-                    <button class="submit-request" @click="submitRequest">
+                    <button class="submit-request" @click="$router.replace({ path: '/rictu/ict_ta/create' })">
                         Submit a Request
                     </button>
                 </div>
@@ -223,29 +223,6 @@ export default {
 
     },
     methods: {
-        checkSurveyCompletion() {
-            this.isSurveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
-        },
-        async submitRequest() {
-            // Check if the survey has been completed
-            const surveyCompleted = localStorage.getItem('surveyCompleted') === 'true';
-
-            if (surveyCompleted) {
-                // If the survey is completed, allow the request submission
-                this.$router.replace({ path: '/rictu/ict_ta/create' });
-                // After submitting the request, reset the survey state
-                localStorage.setItem('surveyCompleted', 'false');
-                this.checkSurveyCompletion(); // Update local state if needed
-            } else {
-                // If the survey is not completed, show an alert using SweetAlert2
-                await Swal.fire({
-                    icon: 'warning',
-                    title: 'Survey Required',
-                    text: 'Please complete the survey before submitting a new request.',
-                    confirmButtonText: 'OK'
-                });
-            }
-        },
         fetchICTAdminCount() {
             // Fetch total ICT requests
             axios.get(`/api/totalCountICTRequest/2024`)
