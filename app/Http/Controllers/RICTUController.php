@@ -285,8 +285,6 @@ class RICTUController extends Controller
 
         $ict_opts->save();
 
-
-
         // Send notification via Pusher
         $options = [
             'cluster' => env('PUSHER_APP_CLUSTER'),
@@ -301,7 +299,6 @@ class RICTUController extends Controller
         );
 
         $data = [
-            'message' => 'A new ICT request has been created',
             'ict_options' => $ict_opts // Include additional data as needed
         ];
 
