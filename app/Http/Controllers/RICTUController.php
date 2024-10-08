@@ -48,15 +48,23 @@ class RICTUController extends Controller
                 ->get()
         );
     }
+    // In your Laravel controller
+    public function getUserData()
+    {
+        // Get the currently logged-in user's data
+        $user = auth()->user();
 
-    // public function getAllUsers()
-    // {
-    //     $users = UserModel::all(); // Fetch all users
-    //     foreach ($users as &$user) {
-    //         $user->first_name . " " . $user->last_name;
-    //     }
-    //     return response()->json($users);
-    // }
+        if ($user) {
+            // Return the user's data as a JSON response
+            return response()->json([
+                'user_role' => $user->user_role,
+            ]);
+        } else {
+            // Return an error response if the user is not logged in
+            return response()->json(['error' => 'You are not logged in'], 401);
+        }
+    }
+
     public function getICTData($id)
     {
         $query = RICTUModel::select(RICTUModel::raw('
@@ -261,9 +269,26 @@ class RICTUController extends Controller
         $month = Carbon::parse($requestedDate)->format('m');
         $req = $request->input('type_of_request');
 
+        // Fetch the user's full name from the database
+        $userId = $request->input('requested_by'); // This is the user ID
+        $user = UserModel::selectRaw('
+        users.id as id,
+        CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
+        users.username
+    ')
+            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
+            ->where('users.id', $userId)
+            ->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        // Create the ICT request
         $ict_opts = new RICTUModel([
             'control_no' => $request->input('control_no'),
-            'request_by' => $request->input('requested_by'),
+            'request_by' => $userId,
             'request_date' => $requestedDate,
             'office_id' => $request->input('pmo'),
             'unit_id' => $request->input('email'),
@@ -297,16 +322,20 @@ class RICTUController extends Controller
             $options
         );
 
+        // Prepare the data for the notification
         $data = [
-            'ict_options' => $ict_opts // Include additional data as needed
+            'id' => $ict_opts->id, // Unique ID of the request
+            'username' => $user->username, // Username of the requester
+            'name' => $user->name, // Full name of the requester
         ];
 
-        // Trigger the event
+        // Trigger the event for admins
         $pusher->trigger('ict-ta-channel', 'new-ict-ta', $data);
-
         // Return a success response
         return response()->json(['message' => 'ICT request created successfully.'], 201);
     }
+
+
 
 
     public function fetch_ict_req_details(Request $request)

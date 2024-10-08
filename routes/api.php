@@ -132,17 +132,15 @@ Route::middleware('api')->group(function () {
     Route::get('countTotalItem/{cur_year}', [AppItemController::class, 'countTotalItem']);
 });
 
-Route::middleware('api')->group(function(){
+Route::middleware('api')->group(function () {
     Route::get('/totalCountICTRequest/{year}', [RICTUController::class, 'totalCountICTrequest']);
 });
 
-Route::middleware('api')->group(function(){
+Route::middleware('api')->group(function () {
     Route::get('/totalCountDraft', [RICTUController::class, 'totalCountDraft']);
 });
-// Route::middleware('api')->group(function(){
-//     Route::get('/getAllUsers', [RICTUController::class, 'getAllUsers']);
-// });
 
+Route::middleware('auth:api')->get('/getUserData', [RICTUController::class, 'getUserData']);
 Route::middleware('api')->group(function () {
     Route::get('/countICTRequest/{userId}/{cur_year}', [RICTUController::class, 'countICTRequest']);
 });

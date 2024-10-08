@@ -56,7 +56,7 @@
     <script src="{{ asset('js/todolist.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
+    {{-- <script>
         // Initialize Pusher
         var pusher = new Pusher('29d53f8816252d29de52', {
             cluster: 'ap1'
@@ -116,6 +116,7 @@
                 // Show SweetAlert notification
                 Swal.fire({
                     title: 'Your Request has been Completed',
+                    text: 'Please dont forget to take the Survey Thank you!.', // You can add more details if needed
                     icon: 'info',
                     confirmButtonText: 'Okay'
                 }).then((result) => {
@@ -127,7 +128,7 @@
                 });
             });
         }
-    </script>
+    </script> --}}
 
 </body>
 
