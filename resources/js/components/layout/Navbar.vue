@@ -157,11 +157,10 @@ export default {
                         // Admin subscribes to the new TA request channel
                         this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index');
                     } 
-                    // else if (this.userRole === 'user') {
-                    //     // User subscribes to their own channels
-                    //     this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received', 'bg-warning', 'ti-check', '/rictu/ict_ta/index');
-                    //     this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
-                    // }
+                    else if (this.userRole === 'user') {
+                        // User subscribes to their own channels
+                        this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
+                    }
                     this.loading = false; // Set loading to false after fetching data
                 })
                 .catch(error => {
@@ -215,20 +214,20 @@ export default {
                     // Display toast notification for admins with sender's name
                     this.showAlert(`${notificationTitle} from ${data.name}`);
                 } 
-                // else if (this.userRole === 'user') {
-                //     // User will see a general notification about their request status
-                //     this.notifications.push({
-                //         id: data.id,
-                //         title: notificationTitle,
-                //         iconColor: iconColor,
-                //         icon: iconClass,
-                //         time: new Date().toLocaleString(),
-                //         redirectUrl: redirectUrl // Add the URL for redirection
-                //     });
+                else if (this.userRole === 'user') {
+                    // User will see a general notification about their request status
+                    this.notifications.push({
+                        id: data.id,
+                        title: notificationTitle,
+                        iconColor: iconColor,
+                        icon: iconClass,
+                        time: new Date().toLocaleString(),
+                        redirectUrl: redirectUrl // Add the URL for redirection
+                    });
 
-                //     // Display toast notification for users without sender's name
-                //     this.showAlert(notificationTitle);
-                // }
+                    // Display toast notification for users without sender's name
+                    this.showAlert(notificationTitle);
+                }
             });
         },
         showAlert(title) {
