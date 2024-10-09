@@ -454,8 +454,10 @@ export default {
                             timer: 1500
                         });
                         setTimeout(() => {
-                            this.$router.push({ path: '/rictu/ict_ta/index', reload: true });
-                        }, 1500);
+                            this.$router.push({ path: '/rictu/ict_ta/index' }).then(() => {
+                                window.location.reload(); // Forces the page to reload
+                            });
+                        });
                     }).catch((error) => {
                         console.error('Error creating ICT request:', error);
                         toast.error("Failed to create ICT request. Please try again.", {
@@ -465,10 +467,6 @@ export default {
                         this.isSaving = false; // Reset the flag whether success or error
                     });
                 })
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                    this.isSaving = false; // Reset the flag on error
-                });
         },
         fetchEndUserInfo() {
             const userId = localStorage.getItem('userId');
