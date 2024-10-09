@@ -160,7 +160,7 @@ export default {
                     else if (this.userRole === 'user') {
                         // User subscribes to their own channels
                         this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
-                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received by the Admin!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
+                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received by the Admin!', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
                     }
                     this.loading = false; // Set loading to false after fetching data
                 })
