@@ -454,8 +454,8 @@ export default {
                             timer: 1500
                         });
                         setTimeout(() => {
-                            this.$router.push({ path: '/rictu/ict_ta/index' });
-                        }, 1500); // Make sure to set a delay before redirect
+                            this.$router.push({ path: '/rictu/ict_ta/index', reload: true });
+                        }, 1500);
                     }).catch((error) => {
                         console.error('Error creating ICT request:', error);
                         toast.error("Failed to create ICT request. Please try again.", {
