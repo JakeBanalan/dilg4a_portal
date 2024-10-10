@@ -1,14 +1,14 @@
 <template>
     <div class="container-scroller">
-        <Navbar />
+        <Navbar></Navbar>
         <div class="container-fluid page-body-wrapper">
             <Sidebar />
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
-
+                    <BreadCrumbs />
                     <div class="row">
-
+                        <StatBoard />
                         <div class="col-md-6">
                             <div class="card" style="max-height: 350px;">
                                 <div class="card-body">
@@ -279,7 +279,7 @@ import axios from 'axios'; // Import axios library to make HTTP requests
 // import employee_table from './app_table.vue';
 
 export default {
-    name: 'Employees_Directory',
+    name: 'User Management',
     components: {
         user_table,
         Navbar,

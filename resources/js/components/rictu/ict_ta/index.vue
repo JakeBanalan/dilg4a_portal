@@ -21,7 +21,7 @@ h5 {
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <BreadCrumbs />
+                    <!-- <BreadCrumbs /> -->
                     <div class="row">
                         <StatBoard />
 
