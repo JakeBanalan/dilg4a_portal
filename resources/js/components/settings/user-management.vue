@@ -7,14 +7,9 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                     <BreadCrumbs />
-<<<<<<< HEAD
 
                     <!-- <div class="row">
 
-=======
-                    <div class="row">
-                        <StatBoard />
->>>>>>> a5780a5e48e6768651694e98b44a750aba1426d1
                         <div class="col-md-6">
                             <div class="card" style="max-height: 350px;">
                                 <div class="card-body">

@@ -151,7 +151,7 @@
                                                     <label for="Gender">Gender</label>
                                                     <Multiselect :options="gender_opts" track-by="value"
                                                         v-model="data.gender" :multiple="false" label="label"
-                                                        :searchable="false" placeholder="Position">
+                                                        :searchable="false" placeholder="Gender">
                                                     </Multiselect>
                                                 </div>
 
