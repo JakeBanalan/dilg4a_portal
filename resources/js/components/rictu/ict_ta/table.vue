@@ -70,7 +70,7 @@ th {
                                     <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                                 </button>
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                    @click="openModal(ict_data.id)" aria-label="Open Modal"  title="Complete">
+                                    @click="openModal(ict_data.id)" aria-label="Open Modal" title="Complete">
                                     <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
                                 </button>
                             </div>
@@ -82,7 +82,7 @@ th {
                             </div>
                             <div v-else-if="ict_data.status === 'Draft'">
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                    @click="received_request(ict_data.id)" aria-label="Confirm Request"  title="Confirm">
+                                    @click="received_request(ict_data.id)" aria-label="Confirm Request" title="Confirm">
                                     <font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon>
                                 </button>
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
@@ -93,7 +93,7 @@ th {
                         </template>
                         <template v-else-if="role === 'user'">
                             <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                @click="view_ict_form(ict_data.id)" aria-label="View Details"  title="Show">
+                                @click="view_ict_form(ict_data.id)" aria-label="View Details" title="Show">
                                 <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                             </button>
                         </template>
@@ -106,14 +106,27 @@ th {
                         <i>~Request Date: {{ formatDate(ict_data.requested_date) }}</i>~
                     </td>
                     <td style="white-space:normal;">{{ ict_data.remarks }}</td>
-
-                    <td v-if="ict_data.status === 'Completed'">
-                        <button class="btn btn-primary mr-1" style="background-color:#059886;color:#fff;">
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" />
-                            <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>
-                        </button>
-                    </td>
-                    <td v-else> ~ </td>
+                    <!-- USER SURVEY LINK -->
+                    <template v-if="role === 'user'">
+                        <td v-if="ict_data.status === 'Completed'">
+                            <button class="btn btn-primary mr-1" :style="{ backgroundColor: '#059886', color: '#fff' }"
+                                :disabled="surveyLinkDisabled" @click="surveyCompleted(ict_data.css_link)">
+                                <font-awesome-icon :icon="['fas', 'square-poll-vertical']" />
+                                <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>
+                            </button>
+                        </td>
+                        <td v-else> ~ </td>
+                    </template>
+                    <!-- ADMIN SURVEY LINK -->
+                    <template v-if="role === 'admin'">
+                        <td v-if="ict_data.status === 'Completed'">
+                            <button class="btn btn-primary mr-1" style="background-color:#059886;color:#fff;">
+                                <font-awesome-icon :icon="['fas', 'square-poll-vertical']" />
+                                <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>
+                            </button>
+                        </td>
+                        <td v-else> ~ </td>
+                    </template>
 
                     <td> {{ formatDate(ict_data.received_date) }}</td>
                     <td> {{ formatTime(ict_data.received_date) }}</td>
@@ -171,12 +184,14 @@ export default {
             request_date: null,
             request_type: null,
             sub_request_type: null,
+            surveyLinkDisabled: false // New property to track the disabled state
         }
 
     },
     created() {
         this.user_id = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
+        this.surveyLinkDisabled = localStorage.getItem('surveyCompleted') === 'true'; // Correct initialization
         console.log(new Date());
     },
     computed: {
@@ -197,6 +212,11 @@ export default {
 
     },
     methods: {
+        surveyCompleted(link) {
+            localStorage.setItem('surveyCompleted', 'true');
+            this.surveyLinkDisabled = true; // Disable the survey link button
+            window.open(link, '_blank'); // Open the survey link in a new tab
+        },
         fetchRequests(role, status) {
             if (role === 'admin') {
                 this.load_ict_request(status);

@@ -6,8 +6,11 @@ namespace App\Http\Controllers;
 use MyEvent;
 use Carbon\Carbon;
 
+use Pusher\Pusher;
+use App\Models\UserModel;
 use App\Models\RICTUModel;
 use Illuminate\Http\Request;
+use App\Events\NewRecordCreated;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -45,6 +48,23 @@ class RICTUController extends Controller
                 ->get()
         );
     }
+    // In your Laravel controller
+    public function getUserData()
+    {
+        // Get the currently logged-in user's data
+        $user = auth()->user();
+
+        if ($user) {
+            // Return the user's data as a JSON response
+            return response()->json([
+                'user_role' => $user->user_role,
+            ]);
+        } else {
+            // Return an error response if the user is not logged in
+            return response()->json(['error' => 'You are not logged in'], 401);
+        }
+    }
+
     public function getICTData($id)
     {
         $query = RICTUModel::select(RICTUModel::raw('
@@ -56,7 +76,7 @@ class RICTUController extends Controller
             tbl_technicalassistance.others_software AS others_software,
             tbl_technicalassistance.website_access AS website_access,
             tbl_technicalassistance.control_no AS control_no,
-            u.username AS requested_by,
+            CONCAT(u.first_name," ",u.last_name) AS requested_by,
             u.user_role as role,
             tbl_technicalassistance.request_date AS requested_date,
             time(tbl_technicalassistance.request_date) AS requested_time,
@@ -242,58 +262,81 @@ class RICTUController extends Controller
 
     public function post_create_ict_request(Request $request)
     {
-        $portal_system = ($request->input('portal_sys') == null) ? null : $request->input('portal_sys');
-        $website_access = ($request->input('web_access') == null) ? null : $request->input('web_access');
+        $portal_system = $request->input('portal_sys') ?? null;
+        $website_access = $request->input('web_access') ?? null;
 
         $requestedDate = $request->input('requested_date');
         $month = Carbon::parse($requestedDate)->format('m');
         $req = $request->input('type_of_request');
-        if ($req == 9) {
-            $ict_opts = new RICTUModel([
-                'control_no'            => $request->input('control_no'),
-                'request_by'            => $request->input('requested_by'),
-                'request_date'          => $request->input('requested_date'),
-                'office_id'             => $request->input('pmo'),
-                'unit_id'               => $request->input('email'),
-                'equipment_type'        => $request->input('equipment_type'),
-                'brand'                 => $request->input('brand'),
-                'property_no'           => $request->input('property_no'),
-                'serial_no'             => $request->input('equipment_sn'),
-                'others'                => $request->input('subRequest'),
-                'portal_system'         => null,
-                'website_access'        => null,
-                'request_type_category_id' => 37,
-                'request_type_id'       => $request->input('type_of_request'),
-                'assign_ict_officer'    => 0,
-                'status_id'             => self::STATUS_DRAFT,
-                'remarks'               => $request->input('remarks'),
-                'css_link'              => $month
-            ]);
-        } else {
 
-            $ict_opts = new RICTUModel([
-                'control_no'            => $request->input('control_no'),
-                'request_by'            => $request->input('requested_by'),
-                'request_date'          => $request->input('requested_date'),
-                'office_id'             => $request->input('pmo'),
-                'unit_id'               => $request->input('email'),
-                'equipment_type'        => $request->input('equipment_type'),
-                'brand'                 => $request->input('brand'),
-                'property_no'           => $request->input('property_no'),
-                'serial_no'             => $request->input('equipment_sn'),
-                'request_type_category_id' => $request->input('subRequest'),
-                'request_type_id'       => $request->input('type_of_request'),
-                'assign_ict_officer'    => 0,
-                'portal_system'         => $portal_system,
-                'website_access'        => $website_access,
-                'status_id'             => self::STATUS_DRAFT,
-                'remarks'               => $request->input('remarks'),
-                'css_link'              => $month
-            ]);
+        // Fetch the user's full name from the database
+        $userId = $request->input('requested_by'); // This is the user ID
+        $user = UserModel::selectRaw('
+        users.id as id,
+        CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
+        users.username
+    ')
+            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
+            ->where('users.id', $userId)
+            ->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
         }
 
+        // Create the ICT request
+        $ict_opts = new RICTUModel([
+            'control_no' => $request->input('control_no'),
+            'request_by' => $userId,
+            'request_date' => $requestedDate,
+            'office_id' => $request->input('pmo'),
+            'unit_id' => $request->input('email'),
+            'equipment_type' => $request->input('equipment_type'),
+            'brand' => $request->input('brand'),
+            'property_no' => $request->input('property_no'),
+            'serial_no' => $request->input('equipment_sn'),
+            'others' => $req == 9 ? $request->input('subRequest') : null,
+            'portal_system' => $portal_system,
+            'website_access' => $website_access,
+            'request_type_category_id' => $req == 9 ? 37 : $request->input('subRequest'),
+            'request_type_id' => $req,
+            'assign_ict_officer' => 0,
+            'status_id' => self::STATUS_DRAFT,
+            'remarks' => $request->input('remarks'),
+            'css_link' => $month
+        ]);
+
         $ict_opts->save();
+
+        // Send notification via Pusher
+        $options = [
+            'cluster' => env('PUSHER_APP_CLUSTER'),
+            'useTLS' => true
+        ];
+
+        $pusher = new Pusher(
+            env('PUSHER_APP_KEY'),
+            env('PUSHER_APP_SECRET'),
+            env('PUSHER_APP_ID'),
+            $options
+        );
+
+        // Prepare the data for the notification
+        $data = [
+            'id' => $ict_opts->id, // Unique ID of the request
+            'username' => $user->username, // Username of the requester
+            'name' => $user->name, // Full name of the requester
+        ];
+
+        // Trigger the event for admins
+        $pusher->trigger('ict-ta-channel', 'new-ict-ta', $data);
+        // Return a success response
+        return response()->json(['message' => 'ICT request created successfully.'], 201);
     }
+
+
+
 
     public function fetch_ict_req_details(Request $request)
     {

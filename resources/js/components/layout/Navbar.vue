@@ -2,6 +2,32 @@
 .navbar {
     background-color: black;
 }
+
+.bell {
+    height: 30px;
+}
+
+/* Add necessary styles for your dropdown */
+.preview-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.bg-success {
+    background-color: #28a745;
+}
+
+.bg-warning {
+    background-color: #ffc107;
+}
+
+.bg-info {
+    background-color: #17a2b8;
+}
 </style>
 <template>
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
@@ -29,56 +55,39 @@
                 </li>
             </ul>
             <ul class="navbar-nav navbar-nav-right">
-                <!-- <li class="nav-item dropdown">
-                    <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#"
-                        data-toggle="dropdown">
-                        <i class="icon-bell mx-0"></i>
-                        <span class="count"></span>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+                        <img class="bell" src="../../../../assets/images/bell.png" alt="Notification Bell" />
+                        <span class="count" style="color: black;">{{ notifications.length }}</span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
                         aria-labelledby="notificationDropdown">
-                        <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-                        <a class="dropdown-item preview-item">
+                        <p class="mb-0 font-weight-normal float-left dropdown-header"
+                            style="font-weight: 900; font-size: 25px;">Notifications</p>
+
+                        <!-- Check if there are notifications -->
+                        <a v-if="notifications.length === 0" class="dropdown-item">
+                            <div class="preview-item-content">
+                                <h6 class="preview-subject font-weight-normal">No Requests</h6>
+                            </div>
+                        </a>
+
+                        <!-- Render notifications if there are any -->
+                        <a v-for="notification in notifications" :key="notification.id"
+                            class="dropdown-item preview-item" @click="redirectTo(notification)">
                             <div class="preview-thumbnail">
-                                <div class="preview-icon bg-success">
-                                    <i class="ti-info-alt mx-0"></i>
+                                <div :class="['preview-icon', notification.iconColor]">
+                                    <i :class="['mx-0', notification.icon]"></i>
                                 </div>
                             </div>
                             <div class="preview-item-content">
-                                <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                                <p class="font-weight-light small-text mb-0 text-muted">
-                                    Just now
-                                </p>
+                                <h6 class="preview-subject font-weight-normal">{{ notification.title }}</h6>
+                                <p class="font-weight-light small-text mb-0 text-muted">{{ notification.time }}</p>
                             </div>
                         </a>
-                        <a class="dropdown-item preview-item">
-                            <div class="preview-thumbnail">
-                                <div class="preview-icon bg-warning">
-                                    <i class="ti-settings mx-0"></i>
-                                </div>
-                            </div>
-                            <div class="preview-item-content">
-                                <h6 class="preview-subject font-weight-normal">Settings</h6>
-                                <p class="font-weight-light small-text mb-0 text-muted">
-                                    Private message
-                                </p>
-                            </div>
-                        </a>
-                        <a class="dropdown-item preview-item">
-                            <div class="preview-thumbnail">
-                                <div class="preview-icon bg-info">
-                                    <i class="ti-user mx-0"></i>
-                                </div>
-                            </div>
-                            <div class="preview-item-content">
-                                <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                                <p class="font-weight-light small-text mb-0 text-muted">
-                                    2 days ago
-                                </p>
-                            </div>
-                        </a>
+
                     </div>
-                </li> -->
+                </li>
                 <li class="nav-item nav-profile dropdown">
                     <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
                         <img src="../../../../assets/images/logo.png" alt="profile" />
@@ -86,13 +95,15 @@
                     <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
                         <a class="dropdown-item">
                             <i class="ti-settings text-primary"></i>
-                           <router-link :to="`/settings/update/${userId}`" style="text-decoration:none;color:inherit;">Settings</router-link>
+                            <router-link :to="`/settings/update/${userId}`"
+                                style="text-decoration:none;color:inherit;">Settings</router-link>
                         </a>
                         <a class="dropdown-item" @click="logout">
                             <i class="ti-power-off text-primary"></i>
                             Logout
                         </a>
                     </div>
+
                 </li>
                 <li class="nav-item nav-settings d-none d-lg-flex">
                     <a class="nav-link" href="#">
@@ -108,21 +119,64 @@
     </nav>
 </template>
 <script>
-
+import Pusher from 'pusher-js';
+import { toast } from "vue3-toastify";
 export default {
     name: 'Navbar',
     data() {
         return {
-            userId:null
+            notifications: [],
+            username: '',
+            userRole: '',
+            userId: '',
+            loading: true // Add a loading state
         }
     },
-    components: {
-
-    },
-    created(){
+    created() {
         this.userId = localStorage.getItem('userId');
     },
+    mounted() {
+        // Check if the user is logged in
+        if (localStorage.getItem('api_token')) {
+            // Make an API call to retrieve the currently logged-in user's data
+            axios.get('/api/getUserData', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('api_token')
+                }
+            })
+                .then(response => {
+                    this.userRole = response.data.user_role;
+
+                    // Initialize Pusher
+                    var pusher = new Pusher('29d53f8816252d29de52', {
+                        cluster: 'ap1'
+                    });
+
+                    // Subscribe to the appropriate channel based on user role
+                    if (this.userRole === 'admin') {
+                        // Admin subscribes to the new TA request channel
+                        this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index');
+                    }
+                    else if (this.userRole === 'user') {
+                        // User subscribes to their own channels
+                        this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
+                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received by the Admin!', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
+                    }
+                    this.loading = false; // Set loading to false after fetching data
+                })
+                .catch(error => {
+                    console.error(error);
+                    this.loading = false; // Ensure loading is false if an error occurs
+                });
+        } else {
+            // Handle not logged in case
+            console.error('Unauthorized access');
+            this.loading = false; // Ensure loading is false if not logged in
+        }
+    },
+
     methods: {
+
         logout() {
             const apiToken = localStorage.getItem('api_token');
 
@@ -142,8 +196,50 @@ export default {
                 .catch(error => {
                     console.error('Logout failed:', error);
                 });
-        }
+        },
+        subscribeToChannel(pusher, channelName, eventName, notificationTitle, iconColor, iconClass, redirectUrl) {
+            let channel = pusher.subscribe(channelName);
+            channel.bind(eventName, (data) => {
+                // Different logic based on user role
+                if (this.userRole === 'admin') {
+                    // Admin will see the sender's name in the notification
+                    this.notifications.push({
+                        id: data.id,
+                        title: `${notificationTitle} from ${data.name}`, // Show sender's name
+                        iconColor: iconColor,
+                        icon: iconClass,
+                        time: new Date().toLocaleString(),
+                        redirectUrl: redirectUrl // Add the URL for redirection
+                    });
 
+                    // Display toast notification for admins with sender's name
+                    this.showAlert(`${notificationTitle} from ${data.name}`);
+                }
+                else if (this.userRole === 'user') {
+                    // Only push notification to the user who sent the request
+                    if (data.requester_id === this.userId) {
+                        this.notifications.push({
+                            id: data.id,
+                            title: notificationTitle,
+                            iconColor: iconColor,
+                            icon: iconClass,
+                            time: new Date().toLocaleString(),
+                            redirectUrl: redirectUrl // Add the URL for redirection
+                        });
+                        this.showAlert(notificationTitle);
+                    }
+                }
+            });
+        },
+        showAlert(title) {
+            toast.success(title, {
+                autoClose: 1500,  // Close the toast automatically after 1.5 seconds
+            });
+        },
+        redirectTo(notification) {
+            // Navigate to the URL for this notification
+            window.location.href = notification.redirectUrl;
+        }
 
     }
 }

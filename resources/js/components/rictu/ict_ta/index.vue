@@ -21,7 +21,7 @@ h5 {
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <BreadCrumbs />
+                    <!-- <BreadCrumbs /> -->
                     <div class="row">
                         <StatBoard />
 
@@ -172,13 +172,15 @@ import ICTTable from './table.vue';
 import Multiselect from 'vue-multiselect'
 import StatBoard from './stat_board';
 import modal_export from '../modal/modal_generate_report.vue';
-
 import axios from 'axios';
+import Pusher from 'pusher-js';
+import Swal from 'sweetalert2';
 
 export default {
     name: 'ICT Technical Assistance',
     data() {
         return {
+            isOnICTTAIndexRoute: false,
             role: null,
             abstract_no: null,
             selected: null,
@@ -199,9 +201,9 @@ export default {
         }
     },
     created() {
+        // Set the role from localStorage
         this.role = localStorage.getItem('user_role');
     },
-
     methods: {
         toggleCard() {
             this.isCardVisible = !this.isCardVisible;

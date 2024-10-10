@@ -186,6 +186,7 @@
 </template>
 
 <script>
+import Swal from 'sweetalert2';
 export default {
     data() {
         return {
@@ -205,6 +206,7 @@ export default {
             ict_adminReturned: 0,
             ict_adminHardware: 0,
             ict_adminSoftware: 0,
+            isSurveyCompleted: false
         };
     },
     created() {

@@ -200,7 +200,7 @@ img {
                                             </div>
 
                                             <div class="col-lg-12">
-                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
+                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS *(REQUIRED): "
                                                     v-model="remarks" />
                                             </div>
 
@@ -260,6 +260,7 @@ img {
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style src="../../../../../public/vendors/select2/select2.min.css"></style>
 <script>
+import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
@@ -275,6 +276,7 @@ import logo from "../../../../assets/logo.png";
 
 export default {
     name: 'Create ICT Technical Assistance',
+    components: { Multiselect },
     data() {
         return {
             isSaving: false,
@@ -289,6 +291,7 @@ export default {
             ict_no: null,
             selectedType: null,
             selectedSubRequest: null,
+            toastShown: false,
             hardwareInfo: {
                 etype: null,
                 brand: null,
@@ -375,19 +378,19 @@ export default {
             return this.selectedSubRequest && this.selectedSubRequest.value == 26;
         }
     },
-
     mounted() {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
-
-
     },
     methods: {
-        formatDate(date) {
-            if (!date) return '';
-            const [year, month, day] = date.split('-');
-            return `${day}/${month}/${year}`;
-        },
+        // async fetchUsers() {
+        //     try {
+        //         const response = await axios.get('/api/getAllUsers');
+        //         this.users = response.data;
+        //     } catch (error) {
+        //         console.error(error);
+        //     }
+        // },
         formatTime(time) {
             if (!time) return '';
             const [hours, minutes] = time.split(':');
@@ -404,20 +407,33 @@ export default {
                 autoClose: 1500,
             });
         },
-        create_ict_ta() {
-            // console.log(this);
+        async create_ict_ta() {
             if (this.isSaving) return; // prevent multiple clicks
-            this.isSaving = true;
+
+            // Validation: Check if remarks is not empty
+            if (!this.remarks || this.remarks.trim() === '') {
+                if (!this.toastShown) {
+                    this.toastShown = true;
+                    toast.error("Please fill out the 'REMARKS.'", {
+                        autoClose: 2500,
+                    });
+                }
+                return;
+            }
+
+            this.isSaving = true; // Set saving flag
+
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
             const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
-            const web_acess = (this.selectedType.value == 7) ? this.website_access : null;
+            const web_access = (this.selectedType.value == 7) ? this.website_access : null;
             const userId = localStorage.getItem('userId');
+
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
                     axios.post('/api/post_create_ict_request', {
                         control_no: this.ict_no,
                         requested_by: userId,
-                        requested_date: this.requested_date + ' ' + this.formatTime(this.requested_time), // Combine date and time
+                        requested_date: `${this.requested_date} ${this.formatTime(this.requested_time)}`,
                         pmo: emp_data.id,
                         email: emp_data.email,
                         equipment_type: this.hardwareInfo.etype,
@@ -428,27 +444,30 @@ export default {
                         subRequest: selectedRequest,
                         remarks: this.remarks,
                         portal_sys: portal_system,
-                        web_access: web_acess,
+                        web_access: web_access,
                         status: 1
-
                     }).then(() => {
-                        this.isSaving = true;
-                        this.showToatSuccess('Successfully created!');
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'TA Created!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
                         setTimeout(() => {
-                            this.$router.push({ path: '/rictu/ict_ta/index' })
-                            this.$router.push({ name: 'ICT Technical Assistance' });
-                        }, 800); // Adjust the delay as needed
-
+                            this.$router.push({ path: '/rictu/ict_ta/index' }).then(() => {
+                                window.location.reload(); // Forces the page to reload
+                            });
+                        });
                     }).catch((error) => {
-                        this.isSaving = false; // reset the flag on error
-                    })
+                        console.error('Error creating ICT request:', error);
+                        toast.error("Failed to create ICT request. Please try again.", {
+                            autoClose: 2500,
+                        });
+                    }).finally(() => {
+                        this.isSaving = false; // Reset the flag whether success or error
+                    });
                 })
-                .catch(error => {
-                    console.error('Error fetching user data:', error);
-                    this.isSaving = false; // reset the flag on error
-                });
         },
-
         fetchEndUserInfo() {
             const userId = localStorage.getItem('userId');
             axios.get(`../../../api/fetchUser/${userId}`)

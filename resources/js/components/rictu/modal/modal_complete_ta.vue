@@ -27,8 +27,9 @@
                                             iconValue="calendar" style="height: 40px;" disabled />
                                     </div>
                                     <div class="col-lg-6 mb-2">
-                                        <TextInput type="datetime-local" label="Completed Date(Required)" iconValue="calendar"
-                                            v-model="completed_date" style="height: 40px;" />
+                                        <TextInput type="datetime-local" label="Completed Date(Required)"
+                                            iconValue="calendar" v-model="completed_date" :min="currentDateTime"
+                                            style="height: 40px;" />
                                     </div>
                                 </div>
                                 <TextInput label="Office" iconValue="building" :value="office" disabled />
@@ -81,6 +82,17 @@ export default {
     components: {
         TextInput,
         TextAreaInput
+    },
+    computed: {
+        currentDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
     },
     methods: {
         isValidDate(date) {
