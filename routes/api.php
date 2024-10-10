@@ -149,10 +149,10 @@ Route::middleware('api')->group(function () {
     Route::get('countDRAFT/{userId}', [RICTUController::class, 'countDRAFT']);
 });
 
-Route::middleware('api')->group(function () {
-    Route::get('countHardwareRequest/{userId}', [RICTUController::class, 'countHardwareRequest']);
-    Route::get('countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
-});
+// Route::middleware('api')->group(function () {
+//     Route::get('/countHardwareRequest/{userId}', [RICTUController::class, 'countHardwareRequest']);
+//     Route::get('/countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
+// });
 
 
 Route::middleware('api')->group(function () {
@@ -294,6 +294,10 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('getOffice', [UserManagementController::class, 'getOffice']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchUserOfficeCount', [UserManagementController::class, 'fetchUserOfficeCount']);
 });
 
 

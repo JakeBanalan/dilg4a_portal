@@ -387,33 +387,33 @@ class RICTUController extends Controller
     }
 
 
-    public function countHardwareRequest($userId)
-    {
-        $hardwareCount = RICTUModel::select(DB::raw('COUNT(*) AS hardware_count'))
-            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-            ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7])
-            ->where('request_by', $userId)  // Filter by user ID
-            ->whereYear('created_at', 2024)
-            ->first();
+    // public function countHardwareRequest($userId)
+    // {
+    //     $hardwareCount = RICTUModel::select(DB::raw('COUNT(*) AS hardware_count'))
+    //         ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+    //         ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+    //         ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+    //         ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7])
+    //         ->where('request_by', $userId)  // Filter by user ID
+    //         ->whereYear('created_at', 2024)
+    //         ->first();
 
-        return response()->json(['hardware_count' => $hardwareCount->hardware_count]);
-    }
+    //     return response()->json(['hardware_count' => $hardwareCount->hardware_count]);
+    // }
 
-    public function countSoftwareRequest($userId)
-    {
-        $softwareCount = RICTUModel::select(DB::raw('COUNT(*) AS software_count'))
-            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-            ->whereIn('c.REQUEST_ID', [4, 5, 8])
-            ->where('request_by', $userId)  // Filter by user ID
-            ->whereYear('created_at', 2024)
-            ->first();
+    // public function countSoftwareRequest($userId)
+    // {
+    //     $softwareCount = RICTUModel::select(DB::raw('COUNT(*) AS software_count'))
+    //         ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+    //         ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+    //         ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+    //         ->whereIn('c.REQUEST_ID', [4, 5, 8])
+    //         ->where('request_by', $userId)  // Filter by user ID
+    //         ->whereYear('created_at', 2024)
+    //         ->first();
 
-        return response()->json(['software_count' => $softwareCount->software_count]);
-    }
+    //     return response()->json(['software_count' => $softwareCount->software_count]);
+    // }
 
 
 

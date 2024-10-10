@@ -1,13 +1,14 @@
 <template>
     <div class="container-scroller">
-        <Navbar />
+        <Navbar></Navbar>
         <div class="container-fluid page-body-wrapper">
             <Sidebar />
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
+                    <BreadCrumbs />
 
-                    <div class="row">
+                    <!-- <div class="row">
 
                         <div class="col-md-6">
                             <div class="card" style="max-height: 350px;">
@@ -24,7 +25,7 @@
                                         </thead>
                                         <tbody class="sbnone" style="display: block; height: 200px; overflow: auto;">
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
-                                                <td>Region</td>
+                                                <td>Regional Office</td>
                                                 <td>2</td>
                                             </tr>
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
@@ -78,10 +79,6 @@
                                         </thead>
                                         <tbody class="sbnone">
                                             <tr>
-                                                <td>Blocked Accounts</td>
-                                                <td>1</td>
-                                            </tr>
-                                            <tr>
                                                 <td>Total No. of Female Employees</td>
                                                 <td>1</td>
                                             </tr>
@@ -96,7 +93,7 @@
                             </div>
                         </div>
 
-                    </div>
+                    </div> -->
 
                     <!--Search Filter-->
                     <div class="row">
@@ -221,16 +218,64 @@
                         <div class="col-md-12 pt-4">
                             <div class="card">
                                 <div class="card-body">
-                                    <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                    <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
                                         @click="toggleCard()" style="float:right;">
                                         Advanced Search
-                                    </button>
+                                    </button> -->
                                     <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
-                                        @click="createUser()" style="float:right;">
+                                        @click="createUser()" style="float:right; margin-bottom:10px;">
                                         Create User
                                     </button>
                                     <div class="table-responsive">
-                                        <user_table />
+                                        <!-- <user_table /> -->
+                                        <table id="employee_table"
+                                            class="table table-striped table-borderless display expandable-table dataTable no-footer"
+                                            role="grid">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        Employee ID</th>
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        Province/HUC</th>
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        City/Municipality</th>
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        Full Name</th>
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        Username</th>
+                                                    <!-- <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
+                style="width: 10px; text-align: center;">Email</th> -->
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        Contact Number</th>
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        action</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                <tr v-for="ed in EmpTableData" :key="ed.id">
+                                                    <td>{{ ed.employee_no }}</td>
+                                                    <td>{{ ed.province }}</td>
+                                                    <td>{{ ed.citymun }}</td>
+                                                    <td>{{ ed.name }}</td>
+                                                    <td>{{ ed.username }}</td>
+                                                    <td>{{ ed.contact_details }}</td>
+                                                    <td> 
+                                                        <button @click="UpdateUser(ed.id)" class="btn btn-icon mr-1"
+                                                            style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                            <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -279,7 +324,7 @@ import axios from 'axios'; // Import axios library to make HTTP requests
 // import employee_table from './app_table.vue';
 
 export default {
-    name: 'Employees_Directory',
+    name: 'User Management',
     components: {
         user_table,
         Navbar,
@@ -293,6 +338,8 @@ export default {
     data() {
         return {
             isCardVisible: false,
+            EmpTableData: [],
+            dataTableInitialized: false,
             options: [
                 { label: 'All', value: 'All' },
                 { label: 'Batangas', value: 'Batangas' },
@@ -356,9 +403,19 @@ export default {
     },
     mounted() {
         this.fetchEmployeeData();
+        // this.fetchUserOfficeCount();
     },
     methods: {
-        createUser(){
+        fetchUserOfficeCount() {
+            axios.get('../../api/fetchUserOfficeCount')
+                .then(response => {
+                    console.log(response.data)
+                })
+                .catch((error) => {
+                    console.error('Error fetching employee data:', error);
+                });
+        },
+        createUser() {
             this.$router.push({ path: `/settings/create` });
         },
         UpdateUser(id) {
@@ -371,46 +428,32 @@ export default {
             const vm = this; // Save Vue instance context
             axios.get('../../api/fetchEmployeeData')
                 .then((response) => {
-                    // Update data table with fetched employee data
-                    console.log(response.data);
-                    $('#employee_table').DataTable({
-                        destroy: true, // Destroy existing DataTable instance
-                        data: response.data,
-                        pageLength: 20,
-                        bLengthChange: false,
-                        bInfo: false,
-                        filter: true,
-                        columns: [
-                            { data: 'employee_no' },
-                            { data: 'pmo_title' },
-                            { data: 'username' },
-                            { data: 'name' },
-                            { data: 'username' },
-                            { data: 'email' },
-                            { data: 'contact_details' },
-                            {
-                                data: null, orderable: false, render: function (data) {
-                                    return '<button type="button" class="btn btn-info btn-update" data-id="' + data.id + '">View</button>';
-                                },
-                            }
-                        ]
-                    });
-
-                    //   $(row).find('.btn-update').on('click', function () {
-                    //   const id = $(this).data('id');
-                    //   vm.UpdateUser(id); // Call the Vue method
-                    // });
-
-                    $('#employee_table tbody').on('click', 'button', function () {
-                        const id = $(this).data('id');
-                        vm.UpdateUser(id);
-                    });
+                    this.EmpTableData = response.data;
+                    this.initializeDataTable();
+                    console.log(response.data)
 
                 })
                 .catch((error) => {
                     console.error('Error fetching employee data:', error);
                 });
-        }
+        },
+        initializeDataTable() {
+            this.$nextTick(() => {
+                if (!this.dataTableInitialized) {
+                    $('#employee_table').DataTable({
+                        retrieve: true,
+                        ordering: true,
+                        paging: true,
+                        pageLength: 20,
+                        bLengthChange: false,
+                        bInfo: false,
+                    });
+                    this.dataTableInitialized = true;
+                } else {
+                    $('#employee_table').DataTable().clear().rows.add(this.EmpTableData).draw();
+                }
+            });
+        },
     },
 
 }

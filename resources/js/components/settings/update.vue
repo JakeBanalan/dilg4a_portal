@@ -85,7 +85,7 @@
                                                 <label for="Position">Position</label>
                                                 <Multiselect :options="Optsposition" track-by="value"
                                                     v-model="data.position_id" :multiple="false" label="label"
-                                                    :searchable="false" placeholder="Position">
+                                                    :searchable="true" placeholder="Position">
                                                 </Multiselect>
                                             </div>
 
@@ -327,12 +327,12 @@ export default {
         // },
         OfficeSelect(arg) {
             console.log(arg)
-            if (arg.value === 1) {
+            if (arg.id === 1) {
                 this.isOfficeDisabled = true;
                 this.isProvinceDisabled = true;
                 this.data.province = '';
                 this.data.citymun = '';
-            } else if (arg.value === 2) {
+            } else if (arg.id === 2) {
                 this.isOfficeDisabled = false;
                 this.isProvinceDisabled = true;
                 this.data.citymun = '';
@@ -404,7 +404,7 @@ export default {
             let data = this.data;
             let province = data.province.value;
             let citymun = data.citymun.value;
-            let office = data.office.value;
+            let office = data.office.id;
             let section = data.section.value;
             let division = data.division.value;
             let employment_status = data.employment_status.value;

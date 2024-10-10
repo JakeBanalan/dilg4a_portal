@@ -12,8 +12,8 @@
                 style="width: 10px; text-align: center;">Full Name</th>
                 <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
                 style="width: 10px; text-align: center;">Username</th>
-                <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
-                style="width: 10px; text-align: center;">Email</th>
+                <!-- <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
+                style="width: 10px; text-align: center;">Email</th> -->
                 <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
                 style="width: 10px; text-align: center;">Contact Number</th>
                 <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"

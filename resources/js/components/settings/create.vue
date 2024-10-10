@@ -162,8 +162,8 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label for="Mobilephone">Email Address</label>
-                                                    <input type="text" class="form-control" id="Mobilephone"
+                                                    <label for="Email">Email Address</label>
+                                                    <input type="text" class="form-control" id="Email"
                                                         v-model="data.email" />
                                                 </div>
                                             </div>
@@ -251,26 +251,26 @@ export default {
             citymun: [],
             office: [],
             division: [
-                { value: 'LGCDD', label: 'Local Government Capacity Development Division' },
-                { value: 'LGMED', label: 'Local Government Monitoring and Evaluation Division' },
-                { value: 'FAD', label: 'Finance and Administrative Division' },
-                { value: 'ORD', label: 'Office of the Regional Director' },
+                { value: 1, label: 'Local Government Monitoring and Evaluation Division' },
+                { value: 2, label: 'Local Government Capacity Development Division' },
+                { value: 3, label: 'Finance and Administrative Division' },
+                { value: 4, label: 'Office of the Regional Director' },
             ],
             section: [
-                { value: 'MBRTG', label: 'Manila Bay Rehabilitation Task Group' },
-                { value: 'PDMU', label: 'Project Development Management Unit' },
-                { value: 'Accounting', label: 'Accounting Section' },
-                { value: 'Budget', label: 'Budget Section' },
-                { value: 'Cash', label: 'Cash Section' },
-                { value: 'HRS', label: 'Human Resources Section' },
-                { value: 'GSS', label: 'General Supplies Section' },
-                { value: 'Records', label: 'Records Section' },
-                { value: 'Planning', label: 'Planning Unit' },
-                { value: 'RICTU', label: 'Regional Information and Communication Technology Unit' },
-                { value: 'LGMES', label: 'Local Government Monitoring and Evaluation Section' },
-                { value: 'LGCDS', label: 'Local Government Capacity Development Section' },
-                { value: 'FAS', label: 'Finance and Administrative Section' },
-                { value: 'OPD', label: 'Office of the Provincial Director' },
+                { value: 1, label: 'Manila Bay Rehabilitation Task Group' },
+                { value: 2, label: 'Project Development Management Unit' },
+                { value: 3, label: 'Accounting Section' },
+                { value: 4, label: 'Budget Section' },
+                { value: 5, label: 'Cash Section' },
+                { value: 6, label: 'Human Resources Section' },
+                { value: 7, label: 'General Supplies Section' },
+                { value: 8, label: 'Records Section' },
+                { value: 9, label: 'Planning Unit' },
+                { value: 10, label: 'Regional Information and Communication Technology Unit' },
+                { value: 11, label: 'Local Government Monitoring and Evaluation Section' },
+                { value: 12, label: 'Local Government Capacity Development Section' },
+                { value: 13, label: 'Finance and Administrative Section' },
+                { value: 14, label: 'Office of the Provincial Director' },
             ],
             gender_opts: [
                 { value: 'M', label: 'Male' },
@@ -305,10 +305,12 @@ export default {
             let section = data.section.value;
             let division = data.division.value;
             let employment_status = data.employment_status.value;
+            let gender = data.gender.value;
+            let position_id = data.position_id.value;
             axios.post(`../../api/PostUser`,
                 {
                     employee_no: data.employee_no,
-                    position_id: data.position_id.value,
+                    position_id: position_id,
                     province: province,
                     citymun: citymun,
                     office: office,
@@ -320,7 +322,7 @@ export default {
                     last_name: data.last_name,
                     ext_name: data.ext_name,
                     birthdate: data.birthdate,
-                    gender: data.gender.value,
+                    gender: gender,
                     contact_details: data.contact_details,
                     email: data.email,
                     username: data.username,

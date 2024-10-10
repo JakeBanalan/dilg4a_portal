@@ -78,7 +78,7 @@ export default {
             selected_year: null,
             options: [
                 { label: 'PML', value: 1 },
-                // { label: 'PSL', value: 2 },
+                 { label: 'PSL', value: 2 },
             ],
             quarter: [
                 { label: '1st Quarter', value: 1 },

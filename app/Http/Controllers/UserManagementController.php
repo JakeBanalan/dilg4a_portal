@@ -31,32 +31,32 @@ class UserManagementController extends Controller
             users.first_name as first_name,
             users.last_name as last_name,
             users.middle_name as middle_name,
-            pmo.pmo_title,
+            pmo.pmo_title as pmo_title,
             pmo.id as pmo_id,
-            pmo.pmo_title,
-            tblposition.position_title,
+            tblposition.position_title as position_title,
             users.email as email,
-            users.ext_name,
-            users.gender,
-            users.birthdate,
-            users.contact_details,
-            users.employment_status,
-            users.code,
-            users.user_role,
-            users.username,
-            users.password,
-            CONCAT(users.first_name," ",users.middle_name," ", users.last_name)  as name
-            ')
+            users.ext_name as ext_name,
+            users.gender as gender,
+            users.birthdate as birthdate,
+            users.contact_details as contact_details,
+            users.employment_status as employment_status,
+            users.code as code,
+            users.user_role as user_role,
+            users.username as username,
+            users.password as password,
+            tbl_province.province as province,
+            tbl_office.office as office,
+            tbl_citymun.citymun as citymun,
+            CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name
+        ')
             ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id');
+            ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id')
+            ->leftJoin('tbl_province', 'tbl_province.id', '=', 'users.province')
+            ->leftJoin('tbl_office', 'tbl_office.id', '=', 'users.office')
+            ->leftJoin('tbl_citymun', 'tbl_citymun.id', '=', 'users.citymun');
 
+        $userData = $query->get();
 
-
-        // Optionally, you can print the SQL query to check
-        // dd($query->toSql());
-
-        // Execute the query and return the result
-        $userData = $query->get(); // Use first() instead of get() to retrieve a single result
         return response()->json($userData);
     }
 
@@ -111,12 +111,12 @@ class UserManagementController extends Controller
         $PostUser = new UserModel([
             'id'                   => null,
             'pmo_id' => 1,
-            'employee_no' => $request->employee_no,
+            'employee_no'           => $request->employee_no,
             'position_id'             => $request->position_id,
             'province'               => $request->province,
             'citymun'               => $request->citymun,
             'office'              => $request->office,
-            'section'        => $request->section,
+            'section'               => $request->section,
             'division'              => $request->division,
             'employment_status'      => $request->employment_status,
             'first_name'           => $request->first_name,
@@ -124,15 +124,15 @@ class UserManagementController extends Controller
             'last_name'         => $request->last_name,
             'ext_name'         => $request->ext_name,
             'birthdate'         => $request->birthdate,
-            'gender'         => $request->gender,
+            'gender'            => $request->gender,
             'contact_details'         => $request->contact_details,
-            'email'         => $request->email,
+            'email'             => $request->email,
             'username'         => $request->username,
             'password'         => $hashedPassword,
             'is_activated'         => 'Yes',
             'user_role'         => 'user',
         ]);
-        // dd($postQP);
+        // dd($PostUser);
         $PostUser->save();
         // return response()->json($PostUser);
     }
@@ -176,4 +176,14 @@ class UserManagementController extends Controller
         return response()->json($data);
     }
 
+    public function fetchUserOfficeCount()
+    {
+        $query = UserModel::selectRaw('
+        users.office, COUNT(*) as office_count')
+            ->leftJoin('tbl_office as o', 'o.id', '=', 'users.office')
+            ->whereNull('users.office')
+            ->groupBy('o.id');
+        $data = $query->get();
+        return response()->json($data);
+    }
 }

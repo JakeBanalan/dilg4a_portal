@@ -1059,7 +1059,7 @@
         },
         {
             path: '/settings/user-management',
-            name: 'Settings',
+            name: 'User Management',
             component: settingPanel,
               meta: {
                 requiresAuth: true

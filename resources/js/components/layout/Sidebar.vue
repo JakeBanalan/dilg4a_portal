@@ -303,7 +303,7 @@ export default {
                 },
                  {
                      link: '/settings/user-management/',
-                     name: 'Settings',
+                     name: 'User Management',
                      tooltip: 'Setings',
                      icon: 'gear',
                      class: 'menu-icon-custom',
