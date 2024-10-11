@@ -101,6 +101,11 @@ img {
                                             <div class="col-lg-12 mt-4">
                                                 <TextInput label="Requested By:" iconValue="user"
                                                     v-model="userData.name" :value="userData.name" :readonly="true" />
+                                                <!-- <Multiselect @update:modelValue="fetchUserData" :options="request_by"
+                                                    track-by="value" v-model="form.request_by" :multiple="false"
+                                                    label="label" :searchable="false" id="request_by"
+                                                    placeholder="Select Name">
+                                                </Multiselect> -->
                                             </div>
                                             <div class="col-lg-12">
                                                 <TextInput label="Office/Service/Bureau/Section/Division/Unit:"
@@ -382,14 +387,24 @@ export default {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
     },
+    created(){
+        // this.fetchUserData()
+    },
     methods: {
-        // async fetchUsers() {
-        //     try {
-        //         const response = await axios.get('/api/getAllUsers');
-        //         this.users = response.data;
-        //     } catch (error) {
-        //         console.error(error);
-        //     }
+        // fetchUserData() {
+        //     axios.get('/api/fetchUserData')
+        //         .then(response => {
+        //             // console.log(response.data)
+        //             this.qp_code = response.data.map(qp_code => ({
+        //                 label: qp_code.qp_code,
+        //                 value: qp_code.id
+        //             }))
+        //             // this.QualityProcedure = response.data
+        //             // console.log(this.QualityProcedure)
+        //         })
+        //         .catch(error => {
+        //             console.error('Error Fetching items:', error)
+        //         })
         // },
         formatTime(time) {
             if (!time) return '';
