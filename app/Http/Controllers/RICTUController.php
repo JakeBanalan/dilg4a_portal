@@ -276,8 +276,6 @@ class RICTUController extends Controller
         CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
         users.username
     ')
-            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
             ->where('users.id', $userId)
             ->first();
 

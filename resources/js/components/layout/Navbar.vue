@@ -160,7 +160,7 @@ export default {
                     else if (this.userRole === 'user') {
                         // User subscribes to their own channels
                         this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
-                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received by the Admin!', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
+                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received by the RICTU Personel', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
                     }
                     this.loading = false; // Set loading to false after fetching data
                 })
@@ -214,6 +214,14 @@ export default {
 
                     // Display toast notification for admins with sender's name
                     this.showAlert(`${notificationTitle} from ${data.name}`);
+                    // Display desktop notification
+                    if (Notification.permission === 'granted') {
+                        new Notification(`${notificationTitle} from ${data.name}`, {
+                            icon: iconClass,
+                            body: `${notificationTitle} from ${data.name}`,
+                            tag: data.id
+                        });
+                    }
                 }
                 else if (this.userRole === 'user') {
                     // Only push notification to the user who sent the request
@@ -227,6 +235,14 @@ export default {
                             redirectUrl: redirectUrl // Add the URL for redirection
                         });
                         this.showAlert(notificationTitle);
+                        // Display desktop notification
+                        if (Notification.permission === 'granted') {
+                            new Notification(notificationTitle, {
+                                icon: iconClass,
+                                body: notificationTitle,
+                                tag: data.id
+                            });
+                        }
                     }
                 }
             });

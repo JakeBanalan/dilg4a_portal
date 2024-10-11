@@ -37,8 +37,6 @@ class CRUDController extends Controller
         CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
         users.username
     ')
-            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
             ->where('users.id', $userId)
             ->first();
 
@@ -62,7 +60,7 @@ class CRUDController extends Controller
         // Define the data to send with the notification
         $data = [
             'ict_options' => $req->input('ict_options'),
-            'requester_id' => $userId // Add the requester ID to the notification data
+            'requester_id' => $userId 
         ];
 
         // Trigger the event
@@ -90,8 +88,6 @@ class CRUDController extends Controller
             CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
             users.username
         ')
-            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
             ->where('users.id', $userId)
             ->first();
 
@@ -115,7 +111,7 @@ class CRUDController extends Controller
         // Define the data to send with the notification
         $data = [
             'ict_options' => $request->input('ict_options'),
-            'requester_id' => $userId // Add the requester ID to the notification data
+            'requester_id' => $userId
         ];
 
         // Trigger the event
