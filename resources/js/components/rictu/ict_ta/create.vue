@@ -101,7 +101,7 @@ img {
                                             <div class="col-lg-12 mt-4">
                                                 <TextInput label="Requested By:" iconValue="user"
                                                     v-model="userData.name" :value="userData.name" :readonly="true" />
-                                                <!-- <Multiselect @update:modelValue="fetchUserData" :options="request_by"
+                                                <!-- <Multiselect @update:modelValue="PostUserRequestID" :options="request_by"
                                                     track-by="value" v-model="form.request_by" :multiple="false"
                                                     label="label" :searchable="false" id="request_by"
                                                     placeholder="Select Name">
@@ -388,11 +388,11 @@ export default {
         this.fetchEndUserInfo();
     },
     created(){
-        // this.fetchUserData()
+        // this.PostUserRequestID()
     },
     methods: {
-        // fetchUserData() {
-        //     axios.get('/api/fetchUserData')
+        // PostUserRequestID() {
+        //     axios.get('/api/PostUserRequestID')
         //         .then(response => {
         //             // console.log(response.data)
         //             this.qp_code = response.data.map(qp_code => ({
