@@ -518,37 +518,69 @@ export default {
             });
         },
         // Login component
+        // Method for handling login submission
         loginUser() {
             axios
                 .post('/api/login', this.form)
                 .then(response => {
                     if (response.data.status) {
-                        //this code is to make user id accessible globally
+                        // Storing user details in localStorage for global access
                         localStorage.setItem('userId', response.data.userId);
                         localStorage.setItem('user_role', response.data.user_role);
                         localStorage.setItem('api_token', response.data.api_token);
                         localStorage.setItem('isUpdatedPassword', response.data.isUpdatedPassword);
                         console.log(response.data.isUpdatedPassword);
 
+                        // Showing success notification
                         this.showSuccessNotification('You are logged in');
+
+                        // Request notification permission
+                        this.requestNotificationPermission();
+
+                        // Redirect to dashboard after 1 second
                         setTimeout(() => {
                             this.$router.push({ name: 'Dashboard' });
                         }, 1000);
                     } else {
                         this.showFailedNotification('Login Failed');
-                        // Handle login failure, show error message, etc.
                     }
                 })
                 .catch(error => {
                     if (error.response && error.response.data) {
-                        // Server returned an error response
+                        // Display server-side errors
                         this.errors = error.response.data.errors;
                     } else {
-                        // Error occurred during the request
+                        // Log any other errors
                         console.log(error);
                     }
                 });
-
+        },
+        // Method to request notification permission
+        requestNotificationPermission() {
+            if (Notification.permission === 'granted') {
+                // Permission already granted, notifications can be shown
+                console.log('Notification permission already granted.');
+            } else if (Notification.permission !== 'denied') {
+                // Request notification permission from the user
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted.');
+                        // Optional: Show a welcome notification
+                        new Notification('Welcome!', { body: 'You are now logged in.' });
+                    } else {
+                        console.log('Notification permission denied.');
+                    }
+                });
+            }
+        },
+        // Placeholder methods for showing notifications (replace with actual logic)
+        showSuccessNotification(message) {
+            console.log('Success: ' + message);
+            // Use your notification system, like SweetAlert or Toast, here
+        },
+        showFailedNotification(message) {
+            console.log('Failed: ' + message);
+            // Use your notification system, like SweetAlert or Toast, here
         },
 
         // renderDetailedReportChart() {
