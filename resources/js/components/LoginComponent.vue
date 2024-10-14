@@ -11,17 +11,18 @@
                     </button>
                     <div class="collapse navbar-collapse pull-right" :class="{ 'show': isNavbarOpen }"
                         id="navbarCollapse">
-                        <form  @submit.prevent="loginUser">
+                        <form @submit.prevent="loginUser">
                             <div class="form-group">
                                 <input type="text" v-model="form.username" class="form-control form-control-lg"
                                     id="exampleInputEmail1" placeholder="Username" style="font-family:'Poppins'">
                             </div>
                             <div class="form-group ml-2">
                                 <input type="password" v-model="form.password" class="form-control form-control-lg"
-                                    id="exampleInputPassword1" placeholder="Password" style="font-family:'Poppins';height: 40px;">
+                                    id="exampleInputPassword1" placeholder="Password"
+                                    style="font-family:'Poppins';height: 40px;">
                             </div>
                             <div>
-                                <button type="submit" class="btn_submit" >SIGN IN</button>
+                                <button type="submit" class="btn_submit">SIGN IN</button>
                             </div>
                         </form>
                     </div>
@@ -40,7 +41,7 @@
                             style="top:-40px !important;margin-left:265px;">
                             ONLINE PORTAL
                         </button>
-                        
+
                     </div>
                 </div>
             </div>
@@ -235,15 +236,13 @@
                 </div>
             </div>
         </section> -->
-    
-        
+
+
     </div>
-    
+
 </template>
 
 <style>
-
-
 nav form {
     display: flex;
 }
@@ -342,36 +341,46 @@ nav input[type="submit"] {
 }
 
 
-    @keyframes blink {
-        0% {
-            background-color: #fff; /* Initial background color */
-            color: #059886; /* Initial text color */
-        }
-        50% {
-            background-color: #059886; /* Blinking color */
-            color: #fff; /* White text color */
-        }
-        100% {
-            background-color: #fff; /* Return to initial background color */
-            color: #059886; /* Return to initial text color */
-        }
+@keyframes blink {
+    0% {
+        background-color: #fff;
+        /* Initial background color */
+        color: #059886;
+        /* Initial text color */
     }
 
-    .blinking_btn {
-        animation: blink 1s infinite; /* Blink animation */
+    50% {
+        background-color: #059886;
+        /* Blinking color */
+        color: #fff;
+        /* White text color */
     }
 
-.btn_submit{
+    100% {
+        background-color: #fff;
+        /* Return to initial background color */
+        color: #059886;
+        /* Return to initial text color */
+    }
+}
+
+.blinking_btn {
+    animation: blink 1s infinite;
+    /* Blink animation */
+}
+
+.btn_submit {
     color: #fff;
     background-color: #059886;
     border-color: #059886;
-    margin-left:10px;
+    margin-left: 10px;
     line-height: 1;
     font-weight: 400;
     height: 40px;
     border-radius: 5px;
     font-family: 'Poppins';
 }
+
 .programs {
     color: #05155e;
     text-align: center;
@@ -519,7 +528,7 @@ export default {
                         localStorage.setItem('user_role', response.data.user_role);
                         localStorage.setItem('api_token', response.data.api_token);
                         localStorage.setItem('isUpdatedPassword', response.data.isUpdatedPassword);
-console.log(response.data.isUpdatedPassword);
+                        console.log(response.data.isUpdatedPassword);
 
                         this.showSuccessNotification('You are logged in');
                         setTimeout(() => {
@@ -539,6 +548,7 @@ console.log(response.data.isUpdatedPassword);
                         console.log(error);
                     }
                 });
+
         },
 
         // renderDetailedReportChart() {
