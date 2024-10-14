@@ -518,7 +518,6 @@ export default {
             });
         },
         // Login component
-        // Method for handling login submission
         loginUser() {
             axios
                 .post('/api/login', this.form)
@@ -572,15 +571,6 @@ export default {
                     }
                 });
             }
-        },
-        // Placeholder methods for showing notifications (replace with actual logic)
-        showSuccessNotification(message) {
-            console.log('Success: ' + message);
-            // Use your notification system, like SweetAlert or Toast, here
-        },
-        showFailedNotification(message) {
-            console.log('Failed: ' + message);
-            // Use your notification system, like SweetAlert or Toast, here
         },
 
         // renderDetailedReportChart() {
