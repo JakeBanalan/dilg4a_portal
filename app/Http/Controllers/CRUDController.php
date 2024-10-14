@@ -30,9 +30,11 @@ class CRUDController extends Controller
                 'status_id' => self::STATUS_COMPLETED
             ]);
 
-        // Fetch the user's full name from the database
+
+        // Fetch the users ID from the database
         $userId = RICTUModel::where('id', $req->input('id'))->first()->request_by;
-        // Fetch the receiver's full name from the database
+
+        // Fetch the receiver's full name and id from the database
         $receiverId = RICTUModel::where('id', $req->input('id'))->first()->assign_ict_officer;
         $receiver = UserModel::selectRaw('
      users.id as id,
@@ -40,6 +42,7 @@ class CRUDController extends Controller
      users.username')
             ->where('users.id', $receiverId)
             ->first();
+
         // Send notification via Pusher
         $options = [
             'cluster' => env('PUSHER_APP_CLUSTER'),
@@ -54,7 +57,6 @@ class CRUDController extends Controller
         );
 
         $data = [
-            'ict_options' => $req->input('ict_options'),
             'requester_id' => $userId,
             'receiverName' => $receiver->receiverName,
         ];
@@ -104,7 +106,6 @@ class CRUDController extends Controller
 
         // Define the data to send with the notification
         $data = [
-            'ict_options' => $request->input('ict_options'),
             'requester_id' => $userId,
             'receiverName' => $receiver->receiverName,
         ];
