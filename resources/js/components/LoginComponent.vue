@@ -563,7 +563,6 @@ export default {
                 // Request notification permission from the user
                 Notification.requestPermission().then(permission => {
                     if (permission === 'granted') {
-                        console.log('Notification permission granted.');
                         // Optional: Show a welcome notification
                         new Notification('Welcome!', { body: 'You are now logged in.' });
                     } else {
