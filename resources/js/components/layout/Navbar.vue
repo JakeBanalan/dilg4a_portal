@@ -148,7 +148,7 @@ export default {
                     this.userRole = response.data.user_role;
 
                     // Initialize Pusher
-                    var pusher = new Pusher('29d53f8816252d29de52', {
+                    var pusher = new Pusher('ab9564fd50f2d6d9e627', {
                         cluster: 'ap1'
                     });
 
@@ -160,7 +160,7 @@ export default {
                     else if (this.userRole === 'user') {
                         // User subscribes to their own channels
                         this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
-                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received by the RICTU Personel', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
+                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
                     }
                     this.loading = false; // Set loading to false after fetching data
                 })
@@ -218,7 +218,6 @@ export default {
                     if (Notification.permission === 'granted') {
                         new Notification(`${notificationTitle} from ${data.name}`, {
                             icon: iconClass,
-                            body: `${notificationTitle} from ${data.name}`,
                             tag: data.id
                         });
                     }
@@ -228,18 +227,17 @@ export default {
                     if (data.requester_id === this.userId) {
                         this.notifications.push({
                             id: data.id,
-                            title: notificationTitle,
+                            title: `${notificationTitle} by ${data.receiverName}`,
                             iconColor: iconColor,
                             icon: iconClass,
                             time: new Date().toLocaleString(),
                             redirectUrl: redirectUrl // Add the URL for redirection
                         });
-                        this.showAlert(notificationTitle);
+                        this.showAlert(`${notificationTitle} by ${data.receiverName}`);
                         // Display desktop notification
                         if (Notification.permission === 'granted') {
-                            new Notification(notificationTitle, {
+                            new Notification(`${notificationTitle} by ${data.receiverName}`, {
                                 icon: iconClass,
-                                body: notificationTitle,
                                 tag: data.id
                             });
                         }

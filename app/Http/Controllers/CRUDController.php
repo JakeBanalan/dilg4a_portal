@@ -32,18 +32,14 @@ class CRUDController extends Controller
 
         // Fetch the user's full name from the database
         $userId = RICTUModel::where('id', $req->input('id'))->first()->request_by;
-        $user = UserModel::selectRaw('
-        users.id as id,
-        CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
-        users.username
-    ')
-            ->where('users.id', $userId)
+        // Fetch the receiver's full name from the database
+        $receiverId = RICTUModel::where('id', $req->input('id'))->first()->assign_ict_officer;
+        $receiver = UserModel::selectRaw('
+     users.id as id,
+     CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as receiverName,
+     users.username')
+            ->where('users.id', $receiverId)
             ->first();
-
-        if (!$user) {
-            return response()->json(['error' => 'User  not found'], 404);
-        }
-
         // Send notification via Pusher
         $options = [
             'cluster' => env('PUSHER_APP_CLUSTER'),
@@ -57,10 +53,10 @@ class CRUDController extends Controller
             $options
         );
 
-        // Define the data to send with the notification
         $data = [
             'ict_options' => $req->input('ict_options'),
-            'requester_id' => $userId 
+            'requester_id' => $userId,
+            'receiverName' => $receiver->receiverName,
         ];
 
         // Trigger the event
@@ -83,17 +79,15 @@ class CRUDController extends Controller
 
         // Fetch the user's full name from the database
         $userId = RICTUModel::where('id', $request->input('control_no_id'))->first()->request_by;
-        $user = UserModel::selectRaw('
-            users.id as id,
-            CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
-            users.username
-        ')
-            ->where('users.id', $userId)
+        // Fetch the receiver's full name from the database
+        $receiverId = RICTUModel::where('id', $request->input('control_no_id'))->first()->assign_ict_officer;
+        $receiver = UserModel::selectRaw('
+        users.id as id,
+        CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as receiverName,
+        users.username')
+            ->where('users.id', $receiverId)
             ->first();
 
-        if (!$user) {
-            return response()->json(['error' => 'User  not found'], 404);
-        }
 
         // Send notification via Pusher
         $options = [
@@ -111,7 +105,8 @@ class CRUDController extends Controller
         // Define the data to send with the notification
         $data = [
             'ict_options' => $request->input('ict_options'),
-            'requester_id' => $userId
+            'requester_id' => $userId,
+            'receiverName' => $receiver->receiverName,
         ];
 
         // Trigger the event
