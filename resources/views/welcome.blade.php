@@ -47,7 +47,7 @@
     <script src="{{ asset('vendors/datatablesnet-bs4/dataTables-bootstrap4.js') }}"></script>
     <script src="{{ asset('js/dataTables.select.min.js') }}"></script>
     <script src="{{ asset('js/Chart.roundedBarCharts.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}" async></script>
     <script src="{{ asset('js/chart.js') }}"></script>
     <script src="{{ asset('js/off-canvas.js') }}"></script>
     <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
