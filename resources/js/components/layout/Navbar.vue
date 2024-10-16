@@ -129,7 +129,8 @@ export default {
             username: '',
             userRole: '',
             userId: '',
-            loading: true // Add a loading state
+            loading: true,
+            pusher: null,
         }
     },
     created() {
@@ -152,10 +153,24 @@ export default {
                         cluster: 'ap1'
                     });
 
+
                     // Subscribe to the appropriate channel based on user role
                     if (this.userRole === 'admin') {
                         // Admin subscribes to the new TA request channel
                         this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index');
+
+                        // Function to subscribe to a channel and bind an event
+                        const subscribeAndBind = (channelName, eventName) => {
+                            const channel = pusher.subscribe(channelName);
+                            channel.bind(eventName, (data) => {
+                                // Refresh the page or update the UI accordingly
+                                window.location.reload();
+                            });
+                        };
+
+                        // Admin subscribes to the received-ta-channel and completed-ta-channel
+                        subscribeAndBind('received-ta-channel', 'received-ict-ta');
+                        subscribeAndBind('completed-ta-channel', 'completed-ict-ta');
                     }
                     else if (this.userRole === 'user') {
                         // User subscribes to their own channels
