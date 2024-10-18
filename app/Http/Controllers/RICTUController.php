@@ -48,7 +48,6 @@ class RICTUController extends Controller
                 ->get()
         );
     }
-    // In your Laravel controller
     public function getUserData()
     {
         // Get the currently logged-in user's data
@@ -78,11 +77,11 @@ class RICTUController extends Controller
             tbl_technicalassistance.control_no AS control_no,
             CONCAT(u.first_name," ",u.last_name) AS requested_by,
             u.user_role as role,
-            tbl_technicalassistance.request_date AS requested_date,
-            time(tbl_technicalassistance.request_date) AS requested_time,
-            MONTH(tbl_technicalassistance.request_date) AS month,
-            YEAR(tbl_technicalassistance.request_date) AS YEAR,
-            tbl_technicalassistance.received_date AS received_date,
+            tbl_technicalassistance.started_date AS started_date,
+            time(tbl_technicalassistance.started_date) AS started_time,
+            MONTH(tbl_technicalassistance.started_date) AS month,
+            YEAR(tbl_technicalassistance.started_date) AS YEAR,
+            tbl_technicalassistance.started_date AS started_date,
             tbl_technicalassistance.completed_date AS completed_date,
             tbl_technicalassistance.remarks AS remarks,
              tbl_technicalassistance.ict_officer_remarks AS ict_officer_remarks,
@@ -121,11 +120,11 @@ class RICTUController extends Controller
                 tbl_technicalassistance.control_no AS control_no,
                 CONCAT(u.first_name," ",u.last_name) AS requested_by,
                 u.user_role as role,
-                tbl_technicalassistance.request_date AS requested_date,
-                time(tbl_technicalassistance.request_date) AS requested_time,
-                MONTH(tbl_technicalassistance.request_date) AS month,
-                YEAR(tbl_technicalassistance.request_date) AS YEAR,
-                tbl_technicalassistance.received_date AS received_date,
+                tbl_technicalassistance.started_date AS started_date,
+                time(tbl_technicalassistance.started_date) AS started_time,
+                MONTH(tbl_technicalassistance.started_date) AS month,
+                YEAR(tbl_technicalassistance.started_date) AS YEAR,
+                tbl_technicalassistance.started_date AS started_date,
                 tbl_technicalassistance.completed_date AS completed_date,
                 tbl_technicalassistance.remarks AS remarks,
                 cl.link AS css_link,
@@ -151,11 +150,11 @@ class RICTUController extends Controller
             tbl_technicalassistance.control_no AS control_no,
             u.username AS requested_by,
             u.user_role as role,
-            tbl_technicalassistance.request_date AS requested_date,
-            time(tbl_technicalassistance.request_date) AS requested_time,
-            MONTH(tbl_technicalassistance.request_date) AS month,
-            YEAR(tbl_technicalassistance.request_date) AS YEAR,
-            tbl_technicalassistance.received_date AS received_date,
+            tbl_technicalassistance.started_date AS requested_date,
+            time(tbl_technicalassistance.started_date) AS requested_time,
+            MONTH(tbl_technicalassistance.started_date) AS month,
+            YEAR(tbl_technicalassistance.started_date) AS YEAR,
+            tbl_technicalassistance.started_date AS received_date,
             tbl_technicalassistance.completed_date AS completed_date,
             tbl_technicalassistance.remarks AS remarks,
             cl.link AS css_link,
@@ -186,6 +185,7 @@ class RICTUController extends Controller
         $page = $request->query('page');
         $itemsPerPage = $request->query('itemsPerPage', 500);
 
+
         if ($status == 6) {
 
             $ictQuery = RICTUModel::select(RICTUModel::raw('
@@ -193,11 +193,11 @@ class RICTUController extends Controller
                 tbl_technicalassistance.control_no AS control_no,
                 CONCAT(u.first_name," ",u.last_name) AS requested_by,
                 u.user_role as role,
-                tbl_technicalassistance.request_date AS requested_date,
-                time(tbl_technicalassistance.request_date) AS requested_time,
-                MONTH(tbl_technicalassistance.request_date) AS month,
-                YEAR(tbl_technicalassistance.request_date) AS YEAR,
-                tbl_technicalassistance.received_date AS received_date,
+                tbl_technicalassistance.started_date AS started_date,
+                time(tbl_technicalassistance.started_date) AS requested_time,
+                MONTH(tbl_technicalassistance.started_date) AS month,
+                YEAR(tbl_technicalassistance.started_date) AS YEAR,
+                tbl_technicalassistance.started_date AS started_date,
                 tbl_technicalassistance.completed_date AS completed_date,
                 tbl_technicalassistance.remarks AS remarks,
                 cl.link AS css_link,
@@ -224,11 +224,11 @@ class RICTUController extends Controller
             tbl_technicalassistance.control_no AS control_no,
             u.username AS requested_by,
             u.user_role as role,
-            tbl_technicalassistance.request_date AS requested_date,
-            time(tbl_technicalassistance.request_date) AS requested_time,
-            MONTH(tbl_technicalassistance.request_date) AS month,
-            YEAR(tbl_technicalassistance.request_date) AS YEAR,
-            tbl_technicalassistance.received_date AS received_date,
+            tbl_technicalassistance.started_date AS requested_date,
+            time(tbl_technicalassistance.started_date) AS requested_time,
+            MONTH(tbl_technicalassistance.started_date) AS month,
+            YEAR(tbl_technicalassistance.started_date) AS YEAR,
+            tbl_technicalassistance.started_date AS started_date,
             tbl_technicalassistance.completed_date AS completed_date,
             tbl_technicalassistance.remarks AS remarks,
             cl.link AS css_link,

@@ -128,8 +128,8 @@ th {
                         <td v-else> ~ </td>
                     </template>
 
-                    <td> {{ formatDate(ict_data.received_date) }}</td>
-                    <td> {{ formatTime(ict_data.received_date) }}</td>
+                    <td> {{ formatDate(ict_data.started_date) }}</td>
+                    <td> {{ formatTime(ict_data.started_date) }}</td>
                     <td>{{ ict_data.requested_by }}</td>
                     <td>{{ ict_data.office }}</td>
                     <td>{{ ict_data.ict_personnel }}</td>
@@ -182,6 +182,7 @@ export default {
             requested_by: null,
             office: null,
             request_date: null,
+            started_date: null,
             request_type: null,
             sub_request_type: null,
             surveyLinkDisabled: false // New property to track the disabled state
@@ -292,7 +293,7 @@ export default {
                     this.control_no = response.data.control_no
                     this.requested_by = response.data.requested_by
                     this.office = response.data.office
-                    this.request_date = response.data.request_date
+                    this.started_date = response.data.started_date
                     this.request_type = response.data.request_type
                     this.sub_request_type = response.data.sub_request_type
                 })
