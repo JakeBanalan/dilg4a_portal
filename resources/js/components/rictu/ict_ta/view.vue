@@ -75,8 +75,8 @@
                                         </div>
                                         <div class="col-lg-6">
                                             <TextInput label="Requested Time" iconValue="calendar" type="text"
-                                                style="height: 40px !important;" v-model="data.requested_time"
-                                                :value="data.requested_time" disabled />
+                                                style="height: 40px !important;" v-model="data.started_time"
+                                                :value="data.started_time" disabled />
                                         </div>
                                        
                                         <div class="col-lg-12 mt-4">

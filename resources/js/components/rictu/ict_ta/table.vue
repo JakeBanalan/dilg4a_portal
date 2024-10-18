@@ -103,7 +103,7 @@ th {
                     <td>
                         <b>{{ ict_data.control_no }}</b>
                         <br>
-                        <i>~Request Date: {{ formatDate(ict_data.requested_date) }}</i>~
+                        <i>~Request Date: {{ formatDate(ict_data.request_date) }}</i>~
                     </td>
                     <td style="white-space:normal;">{{ ict_data.remarks }}</td>
                     <!-- USER SURVEY LINK -->
@@ -294,6 +294,7 @@ export default {
                     this.requested_by = response.data.requested_by
                     this.office = response.data.office
                     this.started_date = response.data.started_date
+                    this.request_date = response.data.request_date
                     this.request_type = response.data.request_type
                     this.sub_request_type = response.data.sub_request_type
                 })
