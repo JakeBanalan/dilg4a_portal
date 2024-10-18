@@ -124,16 +124,10 @@ h5 {
                                                 @click="openModal()" v-if="this.role == 'admin'">
                                                 Generate Report
                                             </button>
-                                            <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
-                                                <router-link class="router-class" style="color:#059886;"
-                                                    :to="{ name: 'Create ICT Technical Assistance' }">
-                                                    Create Request
-                                                </router-link>
-                                            </button> -->
-                                            <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
                                                 @click="toggleCard()">
                                                 Advanced Search
-                                            </button> -->
+                                            </button>
                                         </div>
                                     </div>
 
@@ -217,14 +211,6 @@ export default {
         filter() {
             const status = this.selected_status.value;
             this.$refs.ICTTable.load_ict_request(status);
-
-            // axios.get(`../../api/fetch_ict_request/${status}`)
-            //     .then(response => {
-            //         this.ict_data = response.data.data;
-            //     })
-            //     .catch(error => {
-            //         console.error('Error fetching data:', error);
-            //     });
         },
     },
     components: {
