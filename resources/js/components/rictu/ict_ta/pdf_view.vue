@@ -1192,7 +1192,7 @@ input.largerCheckbox {
                             :checked="isChecked(data.req_id, 'OTHERS (please specify)')" @change="toggleOthers">
                         <b>OTHERS (please specify)</b>
                     </p>
-                    <p v-if="isChecked(data.req_id, 'OTHERS (please specify)')">{{ data.others }}</p>
+                    <p v-if="isChecked(data.req_id, 'OTHERS (please specify)')" style="font-family: 'Cambria'; font-size: 13pt; text-transform: capitalize;">{{ data.others }}</p>
 
                 </div>
             </div>
