@@ -133,7 +133,7 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('/totalCountICTRequest/{year}', [RICTUController::class, 'totalCountICTrequest']);
+    Route::get('/totalCountICTRequest', [RICTUController::class, 'totalCountICTrequest']);
 });
 
 Route::middleware('api')->group(function () {

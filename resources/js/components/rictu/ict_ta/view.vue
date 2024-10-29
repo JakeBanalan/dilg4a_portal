@@ -30,16 +30,27 @@
                                     style="background-color: #000;padding:2px;color:#fff;">
                                     <h6 class="box-title">Document Code</h6>
                                 </div>
-                                <div class="box-header with-border"
-                                    style="color:black;padding:2px;text-align:center;">
+                                <div class="box-header with-border" style="color:black;padding:2px;text-align:center;">
                                     <h6 class="box-title">FM-QP-DILG-ISTMS-RO-17-01</h6>
                                 </div>
                                 <div class="box-header with-border"
-                                    style="background-color: #000;padding:2px;color:#fff;">
-                                    <h6 class="box-title" style="text-align: center;">Rev No. Eff. Date Page</h6>
+                                    style="display: flex; align-items: center; height: 30px; background-color: #000;padding:2px;color:#fff;">
+                                    <div style="margin: 0 10px;">Rev No</div>
+                                    <div style="width: 2px; height: 30px; background-color: black; margin: 0 30px;">
+                                    </div>
+                                    <div style="margin: 0 10px;">Eff. Date</div>
+                                    <div style="width: 2px;  height: 30px; background-color: black; margin: 0 30px;">
+                                    </div>
+                                    <div style="margin: 0 10px;">Page</div>
                                 </div>
-                                <div class="box-header with-border" style="background-color:#fff;padding:2px;">
-                                    <h6 class="box-title">00 06.15.21 1 of 1</h6>
+                                <div class="box" style="display: flex; align-items: center; height: 50px;">
+                                    <div style="margin: 0 30px;">01</div>
+                                    <div style="width: 2px; height: 50px; background-color: black; margin: 0 30px;">
+                                    </div>
+                                    <div style="margin: 0 5px;">03.01.23</div>
+                                    <div style="width: 2px; height: 50px; background-color: black; margin: 0 25px;">
+                                    </div>
+                                    <div style="margin: 0 20px;">1 of 1</div>
                                 </div>
 
                             </div>
@@ -55,6 +66,7 @@
 
 
                     </div>
+                    <br>
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="card">
@@ -69,30 +81,30 @@
                                                 :value="data.control_no" :readonly="true" />
                                         </div> -->
                                         <div class="col-lg-6">
-                                            <TextInput label="Requested Date" iconValue="calendar" type="text"
+                                            <TextInput label="Date" iconValue="calendar" type="text"
                                                 style="height: 40px !important;" v-model="data.requested_date"
                                                 :value="formatDate(data.requested_date)" disabled />
                                         </div>
                                         <div class="col-lg-6">
-                                            <TextInput label="Requested Time" iconValue="calendar" type="text"
-                                                style="height: 40px !important;" v-model="data.requested_time"
-                                                :value="data.requested_time" disabled />
+                                            <TextInput label="Time" iconValue="calendar" type="text"
+                                                style="height: 40px !important;" v-model="data.started_time"
+                                                :value="data.started_time" disabled />
                                         </div>
-                                       
+
                                         <div class="col-lg-12 mt-4">
                                             <TextInput label="Requested By" iconValue="user" v-model="data.requested_by"
                                                 :value="data.requested_by" :readonly="true" />
                                         </div>
                                         <div class="col-lg-12">
-                                            <TextInput label="Office/Service/Bureau/Section/Division/Unit:" iconValue="building" :value="data.office"
-                                                :readonly="true" />
+                                            <TextInput label="Office/Service/Bureau/Section/Division/Unit:"
+                                                iconValue="building" :value="data.office" :readonly="true" />
                                         </div>
-                                        
+
                                         <div class="col-lg-12">
                                             <TextInput label="Contact Number/E-mail" iconValue="envelope-open-text"
                                                 :value="data.email" :readonly="true" />
                                         </div>
-                                        
+
                                         <div class="col-lg-12">
                                             <TextInput label="Agreed Timeline if any:" iconValue="check-circle"
                                                 :readonly="false" />
@@ -101,9 +113,6 @@
                                     </div>
                                     <div class="row">
 
-
-                                     
-                                        
                                     </div>
                                 </div>
                             </div>
@@ -123,21 +132,15 @@
                                         </div>
                                         <div class="col-lg-12">
                                             <TextInput disabled label="Brand/Model:" iconValue="copyright"
-                                                v-model="data.brand" :value="data.brand"/>
+                                                v-model="data.brand" :value="data.brand" />
                                         </div>
                                         <div class="col-lg-12">
                                             <TextInput disabled label="Property No:" iconValue="bars"
-                                                v-model="data.property_no" :value="data.property_no"/>
+                                                v-model="data.property_no" :value="data.property_no" />
                                         </div>
                                         <div class="col-lg-12">
                                             <TextInput disabled label="Equipment SN:" iconValue="hashtag"
                                                 v-model="data.serial_no" :value="data.serial_no" />
-                                        </div>
-                                        <div class="col-lg-12">
-                                            <div class="form-group" style="height: 70px;">
-
-
-                                            </div>
                                         </div>
 
                                     </div>
@@ -150,39 +153,41 @@
 
                                     <div class="row">
                                         <div class="col-lg-6 mb-4">
-                                                <TextInput label="Type of Request" iconValue="hashtag"
-                                                v-model="data.request_type" :value="data.request_type"  disabled/>
+                                            <TextInput label="Type of Request" iconValue="hashtag"
+                                                v-model="data.request_type" :value="data.request_type" disabled />
                                         </div>
                                         <div class="col-lg-6 mb-4" v-if="data.req_id == 9">
                                             <TextInput label="Request Category" iconValue="hashtag"
-                                            v-model="data.others"  :value="data.others" disabled />
+                                                v-model="data.others" :value="data.others" disabled />
                                         </div>
                                         <div class="col-lg-6 mb-4" v-else-if="data.req_id = 7">
-                                            
+
                                             <TextInput label="Request Category" iconValue="hashtag"
-                                            v-model="data.sub_request_type"  :value="data.sub_request_type" disabled />
+                                                v-model="data.sub_request_type" :value="data.sub_request_type"
+                                                disabled />
                                             <TextInput label="Web Apps/Website Access" iconValue="hashtag"
-                                            v-model="data.website_access"  :value="data.website_access" disabled />
+                                                v-model="data.website_access" :value="data.website_access" disabled />
                                         </div>
                                         <div class="col-lg-6 mb-4" v-else-if="data.req_id = 4">
-                                            
+
                                             <TextInput label="Request Category" iconValue="hashtag"
-                                            v-model="data.sub_request_type"  :value="data.sub_request_type" disabled />
+                                                v-model="data.sub_request_type" :value="data.sub_request_type"
+                                                disabled />
                                             <TextInput label="Others (please specify):" iconValue="hashtag"
-                                            v-model="data.others"  :value="data.others_software" disabled />
+                                                v-model="data.others" :value="data.others_software" disabled />
                                         </div>
-                                       
+
 
                                         <div class="col-lg-6">
                                             <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
-                                                v-model="remarks" :value="data.remarks"/>
+                                                v-model="remarks" :value="data.remarks" />
                                         </div>
-                                        
+
                                         <div class="col-lg-6">
-                                            <TextAreaInput label="RECOMMENDATION"
-                                                v-model="remarks" :value="data.ict_officer_remarks" />
+                                            <TextAreaInput label="RECOMMENDATION" v-model="remarks"
+                                                :value="data.ict_officer_remarks" />
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>
@@ -199,15 +204,20 @@
 
 
                                         </div>
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-3">
                                             <TextInput disabled label="ICT Technical Personnel " iconValue="user"
                                                 v-model="data.ict_personnel" :value="data.ict_personnel" />
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <TextInput disabled label="Date/Time" iconValue="calendar"
+                                                v-model="data.requested_date"
+                                                :value="formatDateTime(data.requested_date)" />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                       
+
                     </div>
                 </div>
             </div>
@@ -231,7 +241,7 @@ export default {
     name: 'View ICT Form',
     data() {
         return {
-            dilg_logo:logo,
+            dilg_logo: logo,
             accessToken: null,
             remarks: null,
             acceptance: null,
@@ -262,8 +272,8 @@ export default {
                 issue_concern: null,
                 remarks: null,
                 ict_personnel: null,
-                ict_officer_remarks:null,
-                remarks:null
+                ict_officer_remarks: null,
+                remarks: null
             },
 
         }
@@ -290,6 +300,22 @@ export default {
                     month: 'short',
                     day: 'numeric',
 
+                });
+                return formattedDate;
+            }
+        },
+        formatDateTime(date) {
+            if (!date || date === '0000-00-00') {
+                return null; // Return null if the date is null or '0000-00-00'
+            } else {
+                const formattedDate = new Date(date).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true // Change to false for 24-hour format
                 });
                 return formattedDate;
             }

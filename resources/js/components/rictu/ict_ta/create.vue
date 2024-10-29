@@ -57,11 +57,24 @@ img {
                                         <h6 class="box-title">FM-QP-DILG-ISTMS-RO-17-01</h6>
                                     </div>
                                     <div class="box-header with-border"
-                                        style="background-color: #000;padding:2px;color:#fff;">
-                                        <h6 class="box-title" style="text-align: center;">Rev No. Eff. Date Page</h6>
+                                        style="display: flex; align-items: center; height: 30px; background-color: #000;padding:2px;color:#fff;">
+                                        <div style="margin: 0 10px;">Rev No</div>
+                                        <div style="width: 2px; height: 30px; background-color: black; margin: 0 30px;">
+                                        </div>
+                                        <div style="margin: 0 10px;">Eff. Date</div>
+                                        <div
+                                            style="width: 2px;  height: 30px; background-color: black; margin: 0 30px;">
+                                        </div>
+                                        <div style="margin: 0 10px;">Page</div>
                                     </div>
-                                    <div class="box-header with-border" style="background-color:#fff;padding:2px;">
-                                        <h6 class="box-title">00 06.15.21 1 of 1</h6>
+                                    <div class="box" style="display: flex; align-items: center; height: 50px;">
+                                        <div style="margin: 0 30px;">01</div>
+                                        <div style="width: 2px; height: 50px; background-color: black; margin: 0 30px;">
+                                        </div>
+                                        <div style="margin: 0 5px;">03.01.23</div>
+                                        <div style="width: 2px; height: 50px; background-color: black; margin: 0 25px;">
+                                        </div>
+                                        <div style="margin: 0 20px;">1 of 1</div>
                                     </div>
 
                                 </div>
@@ -77,6 +90,7 @@ img {
 
 
                         </div>
+                        <br>
                         <div class="row">
                             <div class="col-lg-6 mt-4">
                                 <div class="card">
@@ -89,7 +103,7 @@ img {
 
                                             <div class="col-lg-6">
                                                 <input type="hidden" v-model="ict_no" />
-                                                <TextInput label="Requested Date:" iconValue="calendar" type="date"
+                                                <TextInput label="Date:" iconValue="calendar" type="date"
                                                     style="height: 40px !important;" v-model="requested_date"
                                                     :readonly="true" :value="requested_date" />
                                             </div>
@@ -205,7 +219,7 @@ img {
                                             </div>
 
                                             <div class="col-lg-12">
-                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS *(REQUIRED): "
+                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
                                                     v-model="remarks" />
                                             </div>
 
@@ -387,7 +401,7 @@ export default {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
     },
-    created(){
+    created() {
         // this.PostUserRequestID()
     },
     methods: {

@@ -24,94 +24,8 @@ h5 {
                     <!-- <BreadCrumbs /> -->
                     <div class="row">
                         <StatBoard />
-
                         <div class="col-lg-12">
-                            <div class="card" v-if="isCardVisible">
-                                <div class="card-body">
-                                    <div class="card-title">
-                                        <h4><font-awesome-icon :icon="['fas', 'search']" />&nbsp;ADVANCED FILTER</h4>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label>Office</label>
-                                                <multiselect v-model="selected_office"
-                                                    deselect-label="Can't remove this value" track-by="value"
-                                                    label="value" placeholder="Select one" :options="options"
-                                                    :searchable="false" :allow-empty="false">
-                                                </multiselect>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <TextInput label="Control Number" iconValue="user-gear"
-                                                v-model="abstract_no" />
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <TextInput label="Requested By" iconValue="user" v-model="abstract_no" />
-                                        </div>
-
-                                        <div class="col-lg-3">
-                                            <TextInput label="Request Type" iconValue="gear" v-model="abstract_no" />
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label>Region</label>
-                                                <multiselect v-model="selected_region"
-                                                    deselect-label="Can't remove this value" track-by="value"
-                                                    label="value" placeholder="Select one" :options="region"
-                                                    :searchable="false" :allow-empty="false">
-                                                </multiselect>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <TextInput style="height:40px" label="Requested Date" iconValue="calendar"
-                                                type="datetime-local" v-model="abstract_no" />
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label>Quarter</label>
-                                                <multiselect v-model="selected_quarter"
-                                                    deselect-label="Can't remove this value" track-by="value"
-                                                    label="value" placeholder="Select one" :options="quarter"
-                                                    :searchable="false" :allow-empty="false">
-                                                </multiselect>
-                                            </div>
-
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label>Status</label>
-                                                <multiselect v-model="selected_status"
-                                                    deselect-label="Can't remove this value" track-by="label"
-                                                    label="label" placeholder="Select one" :options="status"
-                                                    :searchable="false" :allow-empty="false">
-                                                </multiselect>
-                                            </div>
-
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <div class="form-group">
-                                                <label>Province/HUC</label>
-                                                <multiselect v-model="selected_province"
-                                                    deselect-label="Can't remove this value" track-by="value"
-                                                    label="value" placeholder="Select one" :options="province"
-                                                    :searchable="false" :allow-empty="false">
-                                                </multiselect>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <TextInput label="Email" iconValue="envelope" v-model="abstract_no" />
-                                        </div>
-                                    </div>
-
-                                    <button type="button" class="btn btn-outline-primary btn-fw btn-icon-text"
-                                        style="float:right;" @click="filter()">Filter</button>
-                                    <button type="button" class="btn btn-outline-primary btn-fw btn-icon-text mr-3"
-                                        style="float:right;">Clear</button>
-
-                                </div>
-                            </div>
-                            <div class="card mt-4">
+                            <div class="card mt-12">
                                 <div class="card-body">
                                     <div class="card-title d-flex justify-content-between align-items-center">
                                         <h5 class="card-title">
@@ -124,25 +38,67 @@ h5 {
                                                 @click="openModal()" v-if="this.role == 'admin'">
                                                 Generate Report
                                             </button>
-                                            <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
-                                                <router-link class="router-class" style="color:#059886;"
-                                                    :to="{ name: 'Create ICT Technical Assistance' }">
-                                                    Create Request
-                                                </router-link>
-                                            </button> -->
-                                            <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
-                                                @click="toggleCard()">
+                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                                @click="toggleCard()" v-if="this.role == 'admin'">
                                                 Advanced Search
-                                            </button> -->
+                                            </button>
                                         </div>
                                     </div>
 
                                     <div class="table-responsive">
+                                        <div class="card" v-if="isCardVisible">
+                                            <div class="card-body">
+                                                <div class="card-title">
+                                                    <h4><font-awesome-icon :icon="['fas', 'search']" />&nbsp;ADVANCED
+                                                        FILTER</h4>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col-lg-3">
+                                                        <label style="font-size: 0.875rem;">Control No</label>
+                                                        <input type="text" v-model="control_no"
+                                                            placeholder="Control Number" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label style="font-size: 0.875rem;">Request By</label>
+                                                        <input type="text"  v-model="requested_by"
+                                                            placeholder="Requested By" />
+                                                    </div>
+
+                                                    <div class="col-lg-3">
+                                                        <label style="font-size: 0.875rem;">Start Date</label>
+                                                        <input type="date" class="form-control" v-model="start_date" />
+                                                    </div>
+                                                    <div class="col-lg-3">
+                                                        <label style="font-size: 0.875rem;">End Date</label>
+                                                        <input type="date" class="form-control" v-model="end_date" />
+                                                    </div>
+
+                                                    <div class="col-lg-3">
+                                                        <div class="form-group">
+                                                            <label>Status</label>
+                                                            <multiselect v-model="selected_status"
+                                                                deselect-label="Can't remove this value"
+                                                                track-by="value" label="label" placeholder="Select one"
+                                                                :options="status" :searchable="false"
+                                                                :allow-empty="false">
+                                                            </multiselect>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <button type="button"
+                                                    class="btn btn-outline-primary btn-fw btn-icon-text"
+                                                    style="float:right;" @click="filter()">Filter</button>
+                                                <button type="button"
+                                                    class="btn btn-outline-primary btn-fw btn-icon-text mr-3"
+                                                    style="float:right;" @click="resetFilter()">Clear</button>
+                                            </div>
+                                        </div>
                                         <ICTTable ref="ICTTable" />
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -182,22 +138,54 @@ export default {
         return {
             isOnICTTAIndexRoute: false,
             role: null,
-            abstract_no: null,
+            control_no: '',
+            requested_by: '',
             selected: null,
+            start_date: '',
+            end_date: '',
             value: null,
-            selected_quarter: null,
-            selected_office: null,
-            selected_region: null,
+            user_id: null,
+            ict_data: [],
+            currentPage: 1,
+            itemsPerPage: 10,
+            modalVisible: false,
+            selected_id: null,
             selected_status: null,
             selected_province: null,
-            options: [{ label: "ORD", value: "ORD" }, { label: "LGMED", value: "LGMED" }, { label: "LGCDD", value: "LGCDD" }, { label: "FAD", value: "FAD" }],
-            region: [{ label: 'REGION IV-A (CALABARZON)', value: 'REGION IV-A (CALABARZON)' }],
-            province: [{ label: "Cavite", value: "Cavite" }, { label: "Laguna", value: "Laguna" }, { label: "Batangas", value: "Batangas" }, { label: "Rizal", value: "Rizal" }, { label: "Quezon", value: "Quezon" }, { label: "Lucena City", value: "Lucena City" }],
-            quarter: [{ label: '1st Quarter', value: '1st Quarter' }, { label: '2nd Quarter', value: '2nd Quarter' }, { label: '3rd Quarter', value: '3rd Quarter' }, { label: '4th Quarter', value: '4th Quarter' }],
-            status: [{ label: 'All', value: 6 }, { label: 'Draft', value: 1 }, { label: 'Received', value: 2 }, { label: 'Completed', value: 3 }, { label: 'Rated', value: 4 }],
+            request_type: null,
+            email: null,
+            // options: [
+            //     { label: "ORD", value: "ORD" },
+            //     { label: "LGMED", value: "LGMED" },
+            //     { label: "LGCDD", value: "LGCDD" },
+            //     { label: "FAD", value: "FAD" }
+            // ],
+            // region: [
+            //     { label: 'REGION IV-A (CALABARZON)', value: 'REGION IV-A (CALABARZON)' }
+            // ],
+            // province: [
+            //     { label: "Cavite", value: "1" },
+            //     { label: "Laguna", value: "2" },
+            //     { label: "Batangas", value: "3" },
+            //     { label: "Rizal", value: "4" },
+            //     { label: "Quezon", value: "5" },
+            //     { label: "Lucena City", value: "6" }
+            // ],
+            // quarter: [
+            //     { label: '1st Quarter', value: '1st Quarter' },
+            //     { label: '2nd Quarter', value: '2nd Quarter' },
+            //     { label: '3rd Quarter', value: '3rd Quarter' },
+            //     { label: '4th Quarter', value: '4th Quarter' }
+            // ],
+            status: [
+                { label: 'All', value: 6 },
+                { label: 'Draft', value: 1 },
+                { label: 'Received', value: 2 },
+                { label: 'Completed', value: 3 },
+                { label: 'Rated', value: 4 }
+            ],
+            selected_status: { label: 'All', value: 6 },
             isCardVisible: false,
-            modalVisible: false,
-
         }
     },
     created() {
@@ -215,16 +203,19 @@ export default {
             this.modalVisible = false;
         },
         filter() {
-            const status = this.selected_status.value;
-            this.$refs.ICTTable.load_ict_request(status);
+            const status = this.selected_status ? this.selected_status.value : null;
+            const controlNo = this.control_no;
+            const requestedBy = this.requested_by;
+            const startDate = this.start_date;
+            const endDate = this.end_date;
 
-            // axios.get(`../../api/fetch_ict_request/${status}`)
-            //     .then(response => {
-            //         this.ict_data = response.data.data;
-            //     })
-            //     .catch(error => {
-            //         console.error('Error fetching data:', error);
-            //     });
+            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate);
+        },
+        resetFilter() {
+            this.control_no = '';
+            this.requested_by = '';
+            this.start_date = '';
+            this.end_date = '';
         },
     },
     components: {

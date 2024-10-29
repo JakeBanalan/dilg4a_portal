@@ -101,9 +101,9 @@ th {
 
                     <td>{{ ict_data.status }}</td>
                     <td>
-                        <b>{{ ict_data.control_no }}</b>
+                        <a href="#" @click.prevent="pdf_form(ict_data.id)"><b>{{ ict_data.control_no }}</b></a>
                         <br>
-                        <i>~Request Date: {{ formatDate(ict_data.requested_date) }}</i>~
+                        <i>~Request Date: {{ formatDate(ict_data.request_date) }}</i>~
                     </td>
                     <td style="white-space:normal;">{{ ict_data.remarks }}</td>
                     <!-- USER SURVEY LINK -->
@@ -128,8 +128,8 @@ th {
                         <td v-else> ~ </td>
                     </template>
 
-                    <td> {{ formatDate(ict_data.received_date) }}</td>
-                    <td> {{ formatTime(ict_data.received_date) }}</td>
+                    <td> {{ formatDate(ict_data.started_date) }}</td>
+                    <td> {{ formatTime(ict_data.started_date) }}</td>
                     <td>{{ ict_data.requested_by }}</td>
                     <td>{{ ict_data.office }}</td>
                     <td>{{ ict_data.ict_personnel }}</td>
@@ -176,12 +176,12 @@ export default {
             itemsPerPage: 10,
             modalVisible: false,
             selected_id: null,
-
             id: null,
             control_no: null,
             requested_by: null,
             office: null,
             request_date: null,
+            started_date: null,
             request_type: null,
             sub_request_type: null,
             surveyLinkDisabled: false // New property to track the disabled state
@@ -195,11 +195,14 @@ export default {
         console.log(new Date());
     },
     computed: {
-
         totalPages() {
-            return Math.ceil(this.ict_data.length / this.itemsPerPage);
+            // Check if ict_data is defined and is an array
+            return Array.isArray(this.ict_data) ? Math.ceil(this.ict_data.length / this.itemsPerPage) : 0;
         },
         displayedItems() {
+            if (!Array.isArray(this.ict_data)) {
+                return []; // Return an empty array if ict_data is not an array
+            }
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
             return this.ict_data.slice(start, end);
@@ -207,11 +210,22 @@ export default {
     },
     mounted() {
         this.fetchRequests(this.role, 6);
-        // load the data when the user click the control_no to be completed
-        // then pass the control_no and id to the modal
+        this.loadData();
 
     },
     methods: {
+        loadData() {
+            // Logic to load data based on the current page
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            const paginatedData = this.ict_data.slice(start, end);
+            // You can set this data to another variable if needed
+        },
+        onPageChange(page) {
+            this.currentPage = page;
+            // Fetch data for the new page
+            this.loadData();
+        },
         surveyCompleted(link) {
             localStorage.setItem('surveyCompleted', 'true');
             this.surveyLinkDisabled = true; // Disable the survey link button
@@ -262,14 +276,24 @@ export default {
             }
         },
 
-        load_ict_request(status) {
+        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
-            axios.get(url)
+
+            // Create params object, only including non-null values
+            const params = {
+                ...(controlNo && { control_no: controlNo }),
+                ...(requestedBy && { requested_by: requestedBy }),
+                ...(startDate && { start_date: startDate }), // Include start_date if it exists
+                ...(endDate && { end_date: endDate }), // Include end_date if it exists
+            };
+
+            axios.get(url, { params })
                 .then(response => {
-                    this.ict_data = response.data.data;
+                    this.ict_data = response.data.data || [];
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
+                    this.ict_data = []; // Reset ict_data on error
                 });
         },
         load_ict_perUser_request(status) {
@@ -292,6 +316,7 @@ export default {
                     this.control_no = response.data.control_no
                     this.requested_by = response.data.requested_by
                     this.office = response.data.office
+                    this.started_date = response.data.started_date
                     this.request_date = response.data.request_date
                     this.request_type = response.data.request_type
                     this.sub_request_type = response.data.sub_request_type
@@ -303,10 +328,9 @@ export default {
         view_ict_form(id) {
             this.$router.push({ path: '/rictu/ict_ta/view', query: { id: id } });
         },
-        onPageChange(page) {
-            this.currentPage = page;
-            // Fetch data for the new page
-            this.loadData();
+        pdf_form(id) {
+            // Navigate to the PDF view with the id as a query parameter
+            this.$router.push({ path: '/rictu/ict_ta/pdf', query: { id: id } });
         },
         received_request(id) {
             const userId = localStorage.getItem('userId');

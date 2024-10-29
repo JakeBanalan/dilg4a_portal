@@ -225,7 +225,7 @@ export default {
     methods: {
         fetchICTAdminCount() {
             // Fetch total ICT requests
-            axios.get(`/api/totalCountICTRequest/2024`)
+            axios.get(`/api/totalCountICTRequest`)
                 .then(response => {
                     console.log(response.data); // Log the response to check the structure
                     this.ict_adminTotal = response.data.ictTotal;
