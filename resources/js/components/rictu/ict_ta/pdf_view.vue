@@ -686,7 +686,7 @@ input.largerCheckbox {
     font-weight: 400;
     text-decoration: none;
     vertical-align: baseline;
-    font-size: 9pt;
+    font-size: 12pt;
     font-family: "Cambria";
     font-style: normal
 }
@@ -729,7 +729,7 @@ input.largerCheckbox {
 .documentCodeC12 {
     color: red;
     font-weight: 400;
-    font-size: 9pt;
+    font-size: 13pt;
     font-family: "Cambria";
 }
 
@@ -743,7 +743,7 @@ input.largerCheckbox {
 
 
 .documentCodeC65 {
-    font-size: 9pt;
+    font-size: 12pt;
     font-family: "Cambria";
     font-weight: 400
 }
