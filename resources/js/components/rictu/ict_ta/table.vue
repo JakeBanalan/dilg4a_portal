@@ -101,11 +101,15 @@ th {
 
                     <td>{{ ict_data.status }}</td>
                     <td>
-                        <a href="#" @click.prevent="pdf_form(ict_data.id)"><b>{{ ict_data.control_no }}</b></a>
+
+                        <a href="#" v-if="role === 'admin'" @click.prevent="pdf_form(ict_data.id)"><b>{{
+                            ict_data.control_no }}</b></a>
+                        <b v-if="role === 'user'">{{ ict_data.control_no }}</b>
                         <br>
                         <i>~Request Date: {{ formatDate(ict_data.request_date) }}</i>~
                     </td>
-                    <td style="white-space:normal;">{{ ict_data.remarks }}</td>
+                    <td style=" white-space:normal;">{{ ict_data.remarks }}
+                    </td>
                     <!-- USER SURVEY LINK -->
                     <template v-if="role === 'user'">
                         <td v-if="ict_data.status === 'Completed'">

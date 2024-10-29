@@ -297,7 +297,7 @@
     font-weight: 400;
     text-decoration: none;
     vertical-align: baseline;
-    font-size: 15pt;
+    font-size: calc(0.75rem + 0.5vw);
     font-family: "Cambria";
     font-style: normal
 }
@@ -1014,7 +1014,7 @@ input.largerCheckbox {
                         </td>
                         <td class="font2Head" colspan="3" rowspan="1">
                             <p class="input2"><span class="primaryText">
-                                    {{ data.email }}
+                                    {{ data.contact }} / {{ data.email }}
                                 </span></p>
                         </td>
                         <td class="titleHead" colspan="1" rowspan="1">

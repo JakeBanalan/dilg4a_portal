@@ -70,6 +70,8 @@ class RICTUController extends Controller
             tbl_technicalassistance.control_no AS control_no,
             CONCAT(u.first_name," ",u.last_name) AS requested_by,
             u.user_role as role,
+            u.email,
+            u.contact_details as contact,
             tbl_technicalassistance.started_date AS requested_date,
             time(tbl_technicalassistance.started_date) AS started_time,
             MONTH(tbl_technicalassistance.started_date) AS month,

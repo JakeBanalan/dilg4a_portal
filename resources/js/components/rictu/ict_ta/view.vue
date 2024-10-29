@@ -102,7 +102,7 @@
 
                                         <div class="col-lg-12">
                                             <TextInput label="Contact Number/E-mail" iconValue="envelope-open-text"
-                                                :value="data.email" :readonly="true" />
+                                                :value="`${data.contact} / ${data.email}`" :readonly="true" />
                                         </div>
 
                                         <div class="col-lg-12">
