@@ -1192,7 +1192,9 @@ input.largerCheckbox {
                             :checked="isChecked(data.req_id, 'OTHERS (please specify)')" @change="toggleOthers">
                         <b>OTHERS (please specify)</b>
                     </p>
-                    <p v-if="isChecked(data.req_id, 'OTHERS (please specify)')" style="font-family: 'Cambria'; font-size: 13pt; text-transform: capitalize;">{{ data.others }}</p>
+                    <p v-if="isChecked(data.req_id, 'OTHERS (please specify)')"
+                        style="font-family: 'Cambria'; font-size: 13pt; text-transform: capitalize;">{{ data.others }}
+                    </p>
 
                 </div>
             </div>
@@ -1217,10 +1219,10 @@ input.largerCheckbox {
                 <tbody>
                     <tr>
                         <td class="remarksInput" colspan="1" rowspan="1">
-                            <p>{{ data.remarks }}</p>
+                            <p style="text-transform: capitalize;">{{ data.remarks }}</p>
                         </td>
                         <td class="actionTakenInput" colspan="1" rowspan="1">
-                            <p>{{ data.ict_officer_remarks }}</p>
+                            <p style="text-transform: capitalize;">{{ data.ict_officer_remarks }}</p>
                         </td>
                     </tr>
                 </tbody>
@@ -1332,6 +1334,19 @@ export default {
             window.print();
         }, 1000);
         $("input:checkbox").click(function () { return false; });
+        //Right-Click Disabled
+        document.addEventListener('contextmenu', event => {
+            event.preventDefault();
+            alert('Inspect Element is Disabled');
+        });
+        //CTRL+SHIFT+J DISABLED
+        document.addEventListener('keydown', event => {
+
+            if (event.ctrlKey && event.shiftKey && event.key === 'J') {
+                event.preventDefault();
+                alert('Inspect Element is Disabled');
+            }
+        });
     },
     computed: {
         categoryMap() {
