@@ -102,8 +102,9 @@ th {
                     <td>{{ ict_data.status }}</td>
                     <td>
 
-                        <a href="#" v-if="role === 'admin'" @click.prevent="pdf_form(ict_data.id)"><b>{{
-                            ict_data.control_no }}</b></a>
+                        <a href="#" v-if="role === 'admin'" @click.prevent="pdf_form(ict_data.id)">
+                            <b>{{ ict_data.control_no }}</b>
+                        </a>
                         <b v-if="role === 'user'">{{ ict_data.control_no }}</b>
                         <br>
                         <i>~Request Date: {{ formatDate(ict_data.request_date) }}</i>~
@@ -329,11 +330,12 @@ export default {
                 });
         },
         view_ict_form(id) {
+            // Navigate to the view page with the id as a query parameter
             this.$router.push({ path: '/rictu/ict_ta/view', query: { id: id } });
         },
         pdf_form(id) {
-            // Navigate to the PDF view with the id as a query parameter
-            this.$router.push({ path: '/rictu/ict_ta/pdf', query: { id: id } });
+            const url = this.$router.resolve({ path: '/rictu/ict_ta/pdf', query: { id: id } }).href;
+            window.open(url, '_blank'); // Open in a new tab
         },
         received_request(id) {
             const userId = localStorage.getItem('userId');

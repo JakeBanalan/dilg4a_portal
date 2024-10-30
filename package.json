@@ -20,7 +20,7 @@
         "sass": "^1.32.11",
         "sass-loader": "^11.0.1",
         "vue": "^3.3.4",
-        "vue-loader": "^17.2.2"
+        "vue-loader": "^17.4.2"
     },
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.5.1",

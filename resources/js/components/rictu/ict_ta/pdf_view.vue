@@ -1329,16 +1329,22 @@ export default {
         const id = this.$route.query.id;
     },
     mounted() {
+        //GET THE ICT ALL DATA
         this.getICTData();
+
+        // Set up the print functionality
         setTimeout(() => {
             window.print();
         }, 1000);
+
         $("input:checkbox").click(function () { return false; });
+
         //Right-Click Disabled
         document.addEventListener('contextmenu', event => {
             event.preventDefault();
             alert('Inspect Element is Disabled');
         });
+
         //CTRL+SHIFT+J DISABLED
         document.addEventListener('keydown', event => {
 
