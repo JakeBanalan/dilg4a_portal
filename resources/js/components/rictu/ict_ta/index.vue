@@ -201,6 +201,9 @@ export default {
             this.start_date = '';
             this.end_date = '';
             this.selected_pmo = '';
+            //LOAD ALL DATA AFTER RESET
+            const status = this.selected_status ? this.selected_status.value : null;
+            this.$refs.ICTTable.load_ict_request(status);
         },
     },
     components: {
