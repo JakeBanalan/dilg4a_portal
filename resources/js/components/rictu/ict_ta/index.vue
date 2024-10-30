@@ -61,7 +61,7 @@ h5 {
                                                     </div>
                                                     <div class="col-lg-3">
                                                         <label style="font-size: 0.875rem;">Request By</label>
-                                                        <input type="text"  v-model="requested_by"
+                                                        <input type="text" v-model="requested_by"
                                                             placeholder="Requested By" />
                                                     </div>
 
@@ -73,15 +73,19 @@ h5 {
                                                         <label style="font-size: 0.875rem;">End Date</label>
                                                         <input type="date" class="form-control" v-model="end_date" />
                                                     </div>
-
+                                                    <div class="col-lg-3">
+                                                        <label style="font-size: 0.875rem;">OFFICE/SERVICE/BUREAU
+                                                            DIVISION/SECTION/UNIT</label>
+                                                        <multiselect v-model="selected_pmo" :options="pmo" label="label"
+                                                            :multiple="false"></multiselect>
+                                                    </div>
                                                     <div class="col-lg-3">
                                                         <div class="form-group">
-                                                            <label>Status</label>
+                                                            <label style="font-size: 0.875rem;">Status</label>
                                                             <multiselect v-model="selected_status"
                                                                 deselect-label="Can't remove this value"
-                                                                track-by="value" label="label" placeholder="Select one"
-                                                                :options="status" :searchable="false"
-                                                                :allow-empty="false">
+                                                                track-by="value" label="label" :options="status"
+                                                                :searchable="false" :allow-empty="false">
                                                             </multiselect>
                                                         </div>
                                                     </div>
@@ -136,47 +140,26 @@ export default {
     name: 'ICT Technical Assistance',
     data() {
         return {
-            isOnICTTAIndexRoute: false,
             role: null,
             control_no: '',
             requested_by: '',
-            selected: null,
             start_date: '',
             end_date: '',
             value: null,
-            user_id: null,
-            ict_data: [],
-            currentPage: 1,
-            itemsPerPage: 10,
             modalVisible: false,
-            selected_id: null,
-            selected_status: null,
-            selected_province: null,
-            request_type: null,
-            email: null,
-            // options: [
-            //     { label: "ORD", value: "ORD" },
-            //     { label: "LGMED", value: "LGMED" },
-            //     { label: "LGCDD", value: "LGCDD" },
-            //     { label: "FAD", value: "FAD" }
-            // ],
-            // region: [
-            //     { label: 'REGION IV-A (CALABARZON)', value: 'REGION IV-A (CALABARZON)' }
-            // ],
-            // province: [
-            //     { label: "Cavite", value: "1" },
-            //     { label: "Laguna", value: "2" },
-            //     { label: "Batangas", value: "3" },
-            //     { label: "Rizal", value: "4" },
-            //     { label: "Quezon", value: "5" },
-            //     { label: "Lucena City", value: "6" }
-            // ],
-            // quarter: [
-            //     { label: '1st Quarter', value: '1st Quarter' },
-            //     { label: '2nd Quarter', value: '2nd Quarter' },
-            //     { label: '3rd Quarter', value: '3rd Quarter' },
-            //     { label: '4th Quarter', value: '4th Quarter' }
-            // ],
+            selected_pmo: [],
+            pmo: [
+                { label: "ORD", value: "ORD" },
+                { label: "LGMED", value: "LGMED" },
+                { label: "LGCDD", value: "LGCDD" },
+                { label: "FAD", value: "FAD" },
+                { label: "BATANGAS", value: "BATANGAS" },
+                { label: "CAVITE", value: "CAVITE" },
+                { label: "LAGUNA", value: "LAGUNA" },
+                { label: "QUEZON", value: "QUEZON" },
+                { label: "RIZAL", value: "RIZAL" },
+                { label: "LUCENA CITY", value: "LUCENA CITY" }
+            ],
             status: [
                 { label: 'All', value: 6 },
                 { label: 'Draft', value: 1 },
@@ -208,14 +191,16 @@ export default {
             const requestedBy = this.requested_by;
             const startDate = this.start_date;
             const endDate = this.end_date;
+            const pmo = this.selected_pmo ? this.selected_pmo.value : null;
 
-            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate);
+            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate, pmo);
         },
         resetFilter() {
             this.control_no = '';
             this.requested_by = '';
             this.start_date = '';
             this.end_date = '';
+            this.selected_pmo = '';
         },
     },
     components: {

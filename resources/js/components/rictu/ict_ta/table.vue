@@ -279,16 +279,15 @@ export default {
                 return formattedDate;
             }
         },
-
-        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null) {
+        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
 
-            // Create params object, only including non-null values
             const params = {
                 ...(controlNo && { control_no: controlNo }),
                 ...(requestedBy && { requested_by: requestedBy }),
-                ...(startDate && { start_date: startDate }), // Include start_date if it exists
-                ...(endDate && { end_date: endDate }), // Include end_date if it exists
+                ...(startDate && { start_date: startDate }),
+                ...(endDate && { end_date: endDate }),
+                ...(pmo && { pmo }),
             };
 
             axios.get(url, { params })
@@ -297,7 +296,7 @@ export default {
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
-                    this.ict_data = []; // Reset ict_data on error
+                    this.ict_data = [];
                 });
         },
         load_ict_perUser_request(status) {
