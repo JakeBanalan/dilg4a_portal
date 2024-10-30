@@ -149,7 +149,7 @@ export default {
                     this.userRole = response.data.user_role;
 
                     // Initialize Pusher
-                    var pusher = new Pusher('29d53f8816252d29de52', {
+                    var pusher = new Pusher(process.env.PUSHER_APP_KEY, {
                         cluster: 'ap1'
                     });
 
