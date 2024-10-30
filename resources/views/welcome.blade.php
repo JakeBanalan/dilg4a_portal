@@ -34,23 +34,23 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
-    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js" async></script>
     <script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
-    <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}"></script>
-    <script src="{{ asset('vendors/chart.js/Chart.min.js') }}"></script>
-    <script src="{{ asset('vendors/datatables.net/jquery.dataTables.js') }}"></script>
-    <script src="{{ asset('vendors/datatablesnet-bs4/dataTables-bootstrap4.js') }}"></script>
-    <script src="{{ asset('js/dataTables.select.min.js') }}"></script>
-    <script src="{{ asset('js/Chart.roundedBarCharts.js') }}"></script>
-    <script src="{{ asset('js/app.js') }}" async></script>
-    <script src="{{ asset('js/chart.js') }}"></script>
-    <script src="{{ asset('js/off-canvas.js') }}"></script>
-    <script src="{{ asset('js/hoverable-collapse.js') }}"></script>
-    <script src="{{ asset('js/template.js') }}"></script>
-    <script src="{{ asset('js/settings.js') }}"></script>
-    <script src="{{ asset('js/todolist.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendors/js/vendor.bundle.base.js') }}" defer></script>
+    <script src="{{ asset('vendors/chart.js/Chart.min.js') }}" async></script>
+    <script src="{{ asset('vendors/datatables.net/jquery.dataTables.js') }}" defer></script>
+    <script src="{{ asset('vendors/datatablesnet-bs4/dataTables-bootstrap4.js') }}" defer></script>
+    <script src="{{ asset('js/dataTables.select.min.js') }}" defer></script>
+    <script src="{{ asset('js/Chart.roundedBarCharts.js') }}" async></script>
+    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/chart.js') }}" async></script>
+    <script src="{{ asset('js/off-canvas.js') }}" async></script>
+    <script src="{{ asset('js/hoverable-collapse.js') }}" async></script>
+    <script src="{{ asset('js/template.js') }}" async></script>
+    <script src="{{ asset('js/settings.js') }}" async></script>
+    <script src="{{ asset('js/todolist.js') }}" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" async></script>
 
 
 </body>
