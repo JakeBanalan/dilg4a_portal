@@ -156,8 +156,11 @@ class RICTUController extends Controller
         }
 
         if ($start_date && $end_date) {
+            // Set the end date to the end of the day
+            $end_date = date('Y-m-d 23:59:59', strtotime($end_date));
             $ictQuery->whereBetween('tbl_technicalassistance.started_date', [$start_date, $end_date]);
         }
+        
         if ($pmo) {
             $ictQuery->where(DB::raw('p.pmo_title'), 'LIKE', "%$pmo%");
         }
