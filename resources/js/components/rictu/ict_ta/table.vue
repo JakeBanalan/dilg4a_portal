@@ -147,8 +147,9 @@ th {
                     </td>
                 </tr>
             </tbody>
-
+          
         </table>
+        <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
         <Pagination :total="totalRecords" :currentPage="currentPage" @pageChange="onPageChange" />
 
     </div>
@@ -202,7 +203,6 @@ export default {
     },
     computed: {
         totalPages() {
-            // Check if ict_data is defined and is an array
             return Array.isArray(this.ict_data) ? Math.ceil(this.ict_data.length / this.itemsPerPage) : 0;
         },
         displayedItems() {
@@ -213,6 +213,12 @@ export default {
             const end = start + this.itemsPerPage;
             return this.ict_data.slice(start, end);
         },
+        showingEntriesMessage() {
+            const totalRecords = this.totalRecords; // Total number of records
+            const start = (this.currentPage - 1) * this.itemsPerPage + 1; // Calculate the start index
+            const end = Math.min(start + this.itemsPerPage - 1, totalRecords); // Calculate the end index
+            return `Showing ${start} to ${end} of ${totalRecords} entries`;
+        }
     },
     mounted() {
         this.fetchRequests(this.role, 6);
