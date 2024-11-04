@@ -59,7 +59,7 @@ th {
                         aria-label="TIME: activate to sort column ascending">TIME</th>
                 </tr>
             </thead>
-            <tbody v-if="role === 'admin' || role === 'user'">
+            <tbody v-if="(role === 'admin' || role === 'user') && displayedItems.length > 0">
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
                     <td>
                         <!-- Buttons based on ICT request status -->
@@ -113,8 +113,7 @@ th {
                     <!-- USER SURVEY LINK -->
                     <template v-if="role === 'user'">
                         <td v-if="ict_data.status === 'Completed'">
-                            <button class="btn btn-primary mr-1" :style="{ backgroundColor: '#059886', color: '#fff' }"
-                                :disabled="surveyLinkDisabled" @click="surveyCompleted(ict_data.css_link)">
+                            <button class="btn btn-primary mr-1" :style="{ backgroundColor: '#059886', color: '#fff' }">
                                 <font-awesome-icon :icon="['fas', 'square-poll-vertical']" />
                                 <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>
                             </button>
@@ -147,10 +146,11 @@ th {
                     </td>
                 </tr>
             </tbody>
-          
+
         </table>
         <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
-        <Pagination :total="totalRecords" :currentPage="currentPage" @pageChange="onPageChange" />
+        <Pagination :total="totalRecords" :currentPage="currentPage" :itemsPerPage="itemsPerPage"
+            @pageChange="onPageChange" />
 
     </div>
     <modal_complete_ta :visible="modalVisible" @close="closeModal" :id="selected_id" :control_no="control_no"
@@ -191,54 +191,35 @@ export default {
             started_date: null,
             request_type: null,
             sub_request_type: null,
-            surveyLinkDisabled: false // New property to track the disabled state
         }
 
     },
     created() {
         this.user_id = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
-        this.surveyLinkDisabled = localStorage.getItem('surveyCompleted') === 'true'; // Correct initialization
-        console.log(new Date());
     },
     computed: {
-        totalPages() {
-            return Array.isArray(this.ict_data) ? Math.ceil(this.ict_data.length / this.itemsPerPage) : 0;
+        totalRecords() {
+            return this.ict_data.length; // Total records based on fetched data
         },
         displayedItems() {
-            if (!Array.isArray(this.ict_data)) {
-                return []; // Return an empty array if ict_data is not an array
-            }
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            return this.ict_data.slice(start, end);
+            return this.ict_data.slice(start, end); // Slice the data for current page
         },
         showingEntriesMessage() {
-            const totalRecords = this.totalRecords; // Total number of records
-            const start = (this.currentPage - 1) * this.itemsPerPage + 1; // Calculate the start index
-            const end = Math.min(start + this.itemsPerPage - 1, totalRecords); // Calculate the end index
-            return `Showing ${start} to ${end} of ${totalRecords} entries`;
+            const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+            const end = Math.min(start + this.itemsPerPage - 1, this.totalRecords);
+            return `Showing ${start} to ${end} of ${this.totalRecords} entries`;
         }
     },
     mounted() {
         this.fetchRequests(this.role, 6);
-        this.loadData();
 
     },
     methods: {
-        loadData() {
-            const start = (this.currentPage - 1) * this.itemsPerPage;
-            const end = start + this.itemsPerPage;
-            const paginatedData = this.ict_data.slice(start, end);
-        },
         onPageChange(page) {
             this.currentPage = page;
-            this.loadData();
-        },
-        surveyCompleted(link) {
-            localStorage.setItem('surveyCompleted', 'true');
-            this.surveyLinkDisabled = true; // Disable the survey link button
-            window.open(link, '_blank'); // Open the survey link in a new tab
         },
         fetchRequests(role, status) {
             if (role === 'admin') {
