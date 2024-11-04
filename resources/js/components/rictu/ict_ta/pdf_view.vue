@@ -1446,7 +1446,6 @@ export default {
                 const time = new Date(date).toLocaleTimeString('en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
-                    second: '2-digit',
                     hour12: true // Change to false for 24-hour format
                 });
                 return time;
@@ -1462,7 +1461,6 @@ export default {
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    second: '2-digit',
                     hour12: true // Change to false for 24-hour format
                 });
                 return formattedDate;

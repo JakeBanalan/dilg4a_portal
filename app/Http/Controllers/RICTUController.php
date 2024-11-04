@@ -73,7 +73,7 @@ class RICTUController extends Controller
             u.email,
             u.contact_details as contact,
             tbl_technicalassistance.started_date AS requested_date,
-            time(tbl_technicalassistance.started_date) AS started_time,
+            TIME(tbl_technicalassistance.started_date) AS started_time,
             MONTH(tbl_technicalassistance.started_date) AS month,
             YEAR(tbl_technicalassistance.started_date) AS YEAR,
             tbl_technicalassistance.started_date AS started_date,

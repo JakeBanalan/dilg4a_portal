@@ -260,7 +260,6 @@ export default {
 
                     hour: 'numeric',
                     minute: 'numeric',
-                    second: 'numeric'
                 });
                 return formattedDate;
             }

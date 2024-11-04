@@ -88,7 +88,7 @@
                                         <div class="col-lg-6">
                                             <TextInput label="Time" iconValue="calendar" type="text"
                                                 style="height: 40px !important;" v-model="data.started_time"
-                                                :value="data.started_time" disabled />
+                                                :value="formatTime(data.started_date)" disabled />
                                         </div>
 
                                         <div class="col-lg-12 mt-4">
@@ -314,10 +314,21 @@ export default {
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    second: '2-digit',
                     hour12: true // Change to false for 24-hour format
                 });
                 return formattedDate;
+            }
+        },
+        formatTime(date) {
+            if (!date || date === '0000-00-00') {
+                return null; // Return null if the date is null or '0000-00-00'
+            } else {
+                const formattedTime = new Date(date).toLocaleString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true // Change to false for 24-hour format
+                });
+                return formattedTime;
             }
         },
     },
