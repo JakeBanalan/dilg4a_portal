@@ -1332,11 +1332,6 @@ export default {
         //GET THE ICT ALL DATA
         this.getICTData();
 
-        // Set up the print functionality
-        setTimeout(() => {
-            window.print();
-        }, 1000);
-
         $("input:checkbox").click(function () { return false; });
 
         //Right-Click Disabled
@@ -1446,7 +1441,7 @@ export default {
                 const time = new Date(date).toLocaleTimeString('en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true // Change to false for 24-hour format
+                    hour12: true
                 });
                 return time;
             }
@@ -1461,7 +1456,7 @@ export default {
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true // Change to false for 24-hour format
+                    hour12: true 
                 });
                 return formattedDate;
             }
