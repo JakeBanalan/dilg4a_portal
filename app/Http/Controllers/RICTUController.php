@@ -160,7 +160,7 @@ class RICTUController extends Controller
             $end_date = date('Y-m-d 23:59:59', strtotime($end_date));
             $ictQuery->whereBetween('tbl_technicalassistance.started_date', [$start_date, $end_date]);
         }
-        
+
         if ($pmo) {
             $ictQuery->where(DB::raw('p.pmo_title'), 'LIKE', "%$pmo%");
         }
@@ -533,7 +533,7 @@ class RICTUController extends Controller
             $sheet->setCellValue('K' . $row, Date::PHPToExcel($data['completed_date']));
             $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode($dateFormat);
             $sheet->setCellValue('L' . $row, $data['completed_time']);
-            $sheet->setCellValue('M' . $row, '=INT(IF((K' . $row . '-C' . $row . ')>=1/24,HOUR(K' . $row . '-C' . $row . ') & IF(HOUR(K' . $row . '-C' . $row . ') = 1, " Hour and ", " Hours and ") & (MINUTE(K' . $row . '-C' . $row . ') + IF(SECOND(K' . $row . '-C' . $row . ') > 0, 1, 0)) & " Minutes", (INT((K' . $row . '-C' . $row . ')*1440) + IF(SECOND(K' . $row . '-C' . $row . ') > 0, 1, 0)) & " Minutes"))');
+            $sheet->setCellValue('M' . $row, '=IF((K' . $row . '-C' . $row . ')>=1/24,HOUR(K' . $row . '-C' . $row . ') & IF(HOUR(K' . $row . '-C' . $row . ') = 1, " Hour and ", " Hours and ") & (MINUTE(K' . $row . '-C' . $row . ') + IF(SECOND(K' . $row . '-C' . $row . ') > 0, 1, 0)) & " Minutes", (INT((K' . $row . '-C' . $row . ')*1440) + IF(SECOND(K' . $row . '-C' . $row . ') > 0, 1, 0)) & " Minutes")');
 
             $sheet->getRowDimension($row)->setRowHeight(60);
 
