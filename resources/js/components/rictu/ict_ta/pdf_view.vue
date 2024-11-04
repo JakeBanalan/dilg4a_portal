@@ -1264,7 +1264,7 @@ input.largerCheckbox {
                                 </div>
                                 <div class="date-line">
                                     <p style="margin : 0; padding-top:0; font-weight: 700;">
-                                        {{ formatDate(data.started_date) }}</p>
+                                        {{ formatDateTime(data.started_date) }}</p>
                                     ___________________________
                                     <div class="signature-text">*Date and Time</div>
                                 </div>

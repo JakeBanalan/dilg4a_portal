@@ -101,7 +101,6 @@ th {
 
                     <td>{{ ict_data.status }}</td>
                     <td>
-
                         <a href="#" v-if="role === 'admin'" @click.prevent="pdf_form(ict_data.id)">
                             <b>{{ ict_data.control_no }}</b>
                         </a>
@@ -109,8 +108,8 @@ th {
                         <br>
                         <i>~Request Date: {{ formatDate(ict_data.request_date) }}</i>~
                     </td>
-                    <td style=" white-space:normal;">{{ ict_data.remarks }}
-                    </td>
+                    <td style=" white-space:normal;">{{ ict_data.remarks }}</td>
+
                     <!-- USER SURVEY LINK -->
                     <template v-if="role === 'user'">
                         <td v-if="ict_data.status === 'Completed'">
@@ -122,6 +121,7 @@ th {
                         </td>
                         <td v-else> ~ </td>
                     </template>
+
                     <!-- ADMIN SURVEY LINK -->
                     <template v-if="role === 'admin'">
                         <td v-if="ict_data.status === 'Completed'">
@@ -149,7 +149,7 @@ th {
             </tbody>
 
         </table>
-        <Pagination :total="ict_data.length" @pageChange="onPageChange" />
+        <Pagination :total="totalRecords" :currentPage="currentPage" @pageChange="onPageChange" />
 
     </div>
     <modal_complete_ta :visible="modalVisible" @close="closeModal" :id="selected_id" :control_no="control_no"
@@ -179,6 +179,7 @@ export default {
             role: null,
             currentPage: 1,
             itemsPerPage: 10,
+            totalRecords: 0,
             modalVisible: false,
             selected_id: null,
             id: null,
@@ -220,15 +221,12 @@ export default {
     },
     methods: {
         loadData() {
-            // Logic to load data based on the current page
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
             const paginatedData = this.ict_data.slice(start, end);
-            // You can set this data to another variable if needed
         },
         onPageChange(page) {
             this.currentPage = page;
-            // Fetch data for the new page
             this.loadData();
         },
         surveyCompleted(link) {
@@ -294,12 +292,15 @@ export default {
             axios.get(url, { params })
                 .then(response => {
                     this.ict_data = response.data.data || [];
+                    this.totalRecords = response.data.total; // Assuming your API sends total count
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                     this.ict_data = [];
+                    this.totalRecords = 0; // Reset totalRecords on error
                 });
         },
+
         load_ict_perUser_request(status) {
             const url = status ? `../../api/fetch_ict_perUser/${status}/${this.user_id}` : `../../api/fetch_ict_perUser/6/${this.user_id}`;
             axios.get(url)
