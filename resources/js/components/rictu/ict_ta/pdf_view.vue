@@ -189,7 +189,28 @@
     border-bottom-width: 1pt;
     width: 184.2pt;
     border-top-color: #000000;
-    border-bottom-style: solid
+    border-bottom-style: solid;
+}
+
+.contactEmail {
+    border-right-style: solid;
+    padding: 0pt 5.4pt 0pt 5.4pt;
+    border-bottom-color: #000000;
+    border-top-width: 1pt;
+    border-right-width: 1pt;
+    border-left-color: #000000;
+    vertical-align: middle;
+    border-right-color: #000000;
+    border-left-width: 1pt;
+    border-top-style: solid;
+    border-left-style: solid;
+    border-bottom-width: 1pt;
+    width: 184.2pt;
+    border-top-color: #000000;
+    border-bottom-style: solid;
+    word-break: break-all;
+    white-space: wrap;
+    height: 40px;
 }
 
 .hTime {
@@ -299,7 +320,7 @@
     vertical-align: baseline;
     font-size: calc(0.75rem + 0.5vw);
     font-family: "Cambria";
-    font-style: normal
+    font-style: normal;
 }
 
 
@@ -1009,10 +1030,9 @@ input.largerCheckbox {
                     </tr>
                     <tr class="h3Head">
                         <td class="allHead" colspan="1" rowspan="1">
-                            <p class="fontHead"><span class="primaryText">Contact Number/</span><span
-                                    class="primaryText">Email</span><span class="primaryText">:</span></p>
+                            <p class="fontHead"><span class="primaryText">Contact Number/Email:</span></p>
                         </td>
-                        <td class="font2Head" colspan="3" rowspan="1">
+                        <td class="contactEmail" colspan="3" rowspan="1">
                             <p class="input2"><span class="primaryText">
                                     {{ data.contact }} / {{ data.email }}
                                 </span></p>
@@ -1347,6 +1367,14 @@ export default {
                 event.preventDefault();
                 alert('Inspect Element is Disabled');
             }
+            if (event.keyCode == 123) {
+                event.preventDefault();
+                alert('Inspect Element is Disabled');
+            }
+            if (event.ctrlKey && event.shiftKey && event.key === 'I') {
+                event.preventDefault();
+                alert('Inspect Element is Disabled');
+            }
         });
     },
     computed: {
@@ -1456,7 +1484,7 @@ export default {
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true 
+                    hour12: true
                 });
                 return formattedDate;
             }
