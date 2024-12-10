@@ -283,7 +283,7 @@ Route::middleware('api')->group(function () {
 
 
 
-Route::post('/logout', [UserController::class, 'logout']);
+Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
 
 
 // Route::post('logout', function (Request $request) {
@@ -334,14 +334,14 @@ Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSma
 Route::post('post_create_rfq', [RFQController::class, 'post_create_rfq']);
 
 //CALENDAR
-//C A L E N D A R 
+//C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
 Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
 Route::post('post_create_event', [CalendarController::class, 'post_create_event']);
 
 
 
-//C A L E N D A R 
+//C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
 Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
 
