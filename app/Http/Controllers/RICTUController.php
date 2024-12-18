@@ -263,8 +263,7 @@ class RICTUController extends Controller
         $month = Carbon::parse($requestedDate)->format('m');
         $req = $request->input('type_of_request');
 
-        // Fetch the user's full name from the database
-        $userId = $request->input('requested_by'); // This is the user ID
+        $userId = $request->input('requested_by');
         $user = UserModel::selectRaw('
         users.id as id,
         CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,

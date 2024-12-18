@@ -50,7 +50,7 @@ img {
                                 <div class="box box-primary box-solid dropbox" style="border:1px solid black;">
                                     <div class="box-header with-border"
                                         style="background-color: #000;padding:2px;color:#fff;">
-                                        <h6 class="box-title">Document Code</h6>
+                                        <span class="box-title" style="font-size: 13pt;">Document Code</span>
                                     </div>
                                     <div class="box-header with-border"
                                         style="color:black;padding:2px;text-align:center;">
@@ -82,9 +82,9 @@ img {
                                     <div class="box-header with-border" style="background-color: #000;color:#fff;">
                                         <h4 class="box-title">ICT Technical Assistance Reference Number</h4>
                                     </div>
-                                    <center><span style="text-align:center;color:red;font-weight:bold;font-size:24px;">
-                                            {{ ict_no }}
-                                        </span></center>
+                                    <div style="text-align:center; color:red; font-weight:bold; font-size:24px;">
+                                        {{ ict_no }}
+                                    </div>
                                 </div>
                             </div>
 
@@ -111,15 +111,12 @@ img {
                                                 <TextInput label="Time:" iconValue="calendar" type="text"
                                                     style="height: 40px !important;" v-model="requested_time"
                                                     :readonly="true" :value="formatTime(requested_time)" />
+
                                             </div>
                                             <div class="col-lg-12 mt-4">
                                                 <TextInput label="Requested By:" iconValue="user"
                                                     v-model="userData.name" :value="userData.name" :readonly="true" />
-                                                <!-- <Multiselect @update:modelValue="PostUserRequestID" :options="request_by"
-                                                    track-by="value" v-model="form.request_by" :multiple="false"
-                                                    label="label" :searchable="false" id="request_by"
-                                                    placeholder="Select Name">
-                                                </Multiselect> -->
+
                                             </div>
                                             <div class="col-lg-12">
                                                 <TextInput label="Office/Service/Bureau/Section/Division/Unit:"
@@ -322,7 +319,7 @@ export default {
                 month: '2-digit',
                 year: 'numeric'
             }).split('/').reverse().join('-'),
-            requested_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), // Set current time        
+            requested_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), // Set current time
             userData: {
                 name: null,
                 pmo_title: null,
@@ -402,24 +399,10 @@ export default {
         this.fetchEndUserInfo();
     },
     created() {
-        // this.PostUserRequestID()
+
     },
     methods: {
-        // PostUserRequestID() {
-        //     axios.get('/api/PostUserRequestID')
-        //         .then(response => {
-        //             // console.log(response.data)
-        //             this.qp_code = response.data.map(qp_code => ({
-        //                 label: qp_code.qp_code,
-        //                 value: qp_code.id
-        //             }))
-        //             // this.QualityProcedure = response.data
-        //             // console.log(this.QualityProcedure)
-        //         })
-        //         .catch(error => {
-        //             console.error('Error Fetching items:', error)
-        //         })
-        // },
+
         formatTime(time) {
             if (!time) return '';
             const [hours, minutes] = time.split(':');
@@ -437,20 +420,9 @@ export default {
             });
         },
         async create_ict_ta() {
-            if (this.isSaving) return; // prevent multiple clicks
+            if (this.isSaving) return;
 
-            // Validation: Check if remarks is not empty
-            if (!this.remarks || this.remarks.trim() === '') {
-                if (!this.toastShown) {
-                    this.toastShown = true;
-                    toast.error("Please fill out the 'REMARKS.'", {
-                        autoClose: 2500,
-                    });
-                }
-                return;
-            }
-
-            this.isSaving = true; // Set saving flag
+            this.isSaving = true;
 
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
             const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
@@ -484,7 +456,7 @@ export default {
                         });
                         setTimeout(() => {
                             this.$router.push({ path: '/rictu/ict_ta/index' }).then(() => {
-                                window.location.reload(); // Forces the page to reload
+                                window.location.reload();
                             });
                         });
                     }).catch((error) => {
@@ -493,7 +465,7 @@ export default {
                             autoClose: 2500,
                         });
                     }).finally(() => {
-                        this.isSaving = false; // Reset the flag whether success or error
+                        this.isSaving = false;
                     });
                 })
         },
@@ -509,22 +481,24 @@ export default {
         generateICTControlNo: async function () {
             try {
                 const response = await axios.get('../../../api/generateICTControlNo');
+                if (!response.data || response.data.length === 0 || !response.data[0].ict_no_count) {
+                    throw new Error('Invalid response from the server');
+                }
+
                 const currentDate = new Date();
                 const year = currentDate.getFullYear();
-                const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-indexed
-                const ict_no_format = `${year}`;
-                const ict_no = response.data[0].ict_no_count;
-                const formattedSequence = ict_no.toString().padStart(4, '0');
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const ict_no_count = response.data[0].ict_no_count;
 
-                // set the draft pr no of the user
-                this.ict_no = `R4A-${ict_no_format}-${month}-${formattedSequence}`;
+                if (isNaN(ict_no_count) || ict_no_count < 0) {
+                    throw new Error('Invalid ICT number count');
+                }
 
-                // localStorage.setItem('prId', response.data.userId);
-
-                //this.fetchCartDetails();
-                // this.fetchPurchaseRequestDetails();
+                const formattedSequence = String(ict_no_count).padStart(4, '0');
+                this.ict_no = `R4A-${year}-${month}-${formattedSequence}`;
             } catch (error) {
-                console.error('Error fetching data', error);
+                console.error('Error generating ICT Control Number:', error.message);r
+                this.ict_no = 'Error generating ICT Control Number';
             }
         },
     },
