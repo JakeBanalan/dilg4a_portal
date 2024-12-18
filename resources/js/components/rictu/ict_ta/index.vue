@@ -57,12 +57,12 @@ h5 {
                                                     <div class="col-lg-3">
                                                         <label style="font-size: 0.875rem;">Control No</label>
                                                         <input type="text" v-model="control_no"
-                                                            placeholder="Control Number" />
+                                                            placeholder="Control Number" @keyup.enter="filter" />
                                                     </div>
                                                     <div class="col-lg-3">
                                                         <label style="font-size: 0.875rem;">Request By</label>
                                                         <input type="text" v-model="requested_by"
-                                                            placeholder="Requested By" />
+                                                            placeholder="Requested By" @keyup.enter="filter" />
                                                     </div>
 
                                                     <div class="col-lg-3">
