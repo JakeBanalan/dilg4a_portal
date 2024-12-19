@@ -66,6 +66,12 @@ h5 {
                                                     </div>
 
                                                     <div class="col-lg-3">
+                                                        <label style="font-size: 0.875rem;">Technical Personnel</label>
+                                                        <input type="text" v-model="ict_personnel"
+                                                            placeholder="Technical Personnel" @keyup.enter="filter" />
+                                                    </div>
+
+                                                    <div class="col-lg-3">
                                                         <label style="font-size: 0.875rem;">Start Date</label>
                                                         <input type="date" class="form-control" v-model="start_date" />
                                                     </div>
@@ -189,15 +195,17 @@ export default {
             const status = this.selected_status ? this.selected_status.value : null;
             const controlNo = this.control_no;
             const requestedBy = this.requested_by;
+            const ictPersonnel = this.ict_personnel;
             const startDate = this.start_date;
             const endDate = this.end_date;
             const pmo = this.selected_pmo ? this.selected_pmo.value : null;
 
-            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate, pmo);
+            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate, pmo,ictPersonnel);
         },
         resetFilter() {
             this.control_no = '';
             this.requested_by = '';
+            this.ict_personnel = '';
             this.start_date = '';
             this.end_date = '';
             this.selected_pmo = '';

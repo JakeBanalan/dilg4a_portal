@@ -264,12 +264,13 @@ export default {
                 return formattedDate;
             }
         },
-        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null) {
+        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
 
             const params = {
                 ...(controlNo && { control_no: controlNo }),
                 ...(requestedBy && { requested_by: requestedBy }),
+                ...(ictPersonnel && { ict_personnel: ictPersonnel }),
                 ...(startDate && { start_date: startDate }),
                 ...(endDate && { end_date: endDate }),
                 ...(pmo && { pmo }),

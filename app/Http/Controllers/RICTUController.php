@@ -110,6 +110,7 @@ class RICTUController extends Controller
         $itemsPerPage = $request->query('itemsPerPage', 10000);
         $control_no = $request->query('control_no');
         $requested_by = $request->query('requested_by');
+        $ict_personnel = $request->query('ict_personnel');
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
         $pmo = $request->query('pmo');
@@ -153,6 +154,10 @@ class RICTUController extends Controller
 
         if ($requested_by) {
             $ictQuery->where(DB::raw('CONCAT(u.first_name, " ", u.last_name)'), 'LIKE', "%$requested_by%");
+        }
+
+        if ($ict_personnel) {
+            $ictQuery->where(DB::raw('ip.ict_personnel'), 'LIKE', "%$ict_personnel%");
         }
 
         if ($start_date && $end_date) {
