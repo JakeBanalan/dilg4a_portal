@@ -24,7 +24,7 @@
 }
 </style>
 <template>
-    <Pagination :total="purchaseRequests.length" @pageChange="onPageChange" />
+
 
     <table id="pr_id" class="table table-striped table-bordered mb-3">
 
@@ -89,14 +89,14 @@
                     </div>
                     <div v-else-if="purchaseRequest.status_id == 9">
                         <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)"> <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon> </button>
-                       
+
                     </div>
                </td>
                <td v-else>
                 <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)"> <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon> </button>
                 <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="exportPurchaseRequest(purchaseRequest.id)"> <font-awesome-icon :icon="['fas', 'download']" style="margin-left: -3px;" /> </button>
                </td>
-        
+
                 <td>
                     <div v-if="purchaseRequest.status_id == 1" class="badge badge-success">{{ purchaseRequest.status }}
                     </div>
@@ -137,7 +137,8 @@
             </tr>
         </tbody>
     </table>
-
+    <Pagination :total="totalRecords" :currentPage="currentPage" :itemsPerPage="itemsPerPage"
+    @pageChange="onPageChange" />
 </template>
 
 <script>
@@ -155,6 +156,7 @@ export default {
             userId:null,
             roll:null,
             purchaseRequests: [],
+            totalRecords: 0,
             admins: [3174,2563],
             currentPage: 1,
             itemsPerPage: 10,
@@ -165,19 +167,24 @@ export default {
         FontAwesomeIcon
     },
     computed: {
-        totalPages() {
-            return Math.ceil(this.purchaseRequests.length / this.itemsPerPage);
-        },
-        displayedItems() {
-            const start = (this.currentPage - 1) * this.itemsPerPage;
-            const end = start + this.itemsPerPage;
-            return this.purchaseRequests.slice(start, end);
-        },
+    totalRecords() {
+        return this.purchaseRequests.length;
     },
+    displayedItems() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        return this.purchaseRequests.slice(start, end);
+    },
+    showingEntriesMessage() {
+        const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+        const end = Math.min(start + this.itemsPerPage - 1, this.totalRecords);
+        return `Showing ${start} to ${end} of ${this.totalRecords} entries`;
+    }
+},
     created() {
         this.userId = parseInt(localStorage.getItem('userId'));
         this.role = localStorage.getItem('user_role');
-        
+
 
     },
     mounted() {
@@ -201,7 +208,7 @@ export default {
         },
         onPageChange(page) {
             this.currentPage = page;
-            // Fetch data for the new page  
+            // Fetch data for the new page
             this.loadData();
         },
         viewPr(pr_id, status, step_no) {

@@ -204,46 +204,47 @@ class PurchaseRequestController extends Controller
     }
     public function fetchPurchaseReqData(Request $request)
     {
-        $page = $request->query('page');
-        $itemsPerPage = $request->query('itemsPerPage', 500);
+        $page = $request->query('page', 1); // Default to page 1 if not provided
+        $itemsPerPage = $request->query('itemsPerPage', 100); // Consider a lower default
 
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-        pr.id AS `id`,
-        MAX(pr.pr_no) AS `pr_no`,
-        MAX(pr.action_officer) AS `user_id`,
-        MAX(users.last_name) AS `created_by`,
-        MAX(pr.current_step) AS `step`,
-        MAX(pmo.pmo_title) AS `office`,
-        MAX(pr.submitted_by) AS `submitted_by`,
-        MAX(pr.purpose) AS `particulars`,
-        MAX(pr.pr_date) AS `pr_date`,
-        MAX(pr.target_date) AS `target_date`,
-        MAX(pr.is_urgent) AS `is_urgent`,
-        MAX(pr_items.qty) AS `quantity`,
-        MAX(pr_items.description) AS `desc`,
-        MAX(mode.mode_of_proc_title) AS `type`,
-        MAX(app.sn) AS `serial_no`,
-        MAX(app.item_title) AS `item_title`,
-        MAX(unit.item_unit_title) AS `unit`,
-        MAX(status.title) AS `status`,
-        MAX(status.id) AS `status_id`,
-        sum(pr_items.qty * app.app_price) as `app_price`
+            pr.id AS `id`,
+            MAX(pr.pr_no) AS `pr_no`,
+            MAX(pr.action_officer) AS `user_id`,
+            MAX(users.last_name) AS `created_by`,
+            MAX(pr.current_step) AS `step`,
+            MAX(pmo.pmo_title) AS `office`,
+            MAX(pr.submitted_by) AS `submitted_by`,
+            MAX(pr.purpose) AS `particulars`,
+            MAX(pr.pr_date) AS `pr_date`,
+            MAX(pr.target_date) AS `target_date`,
+            MAX(pr.is_urgent) AS `is_urgent`,
+            MAX(pr_items.qty) AS `quantity`,
+            MAX(pr_items.description) AS `desc`,
+            MAX(mode.mode_of_proc_title) AS `type`,
+            MAX(app.sn) AS `serial_no`,
+            MAX(app.item_title) AS `item_title`,
+            MAX(unit.item_unit_title) AS `unit`,
+            MAX(status.title) AS `status`,
+            MAX(status.id) AS `status_id`,
+            SUM(pr_items.qty * app.app_price) AS `app_price`
         '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
             ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
             ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
             ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.id')
-
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id') // Adjusted join
             ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
             ->orderBy('pr.id', 'desc')
             ->groupBy('pr.id');
 
-        $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
+        try {
+            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching data.'], 500);
+        }
 
-        // Dump and die to output the SQL for debugging
-        // dd($prData);
         return response()->json($prData);
     }
     public function fetchSubmittedtoGSS(Request $request)
@@ -299,29 +300,38 @@ class PurchaseRequestController extends Controller
 
 
 
-    public function viewPurchaseRequest($id, Request $request)
+    public function showPurchaseRequest($id, Request $request)
     {
+        return $this->viewPurchaseRequest($id, $request);
+    }
+
+    private function viewPurchaseRequest($id, Request $request)
+    {
+        // Validate the ID to ensure it's a valid integer
+        if (!is_numeric($id)) {
+            return response()->json(['error' => 'Invalid purchase request ID.'], 400);
+        }
 
         $query = AppItemModel::select(AppItemModel::raw('
-        tbl_app.id as `app_id`,
-        tbl_app.sn as `serial_no`,
-        tbl_app.item_title as `procurement`,
-        tbl_app.app_price as `app_price`,
-        unit.item_unit_title as `unit`,
-        pr_items.description as `description`,
-        pr_items.qty as `quantity`,
-        pr_items.qty * tbl_app.app_price as `total`,
-        pr.pr_no as `pr_no`,
-        pmo.pmo_title as `office`,
-        pmo.id as `office_id`,
-        pmo.pmo_contact_person as  `signatory`,
-        pmo.designation as  `designation`,
-        pr.type as `type`,
-        pr.pr_date as `pr_date`,
-        pr.target_date as `target_date`,
-        pr.purpose as `particulars`,
-        pr.current_step as `step`,
-        tbl_status.title as `status`
+            tbl_app.id as `app_id`,
+            tbl_app.sn as `serial_no`,
+            tbl_app.item_title as `procurement`,
+            tbl_app.app_price as `app_price`,
+            unit.item_unit_title as `unit`,
+            pr_items.description as `description`,
+            pr_items.qty as `quantity`,
+            pr_items.qty * tbl_app.app_price as `total`,
+            pr.pr_no as `pr_no`,
+            pmo.pmo_title as `office`,
+            pmo.id as `office_id`,
+            pmo.pmo_contact_person as `signatory`,
+            pmo.designation as `designation`,
+            pr.type as `type`,
+            pr.pr_date as `pr_date`,
+            pr.target_date as `target_date`,
+            pr.purpose as `particulars`,
+            pr.current_step as `step`,
+            tbl_status.title as `status`
         '))
             ->leftJoin('pr_items', 'pr_items.pr_item_id', '=', 'tbl_app.id')
             ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
@@ -330,11 +340,13 @@ class PurchaseRequestController extends Controller
             ->leftJoin('tbl_status', 'pr.stat', '=', 'tbl_status.id')
             ->where('pr.id', $id);
 
-        // Print the SQL query to check
-        // dd($query->toSql());
-
         // Execute the query and return the result
         $app_item = $query->get();
+
+        // Check if any items were found
+        if ($app_item->isEmpty()) {
+            return response()->json(['error' => 'Purchase request not found.'], 404);
+        }
 
         if ($request->has('export')) {
             // Export the data to Excel

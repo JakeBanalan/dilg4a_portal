@@ -183,7 +183,7 @@ Route::middleware('api')->group(function () {
 
 
 Route::middleware('api')->group(function () {
-    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
+    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
 });
 
 Route::middleware('api')->group(function () {
@@ -369,7 +369,7 @@ Route::post('saveMonthlyData', [QMSController::class, 'saveMonthlyData']);
 // E X P O R T
 // routes/web.php or routes/api.php
 Route::middleware('api')->group(function () {
-    Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
+    Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
 });
 
 Route::middleware('api')->group(function () {

@@ -5,13 +5,8 @@
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <BreadCrumbs />
+                    <!-- <BreadCrumbs /> -->
                     <div class="row">
-                        <div class="col-md-12 grid-margin transparent">
-                            <div class="row">
-                                <StatBox />
-                            </div>
-                        </div>
                         <div class="col-lg-12 col-md-12 col-sm-12 mt-4">
                             <div class="card mb-4">
                                 <div class="card-body">
@@ -19,26 +14,22 @@
                                             :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Purchase Request
                                         Information
                                     </h5>
-                                    <div class="btn-group" style="float:right;margin-top:-50px;">
-                                        <button type="button"
-                                            class="btn btn-outline-primary btn-fw btn-icon-text">Actions</button>
+                                    <div class="btn-group" style="float: right; margin-top: -50px;">
+                                        <button type="button" class="btn btn-outline-primary btn-fw btn-icon-text" disabled>
+                                            Actions
+                                        </button>
                                         <button type="button"
                                             class="btn btn-outline-primary btn-fw btn-icon-text dropdown-toggle dropdown-toggle-split"
                                             id="dropdownMenuSplitButton3" data-toggle="dropdown" aria-haspopup="true"
                                             aria-expanded="false">
                                             <span class="sr-only">Toggle Dropdown</span>
                                         </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuSplitButton3" style="">
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuSplitButton3">
                                             <h6 class="dropdown-header">Generate</h6>
                                             <div class="dropdown-divider"></div>
-
                                             <a class="dropdown-item" href="#">Export PR</a>
-                                            
-
                                         </div>
                                     </div>
-
-
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="row">
@@ -53,25 +44,27 @@
                                                         <label for="PurchaseRequestDate">Purchase Request
                                                             Date</label>
                                                         <input type="date" v-model="purchaseRequestData.pr_date"
-                                                            class="form-control" required />
+                                                            class="form-control" :readonly="true" />
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-3 col-md-12 col-sm-12">
                                                     <div class="form-group">
                                                         <label for="TargetDate">Target Date</label>
                                                         <input type="date" v-model="purchaseRequestData.target_date"
-                                                            class="form-control" required />
+                                                            class="form-control" :readonly="true" />
                                                     </div>
                                                 </div>
                                                 <div class="col-lg-3 col-md-12 col-sm-12">
                                                     <div class="form-group">
                                                         <label for="Office">Office</label>
-                                                        <select class="form-control" v-model="purchaseRequestData.pmo">
-                                                            <option v-for="option in pmoList" :key="option.value" :value="option.value">
-                                                              {{ option.label }}
+                                                        <select class="form-control" v-model="purchaseRequestData.pmo"
+                                                            :readonly="true">
+                                                            <option v-for="option in pmoList" :key="option.value"
+                                                                :value="option.value">
+                                                                {{ option.label }}
                                                             </option>
-                                                          </select>
-                                                          
+                                                        </select>
+
 
                                                     </div>
                                                 </div>
@@ -79,7 +72,7 @@
                                                     <div class="form-group">
                                                         <label for="ProcurementType">Procurement Type</label>
                                                         <select class="form-control"
-                                                            v-model="purchaseRequestData.pr_type">
+                                                            v-model="purchaseRequestData.pr_type" :readonly="true">
                                                             <option v-for="option in procurementType"
                                                                 :key="option.value" :value="option.value">
                                                                 {{ option.label }}
@@ -87,9 +80,11 @@
                                                         </select>
                                                     </div>
                                                 </div>
-                                               
+
                                                 <div class="col-lg-12 col-md-12 col-sm-12">
-                                                    <TextAreaInput label="Particulars" :value="purchaseRequestData.particulars"  v-model="purchaseRequestData.particulars" />
+                                                    <TextAreaInput label="Particulars"
+                                                        :value="purchaseRequestData.particulars"
+                                                        v-model="purchaseRequestData.particulars" />
                                                 </div>
                                             </div>
                                         </div>
@@ -138,7 +133,7 @@ import { toast } from "vue3-toastify";
 library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave);
 
 export default {
-    name: "ViewPurchaseRequestItem",
+    name: "update_pr",
     data() {
         return {
             modalVisible: false,

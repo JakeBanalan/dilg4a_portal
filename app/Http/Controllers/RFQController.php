@@ -143,10 +143,39 @@ class RFQController extends Controller
         $app_item = $query->get();
         return response()->json($app_item);
     }
-    
+
 
     private function exportToExcel($data)
     {
+
+        $data = [
+            [
+                'pr_id' => 1,
+                'rfq_id' => 2,
+                'rfq_no' => 'RFQ-2024-002',
+                'mode' => 'Direct Purchase',
+                'office' => 'Main Office',
+                'app_price' => 100.00,
+                // other fields...
+            ],
+            // more rows...
+        ];
+
+        // Check if data is empty
+        if (empty($data)) {
+            throw new \Exception("Data array is empty.");
+        }
+
+        // Define required keys
+        $requiredKeys = ['pr_id', 'rfq_id', 'rfq_no', 'mode', 'office'];
+
+        // Validate required keys
+        foreach ($requiredKeys as $key) {
+            if (!isset($data[0][$key])) {
+                throw new \Exception("Required key '{$key}' is missing in the data array.");
+            }
+        }
+
         // Load the existing Excel template
         $templatePath = public_path('templates/rfq_template.xlsx');
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
@@ -154,46 +183,43 @@ class RFQController extends Controller
         // Get the active sheet
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Define column headers
-        $headers = ['pr_no', 'serial_no', 'procurement'];
-
-        // Initialize row counter
-        $row        = 29; // Assuming your data starts from the second row in the template
-        $pr_id     = $data[0]['pr_id'];
-        $rfq_id     = $data[0]['rfq_id'];
-        $rfq_no     = $data[0]['rfq_no'];
-        $mode       = $data[0]['mode'];
-        $office     = $data[0]['office'];
+        // Initialize variables
+        $row = 29; // Assuming your data starts from the second row in the template
+        $pr_id = $data[0]['pr_id'];
+        $rfq_id = $data[0]['rfq_id'];
+        $rfq_no = $data[0]['rfq_no'];
+        $mode = $data[0]['mode'];
+        $office = $data[0]['office'];
         $total_amount = 0; // Initialize total amount
 
         // Iterate through each row of data
         foreach ($data as $rowData) {
             // Add app_price of each row to total_amount
-            $total_amount += $rowData['app_price'];
+            if (isset($rowData['app_price'])) {
+                $total_amount += $rowData['app_price'];
+            } else {
+                throw new \Exception("Key 'app_price' is missing in the row data.");
+            }
         }
 
-        // $rfq_date   = Carbon::createFromFormat('Y-m-d', $data[0]['rfq_date'])->format('F d, Y');
-        // $signatories = $data[0]['signatory'];
-        // $designation = $data[0]['designation'];
-
+        // Set values in the spreadsheet
         $sheet->setCellValueByColumnAndRow(4, 5, $mode);
         $sheet->setCellValueByColumnAndRow(10, 6, '');
         $sheet->setCellValueByColumnAndRow(4, 7, $office);
         $sheet->setCellValueByColumnAndRow(11, 5, $rfq_no);
         $sheet->setCellValueByColumnAndRow(1, 25, $total_amount);
 
-
         $query = AppItemModel::select(AppItemModel::raw('
-        pr.pr_no,
-        tbl_app.id as `app_id`,
-        tbl_app.sn as `serial_no`,
-        tbl_app.item_title as `procurement`,
-        tbl_app.app_price as `app_price`,
-        unit.item_unit_title as `unit`,
-        pr_items.description as `description`,
-        pr_items.qty as `quantity`,
-        pr_items.qty * tbl_app.app_price as `total`,
-        pr.purpose
+            pr.pr_no,
+            tbl_app.id as `app_id`,
+            tbl_app.sn as `serial_no`,
+            tbl_app.item_title as `procurement`,
+            tbl_app.app_price as `app_price`,
+            unit.item_unit_title as `unit`,
+            pr_items.description as `description`,
+            pr_items.qty as `quantity`,
+            pr_items.qty * tbl_app.app_price as `total`,
+            pr.purpose
         '))
             ->leftJoin('pr_items', 'pr_items.pr_item_id', '=', 'tbl_app.id')
             ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
@@ -202,30 +228,28 @@ class RFQController extends Controller
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
             ->leftJoin('tbl_status', 'pr.stat', '=', 'tbl_status.id')
             ->where('rfq.rfq_no', $rfq_no);
-         
+
         $app_data = $query->get();
         $lastRow = $row + count($app_data) + 2;
 
-        // END OF PR ITEM LIST
         // Concatenate PR numbers and their purposes with line breaks
         $prNumbersWithPurpose = '';
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-        pr.pr_no,
-        pr.purpose
+            pr.pr_no,
+            pr.purpose
         '))
             ->leftJoin('tbl_rfq as rfq', 'rfq.pr_id', '=', 'pr.id')
             ->where('rfq.rfq_no', $rfq_no);
-            $pr_data = $query->get();
+        $pr_data = $query->get();
 
         foreach ($pr_data as $rowData) {
             $prNumbersWithPurpose .= "REF: PR No: {$rowData->pr_no}\nPurpose: {$rowData->purpose}\n\n";
         }
-        $sheet->setCellValueByColumnAndRow(2, $lastRow , $prNumbersWithPurpose);
+        $sheet->setCellValueByColumnAndRow(2, $lastRow, $prNumbersWithPurpose);
         $sheet->mergeCells('B' . $lastRow . ':E' . $lastRow);
         $sheet->getRowDimension($lastRow)->setRowHeight(165);
-        // $sheet->setCellValueByColumnAndRow(12, $lastRow, $total_amount);
 
-        $lastRow+=2;
+        $lastRow += 2;
         $sheet->setCellValue('B' . $lastRow, 'GRAND TOTAL');
         $sheet->mergeCells('B' . $lastRow . ':K' . $lastRow);
         $sheet->getStyle('B' . $lastRow)->getFont()->setBold(true);
@@ -246,11 +270,6 @@ class RFQController extends Controller
 
             $row++;
         }
-
-        
-
-
-
 
         $sheet->getProtection()->setPassword('dilg4a@2024');
 
