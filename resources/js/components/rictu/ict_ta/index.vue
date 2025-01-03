@@ -151,6 +151,7 @@ export default {
             start_date: '',
             end_date: '',
             value: null,
+            ict_personnel: null,
             modalVisible: false,
             selected_pmo: [],
             pmo: [
