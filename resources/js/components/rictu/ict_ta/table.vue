@@ -180,7 +180,6 @@ export default {
             role: null,
             currentPage: 1,
             itemsPerPage: 10,
-            totalRecords: 0,
             modalVisible: false,
             selected_id: null,
             id: null,
@@ -280,12 +279,10 @@ export default {
             axios.get(url, { params })
                 .then(response => {
                     this.ict_data = response.data.data || [];
-                    this.totalRecords = response.data.total; // Assuming your API sends total count
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                     this.ict_data = [];
-                    this.totalRecords = 0; // Reset totalRecords on error
                 });
         },
 
