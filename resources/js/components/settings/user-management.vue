@@ -205,10 +205,10 @@
                         <div class="col-md-12 pt-4">
                             <div class="card">
                                 <div class="card-body">
-                                    <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                    <!-- <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
                                         @click="toggleCard()" style="float:right;">
                                         Advanced Search
-                                    </button>
+                                    </button> -->
                                     <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
                                         @click="createUser()" style="float:right;">
                                         Create User
@@ -220,7 +220,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div> <!-- content-wrapper -->
                 <FooterVue />
             </div>
@@ -362,7 +361,7 @@ export default {
                         pageLength: 20,
                         bLengthChange: false,
                         bInfo: false,
-                        filter: false,
+                        filter: true,
                         columns: [
                             { data: 'employee_no' },
                             { data: 'pmo_title' },
@@ -383,7 +382,6 @@ export default {
                     //   const id = $(this).data('id');
                     //   vm.UpdateUser(id); // Call the Vue method
                     // });
-
                     $('#employee_table tbody').on('click', 'button', function () {
                         const id = $(this).data('id');
                         vm.UpdateUser(id);

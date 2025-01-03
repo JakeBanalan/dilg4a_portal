@@ -70,7 +70,6 @@ h5 {
                                                         <input type="text" v-model="ict_personnel"
                                                             placeholder="Technical Personnel" @keyup.enter="filter" />
                                                     </div>
-
                                                     <div class="col-lg-3">
                                                         <label style="font-size: 0.875rem;">Start Date</label>
                                                         <input type="date" class="form-control" v-model="start_date" />
@@ -200,7 +199,15 @@ export default {
             const endDate = this.end_date;
             const pmo = this.selected_pmo ? this.selected_pmo.value : null;
 
-            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate, pmo,ictPersonnel);
+            // Extract the year from the start_date or end_date
+            let year = null;
+            if (startDate) {
+                year = new Date(startDate).getFullYear();
+            } else if (endDate) {
+                year = new Date(endDate).getFullYear();
+            }
+
+            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate, pmo, ictPersonnel, year);
         },
         resetFilter() {
             this.control_no = '';

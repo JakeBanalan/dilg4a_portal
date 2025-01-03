@@ -497,10 +497,10 @@ export default {
                 const formattedSequence = String(ict_no_count).padStart(4, '0');
                 this.ict_no = `R4A-${year}-${month}-${formattedSequence}`;
             } catch (error) {
-                console.error('Error generating ICT Control Number:', error.message);r
+                console.error('Error generating ICT Control Number:', error.message);
                 this.ict_no = 'Error generating ICT Control Number';
             }
-        },
+        }
     },
     components: {
         Navbar,

@@ -34,9 +34,10 @@ class RICTUController extends Controller
     }
     public function generateICTControlNo()
     {
+        $currentYear = date('Y');
         return response()->json(
-            RICTUModel::select(RICTUModel::raw('COUNT(*)+1 as "ict_no_count" '))
-                ->whereYear('request_date', 2024)
+            RICTUModel::select(RICTUModel::raw('COUNT(*)+1 as "ict_no_count"'))
+                ->whereYear('request_date', $currentYear)
                 ->get()
         );
     }
@@ -102,10 +103,8 @@ class RICTUController extends Controller
     }
 
 
-
     public function fetch_ict_request(Request $request, $status = null)
     {
-
         $page = $request->query('page');
         $itemsPerPage = $request->query('itemsPerPage', 10000);
         $control_no = $request->query('control_no');
@@ -114,34 +113,36 @@ class RICTUController extends Controller
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
         $pmo = $request->query('pmo');
+        $year = $request->query('year', 2025); // Default to 2025 if year is not provided
 
         $ictQuery = RICTUModel::select(RICTUModel::raw('
-        tbl_technicalassistance.id AS id,
-        tbl_technicalassistance.control_no AS control_no,
-        CONCAT(u.first_name, " ", u.last_name) AS requested_by,
-        u.user_role AS role,
-        tbl_technicalassistance.started_date AS started_date,
-        TIME(tbl_technicalassistance.started_date) AS started_time,
-        MONTH(tbl_technicalassistance.started_date) AS month,
-        YEAR(tbl_technicalassistance.started_date) AS year,
-        tbl_technicalassistance.request_date AS request_date,
-        tbl_technicalassistance.completed_date AS completed_date,
-        tbl_technicalassistance.remarks AS remarks,
-        cl.link AS css_link,
-        p.pmo_title AS office,
-        itr.request_type AS request_type,
-        c.TITLE AS sub_request_type,
-        ip.ict_personnel AS ict_personnel,
-        is.status AS status,
-        is.id AS status_id
-    '))
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.control_no AS control_no,
+            CONCAT(u.first_name, " ", u.last_name) AS requested_by,
+            u.user_role AS role,
+            tbl_technicalassistance.started_date AS started_date,
+            TIME(tbl_technicalassistance.started_date) AS started_time,
+            MONTH(tbl_technicalassistance.started_date) AS month,
+            YEAR(tbl_technicalassistance.started_date) AS year,
+            tbl_technicalassistance.request_date AS request_date,
+            tbl_technicalassistance.completed_date AS completed_date,
+            tbl_technicalassistance.remarks AS remarks,
+            cl.link AS css_link,
+            p.pmo_title AS office,
+            itr.request_type AS request_type,
+            c.TITLE AS sub_request_type,
+            ip.ict_personnel AS ict_personnel,
+            is.status AS status,
+            is.id AS status_id
+        '))
             ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
             ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
             ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
             ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
-            ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link');
+            ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
+            ->whereYear('tbl_technicalassistance.created_at', $year); // Filter by the provided year
 
         if ($status !== null && $status != 6) {
             $ictQuery->where('tbl_technicalassistance.status_id', $status);
@@ -150,7 +151,6 @@ class RICTUController extends Controller
         if ($control_no) {
             $ictQuery->where('tbl_technicalassistance.control_no', 'LIKE', "%$control_no%");
         }
-
 
         if ($requested_by) {
             $ictQuery->where(DB::raw('CONCAT(u.first_name, " ", u.last_name)'), 'LIKE', "%$requested_by%");
@@ -404,7 +404,8 @@ class RICTUController extends Controller
     public function totalCountICTrequest()
     {
         $count = RICTUModel::select(RICTUModel::raw('count(*) as ictTotal'))
-            ->first(); // Use first() to get a single record
+            ->whereYear('created_at', 2025)
+            ->first();
 
         return response()->json(['ictTotal' => $count->ictTotal]);
     }
@@ -418,39 +419,10 @@ class RICTUController extends Controller
                 RICTUModel::raw('COUNT(CASE WHEN status_id = 3 THEN 1 END) as completed'),
                 RICTUModel::raw('COUNT(CASE WHEN status_id = 4 THEN 1 END) as returned')
             )
+                ->whereYear('created_at', 2025)
                 ->get()
         );
     }
-
-
-    // public function countHardwareRequest($userId)
-    // {
-    //     $hardwareCount = RICTUModel::select(DB::raw('COUNT(*) AS hardware_count'))
-    //         ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-    //         ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-    //         ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-    //         ->whereIn('c.REQUEST_ID', [1, 2, 3, 6, 7])
-    //         ->where('request_by', $userId)  // Filter by user ID
-    //         ->whereYear('created_at', 2023)
-    //         ->first();
-
-    //     return response()->json(['hardware_count' => $hardwareCount->hardware_count]);
-    // }
-
-    // public function countSoftwareRequest($userId)
-    // {
-    //     $softwareCount = RICTUModel::select(DB::raw('COUNT(*) AS software_count'))
-    //         ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-    //         ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-    //         ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-    //         ->whereIn('c.REQUEST_ID', [4, 5, 8])
-    //         ->where('request_by', $userId)  // Filter by user ID
-    //         ->whereYear('created_at', 2023)
-    //         ->first();
-
-    //     return response()->json(['software_count' => $softwareCount->software_count]);
-    // }
-
 
 
     public function generate($selectedYear, $selectedQuarter, $requestType)

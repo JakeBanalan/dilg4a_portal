@@ -251,7 +251,7 @@ export default {
 
         },
         fetchICTRequestCount() {
-            axios.get(`/api/countICTRequest/${this.user_id}/2024`)
+            axios.get(`/api/countICTRequest/${this.user_id}/2025`)
                 .then(response => {
                     this.ict_total = response.data.ict;
                 })
