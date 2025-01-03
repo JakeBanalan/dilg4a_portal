@@ -403,8 +403,9 @@ class RICTUController extends Controller
 
     public function totalCountICTrequest()
     {
+        $currentYear = date('Y');
         $count = RICTUModel::select(RICTUModel::raw('count(*) as ictTotal'))
-            ->whereYear('created_at', 2025)
+            ->whereYear('created_at', $currentYear)
             ->first();
 
         return response()->json(['ictTotal' => $count->ictTotal]);
