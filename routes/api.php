@@ -73,6 +73,8 @@ Route::middleware('api')->group(function () {
     Route::get('fetch_ict_request/{status}', [RICTUController::class, 'fetch_ict_request']);
 });
 
+Route::middleware('auth:api')->get('/getUserData', [RICTUController::class, 'getUserData']);
+
 Route::middleware('api')->group(function () {
     Route::get('fetch_ict_perUser/{status}/{userID}', [RICTUController::class, 'fetch_ict_perUser']);
 });

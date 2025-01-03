@@ -112,7 +112,7 @@ class RICTUController extends Controller
     {
 
         $page = $request->query('page');
-        $itemsPerPage = $request->query('itemsPerPage', 500);
+        $itemsPerPage = $request->query('itemsPerPage', 1000);
 
         if ($status == 6) {
 
@@ -184,7 +184,7 @@ class RICTUController extends Controller
     public function fetch_ict_perUser(Request $request, $status, $userID)
     {
         $page = $request->query('page');
-        $itemsPerPage = $request->query('itemsPerPage', 500);
+        $itemsPerPage = $request->query('itemsPerPage', 1000);
 
         if ($status == 6) {
 
@@ -536,6 +536,7 @@ class RICTUController extends Controller
             $sheet->setCellValue('B' . $row, $data['control_no']);
             $sheet->setCellValue('C' . $row, Date::PHPToExcel($data['started_date']));
             $sheet->getStyle('C' . $row)->getNumberFormat()->setFormatCode($dateFormat);
+            $sheet->getStyle('D' . $row)->getNumberFormat()->setFormatCode('hh:mm AM/PM');
             $sheet->setCellValue('D' . $row, $data['started_time']);
             $sheet->setCellValue('E' . $row, $data['requested_by']);
             $sheet->setCellValue('F' . $row, $data['office']);
@@ -543,8 +544,9 @@ class RICTUController extends Controller
             $sheet->setCellValue('H' . $row, $data['ict_personnel']);
             $sheet->setCellValue('K' . $row, Date::PHPToExcel($data['completed_date']));
             $sheet->getStyle('K' . $row)->getNumberFormat()->setFormatCode($dateFormat);
+            $sheet->getStyle('L' . $row)->getNumberFormat()->setFormatCode('hh:mm AM/PM');
             $sheet->setCellValue('L' . $row, $data['completed_time']);
-            $sheet->setCellValue('M' . $row, '=INT(K' . $row . '-C' . $row . ')&" Days, "&HOUR(K' . $row . '-C' . $row . ')&" Hours and  "&MINUTE(K' . $row . '-C' . $row . ')&" Minutes"');
+            $sheet->setCellValue('M' . $row, '=IF((K'.$row.'-C'.$row.')>=1/24,HOUR(K'.$row.'-C'.$row.') & IF(HOUR(K'.$row.'-C'.$row.') = 1, " Hour and ", " Hours and ") & (MINUTE(K'.$row.'-C'.$row.') + IF(SECOND(K'.$row.'-C'.$row.') > 0, 1, 0)) & " Minutes", (INT((K'.$row.'-C'.$row.')*1440) + IF(SECOND(K'.$row.'-C'.$row.') > 0, 1, 0)) & " Minutes")');
             $sheet->getRowDimension($row)->setRowHeight(60);
 
             try {
