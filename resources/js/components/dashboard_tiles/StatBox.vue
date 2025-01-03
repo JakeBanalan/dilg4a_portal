@@ -1,20 +1,11 @@
 <template>
     <div class="row">
         <div class="col-md-6 grid-margin stretch-card">
-                <div class="card-people mt-auto">
-                    <img :src="dashboard_img1" alt="people">
-                    <!-- <div class="weather-info">
-                        <div class="d-flex">
-                            <div>
-                                <h2 class="mb-0 font-weight-normal"><i class="icon-sun mr-2"></i>31<sup>C</sup></h2>
-                            </div>
-                            <div class="ml-2">
-                                <h4 class="location font-weight-normal">Bangalore</h4>
-                                <h6 class="font-weight-normal">India</h6>
-                            </div>
-                        </div>
-                    </div> -->
-                </div>
+            <div class="card-people mt-auto">
+                <img :src="currentImage" alt="people">
+                <button @click="prevImage" class="arrow left-arrow">&#9664;</button>
+                <button @click="nextImage" class="arrow right-arrow">&#9654;</button>
+            </div>
         </div>
         <div class="col-md-6 grid-margin transparent">
             <div class="row">
@@ -22,8 +13,8 @@
                     <div class="card card-dark-blue">
                         <div class="card-body">
                             <p class="mb-4">Procurement Status</p>
-                            <p class="fs-30 mb-2">{{this.total_pr}}</p>
-                            <p>{{this.$formatDecimal((this.total_pr / 300)*100)}}% as of today</p>
+                            <p class="fs-30 mb-2">{{ this.total_pr }}</p>
+                            <p>{{ this.$formatDecimal((this.total_pr / 300) * 100) }}% as of today</p>
                         </div>
                     </div>
                 </div>
@@ -31,7 +22,7 @@
                     <div class="card card-dark-blue">
                         <div class="card-body">
                             <p class="mb-4">Active Accounts</p>
-                            <p class="fs-30 mb-2">{{this.total_accounts}}</p>
+                            <p class="fs-30 mb-2">{{ this.total_accounts }}</p>
                             <p>22.00% (30 days)</p>
                         </div>
                     </div>
@@ -60,42 +51,72 @@
         </div>
     </div>
 </template>
-<style></style>
+<style>
+.arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    z-index: 10;
+    opacity: 30%;
+}
+
+.left-arrow {
+    left: 10px;
+}
+
+.right-arrow {
+    right: 10px;
+}
+</style>
 <script>
 import dashboard_img1 from "../../../../assets/images/banner1.png";
+import dashboard_img2 from "../../../../assets/images/banner2.png"; // Add more images
+import dashboard_img3 from "../../../../assets/images/banner3.png";
+import dashboard_img4 from "../../../../assets/images/banner3.png";
 
 export default {
     name: 'StatBox',
-    components: {
-
-    }, data() {
+    data() {
         return {
-            dashboard_img1: dashboard_img1,
-            total_pr:null,
-            total_accounts:null
+            images: [dashboard_img1, dashboard_img2, dashboard_img3, dashboard_img4], // Array of images
+            currentIndex: 0,
+            currentImage: dashboard_img1,
+            total_pr: null,
+            total_accounts: null
         }
     },
     mounted() {
-        // this.fetch_total_pr();
-        // this.fetch_total_accounts();
+        this.fetch_total_pr();
+        this.fetch_total_accounts();
     },
     methods: {
+        nextImage() {
+            this.currentIndex = (this.currentIndex + 1) % this.images.length;
+            this.currentImage = this.images[this.currentIndex];
+        },
+        prevImage() {
+            this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length
+            this.currentImage = this.images[this.currentIndex];
+        },
         fetch_total_pr() {
             this.$count('/api/countPurchaseRequestStatistics', 2024)
-                .then(data => 
-                { 
+                .then(data => {
                     this.total_pr = data.total_pr;
                 })
-                .catch(error => { console.error(error) })
+                .catch(error => { console.error(error) });
         },
-        fetch_total_accounts()
-        {
+        fetch_total_accounts() {
             this.$count('/api/getActiveAccounts')
-                .then(data => 
-                { 
+                .then(data => {
                     this.total_accounts = data.total_accounts;
                 })
-                .catch(error => { console.error(error) })
+                .catch(error => { console.error(error) });
         }
     },
 }

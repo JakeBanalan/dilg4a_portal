@@ -50,18 +50,31 @@ img {
                                 <div class="box box-primary box-solid dropbox" style="border:1px solid black;">
                                     <div class="box-header with-border"
                                         style="background-color: #000;padding:2px;color:#fff;">
-                                        <h6 class="box-title">Document Code</h6>
+                                        <span class="box-title" style="font-size: 13pt;">Document Code</span>
                                     </div>
                                     <div class="box-header with-border"
                                         style="color:black;padding:2px;text-align:center;">
                                         <h6 class="box-title">FM-QP-DILG-ISTMS-RO-17-01</h6>
                                     </div>
                                     <div class="box-header with-border"
-                                        style="background-color: #000;padding:2px;color:#fff;">
-                                        <h6 class="box-title" style="text-align: center;">Rev No. Eff. Date Page</h6>
+                                        style="display: flex; align-items: center; height: 30px; background-color: #000;padding:2px;color:#fff;">
+                                        <div style="margin: 0 10px;">Rev No</div>
+                                        <div style="width: 2px; height: 30px; background-color: black; margin: 0 30px;">
+                                        </div>
+                                        <div style="margin: 0 10px;">Eff. Date</div>
+                                        <div
+                                            style="width: 2px;  height: 30px; background-color: black; margin: 0 30px;">
+                                        </div>
+                                        <div style="margin: 0 10px;">Page</div>
                                     </div>
-                                    <div class="box-header with-border" style="background-color:#fff;padding:2px;">
-                                        <h6 class="box-title">00 06.15.21 1 of 1</h6>
+                                    <div class="box" style="display: flex; align-items: center; height: 50px;">
+                                        <div style="margin: 0 30px;">01</div>
+                                        <div style="width: 2px; height: 50px; background-color: black; margin: 0 30px;">
+                                        </div>
+                                        <div style="margin: 0 5px;">03.01.23</div>
+                                        <div style="width: 2px; height: 50px; background-color: black; margin: 0 25px;">
+                                        </div>
+                                        <div style="margin: 0 20px;">1 of 1</div>
                                     </div>
 
                                 </div>
@@ -69,14 +82,15 @@ img {
                                     <div class="box-header with-border" style="background-color: #000;color:#fff;">
                                         <h4 class="box-title">ICT Technical Assistance Reference Number</h4>
                                     </div>
-                                    <center><span style="text-align:center;color:red;font-weight:bold;font-size:24px;">
-                                            {{ ict_no }}
-                                        </span></center>
+                                    <div style="text-align:center; color:red; font-weight:bold; font-size:24px;">
+                                        {{ ict_no }}
+                                    </div>
                                 </div>
                             </div>
 
 
                         </div>
+                        <br>
                         <div class="row">
                             <div class="col-lg-6 mt-4">
                                 <div class="card">
@@ -89,7 +103,7 @@ img {
 
                                             <div class="col-lg-6">
                                                 <input type="hidden" v-model="ict_no" />
-                                                <TextInput label="Requested Date:" iconValue="calendar" type="date"
+                                                <TextInput label="Date:" iconValue="calendar" type="date"
                                                     style="height: 40px !important;" v-model="requested_date"
                                                     :readonly="true" :value="requested_date" />
                                             </div>
@@ -97,10 +111,12 @@ img {
                                                 <TextInput label="Time:" iconValue="calendar" type="text"
                                                     style="height: 40px !important;" v-model="requested_time"
                                                     :readonly="true" :value="formatTime(requested_time)" />
+
                                             </div>
                                             <div class="col-lg-12 mt-4">
                                                 <TextInput label="Requested By:" iconValue="user"
                                                     v-model="userData.name" :value="userData.name" :readonly="true" />
+
                                             </div>
                                             <div class="col-lg-12">
                                                 <TextInput label="Office/Service/Bureau/Section/Division/Unit:"
@@ -200,7 +216,7 @@ img {
                                             </div>
 
                                             <div class="col-lg-12">
-                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS *(REQUIRED): "
+                                                <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
                                                     v-model="remarks" />
                                             </div>
 
@@ -303,7 +319,7 @@ export default {
                 month: '2-digit',
                 year: 'numeric'
             }).split('/').reverse().join('-'),
-            requested_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), // Set current time        
+            requested_time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), // Set current time
             userData: {
                 name: null,
                 pmo_title: null,
@@ -382,15 +398,11 @@ export default {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
     },
+    created() {
+
+    },
     methods: {
-        // async fetchUsers() {
-        //     try {
-        //         const response = await axios.get('/api/getAllUsers');
-        //         this.users = response.data;
-        //     } catch (error) {
-        //         console.error(error);
-        //     }
-        // },
+
         formatTime(time) {
             if (!time) return '';
             const [hours, minutes] = time.split(':');
@@ -408,20 +420,9 @@ export default {
             });
         },
         async create_ict_ta() {
-            if (this.isSaving) return; // prevent multiple clicks
+            if (this.isSaving) return;
 
-            // Validation: Check if remarks is not empty
-            if (!this.remarks || this.remarks.trim() === '') {
-                if (!this.toastShown) {
-                    this.toastShown = true;
-                    toast.error("Please fill out the 'REMARKS.'", {
-                        autoClose: 2500,
-                    });
-                }
-                return;
-            }
-
-            this.isSaving = true; // Set saving flag
+            this.isSaving = true;
 
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
             const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
@@ -455,7 +456,7 @@ export default {
                         });
                         setTimeout(() => {
                             this.$router.push({ path: '/rictu/ict_ta/index' }).then(() => {
-                                window.location.reload(); // Forces the page to reload
+                                window.location.reload();
                             });
                         });
                     }).catch((error) => {
@@ -464,7 +465,7 @@ export default {
                             autoClose: 2500,
                         });
                     }).finally(() => {
-                        this.isSaving = false; // Reset the flag whether success or error
+                        this.isSaving = false;
                     });
                 })
         },
@@ -480,24 +481,26 @@ export default {
         generateICTControlNo: async function () {
             try {
                 const response = await axios.get('../../../api/generateICTControlNo');
+                if (!response.data || response.data.length === 0 || !response.data[0].ict_no_count) {
+                    throw new Error('Invalid response from the server');
+                }
+
                 const currentDate = new Date();
                 const year = currentDate.getFullYear();
-                const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-indexed
-                const ict_no_format = `${year}`;
-                const ict_no = response.data[0].ict_no_count;
-                const formattedSequence = ict_no.toString().padStart(4, '0');
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const ict_no_count = response.data[0].ict_no_count;
 
-                // set the draft pr no of the user
-                this.ict_no = `R4A-${ict_no_format}-${month}-${formattedSequence}`;
+                if (isNaN(ict_no_count) || ict_no_count < 0) {
+                    throw new Error('Invalid ICT number count');
+                }
 
-                // localStorage.setItem('prId', response.data.userId);
-
-                //this.fetchCartDetails();
-                // this.fetchPurchaseRequestDetails();
+                const formattedSequence = String(ict_no_count).padStart(4, '0');
+                this.ict_no = `R4A-${year}-${month}-${formattedSequence}`;
             } catch (error) {
-                console.error('Error fetching data', error);
+                console.error('Error generating ICT Control Number:', error.message);
+                this.ict_no = 'Error generating ICT Control Number';
             }
-        },
+        }
     },
     components: {
         Navbar,

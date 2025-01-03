@@ -3,7 +3,7 @@
         <Navbar></Navbar>
         <div class="container-fluid page-body-wrapper">
             <Sidebar />
-            <!-- partial -->
+
             <div class="main-panel">
                 <div class="content-wrapper">
                     <BreadCrumbs />
@@ -18,10 +18,11 @@
                                                 class="mr-2"></font-awesome-icon>User Account Statistics</h4>
                                     </div>
                                     <table class="table">
-                                        <thead
-                                            style="text-align:center; background-color: #059886; display: table; width: 100%; table-layout: fixed;">
-                                            <th></th>
-                                            <th>TOTAL</th>
+                                        <thead style="text-align:center; background-color: #059886;">
+                                            <tr>
+                                                <th></th>
+                                                <th>TOTAL</th>
+                                            </tr>
                                         </thead>
                                         <tbody class="sbnone" style="display: block; height: 200px; overflow: auto;">
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
@@ -29,38 +30,31 @@
                                                 <td>2</td>
                                             </tr>
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
-
                                                 <td>Cavite</td>
                                                 <td>2</td>
                                             </tr>
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
-
                                                 <td>Laguna</td>
                                                 <td>2</td>
                                             </tr>
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
-
                                                 <td>Batangas</td>
                                                 <td>2</td>
                                             </tr>
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
-
                                                 <td>Rizal</td>
                                                 <td>2</td>
                                             </tr>
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
-
                                                 <td>Quezon</td>
                                                 <td>2</td>
                                             </tr>
                                             <tr style="display: table; width: 100%; table-layout: fixed;">
-
                                                 <td>Lucena City</td>
                                                 <td>2</td>
                                             </tr>
                                         </tbody>
                                     </table>
-
                                 </div>
                             </div>
                         </div>
@@ -74,8 +68,10 @@
                                     </div>
                                     <table class="table">
                                         <thead style="background-color: #059886;">
-                                            <th></th>
-                                            <th>TOTAL</th>
+                                            <tr>
+                                                <th></th>
+                                                <th>TOTAL</th>
+                                            </tr>
                                         </thead>
                                         <tbody class="sbnone">
                                             <tr>
@@ -88,12 +84,10 @@
                                             </tr>
                                         </tbody>
                                     </table>
-
                                 </div>
                             </div>
                         </div>
-
-                    </div> -->
+                    </div>
 
                     <!--Search Filter-->
                     <div class="row">
@@ -102,7 +96,6 @@
                                 <div class="card-body">
                                     <h4 class="card-title">Search Filter</h4>
                                     <form class="form-sample">
-
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="form-group row">
@@ -116,7 +109,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group row">
                                                     <div class="col-sm-10">
-                                                        <label>Employee ID No.:</label>
+                                                        <label> Employee ID No.:</label>
                                                         <div id="the-basics">
                                                             <input class="typeahead" type="text">
                                                         </div>
@@ -149,7 +142,6 @@
                                                 <div class="form-group row">
                                                     <div class="col-sm-10">
                                                         <label>Civil Status:</label>
-
                                                         <multiselect :options="options4" label="label" :multiple="false"
                                                             :searchable="false"> </multiselect>
                                                     </div>
@@ -159,7 +151,6 @@
                                                 <div class="form-group row">
                                                     <div class="col-sm-10">
                                                         <label>With Health Issues:</label>
-
                                                         <multiselect :options="options5" label="label" :multiple="false"
                                                             :searchable="false"> </multiselect>
                                                     </div>
@@ -168,34 +159,28 @@
                                         </div>
 
                                         <div class="row">
-
                                             <div class="col-md-4">
                                                 <div class="form-group row">
                                                     <div class="col-sm-10">
                                                         <label>Gender:</label>
-
                                                         <multiselect :options="options6" label="label" :multiple="false"
                                                             :searchable="false"> </multiselect>
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div class="col-md-4">
                                                 <div class="form-group row">
                                                     <div class="col-sm-10">
                                                         <label>PWD:</label>
-
                                                         <multiselect :options="options7" label="label" :multiple="false"
                                                             :searchable="false"> </multiselect>
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div class="col-md-4">
                                                 <div class="form-group row">
                                                     <div class="col-sm-10">
                                                         <label>Are you a Solo Parent:</label>
-
                                                         <multiselect :options="options8" label="label" :multiple="false"
                                                             :searchable="false"> </multiselect>
                                                     </div>
@@ -206,8 +191,7 @@
                                         <button type="submit" class="btn btn-outline-primary btn-icon-text btn-sm"><i
                                                 class="ti-filter"></i> Filter </button>&nbsp
                                         <button class="btn btn-outline-dark btn-icon-text btn-sm"><i
-                                                class="ti-reload"></i>
-                                            Clear</button>
+                                                class="ti-reload"></i> Clear</button>
                                     </form>
                                 </div>
                             </div>
@@ -281,8 +265,6 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div> <!-- content-wrapper -->
                 <FooterVue />
             </div>
@@ -406,15 +388,6 @@ export default {
         // this.fetchUserOfficeCount();
     },
     methods: {
-        fetchUserOfficeCount() {
-            axios.get('../../api/fetchUserOfficeCount')
-                .then(response => {
-                    console.log(response.data)
-                })
-                .catch((error) => {
-                    console.error('Error fetching employee data:', error);
-                });
-        },
         createUser() {
             this.$router.push({ path: `/settings/create` });
         },
@@ -428,9 +401,39 @@ export default {
             const vm = this; // Save Vue instance context
             axios.get('../../api/fetchEmployeeData')
                 .then((response) => {
-                    this.EmpTableData = response.data;
-                    this.initializeDataTable();
-                    console.log(response.data)
+                    // Update data table with fetched employee data
+                    console.log(response.data);
+                    $('#employee_table').DataTable({
+                        destroy: true, // Destroy existing DataTable instance
+                        data: response.data,
+                        pageLength: 20,
+                        bLengthChange: false,
+                        bInfo: false,
+                        filter: true,
+                        columns: [
+                            { data: 'employee_no' },
+                            { data: 'pmo_title' },
+                            { data: 'username' },
+                            { data: 'name' },
+                            { data: 'username' },
+                            { data: 'email' },
+                            { data: 'contact_details' },
+                            {
+                                data: null, orderable: false, render: function (data) {
+                                    return '<button type="button" class="btn btn-info btn-update" data-id="' + data.id + '">View</button>';
+                                },
+                            }
+                        ]
+                    });
+
+                    //   $(row).find('.btn-update').on('click', function () {
+                    //   const id = $(this).data('id');
+                    //   vm.UpdateUser(id); // Call the Vue method
+                    // });
+                    $('#employee_table tbody').on('click', 'button', function () {
+                        const id = $(this).data('id');
+                        vm.UpdateUser(id);
+                    });
 
                 })
                 .catch((error) => {

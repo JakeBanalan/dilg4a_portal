@@ -59,7 +59,7 @@ th {
                         aria-label="TIME: activate to sort column ascending">TIME</th>
                 </tr>
             </thead>
-            <tbody v-if="role === 'admin' || role === 'user'">
+            <tbody v-if="(role === 'admin' || role === 'user') && displayedItems.length > 0">
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
                     <td>
                         <!-- Buttons based on ICT request status -->
@@ -101,22 +101,26 @@ th {
 
                     <td>{{ ict_data.status }}</td>
                     <td>
-                        <b>{{ ict_data.control_no }}</b>
+                        <a href="#" v-if="role === 'admin'" @click.prevent="pdf_form(ict_data.id)">
+                            <b>{{ ict_data.control_no }}</b>
+                        </a>
+                        <b v-if="role === 'user'">{{ ict_data.control_no }}</b>
                         <br>
-                        <i>~Request Date: {{ formatDate(ict_data.requested_date) }}</i>~
+                        <i>~Request Date: {{ formatDate(ict_data.request_date) }}</i>~
                     </td>
-                    <td style="white-space:normal;">{{ ict_data.remarks }}</td>
+                    <td style=" white-space:normal;">{{ ict_data.remarks }}</td>
+
                     <!-- USER SURVEY LINK -->
                     <template v-if="role === 'user'">
                         <td v-if="ict_data.status === 'Completed'">
-                            <button class="btn btn-primary mr-1" :style="{ backgroundColor: '#059886', color: '#fff' }"
-                                :disabled="surveyLinkDisabled" @click="surveyCompleted(ict_data.css_link)">
+                            <button class="btn btn-primary mr-1" :style="{ backgroundColor: '#059886', color: '#fff' }">
                                 <font-awesome-icon :icon="['fas', 'square-poll-vertical']" />
                                 <a :href="ict_data.css_link" target="_blank" style="color:#fff"> Survey Link</a>
                             </button>
                         </td>
                         <td v-else> ~ </td>
                     </template>
+
                     <!-- ADMIN SURVEY LINK -->
                     <template v-if="role === 'admin'">
                         <td v-if="ict_data.status === 'Completed'">
@@ -128,8 +132,8 @@ th {
                         <td v-else> ~ </td>
                     </template>
 
-                    <td> {{ formatDate(ict_data.received_date) }}</td>
-                    <td> {{ formatTime(ict_data.received_date) }}</td>
+                    <td> {{ formatDate(ict_data.started_date) }}</td>
+                    <td> {{ formatTime(ict_data.started_date) }}</td>
                     <td>{{ ict_data.requested_by }}</td>
                     <td>{{ ict_data.office }}</td>
                     <td>{{ ict_data.ict_personnel }}</td>
@@ -144,7 +148,9 @@ th {
             </tbody>
 
         </table>
-        <Pagination :total="ict_data.length" @pageChange="onPageChange" />
+        <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
+        <Pagination :total="totalRecords" :currentPage="currentPage" :itemsPerPage="itemsPerPage"
+            @pageChange="onPageChange" />
 
     </div>
     <modal_complete_ta :visible="modalVisible" @close="closeModal" :id="selected_id" :control_no="control_no"
@@ -174,48 +180,46 @@ export default {
             role: null,
             currentPage: 1,
             itemsPerPage: 10,
+            totalRecords: 0,
             modalVisible: false,
             selected_id: null,
-
             id: null,
             control_no: null,
             requested_by: null,
             office: null,
             request_date: null,
+            started_date: null,
             request_type: null,
             sub_request_type: null,
-            surveyLinkDisabled: false // New property to track the disabled state
         }
 
     },
     created() {
         this.user_id = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
-        this.surveyLinkDisabled = localStorage.getItem('surveyCompleted') === 'true'; // Correct initialization
-        console.log(new Date());
     },
     computed: {
-
-        totalPages() {
-            return Math.ceil(this.ict_data.length / this.itemsPerPage);
+        totalRecords() {
+            return this.ict_data.length; // Total records based on fetched data
         },
         displayedItems() {
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            return this.ict_data.slice(start, end);
+            return this.ict_data.slice(start, end); // Slice the data for current page
         },
+        showingEntriesMessage() {
+            const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+            const end = Math.min(start + this.itemsPerPage - 1, this.totalRecords);
+            return `Showing ${start} to ${end} of ${this.totalRecords} entries`;
+        }
     },
     mounted() {
         this.fetchRequests(this.role, 6);
-        // load the data when the user click the control_no to be completed
-        // then pass the control_no and id to the modal
 
     },
     methods: {
-        surveyCompleted(link) {
-            localStorage.setItem('surveyCompleted', 'true');
-            this.surveyLinkDisabled = true; // Disable the survey link button
-            window.open(link, '_blank'); // Open the survey link in a new tab
+        onPageChange(page) {
+            this.currentPage = page;
         },
         fetchRequests(role, status) {
             if (role === 'admin') {
@@ -243,7 +247,6 @@ export default {
 
                     hour: 'numeric',
                     minute: 'numeric',
-                    second: 'numeric'
                 });
                 return formattedDate;
             }
@@ -261,17 +264,31 @@ export default {
                 return formattedDate;
             }
         },
-
-        load_ict_request(status) {
+        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
-            axios.get(url)
+
+            const params = {
+                ...(controlNo && { control_no: controlNo }),
+                ...(requestedBy && { requested_by: requestedBy }),
+                ...(ictPersonnel && { ict_personnel: ictPersonnel }),
+                ...(startDate && { start_date: startDate }),
+                ...(endDate && { end_date: endDate }),
+                ...(pmo && { pmo }),
+                ...(year && { year }) // Add the year parameter if it is provided
+            };
+
+            axios.get(url, { params })
                 .then(response => {
-                    this.ict_data = response.data.data;
+                    this.ict_data = response.data.data || [];
+                    this.totalRecords = response.data.total; // Assuming your API sends total count
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
+                    this.ict_data = [];
+                    this.totalRecords = 0; // Reset totalRecords on error
                 });
         },
+
         load_ict_perUser_request(status) {
             const url = status ? `../../api/fetch_ict_perUser/${status}/${this.user_id}` : `../../api/fetch_ict_perUser/6/${this.user_id}`;
             axios.get(url)
@@ -292,6 +309,7 @@ export default {
                     this.control_no = response.data.control_no
                     this.requested_by = response.data.requested_by
                     this.office = response.data.office
+                    this.started_date = response.data.started_date
                     this.request_date = response.data.request_date
                     this.request_type = response.data.request_type
                     this.sub_request_type = response.data.sub_request_type
@@ -301,12 +319,12 @@ export default {
                 });
         },
         view_ict_form(id) {
+            // Navigate to the view page with the id as a query parameter
             this.$router.push({ path: '/rictu/ict_ta/view', query: { id: id } });
         },
-        onPageChange(page) {
-            this.currentPage = page;
-            // Fetch data for the new page
-            this.loadData();
+        pdf_form(id) {
+            const url = this.$router.resolve({ path: '/rictu/ict_ta/pdf', query: { id: id } }).href;
+            window.open(url, '_blank'); // Open in a new tab
         },
         received_request(id) {
             const userId = localStorage.getItem('userId');

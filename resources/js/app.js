@@ -18,7 +18,7 @@ const app = createApp(App);
 Object.keys(globalMethods).forEach(methodName => {
     app.config.globalProperties[`$${methodName}`] = globalMethods[methodName];
 });
-    
+
 app.component('font-awesome-icon', FontAwesomeIcon); // Register font-awesome-icon globally
 app.component('vue-multiselect', VueMultiselect); // Register vue-multiselect globally
 app.component('TextInput', TextInput); // Register vue-multiselect globally
@@ -29,5 +29,5 @@ app.component('TextAreaInput', TextAreaInput); // Register vue-multiselect globa
 app.use(router)
    .use(store)
    .mount('#app');
-   
+
 

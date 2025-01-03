@@ -105,11 +105,6 @@
                     </div>
 
                 </li>
-                <!-- <li class="nav-item nav-settings d-none d-lg-flex">
-                    <a class="nav-link" href="#">
-                        <i class="icon-ellipsis"></i>
-                    </a>
-                </li> -->
             </ul>
             <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
                 data-toggle="offcanvas">
@@ -129,16 +124,15 @@ export default {
             username: '',
             userRole: '',
             userId: '',
-            loading: true // Add a loading state
+            loading: true,
+            pusher: null,
         }
     },
     created() {
         this.userId = localStorage.getItem('userId');
     },
     mounted() {
-        // Check if the user is logged in
         if (localStorage.getItem('api_token')) {
-            // Make an API call to retrieve the currently logged-in user's data
             axios.get('/api/getUserData', {
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('api_token')
@@ -156,22 +150,30 @@ export default {
                     if (this.userRole === 'admin') {
                         // Admin subscribes to the new TA request channel
                         this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index');
+
+                        // Function to subscribe to a channel and bind an event
+                        const subscribeAndBind = (channelName, eventName) => {
+                            const channel = pusher.subscribe(channelName);
+                            channel.bind(eventName, (data) => {
+                                window.location.reload();
+                            });
+                        };
+                        subscribeAndBind('received-ta-channel', 'received-ict-ta');
+                        subscribeAndBind('completed-ta-channel', 'completed-ict-ta');
                     }
                     else if (this.userRole === 'user') {
-                        // User subscribes to their own channels
                         this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
-                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received by the Admin!', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
+                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
                     }
-                    this.loading = false; // Set loading to false after fetching data
+                    this.loading = false;
                 })
                 .catch(error => {
                     console.error(error);
-                    this.loading = false; // Ensure loading is false if an error occurs
+                    this.loading = false; 
                 });
         } else {
-            // Handle not logged in case
             console.error('Unauthorized access');
-            this.loading = false; // Ensure loading is false if not logged in
+            this.loading = false;
         }
     },
 
@@ -186,11 +188,7 @@ export default {
                 }
             })
                 .then(() => {
-                    // Clear local storage and any other cached data
                     localStorage.removeItem('api_token');
-
-                    // Redirect to the login page or another appropriate page
-                    // For example, if using Vue Router:
                     this.$router.push('/');
                 })
                 .catch(error => {
@@ -200,44 +198,52 @@ export default {
         subscribeToChannel(pusher, channelName, eventName, notificationTitle, iconColor, iconClass, redirectUrl) {
             let channel = pusher.subscribe(channelName);
             channel.bind(eventName, (data) => {
-                // Different logic based on user role
                 if (this.userRole === 'admin') {
-                    // Admin will see the sender's name in the notification
                     this.notifications.push({
                         id: data.id,
                         title: `${notificationTitle} from ${data.name}`, // Show sender's name
                         iconColor: iconColor,
                         icon: iconClass,
                         time: new Date().toLocaleString(),
-                        redirectUrl: redirectUrl // Add the URL for redirection
+                        redirectUrl: redirectUrl
                     });
 
-                    // Display toast notification for admins with sender's name
                     this.showAlert(`${notificationTitle} from ${data.name}`);
+                    if (Notification.permission === 'granted') {
+                        new Notification(`${notificationTitle} from ${data.name}`, {
+                            icon: iconClass,
+                            tag: data.id
+                        });
+                    }
                 }
                 else if (this.userRole === 'user') {
-                    // Only push notification to the user who sent the request
+
                     if (data.requester_id === this.userId) {
                         this.notifications.push({
                             id: data.id,
-                            title: notificationTitle,
+                            title: `${notificationTitle} by ${data.receiverName}`,
                             iconColor: iconColor,
                             icon: iconClass,
                             time: new Date().toLocaleString(),
-                            redirectUrl: redirectUrl // Add the URL for redirection
+                            redirectUrl: redirectUrl
                         });
-                        this.showAlert(notificationTitle);
+                        this.showAlert(`${notificationTitle} by ${data.receiverName}`);
+                        if (Notification.permission === 'granted') {
+                            new Notification(`${notificationTitle} by ${data.receiverName}`, {
+                                icon: iconClass,
+                                tag: data.id
+                            });
+                        }
                     }
                 }
             });
         },
         showAlert(title) {
             toast.success(title, {
-                autoClose: 1500,  // Close the toast automatically after 1.5 seconds
+                autoClose: 1500,
             });
         },
         redirectTo(notification) {
-            // Navigate to the URL for this notification
             window.location.href = notification.redirectUrl;
         }
 

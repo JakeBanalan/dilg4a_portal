@@ -144,7 +144,7 @@ Route::middleware('api')->group(function(){
 
 
 Route::middleware('api')->group(function () {
-    Route::get('countICTRequest/{userId}/{cur_year}', [RICTUController::class, 'countICTRequest']);
+    Route::get('/totalCountICTRequest', [RICTUController::class, 'totalCountICTrequest']);
 });
 
 Route::middleware('api')->group(function () {
@@ -185,7 +185,7 @@ Route::middleware('api')->group(function () {
 
 
 Route::middleware('api')->group(function () {
-    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
+    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
 });
 
 Route::middleware('api')->group(function () {
@@ -305,7 +305,7 @@ Route::middleware('api')->group(function () {
 
 
 
-Route::post('/logout', [UserController::class, 'logout']);
+Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
 
 
 // Route::post('logout', function (Request $request) {
@@ -356,14 +356,14 @@ Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSma
 Route::post('post_create_rfq', [RFQController::class, 'post_create_rfq']);
 
 //CALENDAR
-//C A L E N D A R 
+//C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
 Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
 Route::post('post_create_event', [CalendarController::class, 'post_create_event']);
 
 
 
-//C A L E N D A R 
+//C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
 Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
 
@@ -391,7 +391,7 @@ Route::post('PostUser', [UserManagementController::class, 'PostUser']);
 // E X P O R T
 // routes/web.php or routes/api.php
 Route::middleware('api')->group(function () {
-    Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
+    Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
 });
 
 Route::middleware('api')->group(function () {
