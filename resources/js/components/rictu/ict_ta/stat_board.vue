@@ -252,7 +252,8 @@ export default {
 
         },
         fetchICTRequestCount() {
-            axios.get(`/api/countICTRequest/${this.user_id}/2025`)
+            const currentYear = new Date().getFullYear();
+            axios.get(`/api/countICTRequest/${this.user_id}/${currentYear}`)
                 .then(response => {
                     this.ict_total = response.data.ict;
                 })
