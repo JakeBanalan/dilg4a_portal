@@ -114,6 +114,7 @@ class RICTUController extends Controller
         $end_date = $request->query('end_date');
         $pmo = $request->query('pmo');
         $year = $request->query('year', date('Y')); // Default to the current year
+        $quarter = $request->query('quarter'); // Retrieve the quarter from the request
 
         $ictQuery = RICTUModel::select(RICTUModel::raw('
             tbl_technicalassistance.id AS id,
@@ -168,6 +169,10 @@ class RICTUController extends Controller
 
         if ($pmo) {
             $ictQuery->where(DB::raw('p.pmo_title'), 'LIKE', "%$pmo%");
+        }
+
+        if ($quarter) {
+            $ictQuery->whereRaw('QUARTER(tbl_technicalassistance.started_date) = ?', [$quarter]);
         }
 
         // Order the results

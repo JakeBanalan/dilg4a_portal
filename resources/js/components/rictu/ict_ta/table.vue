@@ -263,7 +263,7 @@ export default {
                 return formattedDate;
             }
         },
-        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = null) {
+        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = null, quarter = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
 
             const params = {
@@ -273,7 +273,8 @@ export default {
                 ...(startDate && { start_date: startDate }),
                 ...(endDate && { end_date: endDate }),
                 ...(pmo && { pmo }),
-                ...(year && { year }) // Add the year parameter if it is provided
+                ...(year && { year }),
+                ...(quarter && { quarter })
             };
 
             axios.get(url, { params })
