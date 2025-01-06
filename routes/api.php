@@ -142,7 +142,7 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('auth:api')->get('/getUserData', [RICTUController::class, 'getUserData']);
 Route::middleware('api')->group(function () {
-    Route::get('/countICTRequest/{userId}/{cur_year}', [RICTUController::class, 'countICTRequest']);
+    Route::get('/countICTRequest/{userId}', [RICTUController::class, 'countICTRequest']);
 });
 
 Route::middleware('api')->group(function () {
