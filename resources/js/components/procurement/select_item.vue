@@ -445,6 +445,7 @@ select {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     /* Change the box shadow as needed */
 }
+
 .input-group {
     display: flex;
     align-items: center;
@@ -453,7 +454,8 @@ select {
 .input-group-addon {
     padding: 0 10px;
 }
-.cart-icon{
+
+.cart-icon {
     font-size: 45px;
 }
 </style>
@@ -471,29 +473,34 @@ select {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="input-group">
-                                        <input type="text" v-model="searchValue" class="form-control" name=""
-                                            id="" />
-                                            
+                                        <input type="text" v-model="searchValue" @input="fetchAppData"
+                                            class="form-control" name="" id="" />
+
                                         <span class="input-group-addon">
-                                            <font-awesome-icon class="cart-icon" :icon="['fas', 'cart-shopping']"></font-awesome-icon>
+                                            <font-awesome-icon class="cart-icon"
+                                                :icon="['fas', 'cart-shopping']"></font-awesome-icon>
                                         </span>
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-4">
                                             <SelectInput label="Category" class="select-option">
-                                                <option v-for="app in appCategory" :key="app.id" :value="app.item_category_title">{{ app.item_category_title }}</option>
+                                                <option v-for="app in appCategory" :key="app.id"
+                                                    :value="app.item_category_title">{{ app.item_category_title }}
+                                                </option>
                                             </SelectInput>
                                         </div>
                                         <div class="col-lg-4">
                                             <SelectInput label="Office" class="select-option">
-                                                <option v-for="option in pmo" :key="option.value" :value="option.value">{{ option.label }}</option>
-                                                </SelectInput>
+                                                <option v-for="option in pmo" :key="option.value" :value="option.value">
+                                                    {{ option.label }}</option>
+                                            </SelectInput>
                                         </div>
                                         <div class="col-lg-4">
                                             <SelectInput label="Mode of Procurement" class="select-option">
-                                                <option v-for="option in mode" :key="option.value" :value="option.value">{{ option.label }}</option>
+                                                <option v-for="option in mode" :key="option.value"
+                                                    :value="option.value">{{ option.label }}</option>
 
-                                              </SelectInput>
+                                            </SelectInput>
                                         </div>
                                     </div>
                                     <!-- <div v-if="searchResultsCount !== null">
@@ -507,12 +514,12 @@ select {
                             <div class="input-div">
                                 <div class="row" style="height: 500px;overflow-y:auto">
                                     <div class="col-lg-2 d-none d-lg-block" v-for="item in item_title" :key="item.id">
-                                        <div :class="{ 'card mb-4': true, 'selected': isSelected(item.id) } "
+                                        <div :class="{ 'card mb-4': true, 'selected': isSelected(item.id) }"
                                             style="height: 70%;">
                                             <img @click="toggleItemSelection(item.id)" src="../../../assets/proc1.jpg"
                                                 class="card-img-top" alt="Sunset Over the Sea" />
                                             <p style="text-align: center;margin-top:-40px;font-weight: bolder;"> {{
-                                            item.sn }} <br>{{ shorten(item.item_title, 11) }} </p>
+                                                item.sn }} <br>{{ shorten(item.item_title, 11) }} </p>
                                             <p style="margin-top: -10px;text-align:center">Php. {{ item.app_price }}</p>
                                         </div>
                                     </div>
@@ -550,13 +557,13 @@ library.add(faCartShopping);
 export default {
     data() {
         return {
-            appCategory:[],
+            appCategory: [],
             purchase_no: null,
             userId: null,
             isPurchaseNoEditable: true, // Set initially as editable
-            searchResultsCount: null,
-            formnumber: 0,
             searchValue: '',
+            app_item: [],
+            searchResultsCount: null,
             item_title: [],
             selectedItems: [],
             pr_data: [],
@@ -571,7 +578,7 @@ export default {
                 target_date: null,
                 particulars: null
             },
-          
+
             mode: [
                 { value: '1', label: 'Small Value Procurement' },
                 { value: '2', label: 'Shopping' },
@@ -588,7 +595,7 @@ export default {
             ]
         };
     },
-    // 
+    //
     created() {
         this.userId = localStorage.getItem('userId');
     },
@@ -599,28 +606,7 @@ export default {
                 return selectedSet.has(itemId);
             };
         },
-        item_title: function () {
-            var app_item = this.item_title;
-            var searchValue = this.searchValue.trim().toLowerCase();
 
-            if (!searchValue) {
-                this.searchResultsCount = null;
-
-                return app_item;
-            }
-            // Use Array.filter to filter items based on search criteria
-            var filteredItems = app_item.filter(function (item) {
-                return (
-                    item.item_title.toLowerCase().indexOf(searchValue) !== -1 ||
-                    item.sn.toLowerCase().indexOf(searchValue) !== -1
-                );
-            });
-
-            this.searchResultsCount = filteredItems.length;
-            return filteredItems;
-
-        },
-      
 
     },
     mounted() {
@@ -629,41 +615,57 @@ export default {
     },
 
     methods: {
-    //   filtering app item
-    filterByCategory: async function () {
-      try {
-        const response = await axios.get('/api/app_category'); // Replace '/api/users' with your actual endpoint
-        this.appCategory = response.data;
-      }catch(error){
-        console.error('Error fetching item:', error);
+        fetchAppData() {
+            var searchValue = this.searchValue.trim().toLowerCase();
 
-      }
-    },
+            axios.get('/api/fetchAppData', {
+                params: {
+                    searchValue: searchValue
+                }
+            })
+                .then(response => {
+                    this.app_item = response.data;
+                    this.searchResultsCount = this.app_item.length;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+        //   filtering app item
+        filterByCategory: async function () {
+            try {
+                const response = await axios.get('/api/app_category'); // Replace '/api/users' with your actual endpoint
+                this.appCategory = response.data;
+            } catch (error) {
+                console.error('Error fetching item:', error);
+
+            }
+        },
         shorten: function (string, len) {
             return string.substring(0, len + string.substring(len - 1).indexOf(' '));
 
         },
 
         toggleItemSelection(itemId) {
-    // Check if the item is already selected
-    const index = this.selectedItems.indexOf(itemId);
-    if (index !== -1) {
-        // If selected, remove it from the array
-        this.selectedItems.splice(index, 1);
-    } else {
-        // If not selected, add it to the array
-        this.selectedItems.push(itemId);
-    }
+            // Check if the item is already selected
+            const index = this.selectedItems.indexOf(itemId);
+            if (index !== -1) {
+                // If selected, remove it from the array
+                this.selectedItems.splice(index, 1);
+            } else {
+                // If not selected, add it to the array
+                this.selectedItems.push(itemId);
+            }
 
-    // Construct the query parameters for the route
-    const queryParams = {
-        item_id: itemId,
-        pr_id: this.$route.params.id
-    };
+            // Construct the query parameters for the route
+            const queryParams = {
+                item_id: itemId,
+                pr_id: this.$route.params.id
+            };
 
-    // Use Vue Router to navigate to the target route with the query parameters
-    this.$router.push({ path: '/procurement/add_app_details', query: queryParams });
-},
+            // Use Vue Router to navigate to the target route with the query parameters
+            this.$router.push({ path: '/procurement/add_app_details', query: queryParams });
+        },
         addPrItems(selectedItemIds) {
             // Call fetchPRId to get the ID
             this.fetchPRId().then((id) => {
@@ -821,7 +823,7 @@ export default {
 
 
         },
- 
+
         //show data
         fetchPurchaseRequestDetails() {
             const pr_no = this.$route.params.id;

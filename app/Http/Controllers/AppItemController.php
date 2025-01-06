@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class AppItemController extends Controller
 {
-    public function index()
-    {
-    }
+    public function index() {}
     public function countTotalItem($cur_year)
     {
         return response()->json(AppItemModel::select(AppItemModel::raw('count(*) as item'))->whereYear('created_at', $cur_year)
@@ -38,18 +36,19 @@ class AppItemController extends Controller
     }
     public function app_category()
     {
-        return response()->json(AppItemModel::select('item_category.id','item_category.item_category_title')
-        ->join('item_category', 'item_category.id', '=', 'tbl_app.category_id')
-        ->where('app_year', 2022)
-        ->groupBy('item_category.id','item_category.item_category_title')
-        ->orderBy('item_category.id')
+        return response()->json(AppItemModel::select('item_category.id', 'item_category.item_category_title')
+            ->join('item_category', 'item_category.id', '=', 'tbl_app.category_id')
+            ->where('app_year', 2022)
+            ->groupBy('item_category.id', 'item_category.item_category_title')
+            ->orderBy('item_category.id')
 
-        ->limit(1000)
-        ->get());
+            ->limit(1000)
+            ->get());
     }
-    public function fetchAppData()
+    public function fetchAppData(Request $request)
     {
-        // return response()->json(AppItemModel::all());
+        $searchValue = $request->input('searchValue', '');
+
         $app_item = AppItemModel::select(AppItemModel::raw('
             tbl_app.id as `app_id`,
             tbl_app.sn as `sn`,
@@ -65,19 +64,21 @@ class AppItemController extends Controller
             item_unit.item_unit_title as  `item_unit_title`,
             item_category.item_category_title as `item_category_title`,
             mode_of_proc.mode_of_proc_title as `mode_of_proc_title`
-
         '))
             ->join('source_of_funds', 'tbl_app.source_of_funds_id', '=', 'source_of_funds.id')
             ->join('pmo', 'tbl_app.pmo_id', '=', 'pmo.id')
             ->join('item_category', 'tbl_app.category_id', '=', 'item_category.id')
             ->join('mode_of_proc', 'tbl_app.mode', '=', 'mode_of_proc.id')
             ->join('item_unit', 'tbl_app.unit_id', '=', 'item_unit.id')
-            ->where('tbl_app.app_year',2024);
-        // Print the SQL query
-        // $sql = $app_item->toSql();
-        // dd($sql);
+            ->where('tbl_app.app_year', 2024);
 
-        // // Execute the query and return the result
+        if (!empty($searchValue)) {
+            $app_item->where(function ($query) use ($searchValue) {
+                $query->where('tbl_app.item_title', 'LIKE', "%{$searchValue}%")
+                    ->orWhere('tbl_app.sn', 'LIKE', "%{$searchValue}%");
+            });
+        }
+
         $appItems = $app_item->get();
 
         return response()->json($appItems);
@@ -101,9 +102,5 @@ class AppItemController extends Controller
 
         ]);
         $app_item->save();
-    }
-    public function post_complete_ta()
-    {
-        echo 'a';
     }
 }
