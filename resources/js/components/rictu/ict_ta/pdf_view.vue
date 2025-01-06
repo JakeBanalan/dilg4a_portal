@@ -1305,26 +1305,12 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 library.add(faCircleInfo);
 import logo from "../../../../assets/logo.png";
+
 export default {
     name: 'PDF View',
     data() {
         return {
             dilg_logo: logo,
-            accessToken: null,
-            remarks: null,
-            acceptance: null,
-            ict_personnel: null,
-            abstract_no: null,
-            selected: null,
-            ict_no: null,
-            selectedType: null,
-            selectedSubRequest: null,
-            hardwareInfo: {
-                etype: null,
-                brand: null,
-                pNumber: null,
-                eSerial: null,
-            },
             data: {
                 control_no: null,
                 requested_by: null,
@@ -1342,36 +1328,21 @@ export default {
                 ict_personnel: null,
                 ict_officer_remarks: null,
             }
-
         }
     },
     created() {
-        const id = this.$route.query.id;
+        this.getICTData();
     },
     mounted() {
-        //GET THE ICT ALL DATA
-        this.getICTData();
-
         $("input:checkbox").click(function () { return false; });
 
-        //Right-Click Disabled
         document.addEventListener('contextmenu', event => {
             event.preventDefault();
             alert('Inspect Element is Disabled');
         });
 
-        //CTRL+SHIFT+J DISABLED
         document.addEventListener('keydown', event => {
-
-            if (event.ctrlKey && event.shiftKey && event.key === 'J') {
-                event.preventDefault();
-                alert('Inspect Element is Disabled');
-            }
-            if (event.keyCode == 123) {
-                event.preventDefault();
-                alert('Inspect Element is Disabled');
-            }
-            if (event.ctrlKey && event.shiftKey && event.key === 'I') {
+            if ((event.ctrlKey && event.shiftKey && (event.key === 'J' || event.key === 'I')) || event.keyCode == 123) {
                 event.preventDefault();
                 alert('Inspect Element is Disabled');
             }
@@ -1429,14 +1400,13 @@ export default {
                     this.checkedOptions.push(option);
                 }
             } else {
-                // Remove from checked options
                 this.checkedOptions = this.checkedOptions.filter(opt => opt !== option);
             }
         },
         getICTData() {
-            let id = this.$route.query.id;
+            const id = this.$route.query.id;
             axios.get(`../../../api/getICTData/${id}`)
-                .then((response) => {
+                .then(response => {
                     this.data = response.data;
                 })
                 .catch(error => {
@@ -1450,46 +1420,32 @@ export default {
             return id === this.subCategoryMap[category];
         },
         formatDate(date) {
-            if (!date || date === '0000-00-00') {
-                return null;
-            } else {
-                const formattedDate = new Date(date).toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-
-                });
-                return formattedDate;
-            }
+            if (!date || date === '0000-00-00') return null;
+            return new Date(date).toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            });
         },
         formatTime(date) {
-            if (!date || date === '0000-00-00') {
-                return null; // Return null if the date is null or '0000-00-00'
-            } else {
-                const time = new Date(date).toLocaleTimeString('en-US', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-                return time;
-            }
+            if (!date || date === '0000-00-00') return null;
+            return new Date(date).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
         },
         formatDateTime(date) {
-            if (!date || date === '0000-00-00') {
-                return null; // Return null if the date is null or '0000-00-00'
-            } else {
-                const formattedDate = new Date(date).toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-                return formattedDate;
-            }
+            if (!date || date === '0000-00-00') return null;
+            return new Date(date).toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
         },
     },
 }
-
 </script>

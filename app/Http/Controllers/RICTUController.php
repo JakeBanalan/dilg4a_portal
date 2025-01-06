@@ -185,78 +185,47 @@ class RICTUController extends Controller
         $itemsPerPage = $request->query('itemsPerPage', 10000);
         $year = $request->query('year', date('Y')); // Default to the current year
 
+        $ictQuery = RICTUModel::select(RICTUModel::raw('
+            tbl_technicalassistance.id AS id,
+            tbl_technicalassistance.control_no AS control_no,
+            CONCAT(u.first_name," ",u.last_name) AS requested_by,
+            u.user_role as role,
+            tbl_technicalassistance.started_date AS started_date,
+            TIME(tbl_technicalassistance.started_date) AS started_time,
+            MONTH(tbl_technicalassistance.started_date) AS month,
+            YEAR(tbl_technicalassistance.started_date) AS YEAR,
+            tbl_technicalassistance.request_date AS request_date,
+            tbl_technicalassistance.completed_date AS completed_date,
+            tbl_technicalassistance.remarks AS remarks,
+            cl.link AS css_link,
+            p.pmo_title AS office,
+            itr.request_type AS request_type,
+            c.TITLE AS sub_request_type,
+            ip.ict_personnel AS ict_personnel,
+            is.status AS status,
+            is.id AS status_id
+        '))
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+            ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
+            ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
+            ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
+            ->whereYear('tbl_technicalassistance.created_at', $year);
+
         if ($status == 6) {
-            $ictQuery = RICTUModel::select(RICTUModel::raw('
-                tbl_technicalassistance.id AS id,
-                tbl_technicalassistance.control_no AS control_no,
-                CONCAT(u.first_name," ",u.last_name) AS requested_by,
-                u.user_role as role,
-                tbl_technicalassistance.started_date AS started_date,
-                time(tbl_technicalassistance.started_date) AS started_time,
-                MONTH(tbl_technicalassistance.started_date) AS month,
-                YEAR(tbl_technicalassistance.started_date) AS YEAR,
-                tbl_technicalassistance.request_date AS request_date,
-                tbl_technicalassistance.completed_date AS completed_date,
-                tbl_technicalassistance.remarks AS remarks,
-                cl.link AS css_link,
-                p.pmo_title AS office,
-                itr.request_type AS request_type,
-                c.TITLE AS sub_request_type,
-                ip.ict_personnel AS ict_personnel,
-                is.status AS status,
-                is.id AS status_id
-            '))
-                ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-                ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
-                ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
-                ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-                ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-                ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
-                ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
-                ->where('tbl_technicalassistance.request_by', $userID)
-                ->whereYear('tbl_technicalassistance.created_at', $year)
-                ->orderBy('id', 'DESC');
+            $ictQuery->where('tbl_technicalassistance.request_by', $userID);
         } else {
-            $ictQuery = RICTUModel::select(RICTUModel::raw('
-                tbl_technicalassistance.id AS id,
-                tbl_technicalassistance.control_no AS control_no,
-                u.username AS requested_by,
-                u.user_role as role,
-                tbl_technicalassistance.started_date AS started_date,
-                time(tbl_technicalassistance.started_date) AS started_time,
-                MONTH(tbl_technicalassistance.started_date) AS month,
-                YEAR(tbl_technicalassistance.started_date) AS YEAR,
-                tbl_technicalassistance.request_date AS request_date,
-                tbl_technicalassistance.completed_date AS completed_date,
-                tbl_technicalassistance.remarks AS remarks,
-                cl.link AS css_link,
-                p.pmo_title AS office,
-                itr.request_type AS request_type,
-                c.TITLE AS sub_request_type,
-                ip.ict_personnel AS ict_personnel,
-                is.status AS status,
-                is.id AS status_id
-            '))
-                ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-                ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
-                ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
-                ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-                ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
-                ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
-                ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
-                ->where('tbl_technicalassistance.status_id', $status)
-                ->whereYear('tbl_technicalassistance.created_at', $year)
-                ->orderBy('control_no', 'DESC');
+            $ictQuery->where('tbl_technicalassistance.status_id', $status);
         }
+
+        $ictQuery->orderBy('control_no', 'DESC');
 
         $ict = $ictQuery->paginate($itemsPerPage, ['*'], 'page', $page);
 
         return response()->json($ict);
     }
-
-
-
-
 
 
     public function post_create_ict_request(Request $request)
