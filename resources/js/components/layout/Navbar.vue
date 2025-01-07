@@ -169,7 +169,7 @@ export default {
                 })
                 .catch(error => {
                     console.error(error);
-                    this.loading = false; 
+                    this.loading = false;
                 });
         } else {
             console.error('Unauthorized access');
