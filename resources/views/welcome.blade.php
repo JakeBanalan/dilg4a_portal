@@ -54,6 +54,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+    <script>
+        console.log(
+            "%cSTOP!",
+            "color: red; font-size: 80px; font-weight: bold; text-shadow: 2px 2px 0px black;"
+        );
+    </script>
+
+
 </body>
 
 </html>
