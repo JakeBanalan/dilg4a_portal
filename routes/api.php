@@ -167,7 +167,6 @@ Route::middleware('api')->group(function () {
     Route::get('countCancelledPR/{userId}', [PurchaseRequestController::class, 'countCancelledPR']);
 });
 
-
 Route::middleware('api')->group(function () {
     Route::get('countUserTotalPR/{userId}', [PurchaseRequestController::class, 'countUserTotalPR']);
 });
@@ -183,7 +182,7 @@ Route::middleware('api')->group(function () {
 
 
 Route::middleware('api')->group(function () {
-    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
+    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
 });
 
 Route::middleware('api')->group(function () {
@@ -280,6 +279,9 @@ Route::middleware('api')->group(function () {
     Route::get('fetchEmployeeData', [UserManagementController::class, 'fetchEmployeeData']);
 });
 
+Route::middleware('api')->group(function () {
+    Route::get('fetchItems', [PurchaseRequestController::class, 'fetchItems']);
+});
 
 
 
@@ -301,11 +303,11 @@ Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict
 Route::post('post_update_cart', [PurchaseRequestController::class, 'post_update_cart']);
 Route::post('post_insert_pritem', [PurchaseRequestController::class, 'post_insert_pritem']);
 Route::post('post_remove_pritem', [PurchaseRequestController::class, 'post_remove_pritem']);
-Route::post('post_insert_purchaseNo', [PurchaseRequestController::class, 'post_insert_purchaseNo']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
 Route::post('post_update_purchaseRequestDetailsForm', [PurchaseRequestController::class, 'post_update_purchaseRequestDetailsForm']);
-Route::post('fetchCart', [PurchaseRequestController::class, 'fetchCart']);
+
 Route::post('fetchPurchaseReqData', [PurchaseRequestController::class, 'fetchPurchaseReqData']);
+Route::post('updatePurchaseRequestStatus', [PurchaseRequestController::class, 'updatePurchaseRequestStatus']);
 Route::post('fetchSubmittedtoGSS', [PurchaseRequestController::class, 'fetchSubmittedtoGSS']);
 Route::post('fetch_app_item', [SupplierController::class, 'fetch_app_item']);
 Route::post('fetch_app_item_details', [SupplierController::class, 'fetch_app_item_details']);

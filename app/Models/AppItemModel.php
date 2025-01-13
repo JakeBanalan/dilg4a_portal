@@ -15,7 +15,7 @@ class AppItemModel extends Model
     use HasApiTokens, Notifiable;
     protected $table = 'tbl_app';
 
-   
+
   protected $fillable = [
     'id',
     'sn',
@@ -33,7 +33,8 @@ class AppItemModel extends Model
     'app_price',
     'remarks',
     'app_year',
-    'created_at'
+    'created_at',
+    'description'
 ];
 
 }

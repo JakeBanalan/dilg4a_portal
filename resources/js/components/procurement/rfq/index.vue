@@ -133,7 +133,7 @@ td {
                                                 <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
                                                     <td v-if="isAdmin">
                                                         <div v-if="purchaseRequest.status_id == 4">
-                                                            
+
                                                             <button class="btn btn-icon mr-1"
                                                                 @click="toGSS(purchaseRequest.id)"
                                                                 style="background-color:#059886;color:#fff;">
@@ -147,7 +147,7 @@ td {
                                                             </button>
                                                         </div>
                                                         <div v-if="purchaseRequest.status_id == 5">
-                                                            
+
                                                             <button disabled class="btn btn-icon mr-1"
                                                                 @click="toGSS(purchaseRequest.id)"
                                                                 style="background-color:#059886;color:#fff;">

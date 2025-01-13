@@ -12,7 +12,6 @@ import AddAppItem from "../components/procurement/add_app_item.vue";
 import CreatePRItem from "../components/procurement/create_pr.vue"
 import ViewPRItem from "../components/procurement/view_pr.vue";
 import UpdatePRItem from "../components/procurement/update_pr.vue";
-import SelectAPPItem from "../components/procurement/select_item.vue";
 import AddAPPDetails from "../components/procurement/add_item_details.vue";
 
 // Statistics
@@ -238,30 +237,6 @@ const routes = [
         path: '/procurement/create_pr',
         name: 'Create Purchase Request Item',
         component: CreatePRItem,
-        meta: {
-            requiresAuth: true
-        },
-        beforeEnter: (to, from, next) => {
-            const token = localStorage.getItem('api_token');
-            axios.get('/api/authenticated', {
-                params: {
-                    api_token: token
-                }
-            }).then(response => {
-                if (response.data.authenticated) {
-                    next();
-                } else {
-                    next({ name: 'Login' });
-                }
-            }).catch(() => {
-                next({ name: 'Login' });
-            });
-        }
-    },
-    {
-        path: '/procurement/select_purchase_item/:id',
-        name: 'Add APP Item',
-        component: SelectAPPItem,
         meta: {
             requiresAuth: true
         },

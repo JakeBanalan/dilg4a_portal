@@ -49,6 +49,18 @@
 </template>
 
 <style>
+input[type="text"] {
+    width: 100%;
+    height: 40px;
+    border: none;
+    outline: 0;
+    border-radius: 5px;
+    border: 1px solid #cbced4;
+    gap: 20px;
+    box-sizing: border-box;
+    padding: 0px 10px;
+}
+
 nav form {
     display: flex;
 }

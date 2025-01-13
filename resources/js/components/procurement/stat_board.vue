@@ -74,12 +74,12 @@ export default {
     },
     mounted() {
         this.fetch_total_pr();
-    },  
+    },
     methods: {
         fetch_total_pr() {
             this.$count('/api/countPurchaseRequestStatistics', 2024)
-                .then(data => 
-                { 
+                .then(data =>
+                {
                     this.total_pr = data.total_pr;
                     this.rfq_count = data.with_rfq;
                     this.awarded = data.awarded;

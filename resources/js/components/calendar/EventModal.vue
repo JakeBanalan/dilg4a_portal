@@ -83,7 +83,7 @@
                                             <label>No. of Participants: <small class="err-msg" v-if="errors.enp">{{ errors.enp }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="text"
-                                                    v-model="eventDetails.enp" id="enp" :disabled="isDisabled">  
+                                                    v-model="eventDetails.enp" id="enp" :disabled="isDisabled">
                                             </div>
                                         </div>
                                     </div>
@@ -141,7 +141,7 @@ export default {
         mode: String,
         eventDetails: Object,
         posted_by: String
-        // Other props... 
+        // Other props...
     },
     created() {
         this.userId = localStorage.getItem('userId');
@@ -251,9 +251,6 @@ export default {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    /* Adjust the opacity to make it darker or lighter */
-    /* z-index: 10502; */
-    /* Ensure it's above other elements */
 }
 
 /* Style for centering the modal */
