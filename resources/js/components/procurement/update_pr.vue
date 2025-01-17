@@ -8,8 +8,12 @@
                     <div class="row justify-content-end" style="margin-right: 20px;">
                         <button type="button" class="btn btn-primary btn-md"
                             @click="exportPurchaseRequest"><font-awesome-icon :icon="['fas', 'download']" />
-                            &nbsp;<b>Export</b></button>
+                            &nbsp;<b>Export</b></button> &nbsp; &nbsp;
+                        <button type="button" class="btn btn-warning btn-md"
+                            @click="updatePurchaseRequestDetails"><font-awesome-icon :icon="['fas', 'save']" />
+                            &nbsp;<b>Update</b></button>
                     </div>
+
                     <br>
                     <div class="row">
                         <div class="col-md-4 grid-margin stretch-card">
@@ -84,7 +88,7 @@
                                 <div class="card-body">
                                     <button type="button" class="btn btn-primary" style="float: left;"
                                         @click="showAddItemModal"><font-awesome-icon :icon="['fas', 'plus']" /> &nbsp;
-                                        Add Item</button>
+                                        Add More Item</button>
                                     <br>
                                     <h3 style="float: right; font-size: 30px; font-weight: 900;">
                                         &nbsp; &nbsp;GRAND TOTAL: Php
@@ -149,33 +153,43 @@
                                     </div>
                                     <div class="modal-body">
                                         <div class="container">
-                                            <h1>Add New Item</h1>
+                                            <h1>Add More Item</h1>
                                             <div class="form-group">
                                                 <label>Item Name</label>
-
+                                                <v-select :options="availableItems" v-model="addMoreItem"
+                                                    @change="addMoreItemList" label="name">
+                                                    <template slot="option" slot-scope="option">
+                                                        {{ option.name }}
+                                                    </template>
+                                                </v-select>
                                             </div>
                                             <div class="form-group">
                                                 <label>Unit</label>
-
+                                                <input type="text" class="form-control" v-model="addMoreItem.unit"
+                                                    readonly>
                                             </div>
                                             <div class="form-group">
                                                 <label>Quantity</label>
-
+                                                <input type="number" class="form-control" id="itemQuantity"
+                                                    v-model.number="addMoreItem.qty" min="0">
                                             </div>
                                             <div class="form-group">
                                                 <label>ABC</label>
-
+                                                <input type="number" class="form-control" v-model="addMoreItem.price"
+                                                    readonly>
                                             </div>
                                             <div class="form-group">
                                                 <label>Description</label>
-
+                                                <textarea rows="1" v-model="addMoreItem.descrip"
+                                                    @keyup.enter="addItem"></textarea>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-light"
                                             @click="closeAddItemModal">Cancel</button>
-                                        <button type="button" class="btn btn-primary" @click="addItem">Add Item</button>
+                                        <button type="button" class="btn btn-primary" @click="addNewItem">Add More
+                                            Item</button>
                                     </div>
                                 </div>
                             </div>
@@ -249,6 +263,7 @@ import BreadCrumbs from "../dashboard_tiles/BreadCrumbs.vue";
 import dtable from "../procurement/table.vue";
 import UserInfo from "../procurement/user_info.vue";
 import StatBox from "../procurement/stat_board.vue";
+import vSelect from 'vue-select';
 import axios from "axios";
 import { toast } from "vue3-toastify";
 
@@ -266,13 +281,13 @@ export default {
         UserInfo,
         showAddItemModal,
         StatBox,
-        dilg_logo
+        dilg_logo,
+        vSelect
     },
     data() {
         return {
-
+            logo: dilg_logo,
             modalVisible: false,
-            items: [],
             addItemModalVisible: false,
             editItemModalVisible: false,
             status: null,
@@ -307,11 +322,20 @@ export default {
                 { value: '7', label: 'LGCDD' },
                 { value: '8', label: 'LGMED' },
             ],
-            newItem: { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '', unit: '' },
-            editItem: { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '' },
+            addMoreItem: {
+                id: null,
+                name: '',
+                qty: 0,
+                price: 0,
+                descrip: '',
+                stockno: '',
+                unit: ''
+            },
+            availableItems: [], // Populated by fetchItems
+            editItem: { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '' },
             editIndex: -1,
             items: [],
-            availableItems: []
+            isLoading: false
         };
     },
     computed: {
@@ -330,12 +354,20 @@ export default {
     },
     methods: {
         fetchItems() {
+            this.isLoading = true;
             axios.get('/api/fetchItems')
                 .then(response => {
-                    this.availableItems = response.data;
+                    if (Array.isArray(response.data)) {
+                        this.availableItems = response.data;
+                    } else {
+                        console.error('Invalid response format:', response.data);
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching items:', error);
+                })
+                .finally(() => {
+                    this.isLoading = false;
                 });
         },
         formatNumberWithCommas(number) {
@@ -347,7 +379,7 @@ export default {
                 .then(response => {
                     // console.log("Fetched data:", response.data);
                     const data = response.data.purchaseRequest;
-                    // console.log("Purchase request data:", data);
+                    // console.dir(data);
                     // Assign other data
                     this.purchaseRequestData.pr_no = data.pr_no;
                     this.purchaseRequestData.office = data.office;
@@ -383,6 +415,24 @@ export default {
         closeAddItemModal() {
             this.addItemModalVisible = false;
         },
+        addNewItem() {
+            const selectedItem = this.availableItems.find(item => item.id === this.addMoreItem.id);
+            if (selectedItem && this.addMoreItem.qty > 0) {
+                this.items.push({ ...selectedItem, qty: this.addMoreItem.qty, descrip: this.addMoreItem.descrip });
+                this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' };
+                this.closeAddItemModal();
+            } else {
+                alert('Please select an item and enter a valid quantity.');
+            }
+        },
+        addMoreItemList() {
+            const selectedItem = this.availableItems.find(item => item.id === this.addMoreItem.id);
+            if (selectedItem) {
+                this.addMoreItem.price = selectedItem.price;
+                this.addMoreItem.stockno = selectedItem.stockno;
+                this.addMoreItem.unit = selectedItem.unit;
+            }
+        },
 
         closeModal() {
             this.modalVisible = false;
@@ -404,20 +454,6 @@ export default {
             }).catch((error) => {
                 console.error("There was an error updating the purchase request details!", error);
             });
-        },
-        toGSS() {
-            const STATUS_SUBMITTED_TO_GSS = 4;
-            axios.post(`../api/post_update_status`, {
-                pr_id: this.$route.query.id,
-                status: STATUS_SUBMITTED_TO_GSS,
-            }).then(() => {
-                toast.success('Successfully added!', { autoClose: 2000 });
-                setTimeout(() => {
-                    this.$router.push({ name: 'Procurement' });
-                }, 2000);
-            }).catch((error) => {
-                console.error("There was an error updating the status!", error);
-            });
         }
     },
 };
@@ -430,7 +466,7 @@ export default {
     width: 20px;
     height: 20px;
     background-color: #fff;
-    border: 2px solid black;
+    border: 2px solid red;
     border-radius: 4px;
     margin-right: 10px;
     position: relative;
@@ -445,12 +481,12 @@ export default {
     transform: translate(-50%, -50%);
     width: 12px;
     height: 12px;
-    background-color: black;
+    background-color: red;
     border-radius: 2px;
     opacity: 0;
 }
 
-input[type="checkbox"]:checked + .custom-checkbox::after {
+input[type="checkbox"]:checked+.custom-checkbox::after {
     opacity: 1;
 }
 </style>

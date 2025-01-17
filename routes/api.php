@@ -215,6 +215,11 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('dashboardEventData', [CalendarController::class, 'dashboardEventData']);
+});
+
+
+Route::middleware('api')->group(function () {
     Route::get('fetchEventDetails', [CalendarController::class, 'fetchEventDetails']);
 });
 
@@ -300,9 +305,6 @@ Route::post('login', [UserController::class, 'login']);
 Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
 Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
-Route::post('post_update_cart', [PurchaseRequestController::class, 'post_update_cart']);
-Route::post('post_insert_pritem', [PurchaseRequestController::class, 'post_insert_pritem']);
-Route::post('post_remove_pritem', [PurchaseRequestController::class, 'post_remove_pritem']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
 Route::post('post_update_purchaseRequestDetailsForm', [PurchaseRequestController::class, 'post_update_purchaseRequestDetailsForm']);
 

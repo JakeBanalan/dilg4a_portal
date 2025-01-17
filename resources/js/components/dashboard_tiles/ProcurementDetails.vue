@@ -31,30 +31,107 @@
         <div class="col-md-6 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <p class="card-title">Monitoring of Customer Satisfaction Survey</p>
-                        <a href="#" class="text-info">View all</a>
+                    <h4 class="card-title">To Do Lists</h4>
+                    <div class="list-wrapper pt-2">
+                        <ul class="d-flex flex-column-reverse todo-list todo-list-custom">
+                            <li>
+                                <div class="form-check form-check-flat">
+                                    <label class="form-check-label">
+                                        <input class="checkbox" type="checkbox">
+                                        Meeting with Urban Team
+                                    </label>
+                                </div>
+                                <i class="remove ti-close"></i>
+                            </li>
+                            <li class="completed">
+                                <div class="form-check form-check-flat">
+                                    <label class="form-check-label">
+                                        <input class="checkbox" type="checkbox" checked>
+                                        Duplicate a project for new customer
+                                    </label>
+                                </div>
+                                <i class="remove ti-close"></i>
+                            </li>
+                            <li>
+                                <div class="form-check form-check-flat">
+                                    <label class="form-check-label">
+                                        <input class="checkbox" type="checkbox">
+                                        Project meeting with CEO
+                                    </label>
+                                </div>
+                                <i class="remove ti-close"></i>
+                            </li>
+                            <li class="completed">
+                                <div class="form-check form-check-flat">
+                                    <label class="form-check-label">
+                                        <input class="checkbox" type="checkbox" checked>
+                                        Follow up of team zilla
+                                    </label>
+                                </div>
+                                <i class="remove ti-close"></i>
+                            </li>
+                            <li>
+                                <div class="form-check form-check-flat">
+                                    <label class="form-check-label">
+                                        <input class="checkbox" type="checkbox">
+                                        Level up for Antony
+                                    </label>
+                                </div>
+                                <i class="remove ti-close"></i>
+                            </li>
+                        </ul>
                     </div>
-                    <p class="font-weight-500">The total number of sessions within the date range. It is the
-                        period time a user is actively engaged with your website, page or app, etc</p>
-                    <div id="sales-legend" class="chartjs-legend mt-4 mb-2"></div>
-                    <canvas id="sales-chart"></canvas>
-
+                    <div class="add-items d-flex mb-0 mt-2">
+                        <input type="text" class="form-control todo-list-input" placeholder="Add new task">
+                        <button class="add btn btn-icon text-primary todo-list-add-btn bg-transparent"><i
+                                class="icon-circle-plus"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </template>
-<style></style>
 <script>
+
+
+
 export default {
     name: 'ProcurementDetails',
     components: {
 
     },
+    data() {
+        return {
+
+        }
+    },
     mounted() {
         this.renderChart();
         this.renderSalesChart();
+    },
+    computed: {
+
+        FormattedFDate() {
+            return function (DateString) {
+                return moment(DateString).format('MMMM DD, YYYY');
+            };
+        },
+        FormattedMonth() {
+            return function (DateString) {
+                return moment(DateString).format('MMMM');
+            };
+        },
+        FormattedDate() {
+            return function (DateString) {
+                return moment(DateString).format('DD');
+            };
+        },
+        FormattedDay() {
+            return function (DateString) {
+                return moment(DateString).format('dddd');
+            };
+        },
+
     },
     methods: {
         renderChart() {

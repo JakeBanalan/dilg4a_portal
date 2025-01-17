@@ -14,6 +14,7 @@ import 'select2/dist/css/select2.min.css';
 import '@ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.min.css';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Select2 from './components/Select2.vue';
+
 const app = createApp(App);
 
 // Add the methods to the Vue prototype

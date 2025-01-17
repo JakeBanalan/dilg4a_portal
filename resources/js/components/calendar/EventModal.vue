@@ -11,18 +11,28 @@
                     </div>
                     <div class="modal-body">
                         <form class="formEvent" @submit.prevent="validateForm">
+
                             <div class="form-group row">
+                                <label style="font-size: 20pt; color: red; display: flex; align-items: center;">
+                                    <input type="checkbox" v-model="eventDetails.personnalevent" style="visibility: hidden;">
+                                    <span class="custom-checkbox"
+                                        :style="{ backgroundColor: eventDetails.personnalevent ? '#4cae4c' : '#fff' }"></span>
+                                    Personal Event
+                                </label>
+
                                 <div class="col-sm-12">
-                                    <label>Activity: <small class="err-msg" v-if="errors.title">{{ errors.title }}</small> </label>
+                                    <label>Activity: <small class="err-msg" v-if="errors.title">{{ errors.title
+                                            }}</small> </label>
                                     <div id="the-basics">
-                                        <input  class="form-control typeahead" type="text" id="title"
-                                            v-model="eventDetails.title" :disabled="isDisabled"/>
+                                        <input class="form-control typeahead" type="text" id="title"
+                                            v-model="eventDetails.title" :disabled="isDisabled" />
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12">
-                                    <label>Activity Description: <small class="err-msg" v-if="errors.description">{{ errors.description }}</small></label>
+                                    <label>Activity Description: <small class="err-msg" v-if="errors.description">{{
+                                        errors.description }}</small></label>
                                     <div id="the-basics">
                                         <textarea rows="3" col="100" style="height:100px !important;" id="description"
                                             class="form-control" v-model="eventDetails.description"
@@ -34,10 +44,11 @@
                                 <div class="col-md-6">
                                     <div class="form-group row">
                                         <div class="col-sm-12">
-                                            <label>Start: <small class="err-msg" v-if="errors.start">{{ errors.start }}</small></label>
+                                            <label>Start: <small class="err-msg" v-if="errors.start">{{ errors.start
+                                                    }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="date" id="start"
-                                                    v-model="eventDetails.start" :disabled="isDisabled" >
+                                                    v-model="eventDetails.start" :disabled="isDisabled">
                                             </div>
                                         </div>
                                     </div>
@@ -45,7 +56,8 @@
                                 <div class="col-md-6">
                                     <div class="form-group row">
                                         <div class="col-sm-12">
-                                            <label>End: <small class="err-msg" v-if="errors.end">{{ errors.end }}</small></label>
+                                            <label>End: <small class="err-msg" v-if="errors.end">{{ errors.end
+                                                    }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="date" id="end"
                                                     v-model="eventDetails.end" :disabled="isDisabled">
@@ -56,7 +68,8 @@
                             </div>
                             <div class="form-group row">
                                 <div class="col-sm-12">
-                                    <label>Venue: <small class="err-msg" v-if="errors.venue">{{ errors.venue }}</small></label>
+                                    <label>Venue: <small class="err-msg" v-if="errors.venue">{{ errors.venue
+                                            }}</small></label>
                                     <div id="the-basics">
                                         <input class="form-control typeahead" type="text" id="venue"
                                             v-model="eventDetails.venue" :disabled="isDisabled">
@@ -67,11 +80,12 @@
                                 <div class="col-md-8">
                                     <div class="form-group row">
                                         <div class="col-sm-12">
-                                            <label>Target Participants: <small class="err-msg" v-if="errors.remarks">{{ errors.remarks }}</small></label>
+                                            <label>Target Participants: <small class="err-msg" v-if="errors.remarks">{{
+                                                errors.remarks }}</small></label>
                                             <div id="the-basics">
-                                                <multiselect
-                                                    v-model="eventDetails.remarks" :options="TargetParticipantsOpt"
-                                                    :multiple="true" :disabled="isDisabled" :searchable="false">
+                                                <multiselect v-model="eventDetails.remarks"
+                                                    :options="TargetParticipantsOpt" :multiple="true"
+                                                    :disabled="isDisabled" :searchable="false">
                                                 </multiselect>
                                             </div>
                                         </div>
@@ -80,7 +94,8 @@
                                 <div class="col-md-4">
                                     <div class="form-group row">
                                         <div class="col-sm-12">
-                                            <label>No. of Participants: <small class="err-msg" v-if="errors.enp">{{ errors.enp }}</small></label>
+                                            <label>No. of Participants: <small class="err-msg" v-if="errors.enp">{{
+                                                errors.enp }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="text"
                                                     v-model="eventDetails.enp" id="enp" :disabled="isDisabled">
@@ -124,11 +139,12 @@ import Multiselect from 'vue-multiselect'
 export default {
     data() {
         return {
+            isDisabledFlag: false,
             logo: dilg_logo,
             userId: null,
             Author: null,
             hasInteracted: false,
-            errors:{},
+            errors: {},
             TargetParticipantsOpt: ['Regional Office', 'Provincial Office', 'HUC', 'C/MLGOO', 'LGA', 'NGA', 'Others'],
 
         }
@@ -154,53 +170,40 @@ export default {
     },
     computed: {
         isDisabled() {
-            // console.log(this.Author);
-            // console.log(this.eventDetails.postedBy);
-            const res = this.Author != this.eventDetails.postedBy;
-            // console.log('result', res)
-            return res;
+            return this.isDisabledFlag || this.Author != this.eventDetails.postedBy;
         },
-
 
 
     },
     methods: {
-        validateForm(){
+        validateForm() {
             this.errors = {};
-
-            if(!this.eventDetails.title){
+            if (!this.eventDetails.title) {
                 this.errors.title = 'This Field is required';
             }
-
-            if(!this.eventDetails.description){
+            if (!this.eventDetails.description) {
                 this.errors.description = 'This Field is required';
             }
-
-            if(!this.eventDetails.start){
+            if (!this.eventDetails.start) {
                 this.errors.start = 'This Field is required';
             }
-
-            if(!this.eventDetails.end){
+            if (!this.eventDetails.end) {
                 this.errors.end = 'This Field is required';
             }
-
-            if(!this.eventDetails.venue){
+            if (!this.eventDetails.venue) {
                 this.errors.venue = 'This Field is required';
             }
-
-            if(this.eventDetails.remarks.length === 0){
+            if (this.eventDetails.remarks.length === 0) {
                 this.errors.remarks = 'This Field is required';
             }
-
-            if(!this.eventDetails.enp){
+            if (!this.eventDetails.enp) {
                 this.errors.enp = 'This Field is required';
             }
-
-            if(Object.keys(this.errors).length === 0){
-                try{
+            if (Object.keys(this.errors).length === 0) {
+                try {
                     this.$emit('save', this.eventDetails);
-                }catch(error){
-                    if(error.response && error.response.data.errors){
+                } catch (error) {
+                    if (error.response && error.response.data.errors) {
                         this.errors = error.response.data.errors;
                     }
                 }
@@ -214,7 +217,7 @@ export default {
                 });
         },
         closeModal() {
-            this.isDisabled = false;
+            this.isDisabledFlag = false;
             this.errors = {}
             this.$emit('close');
         },
@@ -238,26 +241,57 @@ export default {
 </script>
 
 <style>
-.err-msg{
-    font-style: italic;
-    font-size: 4;
-    color:red;
+.custom-checkbox {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border: 2px solid black;
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    pointer-events: none;
 }
+
+.custom-checkbox::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background-color: black;
+    border-radius: 2px;
+    opacity: 0;
+}
+
+.custom-checkbox.checked::after {
+    opacity: 1;
+}
+
+.err-msg {
+    font-style: italic;
+    color: red;
+    font-size: 12px;
+    /* Make it more visible */
+    margin-top: 5px;
+    /* Add margin for spacing */
+}
+
 /* Style for dimming the background */
 .modal-background {
     position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
 }
 
 /* Style for centering the modal */
 .modal-dialog {
-    top: -6%;
-
-    /* Adjust as needed */
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .selected img {

@@ -7,10 +7,11 @@ use App\Models\AppItemModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\PurchaseRequestModel;
 use Illuminate\Support\Facades\Auth;
-use App\Models\PurchaseRequestItemModel;
 
+use App\Models\PurchaseRequestItemModel;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -40,61 +41,76 @@ class PurchaseRequestController extends Controller
 
     public function post_create_purchaseRequest(Request $request)
     {
-        // Create a new instance of PurchaseRequestModel
-        $purchaseRequest = new PurchaseRequestModel();
+        // dd($request->all());
+        try {
+            // Start a database transaction
+            DB::beginTransaction();
 
-        // Set the purchase request fields
-        $purchaseRequest->pr_no = $request->input('pr_no');
-        $purchaseRequest->pmo = $request->input('pmo');
-        $purchaseRequest->type = $request->input('type');
-        $purchaseRequest->pr_date = $request->input('pr_date');
-        $purchaseRequest->target_date = $request->input('target_date');
-        $purchaseRequest->purpose = $request->input('purpose');
-        $purchaseRequest->action_officer = $request->input('created_by');
-        $purchaseRequest->is_urgent = $request->input('isUrgent');
-        $purchaseRequest->stat = 1;
+            // Create a new instance of PurchaseRequestModel
+            $purchaseRequest = new PurchaseRequestModel();
 
-        // Save the purchase request
-        $purchaseRequest->save();
+            // Set the purchase request fields
+            $purchaseRequest->pr_no = $request->input('pr_no');
+            $purchaseRequest->pmo = $request->input('pmo');
+            $purchaseRequest->type = $request->input('type');
+            $purchaseRequest->pr_date = $request->input('pr_date');
+            $purchaseRequest->target_date = $request->input('target_date');
+            $purchaseRequest->purpose = $request->input('purpose');
+            $purchaseRequest->action_officer = $request->input('created_by');
+            $purchaseRequest->is_urgent = $request->input('isUrgent');
+            $purchaseRequest->stat = 1;
 
-        // Get the PR ID of the newly created purchase request
-        $pr_id = $purchaseRequest->id;
+            // Save the purchase request
+            $purchaseRequest->save();
 
-        // Process the items array
-        $items = $request->input('items');
-        foreach ($items as $item) {
-            // Check if the PR ID and item ID combination already exists
-            $existingItem = PurchaseRequestItemModel::where('pr_id', $pr_id)
-                ->where('pr_item_id', $item['id'])
-                ->first();
+            // Get the PR ID of the newly created purchase request
+            $pr_id = $purchaseRequest->id;
 
-            if ($existingItem) {
-                // If the combination exists, update the quantity
-                $existingItem->qty += $item['quantity'];
-                $existingItem->abc = $existingItem->qty * $item['price'];
-                $existingItem->save();
-            } else {
-                // If the combination doesn't exist, insert a new record
-                $pr_opts = new PurchaseRequestItemModel([
-                    'id'            => null,
-                    'pr_id'         => $pr_id,
-                    'pr_item_id'    => $item['id'],
-                    'description'   => $item['description'],
-                    'qty'           => $item['quantity'],
-                    'abc'           => $item['quantity'] * $item['price'],
-                    'date_added'    => now(), // Automatically set the date_added field to the current date and time
-                    'flag'          => 1, // Set the flag field to a default value of 1
-                ]);
-                $pr_opts->save();
+            // Process the items array
+            $items = $request->input('items');
+            foreach ($items as $item) {
+                // Check if the PR ID and item ID combination already exists
+                $existingItem = PurchaseRequestItemModel::where('pr_id', $pr_id)
+                    ->where('pr_item_id', $item['id'])
+                    ->first();
+
+                if ($existingItem) {
+                    // If the combination exists, update the quantity
+                    $existingItem->qty += $item['quantity'];
+                    $existingItem->abc = $existingItem->qty * $item['price'];
+                    $existingItem->save();
+                } else {
+                    // If the combination doesn't exist, insert a new record
+                    $pr_opts = new PurchaseRequestItemModel([
+                        'id'            => null,
+                        'pr_id'         => $pr_id,
+                        'pr_item_id'    => $item['id'],
+                        'description'   => $item['description'],
+                        'qty'           => $item['quantity'],
+                        'abc'           => $item['quantity'] * $item['price'],
+                        'date_added'    => now(), // Automatically set the date_added field to the current date and time
+                        'flag'          => 1, // Set the flag field to a default value of 1
+                    ]);
+                    $pr_opts->save();
+                }
             }
+
+            // Update the current step of the purchase request
+            $purchaseRequest->current_step = $request->input('step');
+            $purchaseRequest->save();
+
+            // Commit the database transaction
+            DB::commit();
+
+            // Return a response indicating success
+            return response()->json(['message' => 'Purchase request and items created successfully']);
+        } catch (\Exception $e) {
+            // Rollback the database transaction in case of an error
+            DB::rollback();
+            Log::error($e->getMessage());
+            // Return a response indicating failure
+            return response()->json(['message' => 'Failed to create purchase request and items'], 500);
         }
-
-        // Update the current step of the purchase request
-        $purchaseRequest->current_step = $request->input('step');
-        $purchaseRequest->save();
-
-        // Return a response indicating success
-        return response()->json(['message' => 'Purchase request and items created successfully']);
     }
 
     public function post_update_purchaseRequestDetailsForm(Request $request)
@@ -192,7 +208,6 @@ class PurchaseRequestController extends Controller
             pr.action_officer AS `user_id`,
             users.last_name AS `created_by`,
             pmo.id AS `office`,
-            pr.submitted_by AS `submitted_by`,
             pr.purpose AS `particulars`,
             pr.pr_date AS `pr_date`,
             pr.target_date AS `target_date`,

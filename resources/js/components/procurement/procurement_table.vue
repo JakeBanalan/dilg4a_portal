@@ -41,51 +41,59 @@
             <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
                 <td v-if="role == 'admin'">
                     <div v-if="purchaseRequest.status_id == 1">
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                        <button title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
                             @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
-                        <button v-if="!purchaseRequest.isBudgetSubmitted" type="button" class="btn btn-icon mr-1"
-                            style="background-color:#059886;color:#fff;" @click="toBudget(purchaseRequest.id)">
+                        <button title="Send to Budget" v-if="!purchaseRequest.isBudgetSubmitted" type="button"
+                            class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                            @click="toBudget(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'share-square']" style="margin-left: -3px;" />
                         </button>
-                        <button v-if="!purchaseRequest.isGSSSubmitted" type="button" class="btn btn-icon mr-1"
-                            style="background-color:#059886;color:#fff;" @click="toGSS(purchaseRequest.id)">
+                        <button title="Send to GSS" v-if="!purchaseRequest.isGSSSubmitted" type="button"
+                            class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                            @click="toGSS(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'paper-plane']" style="margin-left: -3px;" />
                         </button>
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                            @click="cancelTransaction(purchaseRequest.id)">
+                        <button title="Cancel" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;" @click="cancelTransaction(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'trash']" style="margin-left: -3px;" />
                         </button>
-                        <!-- <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                            @click="exportPurchaseRequest(purchaseRequest.id)">
-                            <font-awesome-icon :icon="['fas', 'download']" style="margin-left: -3px;" />
-                        </button> -->
                     </div>
                     <div
                         v-else-if="purchaseRequest.status_id == 2 || purchaseRequest.status_id == 3 || purchaseRequest.status_id == 4 || purchaseRequest.status_id == 5">
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                        <button title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
                             @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
-                        <button v-if="purchaseRequest.status_id == 2" type="button" class="btn btn-icon mr-1"
-                            style="background-color:#059886;color:#fff;" @click="toGSS(purchaseRequest.id)">
+                        <button title="Send to GSS"
+                            v-if="purchaseRequest.status_id == 2 && !purchaseRequest.isGSSSubmitted" type="button"
+                            class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                            @click="toGSS(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'paper-plane']" style="margin-left: -3px;" />
                         </button>
-                        <!-- <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                            @click="exportPurchaseRequest(purchaseRequest.id)">
-                            <font-awesome-icon :icon="['fas', 'download']" style="margin-left: -3px;" />
-                        </button> -->
                     </div>
-                    <div v-else-if="purchaseRequest.status_id == 9">
-                        <button disabled type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                    <div v-else-if="purchaseRequest.status_id == 6">
+                        <button title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
                             @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
                     </div>
+                    <div v-else-if="purchaseRequest.status_id == 9">
+                        <button disabled title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
+                            @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
+                            <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                        </button>
+                    </div>
+
                 </td>
                 <td v-else>
-                    <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                    <button title="View" type="button" class="btn btn-icon mr-1"
+                        style="background-color:#059886;color:#fff;"
                         @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                         <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                     </button>
@@ -186,7 +194,6 @@ export default {
         loadData() {
             axios.post(`../api/fetchPurchaseReqData`)
                 .then(response => {
-                    // Add new properties to track submission
                     this.purchaseRequests = response.data.data.map(pr => ({
                         ...pr,
                         isBudgetSubmitted: false,
@@ -211,13 +218,14 @@ export default {
             axios.post(`../api/updatePurchaseRequestStatus`, {
                 id: id,
                 status: 2, // Update status to "Budget"
-                submitted_date: new Date().toISOString().slice(0, 19).replace('T', ' '), // Set submitted date
                 is_budget_submitted: true, // Mark as submitted to Budget
+                submitted_date: null, // Set submitted date
             })
                 .then(response => {
                     const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
                     if (updatedRequest) {
-                        updatedRequest.isBudgetSubmitted = true; // Update frontend state
+                        updatedRequest.isBudgetSubmitted = true; // Update frontend state for Budget
+                        // Do not update isGSSSubmitted here
                     }
                     toast.success('Successfully submitted to the Budget!', { autoClose: 2000 });
 
@@ -241,7 +249,8 @@ export default {
                 .then(response => {
                     const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
                     if (updatedRequest) {
-                        updatedRequest.isGSSSubmitted = true; // Update frontend state
+                        updatedRequest.isGSSSubmitted = true; // Update frontend state for GSS
+                        // Do not update isBudgetSubmitted here
                     }
                     toast.success('Successfully submitted to the GSS!', { autoClose: 2000 });
 

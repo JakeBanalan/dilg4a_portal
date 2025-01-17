@@ -136,8 +136,11 @@
                                                     <td>{{ item.name }}</td>
                                                     <td>{{ item.descrip }}</td>
                                                     <td>{{ item.quantity }}</td>
-                                                    <td>₱{{ item.price.toFixed(2) }}</td>
-                                                    <td>₱{{ (item.quantity * item.price).toFixed(2) }}</td>
+                                                    <td>₱{{ item.price.toLocaleString('en-US', {
+                                                        minimumFractionDigits:
+                                                        2, maximumFractionDigits: 2 }) }}</td>
+                                                    <td>₱{{ (item.quantity * item.price).toLocaleString('en-US', {
+                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</td>
                                                     <td>
                                                         <button class="btn btn-warning btn-sm"
                                                             @click="showEditItemModal(index)">Edit</button>
@@ -166,11 +169,12 @@
                                             <h1>Add New Item</h1>
                                             <div class="form-group">
                                                 <label>Item Name</label>
-                                                <select class="form-control" id="itemName" v-model="newItem.id"
-                                                    @change="updateItemPrice">
-                                                    <option v-for="item in availableItems" :key="item.id"
-                                                        :value="item.id">{{ item.name }}</option>
-                                                </select>
+                                                <v-select :options="availableItems" v-model="newItem"
+                                                    @change="updateItemPrice" label="name">
+                                                    <template slot="option" slot-scope="option">
+                                                        {{ option.name }}
+                                                    </template>
+                                                </v-select>
                                             </div>
                                             <div class="form-group">
                                                 <label>Unit</label>
@@ -217,11 +221,11 @@
                                             <h1>Edit Item</h1>
                                             <div class="form-group">
                                                 <label for="editItemName">Item Name</label>
-                                                <select class="form-control" id="editItemName" v-model="editItem.id"
-                                                    @change="updateEditItemPrice">
-                                                    <option v-for="item in availableItems" :key="item.id"
-                                                        :value="item.id">{{ item.name }}</option>
-                                                </select>
+                                                <v-select :options="availableItems" v-model="editItem" label="name">
+                                                    <template slot="option" slot-scope="option">
+                                                        {{ option.name }}
+                                                    </template>
+                                                </v-select>
                                             </div>
                                             <div class="form-group">
                                                 <label for="editItemUnit">Unit</label>
@@ -278,6 +282,7 @@ import "vue3-toastify/dist/index.css";
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircleCheck, faCircleInfo, faEye, faLayerGroup, faList, faPesoSign, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import TextAreaInput from '../micro/TextAreaInput.vue';
+import vSelect from 'vue-select';
 
 library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign, faQuestionCircle);
 
@@ -292,7 +297,8 @@ export default {
         dtable,
         TextAreaInput,
         Modal,
-        dilg_logo
+        dilg_logo,
+        vSelect
     },
     data() {
         return {
@@ -379,6 +385,7 @@ export default {
                     console.error('Error fetching items:', error);
                 });
         },
+
         fetchEndUserInfo() {
             const userId = localStorage.getItem('userId');
             axios.get(`../../../api/fetchUser/${userId}`)
@@ -496,12 +503,11 @@ export default {
             }
         },
         updateEditItemPrice() {
-            const selectedItem = this.availableItems.find(item => item.id === this.editItem.id);
-            if (selectedItem) {
-                this.editItem.price = selectedItem.price;
-                this.editItem.descrip = selectedItem.descrip;
-                this.editItem.stockno = selectedItem.stockno;
-                this.editItem.unit = selectedItem.unit;
+            if (this.editItem) {
+                this.editItem.price = this.editItem.price;
+                this.editItem.descrip = this.editItem.descrip;
+                this.editItem.stockno = this.editItem.stockno;
+                this.editItem.unit = this.editItem.unit;
             }
         }
     }

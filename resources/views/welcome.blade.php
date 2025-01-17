@@ -12,7 +12,6 @@
         href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800%7CShadows+Into+Light&amp;display=swap"
         rel="stylesheet" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-
     <link href="{{ asset('vendors/css/vendor.bundle.base.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/feather/feather.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}" rel="stylesheet">
@@ -32,6 +31,7 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
