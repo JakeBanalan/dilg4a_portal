@@ -347,7 +347,7 @@ Route::post('post_create_event', [CalendarController::class, 'post_create_event'
 
 //C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
-Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
+Route::post('PostUpdateDragDrop', [CalendarController::class, 'PostUpdateDragDrop']);
 
 
 //QMS POST

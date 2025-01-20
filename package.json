@@ -19,8 +19,7 @@
         "resolve-url-loader": "^5.0.0",
         "sass": "^1.32.11",
         "sass-loader": "^11.0.1",
-        "vue": "^3.3.4",
-        "vue-loader": "^17.4.2"
+        "vue": "^3.3.4"
     },
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.5.1",
@@ -54,6 +53,7 @@
         "tui-time-picker": "^2.1.6",
         "vue-cal": "^4.10.2",
         "vue-gapi": "^2.1.2",
+        "vue-loader": "^17.4.2",
         "vue-moment": "^4.1.0",
         "vue-multiselect": "^3.0.0-beta.3",
         "vue-route": "^1.1.5",

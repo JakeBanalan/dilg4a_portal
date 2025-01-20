@@ -17,43 +17,87 @@ use Illuminate\Support\Facades\Auth;
 class CalendarController extends Controller
 {
 
-    public function dashboardEventData()
+    public function dashboardEventData(Request $request)
     {
         // Get the start and end of the current month
         $startOfMonth = now()->startOfMonth()->format('Y-m-d H:i:s');
         $endOfMonth = now()->endOfMonth()->format('Y-m-d H:i:s');
 
-        $EventData = CalendarModel::select(
-            'events.id',
-            'events.office',
-            'events.title',
-            'events.color',
-            'events.description',
-            'events.venue',
-            'events.enp',
-            'events.postedby',
-            'events.posteddate',
-            'events.realenddate',
-            'events.cancelflag',
-            'events.status',
-            'events.isRead',
-            'events.isGenerateRO',
-            'events.remarks',
-            'events.comments',
-            'events.priority',
-            'events.program',
-            'events.is_new',
-            'events.code_series',
-            'events.event_reminder',
-            'events.isSent',
-            DB::raw("DATE_FORMAT(events.start, '%Y-%m-%d %H:%i:%s') as start"),
-            DB::raw("DATE_FORMAT(events.end, '%Y-%m-%d %H:%i:%s') as end"),
-            DB::raw("CONCAT(users.last_name, ' ', users.first_name, ' ', users.middle_name) AS fname")
-        )
-            ->leftjoin('pmo', 'pmo.id', '=', 'events.office')
-            ->leftjoin('users', 'users.id', '=', 'events.postedby')
-            ->whereBetween('events.start', [$startOfMonth, $endOfMonth]) // Filter events for the current month
-            ->get();
+        // Get the user ID from the request
+        $userId = $request->input('userId');
+
+        if ($userId) {
+            // Fetch personal events for the current month
+            $EventData = CalendarModel::select(
+                'events.id',
+                'events.office',
+                'events.title',
+                'events.personnalevent',
+                'events.color',
+                'events.description',
+                'events.venue',
+                'events.enp',
+                'events.postedby',
+                'events.posteddate',
+                'events.realenddate',
+                'events.cancelflag',
+                'events.status',
+                'events.isRead',
+                'events.isGenerateRO',
+                'events.remarks',
+                'events.comments',
+                'events.priority',
+                'events.program',
+                'events.is_new',
+                'events.code_series',
+                'events.event_reminder',
+                'events.isSent',
+                DB::raw("DATE_FORMAT(events.start, '%Y-%m-%d %H:%i:%s') as start"),
+                DB::raw("DATE_FORMAT(events.end, '%Y-%m-%d %H:%i:%s') as end"),
+                DB::raw("CONCAT(users.last_name, ' ', users.first_name, ' ', users.middle_name) AS fname")
+            )
+                ->leftjoin('pmo', 'pmo.id', '=', 'events.office')
+                ->leftjoin('users', 'users.id', '=', 'events.postedby')
+                ->whereBetween('events.start', [$startOfMonth, $endOfMonth]) // Filter events for the current month
+                ->where('events.postedby', $userId) // Filter events by the user ID
+                ->where('events.personnalevent', 1) // Filter events by the personnalevent column
+                ->get();
+        } else {
+            // Fetch all events for the current month
+            $EventData = CalendarModel::select(
+                'events.id',
+                'events.office',
+                'events.title',
+                'events.personnalevent',
+                'events.color',
+                'events.description',
+                'events.venue',
+                'events.enp',
+                'events.postedby',
+                'events.posteddate',
+                'events.realenddate',
+                'events.cancelflag',
+                'events.status',
+                'events.isRead',
+                'events.isGenerateRO',
+                'events.remarks',
+                'events.comments',
+                'events.priority',
+                'events.program',
+                'events.is_new',
+                'events.code_series',
+                'events.event_reminder',
+                'events.isSent',
+                DB::raw("DATE_FORMAT(events.start, '%Y-%m-%d %H:%i:%s') as start"),
+                DB::raw("DATE_FORMAT(events.end, '%Y-%m-%d %H:%i:%s') as end"),
+                DB::raw("CONCAT(users.last_name, ' ', users.first_name, ' ', users.middle_name) AS fname")
+            )
+                ->leftjoin('pmo', 'pmo.id', '=', 'events.office')
+                ->leftjoin('users', 'users.id', '=', 'events.postedby')
+                ->whereBetween('events.start', [$startOfMonth, $endOfMonth]) // Filter events for the current month
+                ->where('events.personnalevent', 0) // Filter events by the personnalevent column
+                ->get();
+        }
 
         // Initialize an array to store the transformed events
         $eventArray = [];
@@ -72,7 +116,7 @@ class CalendarController extends Controller
     {
         $officeFilter = $request->input('office');
         $showMyPersonalEvents = $request->input('personnalevent');
-        $userId = auth()->id();
+        $userId = $request->input('user_id');
 
         $EventData = CalendarModel::select(
             'events.id',
@@ -108,18 +152,20 @@ class CalendarController extends Controller
         // Combine conditions for "All Offices" and "My Personal Events"
         $EventData = $EventData->where(function ($query) use ($officeFilter, $showMyPersonalEvents, $userId) {
             if ($officeFilter === '0') {
-                // Include all offices
-                $query->orWhere('events.office', '!=', null);
-            } else {
+                // Include all offices and exclude personal events
+                $query->where('events.personnalevent', 0);
+            } elseif ($officeFilter !== '') {
                 // Filter by specific offices
                 $officeFilterArray = explode(',', $officeFilter);
                 $query->whereIn('events.office', $officeFilterArray);
             }
 
             if ($showMyPersonalEvents) {
-                // Include personal events or events posted by the user
-                $query->orWhere('events.personnalevent', 1)
-                    ->orWhere('events.postedby', $userId);
+                // Include personal events posted by the current user
+                $query->orWhere(function ($q) use ($userId) {
+                    $q->where('events.postedby', $userId)
+                        ->where('events.personnalevent', 1);
+                });
             }
         });
 
@@ -186,6 +232,18 @@ class CalendarController extends Controller
 
 
     public function PostUpdateEvent(Request $request)
+    {
+        $start = Carbon::parse($request->input('start'));
+        $end = Carbon::parse($request->input('end'));
+
+        CalendarModel::where('id', $request->input('id'))
+            ->update([
+                'start' => $start->format('Y-m-d H:i:s'),
+                'end' => $end->format('Y-m-d H:i:s')
+            ]);
+    }
+
+    public function PostUpdateDragDrop(Request $request)
     {
         $start = Carbon::parse($request->input('start'));
         $end = Carbon::parse($request->input('end'));

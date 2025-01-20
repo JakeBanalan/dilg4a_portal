@@ -8,27 +8,55 @@
             </div>
         </div>
 
-        <div class="col-md-6 grid-margin">
-            <div class="card">
-                <div class="card-body" style="overflow-y:scroll;">
-                    <p class="card-title">Upcoming Events - {{ currentMonth }}</p>
-                    <div class="d-flex align-items-center pb-3 pt-3 border-bottom" v-for="(events, i) in UpcomingEvents"
-                        :key="i">
-                        <div class="move-calendar ms-3">
-                            <span style="display: inline-block;">
-                                <time class="icon">
-                                    <em>{{ FormattedDay(events.start) }}</em>
-                                    <strong>{{ FormattedMonth(events.start) }}</strong>
-                                    <span>{{ FormattedDate(events.start) }}</span>
-                                </time>
-                            </span>
+        <div class="row">
+            <div class="col-md-6 grid-margin">
+                <div class="card">
+                    <div class="card-body scrollable-card-body">
+                        <p class="card-title">Upcoming Events - {{ currentMonth }}</p>
+                        <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                            v-for="(events, i) in UpcomingEvents" :key="i">
+                            <div class="move-calendar ms-3">
+                                <span style="display: inline-block;">
+                                    <time class="icon">
+                                        <em>{{ FormattedDay(events.start) }}</em>
+                                        <strong>{{ FormattedMonth(events.start) }}</strong>
+                                        <span>{{ FormattedDate(events.start) }}</span>
+                                    </time>
+                                </span>
+                            </div>
+                            <div class="ms-3" style="padding-left: 0.3em;">
+                                <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                    class="mb-0">{{ events.title }}</h6>
+                                <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
+                                    FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
+                                    }}</small>
+                            </div>
                         </div>
-                        <div class="ms-3" style="padding-left: 0.3em;">
-                            <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
-                                class="mb-0">{{ events.title }}</h6>
-                            <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
-                                FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
-                                }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 grid-margin">
+                <div class="card">
+                    <div class="card-body scrollable-card-body">
+                        <p class="card-title">My Personal Events - {{ currentMonth }}</p>
+                        <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                            v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
+                            <div class="move-calendar ms-3">
+                                <span style="display: inline-block;">
+                                    <time class="icon">
+                                        <em>{{ FormattedDay(myEvents.start) }}</em>
+                                        <strong>{{ FormattedMonth(myEvents.start) }}</strong>
+                                        <span>{{ FormattedDate(myEvents.start) }}</span>
+                                    </time>
+                                </span>
+                            </div>
+                            <div class="ms-3" style="padding-left: 0.3em;">
+                                <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                    class="mb-0 text-blue">{{ myEvents.title }}</h6>
+                                <small class="text-blue mb-0"><i class="ti-timer me-1"></i> {{
+                                    FormattedFDate(myEvents.start) }} - {{ FormattedFDate(myEvents.end)
+                                    }}</small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -37,6 +65,15 @@
     </div>
 </template>
 <style>
+.scrollable-card-body {
+    overflow-y: scroll;
+    height: 500px;
+}
+
+.text-blue {
+    color: blue;
+}
+
 .arrow {
     position: absolute;
     top: 50%;
@@ -182,12 +219,16 @@ export default {
             total_pr: null,
             total_accounts: null,
             UpcomingEvents: [],
+            MyUpcomingEvents: []
         }
     },
     mounted() {
         this.fetch_total_pr();
         this.fetch_total_accounts();
         this.FetchData();
+    },
+    created() {
+        this.userId = localStorage.getItem('userId');
     },
     computed: {
         currentMonth() {
@@ -221,7 +262,7 @@ export default {
             const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
             const endOfMonth = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
 
-            // Fetch data for the current month
+            // Fetch data for all events
             axios.get(`/api/dashboardEventData`, {
                 params: {
                     start: startOfMonth,
@@ -229,7 +270,29 @@ export default {
                 },
             })
                 .then(response => {
+                    console.log('API response:', response);
+                    console.log('Data:', response.data);
                     this.UpcomingEvents = response.data.map(event => ({
+                        ...event,
+                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
+                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+                    }));
+                    console.log('UpcomingEvents:', this.UpcomingEvents);
+                })
+                .catch(error => {
+                    console.error('Error Fetching items:', error);
+                });
+
+            // Fetch data for the user's personal events
+            axios.get(`/api/dashboardEventData`, {
+                params: {
+                    start: startOfMonth,
+                    end: endOfMonth,
+                    userId: this.userId, // Pass the user ID as a parameter
+                },
+            })
+                .then(response => {
+                    this.MyUpcomingEvents = response.data.map(event => ({
                         ...event,
                         start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
                         end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),

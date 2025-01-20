@@ -27,19 +27,16 @@
                                                 <tbody>
 
                                                     <tr>
-                                                        <!-- All Offices Checkbox -->
-                                                        <td style="background-color: white; color:black; width: 50%;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="'0'"
-                                                                @change="filterEvents">
-                                                            <label style="margin-left: 15%;">All Offices</label>
+                                                        <td
+                                                            style="background-color: whitesmoke; color: black; padding: 9px; width: 50%;">
+                                                            <input type="checkbox" v-model="selectedOffices"
+                                                                name="offices[]" value="0" @change="filterEvents()">
+                                                            <label style="margin-left: 15%;">All offices</label>
                                                         </td>
-
                                                         <!-- My Personal Events Checkbox -->
                                                         <td
                                                             style="background-color: goldenrod; color: #fff; padding: 9px; width: 50%;">
-                                                            <input class="calFilter" type="checkbox"
-                                                                name="myPersonalEvents" v-model="showMyPersonalEvents"
+                                                            <input type="checkbox" v-model="showMyPersonalEvents"
                                                                 @change="FetchData">
                                                             <label style="margin-left: 15%;">My Personal Events</label>
                                                         </td>
@@ -216,7 +213,7 @@ export default {
                 },
 
             },
-            selectedOffices: [0],
+            selectedOffices: [],
             showMyPersonalEvents: true
         }
     },
@@ -297,14 +294,26 @@ export default {
         },
         FetchData() {
             const allOfficesSelected = this.selectedOffices.includes('0');
+            const showPersonalEvents = this.showMyPersonalEvents;
+            const userId = this.userId;
 
-            axios.get(`/api/fetchEventData`, {
+            if (this.selectedOffices.length === 0 && !showPersonalEvents) {
+                this.calendarOptions.events = [];
+                this.events = [];
+                this.$refs.calendar.getApi().refetchEvents();
+                return;
+            }
+
+            // Send request to fetch events with the correct filters
+            axios.get('/api/fetchEventData', {
                 params: {
                     office: allOfficesSelected ? '0' : this.selectedOffices.join(','),
-                    personnalevent: this.showMyPersonalEvents ? 1 : 0,
+                    personnalevent: showPersonalEvents ? 1 : 0,
+                    user_id: userId,
                 }
             })
                 .then(response => {
+                    // Process the events response data
                     const events = response.data.map(event => {
                         const startDate = moment(event.start);
                         const endDate = moment(event.end);
@@ -312,22 +321,27 @@ export default {
 
                         return {
                             ...event,
-                            allDay: duration > 1, // Multi-day event handling
-                            start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-                            end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
-                            backgroundColor: event.color || '#48BD0D', // Default color
+                            allDay: duration > 1,
+                            start: startDate.format('YYYY-MM-DD HH:mm:ss'),
+                            end: endDate.format('YYYY-MM-DD HH:mm:ss'),
+                            backgroundColor: event.color || '#48BD0D',
                         };
                     });
 
-                    this.calendarOptions.events = events; // Update calendar options
-                    this.events = events; // Store events locally
-                    this.$refs.calendar.getApi().refetchEvents(); // Refresh calendar
+
+                    this.calendarOptions.events = events;
+                    this.events = events;
+                    this.$refs.calendar.getApi().refetchEvents();
                 })
                 .catch(error => {
-                    console.error('Error Fetching events:', error);
+                    console.error('Error fetching events:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'An error occurred while fetching events. Please try again later.',
+                    });
                 });
         },
-
         handleEventClick(arg) {
             const event = this.events.find(event => event.id === +arg.event.id);
             const formatDateForInput = (date) => {
@@ -353,6 +367,7 @@ export default {
                 personnalevent: event.personnalevent
             };
 
+
             this.$nextTick(() => {
                 this.openModal('edit');
             });
@@ -364,7 +379,7 @@ export default {
                 end: moment(info.event.end || info.event.start).format('YYYY-MM-DD HH:mm:ss')
             };
 
-            axios.post('/api/PostUpdateEvent', updatedEvent)
+            axios.post('/api/PostUpdateDragDrop', updatedEvent)
                 .then(() => {
                     toast.success('Event Updated!', {
                         autoClose: 1000
@@ -423,6 +438,7 @@ export default {
                         toast.success('Event Updated!', {
                             autoClose: 1000
                         });
+                        this.isDisabledFlag = true;
                         this.FetchData();
                         this.closeModal();
                     })
@@ -430,24 +446,21 @@ export default {
                         console.error('error saving data', error)
                     })
             }
-        }
+        },
 
     }
 };
 </script>
 
 <style scoped>
-.fc-h-event {
-    position: relative;
-    display: block;
-    font-size: .85em;
-    line-height: 1.3;
-    border-radius: 3px;
-}
-
 .fc-daygrid-event {
     margin: 1px 2px 0;
-    padding: 0 1px;
+    padding: 2px 4px;
+    /* Adjusted padding for better display */
+    overflow: visible;
+    /* Allow overflow for long text */
+    white-space: normal;
+    /* Allow text to wrap */
 }
 
 .fc-daygrid-day-frame {
@@ -473,11 +486,6 @@ export default {
 
 .fc-daygrid-event-harness {
     margin-bottom: 2px;
-}
-
-.fc-daygrid-event {
-    border-radius: 3px;
-    padding: 2px 4px;
 }
 
 .fc-daygrid-event-dot {

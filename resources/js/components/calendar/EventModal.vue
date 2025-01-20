@@ -14,7 +14,8 @@
 
                             <div class="form-group row">
                                 <label style="font-size: 20pt; color: red; display: flex; align-items: center;">
-                                    <input type="checkbox" v-model="eventDetails.personnalevent" style="visibility: hidden;">
+                                    <input type="checkbox" v-model="eventDetails.personnalevent"
+                                        style="visibility: hidden;">
                                     <span class="custom-checkbox"
                                         :style="{ backgroundColor: eventDetails.personnalevent ? '#4cae4c' : '#fff' }"></span>
                                     Personal Event
@@ -119,6 +120,11 @@
                             <button type="submit" id="confirmButton" class="btn btn-success" style="float: right;"
                                 :disabled="isDisabled">
                                 {{ mode === 'add' ? 'Add Event' : 'Save Event' }}</button>
+
+                            <button type="button" class="btn btn-secondary" style="float: right;margin-left:5px;"
+                                @click="editEvent" v-if="mode === 'add'">
+                                Edit</button>
+
                         </form>
                     </div>
                 </div>
@@ -139,7 +145,7 @@ import Multiselect from 'vue-multiselect'
 export default {
     data() {
         return {
-            isDisabledFlag: false,
+            isDisabledFlag: true,
             logo: dilg_logo,
             userId: null,
             Author: null,
