@@ -296,7 +296,7 @@ export default {
 
 /* Style for centering the modal */
 .modal-dialog {
-    max-height: 90vh;
+    max-height: 700px;
     overflow-y: auto;
 }
 

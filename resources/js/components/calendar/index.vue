@@ -7,7 +7,7 @@
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <div class="row">
-                        <div class="col-md-9 grid-margin stretch-card">
+                        <div class="col-md-7 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
                                     <FullCalendar ref="calendar" :options="calendarOptions" />
@@ -15,7 +15,59 @@
                             </div>
                         </div>
                         <!--CARDS - Activity Bar-->
-                        <div class="col-md-3 grid-margin">
+                        <div class="col-md-2 grid-margin">
+                            <div class="card">
+                                <div class="card-body scrollable-card-body">
+                                    <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
+                                    <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                                        v-for="(events, i) in UpcomingEvents" :key="i">
+                                        <div class="move-calendar ms-3">
+                                            <span style="display: inline-block;">
+                                                <time class="icon">
+                                                    <em>{{ FormattedDay(events.start) }}</em>
+                                                    <strong>{{ FormattedMonth(events.start) }}</strong>
+                                                    <span>{{ FormattedDate(events.start) }}</span>
+                                                </time>
+                                            </span>
+                                        </div>
+                                        <div class="ms-3" style="padding-left: 0.3em;">
+                                            <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                                class="mb-0">{{ events.title }}</h6>
+                                            <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
+                                                FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
+                                                }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 grid-margin">
+                            <div class="card">
+                                <div class="card-body scrollable-card-body">
+                                    <p class="card-title">My Personal Events - {{ currentMonth }}</p>
+                                    <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                                        v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
+                                        <div class="move-calendar ms-3">
+                                            <span style="display: inline-block;">
+                                                <time class="icon">
+                                                    <em>{{ FormattedDay(myEvents.start) }}</em>
+                                                    <strong>{{ FormattedMonth(myEvents.start) }}</strong>
+                                                    <span>{{ FormattedDate(myEvents.start) }}</span>
+                                                </time>
+                                            </span>
+                                        </div>
+                                        <div class="ms-3" style="padding-left: 0.3em;">
+                                            <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                                class="mb-0 text-blue">{{ myEvents.title }}</h6>
+                                            <small class="text-blue mb-0"><i class="ti-timer me-1"></i> {{
+                                                FormattedFDate(myEvents.start) }} - {{ FormattedFDate(myEvents.end)
+                                                }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 grid-margin" style="margin-top: -500px; overflow: auto;">
                             <div class="card" style="max-height: 770px !important; overflow:hidden;">
                                 <div class="card-body" style="overflow-y:scroll;">
                                     <p class="card-title">Ledger Filter</p>
@@ -136,6 +188,7 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
                 <FooterVue />
@@ -214,16 +267,21 @@ export default {
 
             },
             selectedOffices: [],
-            showMyPersonalEvents: true
+            showMyPersonalEvents: true,
+            UpcomingEvents: [],
+            MyUpcomingEvents: []
         }
     },
     created() {
         this.userId = localStorage.getItem('userId');
+        this.EventData();
         this.FetchData();
         this.fetchAuthor();
     },
     computed: {
-
+        currentMonth() {
+            return moment().format('MMMM YYYY'); // Returns the current month and year
+        },
         FormattedFDate() {
             return function (DateString) {
                 return moment(DateString).format('MMMM DD, YYYY');
@@ -243,13 +301,6 @@ export default {
             return function (DateString) {
                 return moment(DateString).format('dddd');
             };
-        },
-        UpcomingEvents() {
-            const currentDate = new Date();
-            return this.events.filter(events => {
-                const eventDate = new Date(events.start);
-                return eventDate >= currentDate;
-            })
         }
     },
     methods: {
@@ -293,6 +344,51 @@ export default {
             this.eventDetails.postedBy = this.posted_by;
             this.openModal('add')
             // this.modalVisible = true
+        },
+        EventData() {
+            // Get the start and end of the current month
+            const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
+            const endOfMonth = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
+
+            // Fetch data for all events
+            axios.get(`/api/dashboardEventData`, {
+                params: {
+                    start: startOfMonth,
+                    end: endOfMonth,
+                },
+            })
+                .then(response => {
+                    console.log('API response:', response);
+                    console.log('Data:', response.data);
+                    this.UpcomingEvents = response.data.map(event => ({
+                        ...event,
+                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
+                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+                    }));
+                    console.log('UpcomingEvents:', this.UpcomingEvents);
+                })
+                .catch(error => {
+                    console.error('Error Fetching items:', error);
+                });
+
+            // Fetch data for the user's personal events
+            axios.get(`/api/dashboardEventData`, {
+                params: {
+                    start: startOfMonth,
+                    end: endOfMonth,
+                    userId: this.userId, // Pass the user ID as a parameter
+                },
+            })
+                .then(response => {
+                    this.MyUpcomingEvents = response.data.map(event => ({
+                        ...event,
+                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
+                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+                    }));
+                })
+                .catch(error => {
+                    console.error('Error Fetching items:', error);
+                });
         },
         FetchData() {
             const allOfficesSelected = this.selectedOffices.includes('0');
@@ -452,6 +548,47 @@ export default {
 </script>
 
 <style scoped>
+@media (max-width: 1080px) {
+    .card {
+        margin-left: 0;
+        margin-top: 0;
+        max-height: none;
+    }
+
+    .col-md-4 {
+        margin-left: 0;
+    }
+
+    table {
+        width: 100%;
+    }
+
+    td {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .box {
+        margin-top: 20px;
+    }
+}
+
+@media (min-width: 1080px) {
+    .col-md-4 {
+        margin-left: 950px;
+        margin-top: -500px;
+    }
+}
+
+.scrollable-card-body {
+    overflow-y: scroll;
+    height: 300px;
+}
+
+.text-blue {
+    color: blue;
+}
+
 .fc-daygrid-event {
     margin: 1px 2px 0;
     padding: 2px 4px;

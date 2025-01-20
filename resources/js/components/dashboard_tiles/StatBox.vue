@@ -12,7 +12,7 @@
             <div class="col-md-6 grid-margin">
                 <div class="card">
                     <div class="card-body scrollable-card-body">
-                        <p class="card-title">Upcoming Events - {{ currentMonth }}</p>
+                        <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
                         <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
                             v-for="(events, i) in UpcomingEvents" :key="i">
                             <div class="move-calendar ms-3">
@@ -64,10 +64,135 @@
         </div>
     </div>
 </template>
-<style>
+
+<script>
+import dashboard_img1 from "../../../../assets/images/banner1.png";
+import dashboard_img2 from "../../../../assets/images/banner2.png"; // Add more images
+import dashboard_img3 from "../../../../assets/images/banner3.png";
+import dashboard_img4 from "../../../../assets/images/banner3.png";
+import moment from 'moment';
+export default {
+    name: 'StatBox',
+    data() {
+        return {
+            images: [dashboard_img1, dashboard_img2, dashboard_img3, dashboard_img4], // Array of images
+            currentIndex: 0,
+            currentImage: dashboard_img1,
+            total_pr: null,
+            total_accounts: null,
+            UpcomingEvents: [],
+            MyUpcomingEvents: []
+        }
+    },
+    mounted() {
+        this.fetch_total_pr();
+        this.fetch_total_accounts();
+        this.FetchData();
+    },
+    created() {
+        this.userId = localStorage.getItem('userId');
+    },
+    computed: {
+        currentMonth() {
+            return moment().format('MMMM YYYY'); // Returns the current month and year
+        },
+        FormattedFDate() {
+            return function (DateString) {
+                return moment(DateString).format('MMMM DD, YYYY');
+            };
+        },
+        FormattedMonth() {
+            return function (DateString) {
+                return moment(DateString).format('MMMM');
+            };
+        },
+        FormattedDate() {
+            return function (DateString) {
+                return moment(DateString).format('DD');
+            };
+        },
+        FormattedDay() {
+            return function (DateString) {
+                return moment(DateString).format('dddd');
+            };
+        },
+
+    },
+    methods: {
+        FetchData() {
+            // Get the start and end of the current month
+            const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
+            const endOfMonth = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
+
+            // Fetch data for all events
+            axios.get(`/api/dashboardEventData`, {
+                params: {
+                    start: startOfMonth,
+                    end: endOfMonth,
+                },
+            })
+                .then(response => {
+                    console.log('API response:', response);
+                    console.log('Data:', response.data);
+                    this.UpcomingEvents = response.data.map(event => ({
+                        ...event,
+                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
+                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+                    }));
+                    console.log('UpcomingEvents:', this.UpcomingEvents);
+                })
+                .catch(error => {
+                    console.error('Error Fetching items:', error);
+                });
+
+            // Fetch data for the user's personal events
+            axios.get(`/api/dashboardEventData`, {
+                params: {
+                    start: startOfMonth,
+                    end: endOfMonth,
+                    userId: this.userId, // Pass the user ID as a parameter
+                },
+            })
+                .then(response => {
+                    this.MyUpcomingEvents = response.data.map(event => ({
+                        ...event,
+                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
+                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+                    }));
+                })
+                .catch(error => {
+                    console.error('Error Fetching items:', error);
+                });
+        },
+        nextImage() {
+            this.currentIndex = (this.currentIndex + 1) % this.images.length;
+            this.currentImage = this.images[this.currentIndex];
+        },
+        prevImage() {
+            this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length
+            this.currentImage = this.images[this.currentIndex];
+        },
+        fetch_total_pr() {
+            this.$count('/api/countPurchaseRequestStatistics', 2024)
+                .then(data => {
+                    this.total_pr = data.total_pr;
+                })
+                .catch(error => { console.error(error) });
+        },
+        fetch_total_accounts() {
+            this.$count('/api/getActiveAccounts')
+                .then(data => {
+                    this.total_accounts = data.total_accounts;
+                })
+                .catch(error => { console.error(error) });
+        }
+    },
+}
+</script>
+<style scoped>
 .scrollable-card-body {
     overflow-y: scroll;
-    height: 500px;
+    height: 400px;
 }
 
 .text-blue {
@@ -203,127 +328,3 @@ div::-webkit-scrollbar {
     display: none;
 }
 </style>
-<script>
-import dashboard_img1 from "../../../../assets/images/banner1.png";
-import dashboard_img2 from "../../../../assets/images/banner2.png"; // Add more images
-import dashboard_img3 from "../../../../assets/images/banner3.png";
-import dashboard_img4 from "../../../../assets/images/banner3.png";
-import moment from 'moment';
-export default {
-    name: 'StatBox',
-    data() {
-        return {
-            images: [dashboard_img1, dashboard_img2, dashboard_img3, dashboard_img4], // Array of images
-            currentIndex: 0,
-            currentImage: dashboard_img1,
-            total_pr: null,
-            total_accounts: null,
-            UpcomingEvents: [],
-            MyUpcomingEvents: []
-        }
-    },
-    mounted() {
-        this.fetch_total_pr();
-        this.fetch_total_accounts();
-        this.FetchData();
-    },
-    created() {
-        this.userId = localStorage.getItem('userId');
-    },
-    computed: {
-        currentMonth() {
-            return moment().format('MMMM YYYY'); // Returns the current month and year
-        },
-        FormattedFDate() {
-            return function (DateString) {
-                return moment(DateString).format('MMMM DD, YYYY');
-            };
-        },
-        FormattedMonth() {
-            return function (DateString) {
-                return moment(DateString).format('MMMM');
-            };
-        },
-        FormattedDate() {
-            return function (DateString) {
-                return moment(DateString).format('DD');
-            };
-        },
-        FormattedDay() {
-            return function (DateString) {
-                return moment(DateString).format('dddd');
-            };
-        },
-
-    },
-    methods: {
-        FetchData() {
-            // Get the start and end of the current month
-            const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
-            const endOfMonth = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
-
-            // Fetch data for all events
-            axios.get(`/api/dashboardEventData`, {
-                params: {
-                    start: startOfMonth,
-                    end: endOfMonth,
-                },
-            })
-                .then(response => {
-                    console.log('API response:', response);
-                    console.log('Data:', response.data);
-                    this.UpcomingEvents = response.data.map(event => ({
-                        ...event,
-                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
-                    }));
-                    console.log('UpcomingEvents:', this.UpcomingEvents);
-                })
-                .catch(error => {
-                    console.error('Error Fetching items:', error);
-                });
-
-            // Fetch data for the user's personal events
-            axios.get(`/api/dashboardEventData`, {
-                params: {
-                    start: startOfMonth,
-                    end: endOfMonth,
-                    userId: this.userId, // Pass the user ID as a parameter
-                },
-            })
-                .then(response => {
-                    this.MyUpcomingEvents = response.data.map(event => ({
-                        ...event,
-                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
-                    }));
-                })
-                .catch(error => {
-                    console.error('Error Fetching items:', error);
-                });
-        },
-        nextImage() {
-            this.currentIndex = (this.currentIndex + 1) % this.images.length;
-            this.currentImage = this.images[this.currentIndex];
-        },
-        prevImage() {
-            this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length
-            this.currentImage = this.images[this.currentIndex];
-        },
-        fetch_total_pr() {
-            this.$count('/api/countPurchaseRequestStatistics', 2024)
-                .then(data => {
-                    this.total_pr = data.total_pr;
-                })
-                .catch(error => { console.error(error) });
-        },
-        fetch_total_accounts() {
-            this.$count('/api/getActiveAccounts')
-                .then(data => {
-                    this.total_accounts = data.total_accounts;
-                })
-                .catch(error => { console.error(error) });
-        }
-    },
-}
-</script>
