@@ -26,7 +26,7 @@
                                             }}</small> </label>
                                     <div id="the-basics">
                                         <input class="form-control typeahead" type="text" id="title"
-                                            v-model="eventDetails.title" :disabled="isDisabled" />
+                                            v-model="eventDetails.title" :disabled="isDisabledFlag" />
                                     </div>
                                 </div>
                             </div>
@@ -37,7 +37,7 @@
                                     <div id="the-basics">
                                         <textarea rows="3" col="100" style="height:100px !important;" id="description"
                                             class="form-control" v-model="eventDetails.description"
-                                            :disabled="isDisabled"></textarea>
+                                            :disabled="isDisabledFlag"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -49,7 +49,7 @@
                                                     }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="date" id="start"
-                                                    v-model="eventDetails.start" :disabled="isDisabled">
+                                                    v-model="eventDetails.start" :disabled="isDisabledFlag">
                                             </div>
                                         </div>
                                     </div>
@@ -61,7 +61,7 @@
                                                     }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="date" id="end"
-                                                    v-model="eventDetails.end" :disabled="isDisabled">
+                                                    v-model="eventDetails.end" :disabled="isDisabledFlag">
                                             </div>
                                         </div>
                                     </div>
@@ -73,7 +73,7 @@
                                             }}</small></label>
                                     <div id="the-basics">
                                         <input class="form-control typeahead" type="text" id="venue"
-                                            v-model="eventDetails.venue" :disabled="isDisabled">
+                                            v-model="eventDetails.venue" :disabled="isDisabledFlag">
                                     </div>
                                 </div>
                             </div>
@@ -86,7 +86,7 @@
                                             <div id="the-basics">
                                                 <multiselect v-model="eventDetails.remarks"
                                                     :options="TargetParticipantsOpt" :multiple="true"
-                                                    :disabled="isDisabled" :searchable="false">
+                                                    :disabled="isDisabledFlag" :searchable="false">
                                                 </multiselect>
                                             </div>
                                         </div>
@@ -99,7 +99,7 @@
                                                 errors.enp }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="text"
-                                                    v-model="eventDetails.enp" id="enp" :disabled="isDisabled">
+                                                    v-model="eventDetails.enp" id="enp" :disabled="isDisabledFlag">
                                             </div>
                                         </div>
                                     </div>
@@ -118,12 +118,13 @@
                             <button type="button" class="btn btn-primary" style="float: right;margin-left:5px;"
                                 @click="closeModal">Close</button>
                             <button type="submit" id="confirmButton" class="btn btn-success" style="float: right;"
-                                :disabled="isDisabled">
+                                :disabled="isDisabledFlag">
                                 {{ mode === 'add' ? 'Add Event' : 'Save Event' }}</button>
 
                             <button type="button" class="btn btn-secondary" style="float: right;margin-left:5px;"
-                                @click="editEvent" v-if="mode === 'add'">
-                                Edit</button>
+                                @click="toggleEditMode" v-if="mode === 'edit'">
+                                {{ isEditMode ? 'Cancel Edit' : 'Edit' }}
+                            </button>
 
                         </form>
                     </div>
@@ -149,6 +150,7 @@ export default {
             logo: dilg_logo,
             userId: null,
             Author: null,
+            isEditMode: false,
             hasInteracted: false,
             errors: {},
             TargetParticipantsOpt: ['Regional Office', 'Provincial Office', 'HUC', 'C/MLGOO', 'LGA', 'NGA', 'Others'],
@@ -170,18 +172,16 @@ export default {
         this.fetchAuthor();
 
     },
-    mounted() {
-        // console.log(this.posted_By);
-
-    },
     computed: {
         isDisabled() {
-            return this.isDisabledFlag || this.Author != this.eventDetails.postedBy;
-        },
-
-
+            return (this.mode === 'edit' && !this.isEditMode);
+        }
     },
     methods: {
+        toggleEditMode() {
+            this.isEditMode = !this.isEditMode;
+            this.isDisabledFlag = !this.isDisabledFlag;
+        },
         validateForm() {
             this.errors = {};
             if (!this.eventDetails.title) {

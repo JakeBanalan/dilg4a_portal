@@ -283,7 +283,9 @@ export default {
         openModal(mode) {
             this.mode = mode;
             this.modalVisible = true
-
+            if (mode === 'edit') {
+                this.isDisabledFlag = true; // Set isDisabledFlag to true here
+            }
         },
         handleCustomButtonClick() {
             // console.log(this.posted_by)
@@ -366,8 +368,7 @@ export default {
                 remarks: event.remarks,
                 personnalevent: event.personnalevent
             };
-
-
+            this.isDisabledFlag = true;
             this.$nextTick(() => {
                 this.openModal('edit');
             });
@@ -421,7 +422,6 @@ export default {
                         console.error('error saving data', error);
                     })
             } else {
-                console.log(formData);
                 axios.post('/api/PostUpdateEvent',
                     {
                         id: formData.id,
@@ -438,9 +438,8 @@ export default {
                         toast.success('Event Updated!', {
                             autoClose: 1000
                         });
-                        this.isDisabledFlag = true;
+                        this.modalVisible = false;
                         this.FetchData();
-                        this.closeModal();
                     })
                     .catch(error => {
                         console.error('error saving data', error)

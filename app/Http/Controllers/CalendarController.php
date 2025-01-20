@@ -238,6 +238,11 @@ class CalendarController extends Controller
 
         CalendarModel::where('id', $request->input('id'))
             ->update([
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'venue' => $request->input('venue'),
+                'remarks' => $request->input('remarks'),
+                'enp' => $request->input('enp'),
                 'start' => $start->format('Y-m-d H:i:s'),
                 'end' => $end->format('Y-m-d H:i:s')
             ]);
