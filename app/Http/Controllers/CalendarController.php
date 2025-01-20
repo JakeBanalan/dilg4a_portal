@@ -150,24 +150,24 @@ class CalendarController extends Controller
             ->leftJoin('users', 'users.id', '=', 'events.postedby');
 
         // Combine conditions for "All Offices" and "My Personal Events"
-        $EventData = $EventData->where(function ($query) use ($officeFilter, $showMyPersonalEvents, $userId) {
+        if ($showMyPersonalEvents) {
+            // Only show personal events for the specific user
+            $EventData = $EventData->where('events.postedby', $userId)
+                ->where('events.personnalevent', 1);
+        } else {
             if ($officeFilter === '0') {
                 // Include all offices and exclude personal events
-                $query->where('events.personnalevent', 0);
+                $EventData = $EventData->where('events.personnalevent', 0);
             } elseif ($officeFilter !== '') {
-                // Filter by specific offices
+                // Filter by specific offices and exclude personal events
                 $officeFilterArray = explode(',', $officeFilter);
-                $query->whereIn('events.office', $officeFilterArray);
+                $EventData = $EventData->whereIn('events.office', $officeFilterArray)
+                    ->where('events.personnalevent', 0);
+            } else {
+                // Only show non-personal events when no offices are selected
+                $EventData = $EventData->where('events.personnalevent', 0);
             }
-
-            if ($showMyPersonalEvents) {
-                // Include personal events posted by the current user
-                $query->orWhere(function ($q) use ($userId) {
-                    $q->where('events.postedby', $userId)
-                        ->where('events.personnalevent', 1);
-                });
-            }
-        });
+        }
 
         $EventData = $EventData->get();
 
