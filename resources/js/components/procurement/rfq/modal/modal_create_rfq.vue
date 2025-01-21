@@ -266,6 +266,7 @@ export default {
 
 /* Style for centering the modal */
 .modal-dialog {
+  overflow: visible !important;
   margin-top: 10%;
   max-width: 80%;
   /* Adjust as needed */
