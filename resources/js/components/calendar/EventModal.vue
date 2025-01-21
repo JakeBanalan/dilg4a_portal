@@ -125,7 +125,10 @@
                                 @click="toggleEditMode" v-if="mode === 'edit'">
                                 {{ isEditMode ? 'Cancel Edit' : 'Edit' }}
                             </button>
-
+                            <button type="button" class="btn btn-danger" style="float: right;margin-left:5px;"
+                                v-if="mode === 'edit'" @click="$emit('delete', eventDetails.id)">
+                                Delete Event
+                            </button>
                         </form>
                     </div>
                 </div>

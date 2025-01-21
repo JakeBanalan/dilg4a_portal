@@ -194,7 +194,7 @@
                 <FooterVue />
             </div>
         </div>
-        <EventModal :visible="modalVisible" :mode="mode" @close="closeModal" @save="saveEventData"
+        <EventModal :visible="modalVisible" :mode="mode" @close="closeModal" @save="saveEventData" @delete="deleteEvent"
             :fetchAuthor="fetchAuthor" :eventDetails="eventDetails" />
     </div>
 </template>
@@ -543,6 +543,31 @@ export default {
                         console.error('error saving data', error)
                     })
             }
+        },
+        deleteEvent(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/api/DeleteEvent', { id: id })
+                        .then(() => {
+                            toast.success('Event Deleted!', {
+                                autoClose: 1000
+                            });
+                            this.FetchData();
+                            this.closeModal();
+                        })
+                        .catch(error => {
+                            console.error('Error deleting event:', error);
+                        });
+                }
+            });
         },
 
     }

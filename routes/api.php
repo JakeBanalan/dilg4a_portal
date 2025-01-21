@@ -392,7 +392,7 @@ Route::post('post_create_event', [CalendarController::class, 'post_create_event'
 //C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
 Route::post('PostUpdateDragDrop', [CalendarController::class, 'PostUpdateDragDrop']);
-
+Route::post('DeleteEvent', [CalendarController::class, 'deleteEvent']);
 
 //QMS POST
 Route::post('DeleteProcessOwner', [QMSController::class, 'DeleteProcessOwner']);
