@@ -157,6 +157,16 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('countDRAFT/{userId}', [RICTUController::class, 'countDRAFT']);
+    Route::get('/totalCountDraft', [RICTUController::class, 'totalCountDraft']);
+});
+
+Route::middleware('auth:api')->get('/getUserData', [RICTUController::class, 'getUserData']);
+Route::middleware('api')->group(function () {
+    Route::get('/countICTRequest/{userId}', [RICTUController::class, 'countICTRequest']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('/countDRAFT/{userId}', [RICTUController::class, 'countDRAFT']);
 });
 
 // Route::middleware('api')->group(function () {
@@ -177,7 +187,6 @@ Route::middleware('api')->group(function () {
     Route::get('countCancelledPR/{userId}', [PurchaseRequestController::class, 'countCancelledPR']);
 });
 
-
 Route::middleware('api')->group(function () {
     Route::get('countUserTotalPR/{userId}', [PurchaseRequestController::class, 'countUserTotalPR']);
 });
@@ -193,7 +202,7 @@ Route::middleware('api')->group(function () {
 
 
 Route::middleware('api')->group(function () {
-    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
+    Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
 });
 
 Route::middleware('api')->group(function () {
@@ -228,6 +237,11 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('fetchEventData', [CalendarController::class, 'fetchEventData']);
 });
+
+Route::middleware('api')->group(function () {
+    Route::get('dashboardEventData', [CalendarController::class, 'dashboardEventData']);
+});
+
 
 Route::middleware('api')->group(function () {
     Route::get('fetchEventDetails', [CalendarController::class, 'fetchEventDetails']);
@@ -313,7 +327,9 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('fetchUserOfficeCount', [UserManagementController::class, 'fetchUserOfficeCount']);
 });
-
+Route::middleware('api')->group(function () {
+    Route::get('fetchItems', [PurchaseRequestController::class, 'fetchItems']);
+});
 
 
 
@@ -332,14 +348,11 @@ Route::post('login', [UserController::class, 'login']);
 Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
 Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
-Route::post('post_update_cart', [PurchaseRequestController::class, 'post_update_cart']);
-Route::post('post_insert_pritem', [PurchaseRequestController::class, 'post_insert_pritem']);
-Route::post('post_remove_pritem', [PurchaseRequestController::class, 'post_remove_pritem']);
-Route::post('post_insert_purchaseNo', [PurchaseRequestController::class, 'post_insert_purchaseNo']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
 Route::post('post_update_purchaseRequestDetailsForm', [PurchaseRequestController::class, 'post_update_purchaseRequestDetailsForm']);
-Route::post('fetchCart', [PurchaseRequestController::class, 'fetchCart']);
+
 Route::post('fetchPurchaseReqData', [PurchaseRequestController::class, 'fetchPurchaseReqData']);
+Route::post('updatePurchaseRequestStatus', [PurchaseRequestController::class, 'updatePurchaseRequestStatus']);
 Route::post('fetchSubmittedtoGSS', [PurchaseRequestController::class, 'fetchSubmittedtoGSS']);
 Route::post('fetch_app_item', [SupplierController::class, 'fetch_app_item']);
 Route::post('fetch_app_item_details', [SupplierController::class, 'fetch_app_item_details']);
@@ -378,7 +391,7 @@ Route::post('post_create_event', [CalendarController::class, 'post_create_event'
 
 //C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
-Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
+Route::post('PostUpdateDragDrop', [CalendarController::class, 'PostUpdateDragDrop']);
 
 
 //QMS POST

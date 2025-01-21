@@ -120,7 +120,7 @@ export default {
         Transition,
         StatBox
     },
-   
+
     methods: {
 
     },

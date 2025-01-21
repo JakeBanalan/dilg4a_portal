@@ -79,8 +79,16 @@ h5 {
                                                         <input type="date" class="form-control" v-model="end_date" />
                                                     </div>
                                                     <div class="col-lg-3">
+                                                        <label style="font-size: 0.875rem;">Quarterly</label>
+                                                        <multiselect deselect-label="Can't remove this value"
+                                                            v-model="selected_quarter" track-by="value"
+                                                            :options="quarter" label="label" :searchable="false"
+                                                            :allow-empty="false" :multiple="false">
+                                                        </multiselect>
+                                                    </div>
+                                                    <div class="col-lg-3">
                                                         <label style="font-size: 0.875rem;">OFFICE/SERVICE/BUREAU
-                                                            DIVISION/SECTION/UNIT</label>
+                                                            DIVISION/SECTION/UNITS</label>
                                                         <multiselect v-model="selected_pmo" :options="pmo" label="label"
                                                             :multiple="false"></multiselect>
                                                     </div>
@@ -151,8 +159,16 @@ export default {
             start_date: '',
             end_date: '',
             value: null,
+            ict_personnel: null,
             modalVisible: false,
             selected_pmo: [],
+            selected_quarter: [],
+            quarter: [
+                { label: '1st Quarter', value: 1 },
+                { label: '2nd Quarter', value: 2 },
+                { label: '3rd Quarter', value: 3 },
+                { label: '4th Quarter', value: 4 },
+            ],
             pmo: [
                 { label: "ORD", value: "ORD" },
                 { label: "LGMED", value: "LGMED" },
@@ -198,6 +214,7 @@ export default {
             const startDate = this.start_date;
             const endDate = this.end_date;
             const pmo = this.selected_pmo ? this.selected_pmo.value : null;
+            const quarter = this.selected_quarter ? this.selected_quarter.value : null;
 
             // Extract the year from the start_date or end_date
             let year = null;
@@ -207,7 +224,7 @@ export default {
                 year = new Date(endDate).getFullYear();
             }
 
-            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate, pmo, ictPersonnel, year);
+            this.$refs.ICTTable.load_ict_request(status, controlNo, requestedBy, startDate, endDate, pmo, ictPersonnel, year, quarter);
         },
         resetFilter() {
             this.control_no = '';
@@ -216,11 +233,16 @@ export default {
             this.start_date = '';
             this.end_date = '';
             this.selected_pmo = '';
+            this.selected_quarter = '';
             this.selected_status = { label: 'All', value: 6 };
+
+            // Reset the current page to 1
+            this.$refs.ICTTable.currentPage = 1;
+
             //LOAD ALL DATA AFTER RESET
             const status = this.selected_status ? this.selected_status.value : 6;
             this.$refs.ICTTable.load_ict_request(status);
-        },
+        }
     },
     components: {
         Navbar,

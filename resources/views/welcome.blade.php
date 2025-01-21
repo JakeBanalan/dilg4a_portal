@@ -12,7 +12,6 @@
         href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800%7CShadows+Into+Light&amp;display=swap"
         rel="stylesheet" type="text/css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-
     <link href="{{ asset('vendors/css/vendor.bundle.base.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/feather/feather.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/ti-icons/css/themify-icons.css') }}" rel="stylesheet">
@@ -20,11 +19,10 @@
 
     <link href="{{ asset('vendors/select2/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendors/select2-bootstrap-theme/select2-bootstrap.min.css') }}" rel="stylesheet">
-
     <link href="{{ asset('js/select.dataTables.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/vertical-layout-light/style.css') }}" rel="stylesheet">
-
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 
 <body class="antialiased">
@@ -33,6 +31,9 @@
     </div>
 
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
@@ -52,6 +53,14 @@
     <script src="{{ asset('js/settings.js') }}"></script>
     <script src="{{ asset('js/todolist.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+        console.log(
+            "%cSTOP!",
+            "color: red; font-size: 80px; font-weight: bold; text-shadow: 2px 2px 0px black;"
+        );
+    </script>
 
 
 </body>

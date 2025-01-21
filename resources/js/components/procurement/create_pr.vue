@@ -1,645 +1,615 @@
-<style>
-.select-option {
-  height: 40px;
-}
-
-.date-option {
-  height: 40px;
-}
-
-.container .card {
-  height: auto;
-  width: auto;
-  background-color: #fff;
-  position: relative;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-  font-family: "Poppins", sans-serif;
-  border-radius: 20px;
-}
-
-.container .card .form {
-  width: 100%;
-  height: 100%;
-  display: flex;
-}
-
-.container .card .left-side {
-  width: 35%;
-  background-color: #304767;
-  height: 100%;
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
-  padding: 20px 30px;
-  box-sizing: border-box;
-}
-
-/*left-side-start*/
-.left-heading {
-  color: #fff;
-}
-
-.steps-content {
-  margin-top: 30px;
-  color: #fff;
-}
-
-.steps-content p {
-  font-size: 12px;
-  margin-top: 15px;
-}
-
-.progress-barv2 {
-  list-style: none;
-  /*color:#fff;*/
-  margin-top: 30px;
-  font-size: 13px;
-  font-weight: 700;
-  text-align: left;
-  counter-reset: container 0;
-}
-
-.progress-barv2 li {
-  position: relative;
-  margin-left: 40px;
-  margin-top: 50px;
-  counter-increment: container 1;
-  color: #4f6581;
-}
-
-.progress-barv2 li::before {
-  content: counter(container);
-  line-height: 25px;
-  text-align: center;
-  position: absolute;
-  height: 25px;
-  width: 25px;
-  border: 1px solid #4f6581;
-  border-radius: 50%;
-  left: -40px;
-  top: -5px;
-  z-index: 10;
-  background-color: #304767;
-}
-
-.progress-barv2 li::after {
-  content: "";
-  position: absolute;
-  height: 90px;
-  width: 2px;
-  background-color: #4f6581;
-  z-index: 1;
-  left: -27px;
-  top: -70px;
-}
-
-.progress-barv2 li.active::after {
-  background-color: #fff;
-}
-
-.progress-barv2 li:first-child:after {
-  display: none;
-}
-
-/*.progress-barv2 li:last-child:after{*/
-/*  display:none;  */
-/*}*/
-.progress-barv2 li.active::before {
-  color: #fff;
-  border: 1px solid #fff;
-}
-
-.progress-barv2 li.active {
-  color: #fff;
-}
-
-.d-none {
-  display: none;
-}
-
-/*left-side-end*/
-.container .card .right-side {
-  width: 100% !important;
-  background-color: #fff;
-  height: 100%;
-  border-radius: 20px;
-}
-
-/*right-side-start*/
-.main {
-  display: none;
-}
-
-.active {
-  display: block;
-}
-
-.main {
-  padding: 10px;
-}
-
-.main small {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 2px;
-  height: 30px;
-  width: 30px;
-  background-color: #ccc;
-  border-radius: 50%;
-  color: yellow;
-  font-size: 19px;
-}
-
-.text {
-  margin-top: 20px;
-}
-
-.congrats {
-  text-align: center;
-}
-
-.text p {
-  margin-top: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #cbced4;
-}
-
-.input-text {
-  margin: 30px 0;
-  display: flex;
-  gap: 20px;
-}
-
-.input-text .input-div {
-  width: 100%;
-  position: relative;
-}
-
-input[type="text"] {
-  width: 100%;
-  height: 40px;
-  border: none;
-  outline: 0;
-  border-radius: 5px;
-  border: 1px solid #cbced4;
-  gap: 20px;
-  box-sizing: border-box;
-  padding: 0px 10px;
-}
-
-select {
-  width: 100%;
-  height: 40px;
-  border: none;
-  outline: 0;
-  border-radius: 5px;
-  border: 1px solid #cbced4;
-  gap: 20px;
-  box-sizing: border-box;
-  padding: 0px 10px;
-}
-
-.input-text .input-div span {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 14px;
-  transition: all 0.5s;
-}
-
-.input-div input:focus~span,
-.input-div input:valid~span {
-  top: -15px;
-  left: 6px;
-  font-size: 10px;
-  font-weight: 600;
-}
-
-.input-div span {
-  top: -15px;
-  left: 6px;
-  font-size: 10px;
-}
-
-/* .buttons button {
-  height: 40px;
-  width: 100px;
-  border: none;
-  border-radius: 5px;
-  background-color: #0075ff;
-  font-size: 12px;
-  color: #fff;
-  cursor: pointer;
-} */
-
-
-
-.button_space {
-  display: flex;
-  gap: 20px;
-}
-
-.button_space button:nth-child(1) {
-  background-color: #fff;
-  color: #000;
-  border: 1px solid#000;
-}
-
-.user_card {
-  margin-top: 20px;
-  margin-bottom: 40px;
-  height: 200px;
-  width: 100%;
-  border: 1px solid #c7d3d9;
-  border-radius: 10px;
-  display: flex;
-  overflow: hidden;
-  position: relative;
-  box-sizing: border-box;
-}
-
-.user_card span {
-  height: 80px;
-  width: 100%;
-  background-color: #dfeeff;
-}
-
-.circle {
-  position: absolute;
-  top: 40px;
-  left: 60px;
-}
-
-.circle span {
-  height: 70px;
-  width: 70px;
-  background-color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2px solid #fff;
-  border-radius: 50%;
-}
-
-.circle span img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.social {
-  display: flex;
-  position: absolute;
-  top: 100px;
-  right: 10px;
-}
-
-.social span {
-  height: 30px;
-  width: 30px;
-  border-radius: 7px;
-  background-color: #fff;
-  border: 1px solid #cbd6dc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-left: 10px;
-  color: #cbd6dc;
-}
-
-.social span i {
-  cursor: pointer;
-}
-
-.heart {
-  color: red !important;
-}
-
-.share {
-  color: red !important;
-}
-
-.user_name {
-  position: absolute;
-  top: 110px;
-  margin: 10px;
-  padding: 0 30px;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.user_name h3 {
-  color: #4c5b68;
-}
-
-.detail {
-  /*margin-top:10px;*/
-  display: flex;
-  justify-content: space-between;
-  margin-right: 50px;
-}
-
-.detail p {
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.detail p a {
-  text-decoration: none;
-  color: blue;
-}
-
-.checkmark__circle {
-  stroke-dasharray: 166;
-  stroke-dashoffset: 166;
-  stroke-width: 2;
-  stroke-miterlimit: 10;
-  stroke: #7ac142;
-  fill: none;
-  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-}
-
-.checkmark {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  display: block;
-  stroke-width: 2;
-  stroke: #fff;
-  stroke-miterlimit: 10;
-  margin: 10% auto;
-  box-shadow: inset 0px 0px 0px #7ac142;
-  animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
-}
-
-.checkmark__check {
-  transform-origin: 50% 50%;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-}
-
-@keyframes stroke {
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes scale {
-
-  0%,
-  100% {
-    transform: none;
-  }
-
-  50% {
-    transform: scale3d(1.1, 1.1, 1);
-  }
-}
-
-@keyframes fill {
-  100% {
-    box-shadow: inset 0px 0px 0px 30px #7ac142;
-  }
-}
-
-.warning {
-  border: 1px solid red !important;
-}
-
-/*right-side-end*/
-@media (max-width: 750px) {
-  .container {
-    height: scroll;
-  }
-
-  .container .card {
-    max-width: 350px;
-    height: auto !important;
-    margin: 30px 0;
-  }
-
-  .container .card .right-side {
-    width: 100%;
-  }
-
-  .input-text {
-    /* display: block; */
-  }
-
-  .input-text .input-div {
-    /* margin-top: 20px; */
-  }
-
-  .container .card .left-side {
-    display: none;
-  }
-}
-
-.selected img {
-  border: 2px solid #007bff;
-  /* Change the border color as needed */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-  /* Change the box shadow as needed */
-}
-</style>
-
 <template>
-  <div class="container-scroller">
-    <Navbar></Navbar>
-    <div class="container-fluid page-body-wrapper">
-      <Sidebar />
-      <div class="main-panel">
-        <div class="content-wrapper">
-          <BreadCrumbs />
-          <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-              <div class="card">
-                <div class="card-body">
-                  <div class="card-title d-flex justify-content-between align-items-center">
-                    <h5 class="card-title">
-                      <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Create Purchase Request Item
-                    </h5>
-                  </div>
-                  <div class="row">
-                    <div class="col-lg-3">
-                      <TextInput label="Purchase Request No." iconValue="circle-question" v-model="purchase_no"
-                        :value="purchase_no" :readonly="true" />
+    <div class="container-scroller">
+        <Navbar></Navbar>
+        <div class="container-fluid page-body-wrapper">
+            <Sidebar />
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="modal demo-modal" v-if="modalVisible">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div
+                                        style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                                        <img :src="logo" style="width:60px; height:60px;">
+                                    </div>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <h1>Do you wish to continue with Purchase Request No:</h1>
+                                        <h2> <span style="color: #007bff;">{{ purchase_no }}</span>?</h2>
+                                        <div class="details">
+                                            <div><span>END-USER:</span> {{ userData.name }}</div>
+                                            <div><span>OFFICE :</span> {{ userData.pmo_title }}</div>
+                                            <div><span>Region :</span> REGION IV-A - CALABARZON</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light"
+                                        @click="cancelAndRedirect">Cancel</button>
+                                    <button type="button" class="btn btn-primary" @click="proceedWithEncoding">
+                                        <i class="icon-arrow-right"></i>&nbsp;Proceed to Encoding</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-lg-3">
-                      <SelectInput label="Office" v-model="prData.pmo" class="select-option">
-                        <option v-for="option in pmo" :key="option.value" :value="option.value">{{ option.label }}
-                        </option>
-                      </SelectInput>
-                      
+                    <div class="row justify-content-end">
+                        <button type="button" class="btn btn-primary btn-md" @click="post_create_pr"><font-awesome-icon
+                                :icon="['fas', 'save']" /> &nbsp;<b>Saved & Proceed</b></button>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-4 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <label style="font-size: 20pt; color: red; display: flex; align-items: center;">
+                                        <input type="checkbox" v-model="isUrgent" :true-value="1" :false-value="0"
+                                            style="display: none;">
+                                        <span class="custom-checkbox"></span>
+                                        Urgent
+                                    </label>
+                                    <div class="ribbon-top-right"></div>
+                                    <p class="card-description" style="color:red; font-size: 20pt;">* Required *</p>
+                                    <div class="forms-sample">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase Request Number:</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="exampleInputUsername2"
+                                                    placeholder="Purchase Request Number" v-model="purchase_no"
+                                                    readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Office</label>
+                                            <div class="col-sm-9">
+                                                <select v-model="prData.pmo">
+                                                    <option v-for="office in pmo" :key="office.value"
+                                                        :value="office.value">{{ office.label }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase Type</label>
+                                            <div class="col-sm-9">
+                                                <select v-model="prData.pr_type">
+                                                    <option v-for="PurchaseType in pr_type" :key="PurchaseType.value"
+                                                        :value="PurchaseType.value">{{ PurchaseType.label }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase Request Date:</label>
+                                            <div class="col-sm-9">
+                                                <input type="date" class="form-control" v-model="prData.pr_date"
+                                                    readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase Request Target Date:</label>
+                                            <div class="col-sm-9">
+                                                <input type="date" class="form-control" v-model="prData.target_date">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Particulars:</label>
+                                            <div class="col-sm-9">
+                                                <textarea id="tinyMceExample" rows="1" v-model="prData.particulars"
+                                                    placeholder="Enter Particulars"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    </div>
-                    <div class="col-lg-3">
-                      <SelectInput label="Procurement Type" v-model="prData.pr_type" class="select-option">
-                        <option v-for="option in pr_type" :key="option.value" :value="option.value">{{ option.label }}
-                        </option>
-                      </SelectInput>
-                    </div>
-                    <div class="col-lg-3">
-                      <TextInput class="date-option" v-model="prData.pr_date" label="PR Date"
-                        iconValue="circle-question" type="date" />
-                    </div>
-                    <div class="col-lg-3">
-                      <TextInput class="date-option" v-model="prData.target_date" label="Target Date"
-                        iconValue="circle-question" type="date" />
-                    </div>
-                    <div class="col-lg-12 mt-4">
-                      <TextAreaInput label="Particulars" v-model="prData.particulars" />
-                    </div>
-                    <div class="col-lg-12">
-                      <button class="btn btn-outline-primary" style="float:right;"
-                        @click="post_create_pr();">Create</button>
-                    </div>
-                  </div>
+                        <!-- Item Table -->
+                        <div class="col-md-8 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <button type="button" class="btn btn-primary" style="float: left;"
+                                        @click="showAddItemModal"><font-awesome-icon :icon="['fas', 'plus']" /> &nbsp;
+                                        Add Item</button>
+                                    <br>
+                                    <h3 style="float: right; font-size: 30px; font-weight: 900;">&nbsp; &nbsp;GRAND
+                                        TOTAL: Php <span style="font-weight: bold;">₱{{ formattedGrandTotal }}</span>
+                                    </h3>
+                                    <br><br>
+                                    <div class="forms-sample">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Stock Number</th>
+                                                    <th>Unit</th>
+                                                    <th>Item</th>
+                                                    <th>Description</th>
+                                                    <th>Quantity</th>
+                                                    <th>Unit Cost</th>
+                                                    <th>Total Cost</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="(item, index) in items" :key="index">
+                                                    <td>{{ item.stockno }}</td>
+                                                    <td>{{ item.unit }}</td>
+                                                    <td>{{ item.name }}</td>
+                                                    <td>{{ item.descrip }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>₱{{ item.price.toLocaleString('en-US', {
+                                                        minimumFractionDigits:
+                                                        2, maximumFractionDigits: 2 }) }}</td>
+                                                    <td>₱{{ (item.quantity * item.price).toLocaleString('en-US', {
+                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</td>
+                                                    <td>
+                                                        <button class="btn btn-warning btn-sm"
+                                                            @click="showEditItemModal(index)">Edit</button>
+                                                        <button class="btn btn-danger btn-sm"
+                                                            @click="deleteItem(index)">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--ADD ITEM MODAL-->
+                        <div class="modal demo-modal" v-if="addItemModalVisible" id="addItemModal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <div
+                                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                                            <img :src="logo" style="width:60px; height:60px;">
+                                        </div>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="container">
+                                            <h1>Add New Item</h1>
+                                            <div class="form-group">
+                                                <label>Item Name</label>
+                                                <v-select :options="availableItems" v-model="newItem"
+                                                    @change="updateItemPrice" label="name">
+                                                    <template slot="option" slot-scope="option">
+                                                        {{ option.name }}
+                                                    </template>
+                                                </v-select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Unit</label>
+                                                <input type="text" class="form-control" v-model="newItem.unit" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Quantity</label>
+                                                <input type="number" class="form-control" id="itemQuantity"
+                                                    v-model="newItem.quantity" min="0" @keyup.enter="addItem">
+                                            </div>
+                                            <div class="form-group">
+                                                <label>ABC</label>
+                                                <input type="number" class="form-control" id="itemPrice"
+                                                    v-model="newItem.price" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Description</label>
+                                                <textarea rows="1" v-model="newItem.descrip"
+                                                    @keyup.enter="addItem"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light"
+                                            @click="closeAddItemModal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" @click="addItem">Add Item</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!--EDIT ITEM MODAL-->
+                        <div class="modal demo-modal" v-if="editItemModalVisible" id="editItemModal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <div
+                                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                                            <img :src="logo" style="width:60px; height:60px;">
+                                        </div>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="container">
+                                            <h1>Edit Item</h1>
+                                            <div class="form-group">
+                                                <label for="editItemName">Item Name</label>
+                                                <v-select :options="availableItems" v-model="editItem" label="name">
+                                                    <template slot="option" slot-scope="option">
+                                                        {{ option.name }}
+                                                    </template>
+                                                </v-select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="editItemUnit">Unit</label>
+                                                <input type="text" class="form-control" id="editItemUnit"
+                                                    v-model="editItem.unit" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="editItemQuantity">Quantity</label>
+                                                <input type="number" class="form-control" id="editItemQuantity"
+                                                    v-model="editItem.quantity">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="editItemPrice">ABC</label>
+                                                <input type="number" class="form-control" id="editItemPrice"
+                                                    v-model="editItem.price" readonly>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="editItemDescription">Description</label>
+                                                <textarea rows="1" id="editItemDescription"
+                                                    v-model="editItem.descrip"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light"
+                                            @click="closeEditItemModal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" @click="updateItem">Update
+                                            Item</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-
+                <FooterVue />
             </div>
-          </div>
         </div>
-        <FooterVue />
-      </div>
     </div>
-  </div>
 </template>
 
 <script>
+import dilg_logo from "../../../assets/logo.png";
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 import Navbar from "../layout/Navbar.vue";
 import Sidebar from "../layout/Sidebar.vue";
 import FooterVue from "../layout/Footer.vue";
 import BreadCrumbs from "../dashboard_tiles/BreadCrumbs.vue";
+import Modal from "../modals/Modal.vue";
 import item_table from "./item_table.vue";
 import dtable from "./table.vue";
 import axios from "axios";
-import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
+import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircleCheck, faCircleInfo, faEye, faLayerGroup, faList, faPesoSign, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import TextAreaInput from '../micro/TextAreaInput.vue';
-import SelectInput from "../micro/SelectInput.vue";
-
-
+import vSelect from 'vue-select';
 
 library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign, faQuestionCircle);
 
 export default {
-  name: 'create_pr',
-  data() {
-    return {
-      modalVisible: false,
-      purchase_no: null,
-      purchase_id: null,
-      prData: {
-        pmo: null,
-        pr_type: null,
-        pr_date: null,
-        target_date: null,
-        particulars: null
-      },
-      pmo: [
-        { value: '15', label: 'ORD' },
-        { value: '1', label: 'ORD-Legal' },
-        { value: '2', label: 'ORD-Planning' },
-        { value: '3', label: 'LGMED-MBRTG' },
-        { value: '4', label: 'LGCDD-PDMU' },
-        { value: '5', label: 'FAD' },
-        { value: '6', label: 'ORD-RICTU' },
-        { value: '7', label: 'LGCDD' },
-        { value: '8', label: 'LGMED' },
-      ],
-      pr_type: [
-        { value: '1', label: 'Catering Services' },
-        { value: '2', label: 'Meals, Venue and Accomodation' },
-        { value: '3', label: 'Repair and Maintenance' },
-        { value: '4', label: 'Supplies, Materials and Devices' },
-        { value: '5', label: 'Other Services' },
-        { value: '6', label: 'Reimbursement and Petty Cash' }
-      ],
-    }
-  },
-  created() {
-    this.userId = localStorage.getItem('userId');
-  },
-  computed: {
-
-  },
-  mounted() {
-    this.generatePurchaseRequestNo();
-
-  },
-  methods: {
-    generatePurchaseRequestNo: async function () {
-      try {
-        const response = await axios.get('../api/generatePurchaseRequestNo');
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-indexed
-        const purchaseNoFormat = `${year}-${month}`;
-        const purchaseNoFromApi = response.data[0].pr_count;
-        const formattedSequence = purchaseNoFromApi.toString().padStart(5, '0');
-
-        if (this.$route.query.pr_no) {
-          this.purchase_no = this.$route.query.pr_no;
-        } else {
-          this.purchase_no = `${purchaseNoFormat}-${formattedSequence}`;
+    name: 'Create Purchase Request Item',
+    components: {
+        Navbar,
+        Sidebar,
+        FooterVue,
+        BreadCrumbs,
+        item_table,
+        dtable,
+        TextAreaInput,
+        Modal,
+        dilg_logo,
+        vSelect
+    },
+    data() {
+        return {
+            logo: dilg_logo,
+            modalVisible: false,
+            addItemModalVisible: false,
+            editItemModalVisible: false,
+            isUrgent: null,
+            purchase_no: null,
+            purchase_id: null,
+            userData: {
+                name: null,
+                office: null,
+            },
+            prData: {
+                pmo: null,
+                pr_type: null,
+                particulars: null,
+                pr_date: new Date().toISOString().substr(0, 10),
+                target_date: new Date().toISOString().substr(0, 10),
+            },
+            pmo: [
+                { value: '15', label: 'ORD' },
+                { value: '1', label: 'ORD-Legal' },
+                { value: '2', label: 'ORD-Planning' },
+                { value: '3', label: 'LGMED-MBRTG' },
+                { value: '4', label: 'LGCDD-PDMU' },
+                { value: '5', label: 'FAD' },
+                { value: '6', label: 'ORD-RICTU' },
+                { value: '7', label: 'LGCDD' },
+                { value: '8', label: 'LGMED' },
+            ],
+            pr_type: [
+                { value: '1', label: 'Catering Services' },
+                { value: '2', label: 'Meals, Venue and Accomodation' },
+                { value: '3', label: 'Repair and Maintenance' },
+                { value: '4', label: 'Supplies, Materials and Devices' },
+                { value: '5', label: 'Other Services' },
+                { value: '6', label: 'Reimbursement and Petty Cash' }
+            ],
+            newItem: { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '', unit: '' },
+            editItem: { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '' },
+            editIndex: -1,
+            items: [],
+            availableItems: []
         }
-        this.purchase_id = response.data[0].pr_count;
-      } catch (error) {
-        console.error('Error fetching data', error);
-      }
     },
-    post_create_pr() {
-      axios.post('/api/post_create_purchaseRequest', {
-        created_by: this.userId,
-        pr_no: this.purchase_no,
-        pmo: this.prData.pmo,
-        type: this.prData.pr_type,
-        pr_date: this.prData.pr_date,
-        target_date: this.prData.target_date,
-        purpose: this.prData.particulars
-      }
-      ).then(() => {
-        const purchaseId = this.purchase_id; // Assuming your API returns the inserted purchase ID
-        console.log(purchaseId);
-        toast.success('Successfully added!', {
-          autoClose: 1000
-        });
+    computed: {
+        grandTotal() {
+            return this.items.reduce((total, item) => total + (item.quantity * item.price), 0).toFixed(2);
+        },
+        formattedGrandTotal() {
+            return this.formatNumberWithCommas(this.grandTotal);
+        }
+    },
+    mounted() {
+        this.generatePurchaseRequestNo();
+        this.fetchEndUserInfo();
+        this.fetchItems();
         setTimeout(() => {
-          this.$router.push({ path: `/procurement/select_purchase_item/${purchaseId}` });
-        }, 1000);
+            this.openModal();
+        }, 1);
+    },
+    methods: {
+        showToastSuccess(message) {
+            toast.success(message, {
+                autoClose: 1000,
+            });
+        },
+        showToastError(message) {
+            toast.error(message, {
+                autoClose: 1000,
+            });
+        },
+        formatNumberWithCommas(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
+        fetchItems() {
+            axios.get('/api/fetchItems')
+                .then(response => {
+                    this.availableItems = response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching items:', error);
+                });
+        },
 
-      }).catch((error) => {
-      })
-    },
-    openModal() {
-      this.modalVisible = true;
-    },
-    closeModal() {
-      this.modalVisible = false;
-    },
-  },
+        fetchEndUserInfo() {
+            const userId = localStorage.getItem('userId');
+            axios.get(`../../../api/fetchUser/${userId}`)
+                .then((response) => {
+                    this.userData = response.data
+                }).catch(error => {
+                    return null;
+                });
+        },
+        async generatePurchaseRequestNo() {
+            try {
+                const response = await axios.get('../api/generatePurchaseRequestNo');
+                const currentDate = new Date();
+                const year = currentDate.getFullYear();
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                const purchaseNoFormat = `${year}-${month}`;
+                const purchaseNoFromApi = response.data[0].pr_count;
+                const formattedSequence = purchaseNoFromApi.toString().padStart(5, '0');
 
-  components: {
-    Navbar,
-    Sidebar,
-    FooterVue,
-    BreadCrumbs,
-    item_table,
-    dtable,
-    TextAreaInput,
-    SelectInput
-  },
+                this.purchase_no = this.$route.query.pr_no || `${purchaseNoFormat}-${formattedSequence}`;
+                this.purchase_id = response.data[0].pr_count;
+            } catch (error) {
+                console.error('Error fetching data', error);
+            }
+        },
+        post_create_pr() {
+            const userId = localStorage.getItem('userId');
+            const requestData = {
+                created_by: userId,
+                pr_no: this.purchase_no,
+                pmo: this.prData.pmo,
+                type: this.prData.pr_type,
+                pr_date: this.prData.pr_date,
+                target_date: this.prData.target_date,
+                isUrgent: this.isUrgent ? 1 : 0,
+                purpose: this.prData.particulars,
+                items: this.items.map(item => ({
+                    id: item.id,
+                    quantity: item.quantity,
+                    price: item.price,
+                    description: item.descrip,
+                    stockno: item.stockno,
+                    unit: item.unit
+                }))
+            };
+
+            axios.post('/api/post_create_purchaseRequest', requestData)
+                .then((response) => {
+                    this.showToastSuccess('Purchase request and items created successfully!');
+                    setTimeout(() => {
+                        window.location.href = '/procurement/index';
+                    }, 1500);
+                })
+                .catch((error) => {
+                    console.error('Error creating purchase request:', error);
+                    this.showToastError('Error creating purchase request!');
+                });
+        },
+
+        openModal() {
+            this.modalVisible = true;
+        },
+        closeModal() {
+            this.modalVisible = false;
+        },
+        proceedWithEncoding() {
+            this.closeModal();
+        },
+        cancelAndRedirect() {
+            this.closeModal();
+            window.location.href = '/procurement/index';
+        },
+        showAddItemModal() {
+            this.addItemModalVisible = true;
+        },
+        closeAddItemModal() {
+            this.addItemModalVisible = false;
+        },
+        addItem() {
+            const selectedItem = this.availableItems.find(item => item.id === this.newItem.id);
+            if (selectedItem && this.newItem.quantity > 0) {
+                this.items.push({ ...selectedItem, quantity: this.newItem.quantity, descrip: this.newItem.descrip });
+                this.newItem = { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '', unit: '' };
+                this.closeAddItemModal();
+            } else {
+                alert('Please select an item and enter a valid quantity.');
+            }
+        },
+        showEditItemModal(index) {
+            this.editIndex = index;
+            this.editItem = { ...this.items[index] };
+            this.editItemModalVisible = true;
+        },
+        closeEditItemModal() {
+            this.editItemModalVisible = false;
+        },
+        updateItem() {
+            if (this.editItem.id && this.editItem.quantity > 0) {
+                this.items.splice(this.editIndex, 1, { ...this.editItem });
+                this.editItemModalVisible = false;
+            } else {
+                alert('Please select an item and enter a valid quantity.');
+            }
+        },
+        deleteItem(index) {
+            this.showToastSuccess('Item successfully deleted.');
+            this.items.splice(index, 1);
+        },
+        updateItemPrice() {
+            const selectedItem = this.availableItems.find(item => item.id === this.newItem.id);
+            if (selectedItem) {
+                this.newItem.price = selectedItem.price;
+                this.newItem.stockno = selectedItem.stockno;
+                this.newItem.unit = selectedItem.unit;
+            }
+        },
+        updateEditItemPrice() {
+            if (this.editItem) {
+                this.editItem.price = this.editItem.price;
+                this.editItem.descrip = this.editItem.descrip;
+                this.editItem.stockno = this.editItem.stockno;
+                this.editItem.unit = this.editItem.unit;
+            }
+        }
+    }
 };
 </script>
+
+<style>
+.custom-checkbox {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #fff;
+    border: 2px solid black;
+    border-radius: 4px;
+    margin-right: 10px;
+    position: relative;
+    pointer-events: none;
+}
+
+.custom-checkbox::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background-color: black;
+    border-radius: 2px;
+    opacity: 0;
+}
+
+input[type="checkbox"]:checked+.custom-checkbox::after {
+    opacity: 1;
+}
+
+select {
+    width: 100%;
+    height: 40px;
+    border: none;
+    outline: 0;
+    border-radius: 5px;
+    border: 1px solid #cbced4;
+    box-sizing: border-box;
+    padding: 0px 10px;
+}
+
+.modal.demo-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 5px;
+    z-index: 1050;
+    display: block;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+
+}
+
+.modal-dialog {
+    margin: auto;
+    position: relative;
+    transform: translateY(20%);
+}
+
+.modal-content .container h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.modal-content .container h2 {
+    font-size: 2em;
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+.modal-content .button {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1em;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content .button i {
+    margin-right: 5px;
+}
+
+.modal-content .details {
+    text-align: left;
+    margin-top: 20px;
+}
+
+.modal-content .details div {
+    margin-bottom: 10px;
+}
+
+.modal-content .details div span {
+    font-weight: bold;
+}
+</style>

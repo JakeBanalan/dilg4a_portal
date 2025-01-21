@@ -41,53 +41,79 @@
             <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
                 <td v-if="role == 'admin'">
                     <div v-if="purchaseRequest.status_id == 1">
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
+                        <button title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
+                            @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="toBudget(purchaseRequest.id)">
+                        <button title="Send to Budget" v-if="!purchaseRequest.isBudgetSubmitted" type="button"
+                            class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                            @click="toBudget(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'share-square']" style="margin-left: -3px;" />
                         </button>
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="toGSS(purchaseRequest.id)">
+                        <button title="Send to GSS" v-if="!purchaseRequest.isGSSSubmitted" type="button"
+                            class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                            @click="toGSS(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'paper-plane']" style="margin-left: -3px;" />
                         </button>
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="exportPurchaseRequest(purchaseRequest.id)">
-                            <font-awesome-icon :icon="['fas', 'download']" style="margin-left: -3px;" />
+                        <button title="Cancel" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;" @click="cancelTransaction(purchaseRequest.id)">
+                            <font-awesome-icon :icon="['fas', 'trash']" style="margin-left: -3px;" />
                         </button>
                     </div>
-                    <div v-else-if="purchaseRequest.status_id == 2 || purchaseRequest.status_id == 3 || purchaseRequest.status_id == 4 || purchaseRequest.status_id == 5">
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
+                    <div
+                        v-else-if="purchaseRequest.status_id == 2 || purchaseRequest.status_id == 3 || purchaseRequest.status_id == 4 || purchaseRequest.status_id == 5">
+                        <button title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
+                            @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
-                        <button type="button" disabled class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="toBudget(purchaseRequest.id)">
-                            <font-awesome-icon :icon="['fas', 'share-square']" style="margin-left: -3px;" />
-                        </button>
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="toGSS(purchaseRequest.id)">
+                        <button title="Send to GSS"
+                            v-if="purchaseRequest.status_id == 2 && !purchaseRequest.isGSSSubmitted" type="button"
+                            class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                            @click="toGSS(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'paper-plane']" style="margin-left: -3px;" />
                         </button>
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="exportPurchaseRequest(purchaseRequest.id)">
-                            <font-awesome-icon :icon="['fas', 'download']" style="margin-left: -3px;" />
+                    </div>
+                    <div v-else-if="purchaseRequest.status_id == 6">
+                        <button title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
+                            @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
+                            <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
                     </div>
                     <div v-else-if="purchaseRequest.status_id == 9">
-                        <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
+                        <button disabled title="View" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#059886;color:#fff;"
+                            @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
                     </div>
+
                 </td>
                 <td v-else>
-                    <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
+                    <button title="View" type="button" class="btn btn-icon mr-1"
+                        style="background-color:#059886;color:#fff;"
+                        @click="viewPr(purchaseRequest.id, purchaseRequest.status_id, purchaseRequest.step)">
                         <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                     </button>
-                    <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;" @click="exportPurchaseRequest(purchaseRequest.id)">
+                    <!-- <button type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                        @click="exportPurchaseRequest(purchaseRequest.id)">
                         <font-awesome-icon :icon="['fas', 'download']" style="margin-left: -3px;" />
-                    </button>
+                    </button> -->
                 </td>
                 <td>
-                    <div :class="['badge', purchaseRequest.status_id == 9 ? 'badge-danger' : 'badge-success']">{{ purchaseRequest.status }}</div>
+                    <div :class="['badge', purchaseRequest.status_id == 9 ? 'badge-danger' : 'badge-success']">
+                        {{ purchaseRequest.status }}
+                    </div>
                 </td>
                 <td>
                     <div class="badge badge-default">
                         <b>{{ purchaseRequest.pr_no }}</b><br><i>~{{ purchaseRequest.office }}~</i>
+                        <br>
+                        <div v-show="purchaseRequest.is_urgent == 1" class="badge badge-danger">
+                            URGENT
+                        </div>
                     </div>
                 </td>
                 <td>Php. {{ this.$formatTotalAmount(purchaseRequest.app_price) }}</td>
@@ -97,8 +123,10 @@
                 <td>{{ purchaseRequest.created_by }}</td>
             </tr>
         </tbody>
+
     </table>
-    <Pagination :total="totalRecords" :currentPage="currentPage" :itemsPerPage="itemsPerPage" @pageChange="onPageChange" />
+    <Pagination :total="totalRecords" :currentPage="currentPage" :itemsPerPage="itemsPerPage"
+        @pageChange="onPageChange" />
 </template>
 
 <script>
@@ -118,11 +146,16 @@ export default {
             userId: null,
             role: null,
             purchaseRequests: [],
-            totalRecords: 0,
-            admins: [3174, 2563],
             currentPage: 1,
             itemsPerPage: 10,
         };
+    },
+    props: {
+        purchaseRequest: {
+            type: Object,
+            required: false,
+            default: () => ({}),
+        },
     },
     components: {
         Pagination,
@@ -141,7 +174,8 @@ export default {
             const start = (this.currentPage - 1) * this.itemsPerPage + 1;
             const end = Math.min(start + this.itemsPerPage - 1, this.totalRecords);
             return `Showing ${start} to ${end} of ${this.totalRecords} entries`;
-        }
+        },
+
     },
     created() {
         this.userId = parseInt(localStorage.getItem('userId'));
@@ -160,7 +194,11 @@ export default {
         loadData() {
             axios.post(`../api/fetchPurchaseReqData`)
                 .then(response => {
-                    this.purchaseRequests = response.data.data;
+                    this.purchaseRequests = response.data.data.map(pr => ({
+                        ...pr,
+                        isBudgetSubmitted: false,
+                        isGSSSubmitted: false,
+                    }));
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -177,15 +215,62 @@ export default {
             window.location.href = `../api/export-purchase-request/${pr_id}?export=true`;
         },
         toBudget(id) {
-            this.updatePurchaseRequestStatus(id, 2);
-            toast.success('Successfully submitted to the Budget!', { autoClose: 2000 });
-            setTimeout(() => {
-                this.loadData();
-            }, 2000);
+            axios.post(`../api/updatePurchaseRequestStatus`, {
+                id: id,
+                status: 2, // Update status to "Budget"
+                is_budget_submitted: true, // Mark as submitted to Budget
+                submitted_date: null, // Set submitted date
+            })
+                .then(response => {
+                    const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
+                    if (updatedRequest) {
+                        updatedRequest.isBudgetSubmitted = true; // Update frontend state for Budget
+                        // Do not update isGSSSubmitted here
+                    }
+                    toast.success('Successfully submitted to the Budget!', { autoClose: 2000 });
+
+                    // Reload data after 2 seconds
+                    setTimeout(() => {
+                        this.loadData();
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error updating status:', error);
+                    toast.error('Failed to submit to the Budget. Please try again.', { autoClose: 2000 });
+                });
         },
         toGSS(id) {
-            this.updatePurchaseRequestStatus(id, 4);
-            toast.success('Successfully submitted to the GSS!', { autoClose: 2000 });
+            axios.post(`../api/updatePurchaseRequestStatus`, {
+                id: id,
+                status: 4, // Update status to "GSS"
+                is_gss_submitted: true, // Mark as submitted to GSS
+                submitted_date_gss: null, // Set submitted date
+            })
+                .then(response => {
+                    const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
+                    if (updatedRequest) {
+                        updatedRequest.isGSSSubmitted = true; // Update frontend state for GSS
+                        // Do not update isBudgetSubmitted here
+                    }
+                    toast.success('Successfully submitted to the GSS!', { autoClose: 2000 });
+
+                    // Reload data after 2 seconds
+                    setTimeout(() => {
+                        this.loadData();
+                    }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error updating status:', error);
+                    toast.error('Failed to submit to the GSS. Please try again.', { autoClose: 2000 });
+                });
+        },
+        cancelTransaction(id) {
+            this.updatePurchaseRequestStatus(id, 9);
+            const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
+            if (updatedRequest) {
+                updatedRequest.status_id = 9; // Cancelled Transaction
+            }
+            toast.success('Successfully Cancelled!', { autoClose: 2000 });
             setTimeout(() => {
                 this.loadData();
             }, 2000);
@@ -193,12 +278,12 @@ export default {
         updatePurchaseRequestStatus(id, status) {
             axios.post(`../api/updatePurchaseRequestStatus`, { id, status })
                 .then(response => {
-                    console.log('Status updated:', response.data);
+                    // console.log('Status updated:', response.data);
                 })
                 .catch(error => {
                     console.error('Error updating status:', error);
                 });
-        }
+        },
     },
 };
 </script>

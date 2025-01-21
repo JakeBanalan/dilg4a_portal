@@ -478,7 +478,7 @@ export default {
                     return null;
                 });
         },
-        generateICTControlNo: async function () {
+        async generateICTControlNo() {
             try {
                 const response = await axios.get('../../../api/generateICTControlNo');
                 if (!response.data || response.data.length === 0 || !response.data[0].ict_no_count) {

@@ -4,214 +4,103 @@
 }
 </style>
 <template>
-    <div class="container-scroller">
+      <div class="container-scroller">
         <Navbar></Navbar>
         <div class="container-fluid page-body-wrapper">
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <BreadCrumbs />
                     <div class="row">
-                        <div class="col-md-12 grid-margin transparent">
-                            <div class="row">
-                                <div class="col-md-3 mb-4 stretch-card transparent">
-                                    <div class="card card-tale">
-                                        <div class="card-body">
-                                            <p class="mb-4">Procurement</p>
-                                            <p class="fs-30 mb-2">4006</p>
-                                            <p>10.00% (30 days)</p>
-                                        </div>
+                        <div class="col-md-5 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <input type="checkbox" value="Urgent">
+                                    <label style="font-size: 12pt; color: red;">&nbsp; &nbsp;Urgent</label>
+                                    <div class="ribbon-top-right">
+
                                     </div>
-                                </div>
-                                <div class="col-md-3 mb-4 stretch-card transparent">
-                                    <div class="card card-dark-blue">
-                                        <div class="card-body">
-                                            <p class="mb-4">Disbursement Rate</p>
-                                            <p class="fs-30 mb-2">61344</p>
-                                            <p>22.00% (30 days)</p>
+                                    <p class="card-description" style="color:red; font-size: 12pt;">*
+                                        Required *
+                                    </p>
+                                    <div class="forms-sample">
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase
+                                                Request Number:</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="exampleInputUsername2"
+                                                    placeholder="Purchase Request Number" v-model="purchase_no"
+                                                    readonly>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-4 stretch-card transparent">
-                                    <div class="card card-tale">
-                                        <div class="card-body">
-                                            <p class="mb-4">Procurement</p>
-                                            <p class="fs-30 mb-2">4006</p>
-                                            <p>10.00% (30 days)</p>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Office</label>
+                                            <div class="col-sm-9">
+                                                <select>
+                                                    <option v-for="office in pmo" :key="office.value"
+                                                        :value="office.value">
+                                                        {{ office.label }}</option>
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-4 stretch-card transparent">
-                                    <div class="card card-tale">
-                                        <div class="card-body">
-                                            <p class="mb-4">Procurement</p>
-                                            <p class="fs-30 mb-2">4006</p>
-                                            <p>10.00% (30 days)</p>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase
+                                                Type</label>
+                                            <div class="col-sm-9">
+                                                <select>
+                                                    <option v-for="PurchaseType in pr_type" :key="PurchaseType.value"
+                                                        :value="PurchaseType.value">
+                                                        {{ PurchaseType.label }}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase Request Date:</label>
+                                            <div class="col-sm-9">
+                                                <input type="date" class="form-control" v-model="pr_date" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Purchase Request Target Date:</label>
+                                            <div class="col-sm-9">
+                                                <input type="date" class="form-control" v-model="target_date">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label class="col-sm-3 col-form-label">Particulars:</label>
+                                            <div class="col-sm-9">
+                                                <textarea id="tinyMceExample" rows="1" v-model="particulars"
+                                                    placeholder="Enter Particulars"></textarea>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                         </div>
-                        <div class="col-lg-2">
-                            <div class="card ">
-                                <div class="card-body" style="height: 320px;text-align: center;">
-                                    <img src="../../../assets/logo.png" class="profile_img">
-                                    <div class="user_info">
-                                        <p>Office:</p>
-                                        <p>ORD-RICTU</p>
-                                    </div>
-                                    <div class="user_info">
-                                        <p>Position:</p>
-                                        <p>Database Admin</p>
-                                    </div>
-                                    <div class="user_info">
-                                        <p>Cancelled PR:</p>
-                                        <p>10</p>
-                                    </div>
-                                    <div class="user_info">
-                                        <p>Total PR's:</p>
-                                        <p>10</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card " style="margin-top: 10px;">
-                                <div class="card-body" style="height: 500px;">
-                                    <h5>Supplier Rankings</h5><select class="form-control">
-                                        <option>This Week</option>
-                                        <option>This Month</option>
-                                        <option>This Year</option>
-                                    </select>
-                                    <div class="card" style="margin-top: 10px;">
-                                        <div class="card-body" style="height: 90px;">
-                                            <div class="media" style="margin-top: -25px;">
-                                                <div style="width: 65px; height: 65px;">
-                                                    <img src="../../../assets/logo.png" alt="..."
-                                                        style="margin-top:10px;border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
-                                                </div>
-                                                <div class="media-body">
-                                                    <div class="media-content" style="margin-top:5%;">Supplier Title<br>
-                                                    </div>
-                                                    <div class="media-content">0955136565</div>
-                                                    <div class="media-content">Calamba City, Laguna</div>
-                                                </div>
-                                            </div>
-                                            <p class="rank_wrapper rank_banner">1st</p>
-                                        </div>
-                                    </div>
-                                    <div class="card" style="margin-top: 10px;">
-                                        <div class="card-body" style="height: 90px;">
-                                            <div class="media" style="margin-top: -25px;">
-                                                <div style="width: 65px; height: 65px;">
-                                                    <img src="../../../assets/logo.png" alt="..."
-                                                        style="border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
-                                                </div>
-                                                <div class="media-body">
-                                                    <div class="media-content"><small>Supplier Title</small><br></div>
-                                                    <div class="media-content" style="margin-top:-1%;"></div>
-                                                    <div class="media-content" style="margin-top:-2%;"></div>
-                                                </div>
-                                            </div>
-                                            <p class="rank_wrapper rank_banner2">2nd</p>
-                                        </div>
-                                    </div>
-                                    <div class="card" style="margin-top: 10px;">
-                                        <div class="card-body" style="height: 90px;">
-                                            <div class="media" style="margin-top: -25px;">
-                                                <div style="width: 65px; height: 65px;">
-                                                    <img src="../../../assets/logo.png" alt="..."
-                                                        style="border-radius: 5px; width: 100%; object-fit: cover; margin-left: -14px;">
-                                                </div>
-                                                <div class="media-body">
-                                                    <div class="media-content"><small>Supplier Title</small><br></div>
-                                                    <div class="media-content" style="margin-top:-1%;"></div>
-                                                    <div class="media-content" style="margin-top:-2%;"></div>
-                                                </div>
-                                            </div>
-                                            <p class="rank_wrapper rank_banner3">3rd</p>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-10 grid-margin mb-4">
-                            <div class="card mb-4">
+                        <div class="col-md-7 grid-margin stretch-card">
+                            <div class="card">
                                 <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <h4 class="card-title">Purchase Request No: <div class="badge badge-danger"
-                                                style="font-size: 15pt;">{{ pr_no }}</div>
-                                        </h4>
-                                        <h4 class="card-title">Total Amount: Php {{ total_amount }}</h4>
+                                    <h3 style="float: right; font-size: 30px; font-weight: 900;">&nbsp;
+                                        &nbsp;GRAND TOTAL: Php
+                                        <span style="font-weight: bold;">₱0.00</span>
+                                    </h3>
+                                    <br>
+                                    <br>
+                                    <div class="forms-sample">
+
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="card mb-4" v-if="current_step <= 3">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-12 col-sm-12 col-xs-12 col-lg-6">
-                                            <div class="form-group">
-                                                <label for="Office">Office</label>
-                                                <select class="form-control" v-model="purchaseRequestData.pmo">
-                                                    <option v-for="option in pmo" :key="option.value" :value="option.value">
-                                                        {{ option.label
-                                                        }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group">
-                                                <label for="exampleInputPassword1">Procurement Type</label>
-                                                <select class="form-control" v-model="purchaseRequestData.pr_type">
-                                                    <option v-for="option in procurementType" :key="option.value"
-                                                        :value="option.value">{{
-                                                            option.label
-                                                        }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group">
-                                                <label for="exampleInputPassword1">Purchase Request Date</label>
-                                                <input type="date" v-model="purchaseRequestData.pr_date"
-                                                    class="form-control" required />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-12 col-sm-12 col-xs-12">
-                                            <div class="form-group">
-                                                <label for="exampleInputPassword1">Target Date</label>
-                                                <input type="date" v-model="purchaseRequestData.target_date"
-                                                    class="form-control" required />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label for="exampleInputPassword1">Particulars</label>
-                                                <textarea v-model="purchaseRequestData.particulars"
-                                                    class="form-control"> </textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Add more form fields as needed -->
-                                </div>
-                            </div>
-                            <div class="card ">
-                                <div class="card-body">
-
-
-                                    <div class="table-responsive">
-                                        <dtable :data="pr_data" :columns="tableColumns" />
-                                    </div>
-                                    <button type="submit" class="btn btn-success">Submit</button>
-                                </div>
-                            </div>
                         </div>
                     </div>
+
+
                 </div>
+
                 <FooterVue />
             </div>
+
         </div>
     </div>
 </template>
@@ -292,8 +181,7 @@ export default {
     }
 };
 </script>
-  
+
 <style>
 /* Add your component styles here */
 </style>
-  
