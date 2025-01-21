@@ -15,7 +15,7 @@
                             </div>
                         </div>
                         <!--CARDS - Activity Bar-->
-                        <div class="col-md-2 grid-margin">
+                        <div class="col-md-2">
                             <div class="card">
                                 <div class="card-body scrollable-card-body">
                                     <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
@@ -41,7 +41,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-2 grid-margin">
+                        <div class="col-md-2">
                             <div class="card">
                                 <div class="card-body scrollable-card-body">
                                     <p class="card-title">My Personal Events - {{ currentMonth }}</p>
@@ -67,17 +67,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 grid-margin" style="margin-top: -500px; overflow: auto;">
+                        <div class="col-md-4" style="margin-top: -500px; overflow: auto;">
                             <div class="card" style="max-height: 770px !important; overflow:hidden;">
                                 <div class="card-body" style="overflow-y:scroll;">
                                     <p class="card-title">Ledger Filter</p>
-
                                     <div class="box box-widget widget-user-12">
                                         <div class="col-xs-2 col-sm-2 col-md-2 col-lg-12">
-                                            <table class="table table-bordered"
-                                                style="border-width: 3px;max-width:100%;">
+                                            <table class="table table-bordered">
                                                 <tbody>
-
                                                     <tr>
                                                         <td
                                                             style="background-color: whitesmoke; color: black; padding: 9px; width: 50%;">
@@ -545,6 +542,16 @@ export default {
             }
         },
         deleteEvent(id) {
+            if (this.eventDetails.postedBy !== this.posted_by) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'You do not have permission to delete this event.',
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6',
+                });
+                return;
+            }
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -560,8 +567,8 @@ export default {
                             toast.success('Event Deleted!', {
                                 autoClose: 1000
                             });
-                            this.FetchData();
-                            this.closeModal();
+                            this.FetchData(); // Refresh the event list
+                            this.closeModal(); // Close the modal
                         })
                         .catch(error => {
                             console.error('Error deleting event:', error);
@@ -570,12 +577,14 @@ export default {
             });
         },
 
+
     }
 };
 </script>
 
 <style scoped>
-@media (max-width: 1080px) {
+@media (max-width: 768px) {
+
     .card {
         margin-left: 0;
         margin-top: 0;
@@ -587,6 +596,7 @@ export default {
     }
 
     table {
+        font-size: 0.8em;
         width: 100%;
     }
 
@@ -600,7 +610,13 @@ export default {
     }
 }
 
-@media (min-width: 1080px) {
+@media (min-width: 1200px) {
+    table {
+        font-size: 1.2em;
+        /* Increase font size for larger screens */
+    }
+
+
     .col-md-4 {
         margin-left: 935px;
         margin-top: -500px;

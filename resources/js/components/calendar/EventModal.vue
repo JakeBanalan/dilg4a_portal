@@ -190,10 +190,20 @@ export default {
             return (this.mode === 'edit' && !this.isEditMode);
         }
     },
+
     methods: {
         toggleEditMode() {
-            this.isEditMode = !this.isEditMode;
-            this.isDisabledFlag = !this.isDisabledFlag;
+            if (this.eventDetails.postedBy === this.Author) {
+                this.isEditMode = !this.isEditMode;
+                this.isDisabledFlag = !this.isDisabledFlag;
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'You do not have permission to edit this event.',
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6',
+                });
+            }
         },
         validateForm() {
             this.errors = {};
