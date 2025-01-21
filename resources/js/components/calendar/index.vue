@@ -329,21 +329,25 @@ export default {
             }
         },
         closeModal() {
-            this.modalVisible = false
+            this.modalVisible = false; // Hide the modal
+            this.mode = ''; // Reset the mode
         },
         openModal(mode) {
-            this.mode = mode;
-            this.modalVisible = true
+            this.mode = mode; // Set the mode ('add' or 'edit')
+            this.modalVisible = true; // Show the modal
+
+            // Set isDisabledFlag and isEditMode based on the mode
             if (mode === 'edit') {
-                this.isDisabledFlag = true; // Set isDisabledFlag to true here
+                this.isDisabledFlag = false; // Enable fields in 'edit' mode initially
+                this.isEditMode = true; // Set edit mode to true
+            } else if (mode === 'add') {
+                this.isDisabledFlag = false; // Enable fields in 'add' mode
             }
         },
         handleCustomButtonClick() {
-            // console.log(this.posted_by)
             this.ClearEvents()
             this.eventDetails.postedBy = this.posted_by;
             this.openModal('add')
-            // this.modalVisible = true
         },
         EventData() {
             // Get the start and end of the current month
@@ -462,7 +466,6 @@ export default {
                 remarks: event.remarks,
                 personnalevent: event.personnalevent
             };
-            this.isDisabledFlag = true;
             this.$nextTick(() => {
                 this.openModal('edit');
             });
@@ -533,6 +536,7 @@ export default {
                             autoClose: 1000
                         });
                         this.modalVisible = false;
+                        this.isDisabledFlag = true;
                         this.FetchData();
                     })
                     .catch(error => {

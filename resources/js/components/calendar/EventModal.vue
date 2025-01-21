@@ -146,7 +146,7 @@ import Multiselect from 'vue-multiselect'
 export default {
     data() {
         return {
-            isDisabledFlag: true,
+            isDisabledFlag: false,
             logo: dilg_logo,
             userId: null,
             Author: null,
@@ -166,6 +166,16 @@ export default {
         eventDetails: Object,
         posted_by: String
         // Other props...
+    },
+    watch: {
+        mode(newMode) {
+            // Update isDisabledFlag when mode changes
+            if (newMode === 'edit') {
+                this.isDisabledFlag = true; // Disable fields in 'edit' mode
+            } else if (newMode === 'add') {
+                this.isDisabledFlag = false; // Enable fields in 'add' mode
+            }
+        },
     },
     created() {
         this.userId = localStorage.getItem('userId');
@@ -223,9 +233,10 @@ export default {
                 });
         },
         closeModal() {
-            this.isDisabledFlag = false;
-            this.errors = {}
-            this.$emit('close');
+            this.isDisabledFlag = this.mode === 'edit';
+            this.isEditMode = false; // Reset edit mode
+            this.errors = {}; // Clear validation errors
+            this.$emit('close'); // Emit the close event
         },
         getUserInfo() {
 
@@ -236,10 +247,9 @@ export default {
             });
         },
         saveData() {
-            // console.log(this.eventDetails);
-            // if(this.isValid){
+
             this.$emit('save', this.eventDetails);
-            // }
+
         },
     }
 }
