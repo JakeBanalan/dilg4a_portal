@@ -1,8 +1,8 @@
-<template>
+`<template>
   <div v-if="visible" class="modal-background">
-    <div class="modal fade show" tabindex="-1" style="display: block;">
-      <div class="modal-dialog" style="margin-top: 20px; display: flex; align-items: center;">
-        <div class="modal-content" style="width: 150%; margin-bottom: 5%;">
+    <div class="modal" tabindex="1" style="display: block;">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
           <div class="modal-header">
             <div
               style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
@@ -13,27 +13,68 @@
             <div class="row">
               <div class="col-lg-12">
                 <!-- <MultiSelectInput label="Purchase Request Number" :op?tions="pr_no" v-model="pr_no" /> -->
-                <div class="form-group">
-                  <label>Purchase Request Number</label>
-                  <multiselect v-model="selected" :options="options" label="label" :multiple="true"></multiselect>
+                <div class="row">
+                  <div class="col-md-8">
+                    <div class="form-group">
+                      <label>Purchase Request No <small class="err-msg" v-if="errors.pr_no">{{ errors.pr_no }}</small></label>
+                      <multiselect id="PR_multi" v-model="selected" :options="options" label="label" :multiple="true"
+                        :searchable="false"></multiselect>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="inline-label" style="font-size: 0.875rem !important;">
+                    Mode of Procurement
+                    <small class="err-msg" v-if="errors.mode">{{ errors.mode }}</small>
+                  </label>
+                    <SelectInput v-model="selectedMode">
+                      <option value="1" data-id="Small Value Procurement" data-value="1">Small Value Procu rement
+                      </option>
+                      <option value="2" data-id="Shopping" data-value="2">Shopping</option>
+                      <option value="3" data-id="NP Lease of Venue" data-value="3">NP Lease of Venue</option>
+                      <option value="4" data-id="Direct Contracting" data-value="4">Direct Contracting</option>
+                      <option value="5" data-id="Agency to Agency" data-value="5">Agency to Agency</option>
+                      <option value="6" data-id="Public Bidding" data-value="6">Public Bidding</option>
+                      <option value="7" data-id="Not Applicable N/A" data-value="7">Not Applicable N/A</option>
+                    </SelectInput>
+                  </div>
                 </div>
-                <TextInput label="RFQ Number" v-model="rfq_no" :value="rfq_no" :readonly="true" iconValue="gear" />
-                <SelectInput label="Mode of Procurement" v-model="selectedMode">
-                  <option value="1" data-id="Small Value Procurement" data-value="1">Small Value Procu rement</option>
-                  <option value="2" data-id="Shopping" data-value="2">Shopping</option>
-                  <option value="3" data-id="NP Lease of Venue" data-value="3">NP Lease of Venue</option>
-                  <option value="4" data-id="Direct Contracting" data-value="4">Direct Contracting</option>
-                  <option value="5" data-id="Agency to Agency" data-value="5">Agency to Agency</option>
-                  <option value="6" data-id="Public Bidding" data-value="6">Public Bidding</option>
-                  <option value="7" data-id="Not Applicable N/A" data-value="7">Not Applicable N/A</option>
-                </SelectInput>
-                <TextInput v-model="rfq_date" label="RFQ Date" type="datetime-local" iconValue="calendar" />
-                <TextAreaInput v-model="particulars" label="Particulars" />
-                <button type="button" class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
-                  style="float: right;margin-left:5px;" @click="close();">Close</button>
 
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>RFQ Number <small class="err-msg" v-if="errors.rfq_no">{{ errors.rfq_no }}</small></label>
+                      <input class="form-control typeahead" type="text" id="rfq_number" v-model="rfq_no"
+                        :readonly="true" />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>RFQ Date <small class="err-msg" v-if="errors.rfq_date">{{ errors.rfq_date
+                          }}</small></label>
+                      <input class="form-control typehead" type="datetime-local" v-model="rfq_date" />
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label>RFQ Deadline <small class="err-msg" v-if="errors.rfq_deadline">{{ errors.rfq_deadline
+                          }}</small></label>
+                      <input class="form-control typehead" type="datetime-local" v-model="rfq_deadline" />
+                    </div>
+                  </div>
+                </div>
 
-                <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="post_create_rfq()"
+                <div class="form-group">
+                  <label class="inline-label">
+                    Particulars
+                    <small class="err-msg" v-if="errors.remarks">{{ errors.remarks }}</small>
+                  </label>
+                  <TextAreaInput v-model="remarks" />
+                </div>
+
+                <button type="button" class="btn btn-primary" style="float: right;margin-left:5px;"
+                  @click="close();">Close</button>
+
+                <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="validateForm()"
                   style="float: right;">
                   Save
                 </button>
@@ -77,11 +118,13 @@ export default {
       rfq_no: null,
       selectedItems: [],
       pr_no: [],
-      selected: null,
+      selected: [],
       options: [],
+      errors: {},
       selectedMode: null,
       rfq_date: null,
-      particulars: null
+      rfq_deadline: null,
+      remarks: null
 
     }
   },
@@ -92,46 +135,69 @@ export default {
   },
 
   methods: {
+    validateForm() {
+      this.errors = {};
 
-    post_create_rfq() {
-      // console.log(this.selected.map(item => item.value));
-      // Prepare data to be sent
-      const userId = localStorage.getItem('userId');
-      const requestData = {
-        rfq_no: this.rfq_no,
-        rfq_date: this.rfq_date,
-        particulars: this.particulars,
-        updated_by: userId
-      };
-
-      // Send separate POST requests for each selected value
-      for (const prId of Object.values((this.selected.map(item => item.value)))) {
-        // Construct data for the current selected value
-        const prData = {
-          ...requestData,
-          pr_id: prId,
-          mode_id: this.selectedMode // Assuming mode_id is the correct property name
-        };
-
-        // Send POST request using Axios for the current selected value
-        axios.post('../../api/post_create_rfq', prData)
-          .then(() => {
-            // Assuming this.pr_no[0].value is the ID for the first selected PR
-            this.$updatePurchaseRequestStatus(this.selected.map(item => item.value), 6);
-            toast.success('RFQ successfully created!', {
-              autoClose: 100
-            });
-            setTimeout(() => {
-              location.reload();
-            }, 1000);
-
-          })
-          .catch(error => {
-            // Handle error
-            console.error('Error creating RFQ:', error);
-            // You can also display an error message or perform other error handling actions
-          });
+      if (this.selected==0) {
+        this.errors.pr_no = 'This Field is required';
       }
+
+      if (!this.selectedMode) {
+        this.errors.mode = 'This Field is required';
+      }
+
+      if (!this.rfq_no) {
+        this.errors.rfq_no = 'This Field is required';
+      }
+
+      if (!this.rfq_date) {
+        this.errors.rfq_date = 'This Field is required';
+      }
+
+      if (!this.rfq_deadline) {
+        this.errors.rfq_deadline = 'This Field is required';
+      }
+
+      if (!this.remarks) {
+        this.errors.remarks = 'This Field is required';
+      }
+
+      if (Object.keys(this.errors).length === 0) {
+        try {
+          this.post_create_rfq()
+          // this.$emit('save', this.eventDetails);
+        } catch (error) {
+          if (error.response && error.response.data.errors) {
+            this.errors = error.response.data.errors;
+          }
+        }
+      }
+    },
+    post_create_rfq() {
+      const userId = localStorage.getItem('userId');
+      axios.post('../../api/post_create_rfq',
+        {
+          pr_id_check: this.selected.map(item => item.value),
+          pr_id: `${this.selected.map(item => item.value).join(', ')}`,
+          rfq_no: this.rfq_no,
+          rfq_date: this.rfq_date,
+          rfq_deadline: this.rfq_deadline,
+          mode_id: this.selectedMode,
+          remarks: this.remarks,
+          created_by: userId
+        }
+      )
+        .then(response => {
+          toast.success('RFQ successfully created!', {
+            autoClose: 1000
+          });
+          this.$emit('post');  // Emit updated data to parent
+          this.$emit('close');  // Close modal
+        })
+        .catch(error => {
+          console.error('error saving data', error);
+        })
+
     },
 
 
@@ -143,11 +209,11 @@ export default {
         const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Adding 1 because months are zero-indexed
         const purchaseNoFormat = `${year}`;
         const rfq_no = response.data[0].rfq_count;
-        const formattedSequence = rfq_no.toString().padStart(4, '0');
+        const formattedSequence = rfq_no.toString().padStart(3, '0');
 
         // set the draft pr no of the user
 
-        this.rfq_no = `${purchaseNoFormat}-${formattedSequence}`;
+        this.rfq_no = `${purchaseNoFormat}-${month}-${formattedSequence}`;
 
         // localStorage.setItem('prId', response.data.userId);
 
@@ -157,11 +223,15 @@ export default {
         console.error('Error fetching data', error);
       }
     },
+
     async fetchSubmittedPurchaseRequest() {
       try {
         const response = await axios.get('../../api/fetchSubmittedPurchaseRequest');
         // Assuming response.data is an array of objects with 'label' and 'value' properties
-        this.options = response.data.map(item => ({ label: item.pr_no, value: item.id }))
+        this.options = response.data.map(item => ({
+          label: `${item.pr_no} - ${item.purpose}`,
+          value: item.id
+        }))
       } catch (error) {
         console.error('Error fetching submitted purchase requests:', error);
       }
@@ -171,10 +241,10 @@ export default {
       this.showDetailsModal = true;
     },
 
-
-      close() {
-        this.$emit('close');
-      },
+    close() {
+      this.errors = {}
+      this.$emit('close');
+    },
   },
 };
 </script>
@@ -197,6 +267,7 @@ export default {
 /* Style for centering the modal */
 .modal-dialog {
   margin-top: 10%;
+  max-width: 80%;
   /* Adjust as needed */
 }
 
@@ -207,24 +278,67 @@ export default {
   /* Change the box shadow as needed */
 }
 
-/* Style for dimming the background */
-.modal-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  /* Adjust the opacity to make it darker or lighter */
-  z-index: 1050;
-  /* Ensure it's above other elements */
+/* Custom styles for text overflow with ellipsis */
+.multiselect__tags #modal_multi {
+  display: flex;
+  flex-wrap: wrap;
 }
 
-/* Style for centering the modal */
-.modal-dialog {
-  margin-top: 10%;
-  /* Adjust as needed */
+.multiselect__tag #modal_multi {
+  display: inline-flex;
+  align-items: center;
+  min-width: 900px;
+  /* Critical: Prevent shrinking issues */
+  max-width: 100%;
+  /* Constrain to the parent's width */
+  flex: 1 0 auto;
+  /* Enable dynamic growth */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 2px;
+  padding: 0.25em 0.5em;
+  border-radius: 4px;
+  font-size: 0.875rem;
 }
+
+/* Responsive styling for small screens */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin-top: 5%;
+    max-width: 100%;
+  }
+
+  .multiselect__tag #modal_multi {
+    max-width: 80%;
+    /* Reduce tag width for smaller screens */
+  }
+}
+
+.multiselect__tag span #modal_multi {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multiselect__tag-icon #modal_multi {
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+.inline-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Adjust spacing between label and error */
+  margin-bottom: -10px !important;
+  /* Override default margin */
+}
+
+/* .err-msg {
+  color: red;
+  font-size: 0.85em;
+} */
 
 /* You may need additional styles to customize the appearance of the modal */
-</style>
+</style>`

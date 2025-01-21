@@ -89,7 +89,8 @@
                         </div>
                     </div>
 
-                    <!--Search Filter-->
+                    Search Filter-->
+
                     <div class="row">
                         <div class="col-md-12 pt-4">
                             <div class="card" v-if="isCardVisible">
@@ -225,15 +226,15 @@
                                                         Province/HUC</th>
                                                     <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
                                                         aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        City/Municipality</th>
+                                                        Username</th>
                                                     <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
                                                         aria-label="Quote#" style="width: 10px; text-align: center;">
                                                         Full Name</th>
                                                     <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
                                                         aria-label="Quote#" style="width: 10px; text-align: center;">
                                                         Username</th>
-                                                    <!-- <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
-                style="width: 10px; text-align: center;">Email</th> -->
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
+                style="width: 10px; text-align: center;">Email</th>
                                                     <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
                                                         aria-label="Quote#" style="width: 10px; text-align: center;">
                                                         Contact Number</th>

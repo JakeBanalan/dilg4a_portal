@@ -81,10 +81,10 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faGroupArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faGroupArrowsRotate, faCoins } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
 
-library.add(faGroupArrowsRotate, faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer);
+library.add(faGroupArrowsRotate, faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faCoins);
 
 export default {
     name: 'Sidebar',
@@ -134,6 +134,12 @@ export default {
                             name: 'Procurement',
                             tooltip: 'Buttons',
                             icon: 'store',
+                        },
+                        {
+                            link: '/procurement/budget/index',
+                            name: 'Budgeting',
+                            tooltip: 'Buttons',
+                            icon: 'coins',
                         },
                         {
                             link: '/procurement/rfq/index',

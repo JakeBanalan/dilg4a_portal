@@ -117,7 +117,15 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetchRFQ', [RFQController::class, 'fetchRFQ']);
+});
+
+Route::middleware('api')->group(function () {
     Route::get('fetch_rfq', [RFQController::class, 'fetch_rfq']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('ExportRFQ/{id}', [RFQController::class, 'ExportRFQ']);
 });
 
 Route::middleware('api')->group(function () {
@@ -186,6 +194,10 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchRFQItems/{rfqID}', [RFQController::class, 'fetchRFQItems']);
 });
 
 Route::middleware('api')->group(function () {
@@ -354,6 +366,7 @@ Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSma
 
 // R F Q
 Route::post('post_create_rfq', [RFQController::class, 'post_create_rfq']);
+Route::post('PostUpdateRFQ', [RFQController::class, 'PostUpdateRFQ']);
 
 //CALENDAR
 //C A L E N D A R

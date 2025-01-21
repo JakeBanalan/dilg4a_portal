@@ -112,7 +112,7 @@ export default {
         fetchProcessOwner() {
         axios.get('/api/fetchProcessOwner')
             .then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 const vm = this; // Save Vue instance context
                 let table = $('#po_table').DataTable({
                     retrieve: true,

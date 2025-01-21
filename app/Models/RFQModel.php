@@ -19,8 +19,10 @@ class RFQModel extends Model
         'pr_id',
         'rfq_no',
         'rfq_date',
+        'rfq_deadline',
         'particulars',
         'mode_id',
+        'created_by',
         'updated_by'
    
     ];

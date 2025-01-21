@@ -101,138 +101,91 @@ td {
                                             RFQ
                                         </h5>
                                         <div class="d-flex">
-                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                            <button class="btn btn-primary btn-fw btn-icon-text mx-2"
                                                 @click="openModal()">
+                                                <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
                                                 Create RFQ
                                             </button>
-                                            <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            <button type="button" class="btn btn-primary btn-fw btn-icon-text mx-2"
+                                                @click="toggleSearch">
+                                                <font-awesome-icon :icon="['fas', 'magnifying-glass']"></font-awesome-icon>
                                                 Advanced Search
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-bordered">
+                                    <!-- Advanced Search Form -->
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <div v-if="searchVisible">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <input type="text" v-model="searchQuery.rfqNo" class="form-control"
+                                                        placeholder="RFQ #">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="date" v-model="searchQuery.rfqDate"
+                                                        class="form-control">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="date" v-model="searchQuery.rfqDeadline"
+                                                        class="form-control">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <input type="text" v-model="searchQuery.createdBy"
+                                                        class="form-control" placeholder="Created By">
+                                                </div>
+                                            </div>
 
+                                            <div class="d-flex" style="float:right;">
+                                                <button type="button" class="btn btn-primary btn-icon-text"
+                                                    @click="applySearch">
+                                                    <font-awesome-icon :icon="['fas', 'magnifying-glass']"></font-awesome-icon>
+                                                    Search</button>
+                                                <button type="button" class="btn btn-secondary btn-icon-text mx-2"
+                                                    @click="resetSearch">
+                                                    <font-awesome-icon :icon="['fas', 'rotate']"></font-awesome-icon>
+                                                    Reset</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive" v-if="displayedItems.length" style="padding-top:10px;">
+                                        <table class="table table-striped table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>ACTION</th>
-                                                    <th>STATUS</th>
-                                                    <th>PURCHASE REQUEST #</th>
-                                                    <th>REQUEST FOR QUOTATION #</th>
-                                                    <th>TOTAL AMOUNT</th>
-                                                    <th style="width: 10px !important;">PARTICULARS</th>
-                                                    <th>PR DATE</th>
-                                                    <th>TARGET DATE</th>
-                                                    <th>Created By</th>
-
+                                                    <th style="width: 10%;">ACTION</th>
+                                                    <th style="width: 10%;">REQUEST FOR QUOTATION #</th>
+                                                    <th style="width: 10%;">RFQ DATE</th>
+                                                    <th style="width: 10%;">RFQ DEADLINE</th>
+                                                    <th>PARTICULARS</th>
+                                                    <th style="width: 10%;">CREATED BY</th>
                                                 </tr>
                                             </thead>
-
                                             <tbody>
-                                                <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
+                                                <tr v-for="RFQ in displayedItems" :key="RFQ.id">
                                                     <td v-if="isAdmin">
-                                                        <div v-if="purchaseRequest.status_id == 4">
-                                                            
-                                                            <button class="btn btn-icon mr-1"
-                                                                @click="toGSS(purchaseRequest.id)"
-                                                                style="background-color:#059886;color:#fff;">
-                                                                <font-awesome-icon
-                                                                    :icon="['fas', 'circle-check']"></font-awesome-icon>
-                                                            </button>
-                                                            <button class="btn btn-icon mr-1"
-                                                                style="background-color:#059886;color:#fff;"
-                                                                @click="exportRFQ(purchaseRequest.rfq_id)"> <i
-                                                                    class="ti-download" style="margin-left: -3px;"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 5">
-                                                            
-                                                            <button disabled class="btn btn-icon mr-1"
-                                                                @click="toGSS(purchaseRequest.id)"
-                                                                style="background-color:#059886;color:#fff;">
-                                                                <font-awesome-icon
-                                                                    :icon="['fas', 'circle-check']"></font-awesome-icon>
-                                                            </button>
-                                                            <button class="btn btn-icon mr-1"
-                                                                style="background-color:#059886;color:#fff;"
-                                                                @click="exportRFQ(purchaseRequest.rfq_id)"> <i
-                                                                    class="ti-download" style="margin-left: -3px;"></i>
-                                                            </button>
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 6">
-                                                            <button class="btn btn-icon mr-1"
-                                                                @click="viewRFQ(purchaseRequest.id, purchaseRequest.rfq_id)"
-                                                                style="background-color:#059886;color:#fff;">
-                                                                <font-awesome-icon
-                                                                    :icon="['fas', 'eye']"></font-awesome-icon>
-                                                            </button>
-                                                            <button disabled class="btn btn-icon mr-1"
-                                                                @click="toGSS(purchaseRequest.id)"
-                                                                style="background-color:#059886;color:#fff;">
-                                                                <font-awesome-icon
-                                                                    :icon="['fas', 'circle-check']"></font-awesome-icon>
-                                                            </button>
-                                                            <button class="btn btn-icon mr-1"
-                                                                style="background-color:#059886;color:#fff;"
-                                                                @click="exportRFQ(purchaseRequest.rfq_id)"> <i
-                                                                    class="ti-download" style="margin-left: -3px;"></i>
-                                                            </button>
-                                                        </div>
+                                                        <button type="button" class="btn btn-primary btn-icon-text mx-1"
+                                                            @click="viewRFQ(RFQ.id, RFQ.pr_id, RFQ.rfq_no)"
+                                                            style="background-color:#059886; color:#fff;">
+                                                            <font-awesome-icon
+                                                                :icon="['fas', 'eye']"></font-awesome-icon> View
+                                                        </button>
+                                                        <!-- <button type="button" class="btn btn-danger btn-icon-text mx-1"
+                                                            @click="cancelRFQ(RFQ.id)">
+                                                            <font-awesome-icon
+                                                                :icon="['fas', 'trash']"></font-awesome-icon> Cancel
+                                                        </button> -->
                                                     </td>
-                                                    <td>
-                                                        <div v-if="purchaseRequest.status_id == 1"
-                                                            class="badge badge-success">{{ purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 2"
-                                                            class="badge badge-success">{{ purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 3"
-                                                            class="badge badge-success">{{ purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 4"
-                                                            class="badge badge-success">{{ purchaseRequest.status
-                                                            }}</div>
-                                                        <div v-if="purchaseRequest.status_id == 5"
-                                                            class="badge badge-success">{{ purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 6"
-                                                            class="badge badge-success">{{ purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 7"
-                                                            class="badge badge-success">{{ purchaseRequest.status }}
-                                                        </div>
-                                                        <div v-if="purchaseRequest.status_id == 8"
-                                                            class="badge badge-success">{{ purchaseRequest.status }}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="badge badge-default"> <b>{{ purchaseRequest.pr_no
-                                                                }}</b><br><i>~{{ purchaseRequest.office }}~</i>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="badge badge-default">
-                                                            <b>{{ purchaseRequest.rfq_no }}</b><br><i>~RFQ Date: {{
-                                                dateFormat(purchaseRequest.rfq_date) }}~</i>
-                                                        </div>
-
-                                                    </td>
-
-
-                                                    <td>Php. {{ formatAmount(purchaseRequest.app_price) }}</td>
-                                                    <td style="width: 10px !important;">{{ purchaseRequest.particulars
-                                                        }}</td>
-                                                    <td>{{ dateFormat(purchaseRequest.pr_date) }}</td>
-                                                    <td>{{ dateFormat(purchaseRequest.target_date) }}</td>
-                                                    <td>{{ purchaseRequest.created_by }}</td>
-
-
-
+                                                    <td><b>{{ RFQ.rfq_no }}</b></td>
+                                                    <td>{{ dateFormat(RFQ.rfq_date) }}</td>
+                                                    <td>{{ dateFormat(RFQ.rfq_deadline) }}</td>
+                                                    <td>{{ RFQ.particulars }}</td>
+                                                    <td>{{ RFQ.created_by }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <Pagination :total="purchaseRequests.length" @pageChange="onPageChange" />
+                                        <Pagination :total="displayedItems.length" :currentPage="currentPage"
+                                            :itemsPerPage="itemsPerPage" @pageChange="onPageChange" />
                                     </div>
                                 </div>
                             </div>
@@ -244,7 +197,7 @@ td {
                 <FooterVue />
             </div>
         </div>
-        <ModalRFQ :visible="modalVisible" @close="closeModal" />
+        <ModalRFQ :visible="modalVisible" @close="closeModal" @post="HandlePost" />
     </div>
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
@@ -262,11 +215,11 @@ import StatBox from '../stat_board.vue';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
-import { faEye, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
 import { formatTotalAmount } from '../../../globalMethods';
 import { formatDate } from '../../../globalMethods';
-library.add(faEye, faPaperPlane);
+library.add(faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus);
 export default {
     name: 'Request for Quotation',
     props: {
@@ -277,12 +230,21 @@ export default {
             userId: null,
             selected: null,
             options: [],
-            admins: [3174, 2563],
-            purchaseRequests: [],
+            admins: [3310, 2563],
+            // totalPages: 0,
+            // purchaseRequests: [],
+            RFQs: [],
             selectedRows: [],
             currentPage: 1,
-            itemsPerPage: 5,
+            itemsPerPage: 10,
             modalVisible: false,
+            searchVisible: false,
+            searchQuery: {
+                rfqNo: '',
+                rfqDate: '',
+                rfqDeadline: '',
+                createdBy: ''
+            }
 
         };
     },
@@ -299,36 +261,70 @@ export default {
     },
     computed: {
         totalPages() {
-            return Math.ceil(this.purchaseRequests.length / this.itemsPerPage);
+            return Math.ceil(this.RFQs.length / this.itemsPerPage);
         },
+        // Apply pagination to filtered RFQs
         displayedItems() {
+            const filtered = this.filteredRFQs();
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            return this.purchaseRequests.slice(start, end);
+            return filtered.slice(start, end);
         },
+        showingEntriesMessage() {
+            const filtered = this.filteredRFQs();
+            const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+            const end = Math.min(start + this.itemsPerPage - 1, filtered.length);
+            return `Showing ${start} to ${end} of ${filtered.length} entries`;
+        }
     },
     created() {
         this.userId = parseInt(localStorage.getItem('userId'));
     },
     mounted() {
-        this.loadData();
-        this.fetchSubmittedPurchaseRequest();
+        this.fetchRFQ();
+        // this.loadData();
+        // this.fetchSubmittedPurchaseRequest();
         this.userId = localStorage.getItem('userId');
 
 
     },
     methods: {
+        // Toggle the visibility of the advanced search form
+        toggleSearch() {
+            this.searchVisible = !this.searchVisible;
+        },
+        // Apply the search filter based on the query
+        applySearch() {
+            this.currentPage = 1; // Reset to first page on new search
+            this.fetchRFQ();
+        },
+        // Reset the search query and fetch the data again
+        resetSearch() {
+            this.searchQuery = {
+                rfqNo: '',
+                rfqDate: '',
+                rfqDeadline: '',
+                createdBy: ''
+            };
+            this.fetchRFQ();
+        },
+        // Filter the RFQs based on the search query
+        filteredRFQs() {
+            return this.RFQs.filter(rfq => {
+                const matchesRFQNo = rfq.rfq_no.includes(this.searchQuery.rfqNo);
+                const matchesRFQDate = this.searchQuery.rfqDate ? rfq.rfq_date === this.searchQuery.rfqDate : true;
+                const matchesRFQDeadline = this.searchQuery.rfqDeadline ? rfq.rfq_deadline === this.searchQuery.rfqDeadline : true;
+                const matchesCreatedBy = rfq.created_by.toLowerCase().includes(this.searchQuery.createdBy.toLowerCase());
+
+                return matchesRFQNo && matchesRFQDate && matchesRFQDeadline && matchesCreatedBy;
+            });
+        },
+        HandlePost() {
+            this.fetchRFQ();
+            this.closeModal();
+        },
         isAdmin() {
             return this.admins.includes(this.userId);
-        },
-        async fetchSubmittedPurchaseRequest() {
-            try {
-                const response = await axios.get('../../api/fetchSubmittedPurchaseRequest');
-                // Assuming response.data is an array of objects with 'label' and 'value' properties
-                this.options = response.data.map(item => item.pr_no);
-            } catch (error) {
-                console.error('Error fetching submitted purchase requests:', error);
-            }
         },
         dateFormat(date) {
             return formatDate(date);
@@ -355,48 +351,60 @@ export default {
             } else {
                 this.selectedRows.push(id);
             }
-            console.log("Selected PurchaseRequest IDs:", this.selectedRows);
+            // console.log("Selected PurchaseRequest IDs:", this.selectedRows);
 
         },
-        loadData() {
-            axios.post(`../../api/fetchSubmittedtoGSS`)
+        // loadData() {
+        //     axios.post(`../../api/fetchSubmittedtoGSS`)
+        //         .then(response => {
+        //             // console.log(response.data.data)
+        //             this.purchaseRequests = response.data.data;
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching data:', error);
+        //         });
+        // },
+        onPageChange(page) {
+            // console.log("Page Change Triggered:", page);
+            this.currentPage = page;
+        },
+
+        viewRFQ(rfq_id) {
+            this.$router.push({ path: '/procurement/rfq', query: { id: rfq_id } });
+        },
+
+
+        fetchRFQ() {
+            axios.get('../../api/fetch_rfq')
                 .then(response => {
-                    this.purchaseRequests = response.data.data;
+                    this.RFQs = response.data.data;
+                    // console.log(this.RFQs);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                 });
         },
-        onPageChange(page) {
-            this.currentPage = page;
-            // Fetch data for the new page
-            this.loadData();
-        },
-
-        viewRFQ(pr_id, rfq_id) {
-            this.$router.push({ path: '/procurement/rfq', query: { id: rfq_id, pr: pr_id } });
-        },
 
         exportRFQ(rfq_id) {
-            console.log(rfq_id);
+            // console.log(rfq_id);
             window.location.href = `../../api/export-rfq/${rfq_id}?export=true`;
         },
-        toGSS(id) {
-            const STATUS_RECEIVED_BY_GSS = 5;
-            axios.post(`../../api/post_update_status`, {
-                pr_id: id,
-                status: STATUS_RECEIVED_BY_GSS,
-            }
-            ).then(() => {
-                toast.success('Successfully submitted to the GSS!', {
-                    autoClose: 2000
-                });
-                this.loadData();
-            }).catch((error) => {
+        // toGSS(id) {
+        //     const STATUS_RECEIVED_BY_GSS = 5;
+        //     axios.post(`../../api/post_update_status`, {
+        //         pr_id: id,
+        //         status: STATUS_RECEIVED_BY_GSS,
+        //     }
+        //     ).then(() => {
+        //         toast.success('Successfully submitted to the GSS!', {
+        //             autoClose: 2000
+        //         });
+        //         this.loadData();
+        //     }).catch((error) => {
 
-            })
+        //     })
 
-        }
+        // }
     },
 
 }
