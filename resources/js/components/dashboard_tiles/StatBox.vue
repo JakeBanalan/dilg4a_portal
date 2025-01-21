@@ -132,14 +132,11 @@ export default {
                 },
             })
                 .then(response => {
-                    console.log('API response:', response);
-                    console.log('Data:', response.data);
                     this.UpcomingEvents = response.data.map(event => ({
                         ...event,
                         start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
                         end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
                     }));
-                    console.log('UpcomingEvents:', this.UpcomingEvents);
                 })
                 .catch(error => {
                     console.error('Error Fetching items:', error);

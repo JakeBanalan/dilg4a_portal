@@ -266,7 +266,7 @@ export default {
                 },
 
             },
-            selectedOffices: [],
+            selectedOffices: [0],
             showMyPersonalEvents: true,
             UpcomingEvents: [],
             MyUpcomingEvents: []
@@ -358,14 +358,11 @@ export default {
                 },
             })
                 .then(response => {
-                    console.log('API response:', response);
-                    console.log('Data:', response.data);
                     this.UpcomingEvents = response.data.map(event => ({
                         ...event,
                         start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
                         end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
                     }));
-                    console.log('UpcomingEvents:', this.UpcomingEvents);
                 })
                 .catch(error => {
                     console.error('Error Fetching items:', error);
@@ -430,6 +427,7 @@ export default {
                     this.calendarOptions.events = events;
                     this.events = events;
                     this.$refs.calendar.getApi().refetchEvents();
+                    this.EventData();
                 })
                 .catch(error => {
                     console.error('Error fetching events:', error);
@@ -496,7 +494,7 @@ export default {
                                 postedby: this.userId,
                                 office: emp_data.id,
                                 title: this.eventDetails.title,
-                                color: emp_data.DIVISION_COLOR,
+                                color: this.eventDetails.personnalevent ? '#DAA520' : emp_data.DIVISION_COLOR,
                                 start: this.eventDetails.start,
                                 end: this.eventDetails.end,
                                 description: this.eventDetails.description,
