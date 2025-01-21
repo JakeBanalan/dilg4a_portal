@@ -577,7 +577,7 @@ export default {
 
 @media (min-width: 1080px) {
     .col-md-4 {
-        margin-left: 950px;
+        margin-left: 935px;
         margin-top: -500px;
     }
 }
