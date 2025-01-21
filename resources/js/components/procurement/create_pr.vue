@@ -5,8 +5,10 @@
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="modal demo-modal" v-if="modalVisible">
-                        <div class="modal-dialog">
+                    <div class="modal demo-modal" v-if="modalVisible"
+                        style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent;overflow-y: auto; width: 600px;">
+                        <div class="modal-dialog"
+                            style=" margin: auto; position: relative; transform: translateY(60%);">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <div
@@ -138,9 +140,11 @@
                                                     <td>{{ item.quantity }}</td>
                                                     <td>₱{{ item.price.toLocaleString('en-US', {
                                                         minimumFractionDigits:
-                                                        2, maximumFractionDigits: 2 }) }}</td>
+                                                            2, maximumFractionDigits: 2
+                                                    }) }}</td>
                                                     <td>₱{{ (item.quantity * item.price).toLocaleString('en-US', {
-                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</td>
+                                                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                                                    }) }}</td>
                                                     <td>
                                                         <button class="btn btn-warning btn-sm"
                                                             @click="showEditItemModal(index)">Edit</button>
@@ -155,8 +159,10 @@
                             </div>
                         </div>
                         <!--ADD ITEM MODAL-->
-                        <div class="modal demo-modal" v-if="addItemModalVisible" id="addItemModal">
-                            <div class="modal-dialog">
+                        <div class="modal" v-if="addItemModalVisible" id="addItemModal"
+                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            <div class="modal-dialog"
+                                style=" margin: auto; position: relative; transform: translateY(20%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -207,8 +213,10 @@
                         </div>
 
                         <!--EDIT ITEM MODAL-->
-                        <div class="modal demo-modal" v-if="editItemModalVisible" id="editItemModal">
-                            <div class="modal-dialog">
+                        <div class="modal" v-if="editItemModalVisible" id="editItemModal"
+                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            <div class="modal-dialog"
+                                style=" margin: auto; position: relative; transform: translateY(20%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -553,25 +561,6 @@ select {
     border: 1px solid #cbced4;
     box-sizing: border-box;
     padding: 0px 10px;
-}
-
-.modal.demo-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 5px;
-    z-index: 1050;
-    display: block;
-    background-color: rgba(0, 0, 0, 0.5);
-    overflow-y: auto;
-
-}
-
-.modal-dialog {
-    margin: auto;
-    position: relative;
-    transform: translateY(20%);
 }
 
 .modal-content .container h1 {

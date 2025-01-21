@@ -142,8 +142,10 @@
                             </div>
                         </div>
                         <!--ADD ITEM MODAL-->
-                        <div class="modal demo-modal" v-if="addItemModalVisible" id="addEditModal">
-                            <div class="modal-dialog">
+                        <div class="modal" v-if="addItemModalVisible" id="addEditModal"
+                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            <div class="modal-dialog"
+                                style=" margin: auto; position: relative; transform: translateY(20%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -196,8 +198,10 @@
                         </div>
 
                         <!--EDIT ITEM MODAL-->
-                        <div class="modal demo-modal" v-if="editItemModalVisible" id="viewEditModal">
-                            <div class="modal-dialog">
+                        <div class="modal" v-if="editItemModalVisible" id="viewEditModal"
+                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            <div class="modal-dialog"
+                                style=" margin: auto; position: relative; transform: translateY(20%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div

@@ -298,17 +298,23 @@ export default {
 /* Style for dimming the background */
 .modal-background {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    left: 50%;
+    border-radius: 5px;
+    z-index: 1050;
+    display: block;
     background-color: rgba(0, 0, 0, 0.5);
     overflow-y: auto;
 }
 
 /* Style for centering the modal */
 .modal-dialog {
-    max-height: 700px;
+    overflow: visible !important;
     overflow-y: auto;
+    margin-top: 10%;
+    max-width: 80%;
+    /* Adjust as needed */
 }
+
 
 .selected img {
     border: 2px solid #007bff;
