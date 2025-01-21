@@ -7,185 +7,196 @@
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <div class="row">
-                        <div class="col-md-7 grid-margin stretch-card">
+                        <div class="col-md-7 stretch-card">
                             <div class="card">
                                 <div class="card-body">
                                     <FullCalendar ref="calendar" :options="calendarOptions" />
                                 </div>
                             </div>
                         </div>
-                        <!--CARDS - Activity Bar-->
-                        <div class="col-md-2">
-                            <div class="card">
-                                <div class="card-body scrollable-card-body">
-                                    <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
-                                    <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                                        v-for="(events, i) in UpcomingEvents" :key="i">
-                                        <div class="move-calendar ms-3">
-                                            <span style="display: inline-block;">
-                                                <time class="icon">
-                                                    <em>{{ FormattedDay(events.start) }}</em>
-                                                    <strong>{{ FormattedMonth(events.start) }}</strong>
-                                                    <span>{{ FormattedDate(events.start) }}</span>
-                                                </time>
-                                            </span>
+                        <div class="col-md-5">
+                            <div class="row">
+                                <div class="col-md-6 grid-margin">
+                                    <div class="card">
+                                        <div class="card-body scrollable-card-body">
+                                            <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
+                                            <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                                                v-for="(events, i) in UpcomingEvents" :key="i">
+                                                <div class="move-calendar ms-3">
+                                                    <span style="display: inline-block;">
+                                                        <time class="icon">
+                                                            <em>{{ FormattedDay(events.start) }}</em>
+                                                            <strong>{{ FormattedMonth(events.start) }}</strong>
+                                                            <span>{{ FormattedDate(events.start) }}</span>
+                                                        </time>
+                                                    </span>
+                                                </div>
+                                                <div class="ms-3" style="padding-left: 0.3em;">
+                                                    <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                                        class="mb-0">{{ events.title }}</h6>
+                                                    <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
+                                                        FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
+                                                        }}</small>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="ms-3" style="padding-left: 0.3em;">
-                                            <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
-                                                class="mb-0">{{ events.title }}</h6>
-                                            <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
-                                                FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
-                                                }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 grid-margin">
+                                    <div class="card">
+                                        <div class="card-body scrollable-card-body">
+                                            <p class="card-title">My Personal Events - {{ currentMonth }}</p>
+                                            <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                                                v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
+                                                <div class="move-calendar ms-3">
+                                                    <span style="display: inline-block;">
+                                                        <time class="icon">
+                                                            <em>{{ FormattedDay(myEvents.start) }}</em>
+                                                            <strong>{{ FormattedMonth(myEvents.start) }}</strong>
+                                                            <span>{{ FormattedDate(myEvents.start) }}</span>
+                                                        </time>
+                                                    </span>
+                                                </div>
+                                                <div class="ms-3" style="padding-left: 0.3em;">
+                                                    <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                                        class="mb-0 text-blue">{{ myEvents.title }}</h6>
+                                                    <small class="text-blue mb-0"><i class="ti-timer me-1"></i> {{
+                                                        FormattedFDate(myEvents.start) }} - {{
+                                                            FormattedFDate(myEvents.end)
+                                                        }}</small>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="card">
-                                <div class="card-body scrollable-card-body">
-                                    <p class="card-title">My Personal Events - {{ currentMonth }}</p>
-                                    <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                                        v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
-                                        <div class="move-calendar ms-3">
-                                            <span style="display: inline-block;">
-                                                <time class="icon">
-                                                    <em>{{ FormattedDay(myEvents.start) }}</em>
-                                                    <strong>{{ FormattedMonth(myEvents.start) }}</strong>
-                                                    <span>{{ FormattedDate(myEvents.start) }}</span>
-                                                </time>
-                                            </span>
-                                        </div>
-                                        <div class="ms-3" style="padding-left: 0.3em;">
-                                            <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
-                                                class="mb-0 text-blue">{{ myEvents.title }}</h6>
-                                            <small class="text-blue mb-0"><i class="ti-timer me-1"></i> {{
-                                                FormattedFDate(myEvents.start) }} - {{ FormattedFDate(myEvents.end)
-                                                }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4" style="margin-top: -500px; overflow: auto;">
-                            <div class="card" style="max-height: 770px !important; overflow:hidden;">
-                                <div class="card-body" style="overflow-y:scroll;">
-                                    <p class="card-title">Ledger Filter</p>
-                                    <div class="box box-widget widget-user-12">
-                                        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-12">
-                                            <table class="table table-bordered">
-                                                <tbody>
-                                                    <tr>
-                                                        <td
-                                                            style="background-color: whitesmoke; color: black; padding: 9px; width: 50%;">
-                                                            <input type="checkbox" v-model="selectedOffices"
-                                                                name="offices[]" value="0" @change="filterEvents()">
-                                                            <label style="margin-left: 15%;">All offices</label>
-                                                        </td>
-                                                        <!-- My Personal Events Checkbox -->
-                                                        <td
-                                                            style="background-color: goldenrod; color: #fff; padding: 9px; width: 50%;">
-                                                            <input type="checkbox" v-model="showMyPersonalEvents"
-                                                                @change="FetchData">
-                                                            <label style="margin-left: 15%;">My Personal Events</label>
-                                                        </td>
-                                                    </tr>
+                            <div class="col-md-12 grid-margin">
+                                <div class="card">
+                                    <div class="card-body" style="overflow-y:scroll;">
+                                        <p class="card-title">Ledger Filter</p>
 
-                                                    <tr>
-                                                        <td style="background-color: #D5D911; color:white;width:50%;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="6"
-                                                                @change="filterEvents()">
-                                                            <label style="margin-left:15%;">ORD</label>
-                                                        </td>
-                                                        <td
-                                                            style="background-color: #607D8B; color:#fff;padding:9px;width:50%;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="9"
-                                                                @change="filterEvents()">
-                                                            <label style="margin-left:15%;">Batangas</label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="background-color: #E60785; color:white;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="5"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">FAD</label>
-                                                        </td>
-                                                        <td
-                                                            style="background-color:#FF9800 ; color:white;;padding:9px;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="10"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">Cavite</label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="background-color: #48BD0D; color:white;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="7"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">LGCDD</label>
-                                                        </td>
-                                                        <td style="background-color:#009688; color:white;;padding:9px;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="11"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">Laguna</label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="background-color: #E6680E; color:white;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="3"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">MBRTG</label>
-                                                        </td>
-                                                        <td style="background-color:#81D4FA; color:white;;padding:9px;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="13"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">Rizal</label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="background-color: #0071c5; color:white;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="8"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">LGMED</label>
-                                                        </td>
-                                                        <td style="background-color:#d50000; color:white;;padding:9px;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="12"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">Quezon</label>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td style="background-color: #8F0CC7; color:white;">
-                                                            <input class="calFilter" data-id="9" type="checkbox"
-                                                                name="offices[]" v-model="selectedOffices" :value="4"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">PDMU</label>
-                                                        </td>
-                                                        <td
-                                                            style="background-color: #FFEB3B; color:white;;padding:9px;">
-                                                            <input class="calFilter" type="checkbox" name="offices[]"
-                                                                v-model="selectedOffices" :value="14"
-                                                                @change="filterEvents()"><label
-                                                                style="margin-left:15%;">Lucena City</label>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                        <div class="box box-widget widget-user-12">
+                                            <div class="col-xs-2 col-sm-2 col-md-2 col-lg-12">
+                                                <table class="table table-bordered"
+                                                    style="border-width: 3px;max-width:100%;">
+                                                    <tbody>
+
+                                                        <tr>
+                                                            <td
+                                                                style="background-color: whitesmoke; color: black; padding: 9px; width: 50%;">
+                                                                <input type="checkbox" v-model="selectedOffices"
+                                                                    name="offices[]" value="0" @change="filterEvents()">
+                                                                <label style="margin-left: 15%;">All offices</label>
+                                                            </td>
+                                                            <!-- My Personal Events Checkbox -->
+                                                            <td
+                                                                style="background-color: goldenrod; color: #fff; padding: 9px; width: 50%;">
+                                                                <input type="checkbox" v-model="showMyPersonalEvents"
+                                                                    @change="FetchData">
+                                                                <label style="margin-left: 15%;">My Personal
+                                                                    Events</label>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td
+                                                                style="background-color: #D5D911; color:white;width:50%;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="6" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">ORD</label>
+                                                            </td>
+                                                            <td
+                                                                style="background-color: #607D8B; color:#fff;padding:9px;width:50%;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="9" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">Batangas</label>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #E60785; color:white;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="5" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">FAD</label>
+                                                            </td>
+                                                            <td
+                                                                style="background-color:#FF9800 ; color:white;;padding:9px;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="10" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">Cavite</label>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #48BD0D; color:white;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="7" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">LGCDD</label>
+                                                            </td>
+                                                            <td
+                                                                style="background-color:#009688; color:white;;padding:9px;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="11" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">Laguna</label>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #E6680E; color:white;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="3" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">MBRTG</label>
+                                                            </td>
+                                                            <td
+                                                                style="background-color:#81D4FA; color:white;;padding:9px;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="13" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">Rizal</label>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #0071c5; color:white;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="8" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">LGMED</label>
+                                                            </td>
+                                                            <td
+                                                                style="background-color:#d50000; color:white;;padding:9px;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="12" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">Quezon</label>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td style="background-color: #8F0CC7; color:white;">
+                                                                <input class="calFilter" data-id="9" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="4" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">PDMU</label>
+                                                            </td>
+                                                            <td
+                                                                style="background-color: #FFEB3B; color:white;;padding:9px;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="14" @change="filterEvents()"><label
+                                                                    style="margin-left:15%;">Lucena City</label>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
                 <FooterVue />
@@ -583,46 +594,6 @@ export default {
 </script>
 
 <style scoped>
-@media (max-width: 768px) {
-
-    .card {
-        margin-left: 0;
-        margin-top: 0;
-        max-height: none;
-    }
-
-    .col-md-4 {
-        margin-left: 0;
-    }
-
-    table {
-        font-size: 0.8em;
-        width: 100%;
-    }
-
-    td {
-        padding: 8px;
-        font-size: 14px;
-    }
-
-    .box {
-        margin-top: 20px;
-    }
-}
-
-@media (min-width: 1200px) {
-    table {
-        font-size: 1.2em;
-        /* Increase font size for larger screens */
-    }
-
-
-    .col-md-4 {
-        margin-left: 935px;
-        margin-top: -500px;
-    }
-}
-
 .scrollable-card-body {
     overflow-y: scroll;
     height: 300px;
