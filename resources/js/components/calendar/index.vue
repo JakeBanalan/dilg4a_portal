@@ -479,12 +479,25 @@ export default {
             });
         },
         handleEventDrop(info) {
+            // Check if the user has permission to update the event
+            if (this.eventDetails.postedBy !== this.posted_by) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'You do not have permission to update this event.',
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6',
+                });
+                return;
+            }
+
+            // Prepare the updated event data
             const updatedEvent = {
                 id: info.event.id,
                 start: moment(info.event.start).format('YYYY-MM-DD HH:mm:ss'),
                 end: moment(info.event.end || info.event.start).format('YYYY-MM-DD HH:mm:ss')
             };
 
+            // Send the updated event data to the server
             axios.post('/api/PostUpdateDragDrop', updatedEvent)
                 .then(() => {
                     toast.success('Event Updated!', {

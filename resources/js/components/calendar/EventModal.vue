@@ -251,9 +251,6 @@ export default {
             this.errors = {}; // Clear validation errors
             this.$emit('close'); // Emit the close event
         },
-        getUserInfo() {
-
-        },
         showToatSuccess(message) {
             toast.success(message, {
                 autoClose: 1000,
