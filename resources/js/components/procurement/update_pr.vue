@@ -6,9 +6,11 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="row justify-content-end" style="margin-right: 20px;">
-                        <button type="button" class="btn btn-primary btn-md"
-                            @click="exportPurchaseRequest"><font-awesome-icon :icon="['fas', 'download']" />
-                            &nbsp;<b>Export</b></button> &nbsp; &nbsp;
+                        <button type="button" class="btn btn-primary btn-md" @click="exportPurchaseRequest"
+                            :disabled="isExporting">
+                            <font-awesome-icon :icon="['fas', 'download']" />
+                            &nbsp;<b>{{ isExporting ? 'Exporting...' : 'Export' }}</b>
+                        </button> &nbsp; &nbsp;
                         <button type="button" class="btn btn-warning btn-md"
                             @click="updatePurchaseRequestDetails"><font-awesome-icon :icon="['fas', 'save']" />
                             &nbsp;<b>Update</b></button>
@@ -100,8 +102,7 @@
                                         </span>
                                     </h3>
                                     <br><br>
-                                    <div class="forms-sample table-responsive"
-                                        style="max-height: auto;">
+                                    <div class="forms-sample table-responsive" style="max-height: auto;">
                                         <table class="table table-bordered table-hover" style="width: 100%;">
                                             <thead>
                                                 <tr>
@@ -353,6 +354,7 @@ export default {
             items: [],
             isLoading: false,
             updatedItems: [],
+            isExporting: false,
         };
     },
     computed: {
@@ -540,8 +542,40 @@ export default {
             });
         },
         exportPurchaseRequest() {
-            window.location.href = `../api/export-purchase-request/${this.$route.query.id}?export=true`;
-        },
+            const purchaseRequestId = this.$route.query.id;
+            this.isExporting = true;
+
+            axios
+                .get(`../api/export-purchase-request/${purchaseRequestId}`, {
+                    responseType: 'blob', // Ensure we handle the response as a binary Blob
+                })
+                .then((response) => {
+                    const { data, headers } = response;
+
+                    // Extract filename from headers or use a default fallback
+                    const fileName = headers['content-disposition']?.match(/filename="?(.+)"?/)?.[1] || 'PurchaseRequest.xlsx';
+
+                    // Create a Blob URL and trigger the file download
+                    const blob = new Blob([data]);
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = fileName;
+                    document.body.appendChild(link); // Append link for Firefox compatibility
+                    link.click();
+                    document.body.removeChild(link); // Remove the link after downloading
+
+                    // Revoke the object URL to release memory
+                    URL.revokeObjectURL(url);
+                })
+                .catch((error) => {
+                    console.error('Error exporting purchase request:', error);
+                    Swal.fire('Error', 'Failed to export the purchase request. Please try again.', 'error');
+                })
+                .finally(() => {
+                    this.isExporting = false; // Reset loading state
+                });
+        }
 
     },
 };

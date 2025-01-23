@@ -37,4 +37,9 @@ class PurchaseRequestModel extends Model
         'name',
         'email'
     ];
+
+    public function items()
+    {
+        return $this->hasMany(PurchaseRequestItemModel::class, 'pr_id');
+    }
 }

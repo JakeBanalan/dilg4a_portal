@@ -7,6 +7,7 @@ use App\Models\AppItemModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseRequestModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\PurchaseRequestItemModel;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -107,6 +108,15 @@ class PurchaseRequestController extends Controller
                 return response()->json(['message' => 'Purchase request not found'], 404);
             }
 
+            // Update the main fields of the purchase request
+            $purchaseRequest->update([
+                'pmo' => $request->input('pmo'),
+                'type' => $request->input('type'),
+                'pr_date' => $request->input('pr_date'),
+                'target_date' => $request->input('target_date'),
+                'purpose' => $request->input('purpose'),
+            ]);
+
             // Validate the items array
             $validatedData = $request->validate([
                 'items' => 'required|array',
@@ -129,7 +139,6 @@ class PurchaseRequestController extends Controller
                         'description' => $item['descrip'],
                     ]);
                 } else {
-
                     $isDuplicate = PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)
                         ->where('pr_item_id', $item['id'])
                         ->exists();
@@ -148,18 +157,18 @@ class PurchaseRequestController extends Controller
                 }
             }
 
-
             DB::commit();
 
             return response()->json([
-                'message' => 'Purchase request items updated successfully',
+                'message' => 'Purchase request and items updated successfully',
                 'items' => PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)->get(),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Failed to update purchase request items'], 500);
+            return response()->json(['message' => 'Failed to update purchase request and items'], 500);
         }
     }
+
 
 
 
@@ -342,59 +351,106 @@ class PurchaseRequestController extends Controller
 
 
 
-    // GENERATE REPORTS
-    public function exportToExcel($data)
-    {
-        // Load the existing Excel template
-        $templatePath = public_path('templates/purchase_request_template.xlsx');
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
 
-        // Get the active sheet
+    // GENERATE REPORTS
+    public function exportPurchaseRequest(Request $request, $id)
+    {
+        // Fetch the purchase request data based on the ID, along with its items
+        $query = DB::table('pr')
+            ->select([
+                'pr.id AS id',
+                'pr.type',
+                'pr.pr_no',
+                'pr.action_officer',
+                'users.first_name',
+                'users.middle_name',
+                'users.last_name',
+                'pmo.id AS office',
+                'pmo.pmo_title',
+                'pmo.pmo_contact_person',
+                'pmo.designation',
+                'pr.purpose AS particulars',
+                'pr.pr_date',
+                'pr.target_date',
+                'pr.is_urgent',
+                'pr_items.id AS item_id',
+                'pr_items.qty AS quantity',
+                'pr_items.description AS desc',
+                'app.sn AS serial_no',
+                'app.item_title',
+                'unit.item_unit_title AS unit',
+                'app.app_price AS price'
+            ])
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
+            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
+            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
+            ->leftJoin('tbl_app AS app', 'app.id', '=', 'pr_items.pr_item_id')
+            ->leftJoin('item_unit AS unit', 'unit.id', '=', 'app.unit_id')
+            ->where('pr.id', $id)
+            ->get();
+
+        if ($query->isEmpty()) {
+            return response()->json(['error' => 'Purchase Request not found.'], 404);
+        }
+
+        $templatePath = public_path('templates/purchase_request_template.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Define column headers
-        $headers = ['pr_no', 'serial_no', 'procurement'];
+        $sheet->setCellValue('C7', 'PR No.: ' . $query[0]->pr_no);
+        $sheet->setCellValue('E7', 'Date: ' . $query[0]->pr_date);
+        $sheet->setCellValue('B7', $query[0]->pmo_title);
+        $sheet->setCellValue('B23', $query[0]->particulars);
 
-        // Initialize row counter
-        $row = 11; // Assuming your data starts from the second row in the template
-        $particulars = $data[0]['particulars'];
-        $pr_date = Carbon::createFromFormat('Y-m-d', $data[0]['pr_date'])->format('F d, Y');
-        $office = $data[0]['office'];
-        $signatories = $data[0]['signatory'];
-        $designation = $data[0]['designation'];
+        $contactPerson = strtoupper($query[0]->pmo_contact_person);
 
-        $sheet->setCellValueByColumnAndRow(2, 36, $particulars);
-        $sheet->setCellValueByColumnAndRow(5, 7, "Date:" . $pr_date);
-        $sheet->setCellValueByColumnAndRow(2, 7, $office);
-        $sheet->setCellValueByColumnAndRow(2, 42, $signatories);
-        $sheet->setCellValueByColumnAndRow(2, 43, $designation);
-        $sheet->setCellValueByColumnAndRow(6, 35, "=SUM(F11:F34)");
+        $sheet->setCellValue('B29', $contactPerson);
 
-        // Iterate through data
-        foreach ($data as $rowData) {
-            // Iterate through columns
-            foreach ($data as $index => $field) {
-                // Set the cell value using the field name and row index
-                $sheet->setCellValueByColumnAndRow(1, $row, $rowData['serial_no']);
-                $sheet->setCellValueByColumnAndRow(2, $row, $rowData['unit']);
-                $sheet->setCellValueByColumnAndRow(3, $row, $rowData['procurement']);
-                $sheet->setCellValueByColumnAndRow(4, $row, $rowData['quantity']);
-                $sheet->setCellValueByColumnAndRow(5, $row, $rowData['app_price']);
-                $sheet->setCellValueByColumnAndRow(6, $row, $rowData['quantity'] * $rowData['app_price']);
-            }
-            // Increment the row counter
+        $designationPerson = ($query[0]->designation);
+
+
+        $sheet->setCellValue('B30', $designationPerson);
+
+        $row = 11;
+        $totalAmount = 0;
+
+        // Start populating dynamic fields (items data)
+        foreach ($query as $item) {
+            // Populate each row with the item data
+            $sheet->setCellValueByColumnAndRow(1, $row, $item->serial_no);
+            $sheet->setCellValueByColumnAndRow(2, $row, $item->unit);
+
+            // Populate item details
+            $sheet->setCellValueByColumnAndRow(3, $row, $item->item_title);
+            $sheet->setCellValueByColumnAndRow(4, $row, $item->quantity);
+            $sheet->setCellValueByColumnAndRow(5, $row, '₱ ' . number_format($item->price, 2));
+            $sheet->setCellValueByColumnAndRow(6, $row, '₱ ' . number_format($item->quantity * $item->price, 2));
+
+
+            $totalAmount += $item->quantity * $item->price;
+
             $row++;
         }
+
+        $sheet->setCellValue('F22', '₱ ' . number_format($totalAmount, 2));
+
+
+        $sheet->getProtection()->setSheet(true);
+
+        // Set password for the sheet
         $sheet->getProtection()->setPassword('dilg4a@2024');
 
-        // Create a writer and save the spreadsheet to a new file
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $fileName = $data[0]['pr_no'] . '.xlsx';
-        $writer->save($fileName);
 
-        // Download the file and delete it after sending
-        return response()->download($fileName)->deleteFileAfterSend(true);
+        $fileName = "PurchaseRequest_" . $query[0]->pr_no . ".xlsx";
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'PurchaseRequest');
+        $writer->save($tempFile);
+        return response()->download($tempFile, $fileName, [
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+        ])->deleteFileAfterSend(true);
     }
+
+
 
 
 

@@ -16,25 +16,24 @@ class AppItemModel extends Model
     protected $table = 'tbl_app';
 
 
-  protected $fillable = [
-    'id',
-    'sn',
-    'code',
-    'new_entry',
-    'merge_code',
-    'item_title',
-    'unit_id',
-    'source_of_funds_id',
-    'category_id',
-    'pmo_id',
-    'quantity',
-    'mode',
-    'price',
-    'app_price',
-    'remarks',
-    'app_year',
-    'created_at',
-    'description'
-];
-
+    protected $fillable = [
+        'id',
+        'sn',
+        'code',
+        'new_entry',
+        'merge_code',
+        'item_title',
+        'unit_id',
+        'source_of_funds_id',
+        'category_id',
+        'pmo_id',
+        'quantity',
+        'mode',
+        'price',
+        'app_price',
+        'remarks',
+        'app_year',
+        'created_at',
+        'description'
+    ];
 }

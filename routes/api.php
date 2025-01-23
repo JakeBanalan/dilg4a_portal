@@ -403,8 +403,9 @@ Route::post('PostUser', [UserManagementController::class, 'PostUser']);
 // E X P O R T
 // routes/web.php or routes/api.php
 Route::middleware('api')->group(function () {
-    Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
+    Route::get('/export-purchase-request/{id}', [PurchaseRequestController::class, 'exportPurchaseRequest']);
 });
+
 
 Route::middleware('api')->group(function () {
     Route::get('export-rfq/{id}', [RFQController::class, 'viewRFQItems']);
