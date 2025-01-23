@@ -113,26 +113,75 @@ class PurchaseRequestController extends Controller
         }
     }
 
-    public function post_update_purchaseRequestDetailsForm(Request $request)
+    public function post_update_purchaseRequest(Request $request)
     {
-        // Assuming your model is named PurchaseRequestModel
-        $purchaseRequest = PurchaseRequestModel::where('pr_no', $request->input('pr_no'))->first();
+        DB::beginTransaction();  // Start the transaction
 
-        // Update the record
-        PurchaseRequestModel::where('id', $request->input('pr_id'))
-            ->update([
-                'pmo' => $request->input('pmo'),
-                'type' => $request->input('type'),
-                'pr_date' => $request->input('pr_date'),
-                'target_date' => $request->input('target_date'),
-                'purpose' => $request->input('purpose'),
-                'current_step' => $request->input('step'),
+        try {
+            // Retrieve the purchase request using pr_id
+            $purchaseRequest = PurchaseRequestModel::find($request->input('pr_id'));
+
+            // Check if the purchase request exists
+            if (!$purchaseRequest) {
+                return response()->json(['message' => 'Purchase request not found'], 404);
+            }
+
+            // Validate the items array
+            $validatedData = $request->validate([
+                'items' => 'required|array',
+                'items.*.id' => 'required|integer',  // Ensure every item has an 'id'
+                'items.*.qty' => 'required|numeric|min:1',  // Ensure 'qty' is a number >= 1
+                'items.*.price' => 'required|numeric|min:0',  // Ensure 'price' is a number >= 0
+                'items.*.descrip' => 'nullable|string',  // 'descrip' is optional
             ]);
 
+            // Update or add items (if any)
+            $items = $validatedData['items'];
+            foreach ($items as $item) {
+                $existingItem = PurchaseRequestItemModel::find($item['id']);
 
-        // You can return a response, if needed
-        return response()->json(['message' => 'Purchase request details updated successfully']);
+                if ($existingItem) {
+                    // Update the existing item
+                    $existingItem->update([
+                        'qty' => $item['qty'],
+                        'abc' => $item['qty'] * $item['price'],
+                        'description' => $item['descrip'],
+                    ]);
+                } else {
+                    // Check for duplicates before creating a new record
+                    $isDuplicate = PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)
+                        ->where('pr_item_id', $item['id']) // Ensure item ID matches
+                        ->exists();
+
+                    if (!$isDuplicate) {
+                        PurchaseRequestItemModel::create([
+                            'pr_id' => $purchaseRequest->id,
+                            'pr_item_id' => $item['id'],
+                            'description' => $item['descrip'],
+                            'qty' => $item['qty'],
+                            'abc' => $item['qty'] * $item['price'],
+                            'date_added' => now(),
+                            'flag' => 1,
+                        ]);
+                    }
+                }
+            }
+
+
+
+            DB::commit();  // Commit the transaction
+
+            // Return the updated items
+            return response()->json([
+                'message' => 'Purchase request items updated successfully',
+                'items' => PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)->get(),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();  // Rollback the transaction if an error occurs
+            return response()->json(['message' => 'Failed to update purchase request items'], 500);
+        }
     }
+
 
 
     public function fetchItems()
@@ -201,24 +250,26 @@ class PurchaseRequestController extends Controller
 
     public function viewPurchaseRequest($id)
     {
+        // Get the main purchase request details
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-            pr.id AS `id`,
-            pr.type AS `type`,
-            pr.pr_no AS `pr_no`,
-            pr.action_officer AS `user_id`,
-            users.last_name AS `created_by`,
-            pmo.id AS `office`,
-            pr.purpose AS `particulars`,
-            pr.pr_date AS `pr_date`,
-            pr.target_date AS `target_date`,
-            pr.is_urgent AS `is_urgent`,
-            pr_items.qty AS `quantity`,
-            pr_items.description AS `desc`,
-            app.sn AS `serial_no`,
-            app.item_title AS `item_title`,
-            unit.item_unit_title as  `unit`,
-            app.app_price AS `price`
-        '))
+                pr.id AS `id`,
+                pr.type AS `type`,
+                pr.pr_no AS `pr_no`,
+                pr.action_officer AS `user_id`,
+                users.last_name AS `created_by`,
+                pmo.id AS `office`,
+                pr.purpose AS `particulars`,
+                pr.pr_date AS `pr_date`,
+                pr.target_date AS `target_date`,
+                pr.is_urgent AS `is_urgent`,
+                pr_items.id,
+                pr_items.qty AS `quantity`,
+                pr_items.description AS `desc`,
+                app.sn AS `serial_no`,
+                app.item_title AS `item_title`,
+                unit.item_unit_title as  `unit`,
+                app.app_price AS `price`
+            '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
             ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
@@ -227,17 +278,25 @@ class PurchaseRequestController extends Controller
             ->where('pr.id', $id)
             ->first();
 
+        // If no purchase request is found, return a 404 response
+        if (!$query) {
+            return response()->json(['message' => 'Purchase request not found'], 404);
+        }
+
+        // Get related pr_items
         $prItems = PurchaseRequestItemModel::where('pr_id', $id)
             ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
             ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
             ->select('pr_items.*', 'app.app_price AS price', 'app.sn as serial_no', 'app.item_title as item_title', 'unit.item_unit_title as unit')
             ->get();
 
+        // Return the data in a structured format
         return response()->json([
             'purchaseRequest' => $query,
-            'pr_items' => $prItems
+            'prItems' => $prItems
         ]);
     }
+
 
     public function updatePurchaseRequestStatus(Request $request)
     {
@@ -274,6 +333,35 @@ class PurchaseRequestController extends Controller
         // Return a response
         return response()->json(['message' => 'Purchase request updated successfully']);
     }
+
+    //Removed Items
+    public function deletePurchaseRequestItem(Request $request)
+    {
+        try {
+            // Retrieve the item_id from the request
+            $item_id = $request->input('item_id');  // Assuming 'item_id' is the ID of the record in the 'pr_items' table
+
+            // Find and delete the item by its ID
+            $item = PurchaseRequestItemModel::find($item_id);  // Use `find()` to retrieve by primary key (id)
+
+            if ($item) {
+                // Delete the item from the database
+                $item->delete();
+
+                // Return success response
+                return response()->json(['message' => 'Item deleted successfully.']);
+            } else {
+                // If the item doesn't exist, return 'Item not found' message
+                return response()->json(['message' => 'Item not found'], 404);
+            }
+        } catch (\Exception $e) {
+            // In case of an exception, return error response
+            return response()->json(['message' => 'Failed to delete item.'], 500);
+        }
+    }
+
+
+
 
 
     // GENERATE REPORTS

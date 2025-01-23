@@ -100,8 +100,9 @@
                                         </span>
                                     </h3>
                                     <br><br>
-                                    <div class="forms-sample">
-                                        <table class="table table-bordered table-hover">
+                                    <div class="forms-sample table-responsive"
+                                        style="max-height: auto;">
+                                        <table class="table table-bordered table-hover" style="width: 100%;">
                                             <thead>
                                                 <tr>
                                                     <th>Stock Number</th>
@@ -115,26 +116,32 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="(item, index) in items" :key="index">
+                                                <tr v-for="item in items" :key="item.id">
                                                     <td>{{ item.stockno }}</td>
                                                     <td>{{ item.unit }}</td>
                                                     <td>{{ item.name }}</td>
                                                     <td>{{ item.descrip }}</td>
                                                     <td>{{ item.qty }}</td>
                                                     <td>₱{{ item.price?.toLocaleString('en-US', {
-                                                        minimumFractionDigits:
-                                                            2, maximumFractionDigits: 2
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2
                                                     }) }}</td>
                                                     <td>₱{{ (item.qty * item.price)?.toLocaleString('en-US', {
-                                                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2
                                                     }) }}</td>
                                                     <td>
                                                         <button class="btn btn-warning btn-sm"
-                                                            @click="showEditItemModal(index)">Edit</button>
+                                                            @click="EditItemModal(item.id)">
+                                                            <font-awesome-icon :icon="['fas', 'pen']" /> &nbsp;Edit
+                                                        </button>
                                                         <button class="btn btn-danger btn-sm"
-                                                            @click="deleteItem(index)">Delete</button>
+                                                            @click="removeList(item.id)">
+                                                            <font-awesome-icon :icon="['fas', 'trash']" /> &nbsp;Delete
+                                                        </button>
                                                     </td>
                                                 </tr>
+
                                             </tbody>
                                         </table>
                                     </div>
@@ -145,7 +152,7 @@
                         <div class="modal" v-if="addItemModalVisible" id="addEditModal"
                             style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
                             <div class="modal-dialog"
-                                style=" margin: auto; position: relative; transform: translateY(20%);">
+                                style=" margin: auto; position: relative; transform: translateY(15%); ">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -201,7 +208,7 @@
                         <div class="modal" v-if="editItemModalVisible" id="viewEditModal"
                             style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
                             <div class="modal-dialog"
-                                style=" margin: auto; position: relative; transform: translateY(20%);">
+                                style=" margin: auto; position: relative; transform: translateY(15%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -214,6 +221,11 @@
                                             <h1>Edit Item</h1>
                                             <div class="form-group">
                                                 <label for="editItemName">Item Name</label>
+                                                <v-select :options="availableItems" v-model="editItem" label="name">
+                                                    <template #option="option">
+                                                        {{ option.name }}
+                                                    </template>
+                                                </v-select>
                                             </div>
                                             <div class="form-group">
                                                 <label for="editItemUnit">Unit</label>
@@ -223,7 +235,7 @@
                                             <div class="form-group">
                                                 <label for="editItemQuantity">Quantity</label>
                                                 <input type="number" class="form-control" id="editItemQuantity"
-                                                    v-model="editItem.quantity">
+                                                    v-model="editItem.qty">
                                             </div>
                                             <div class="form-group">
                                                 <label for="editItemPrice">ABC</label>
@@ -238,14 +250,14 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-light"
-                                            @click="closeEditItemModal">Cancel</button>
-                                        <button type="button" class="btn btn-primary" @click="updateItem">Update
+                                        <button type="button" class="btn btn-light" @click="closeEdit">Cancel</button>
+                                        <button type="button" class="btn btn-primary" @click="editItemList">Update
                                             Item</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
                 <FooterVue />
@@ -339,7 +351,8 @@ export default {
             editItem: { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '' },
             editIndex: -1,
             items: [],
-            isLoading: false
+            isLoading: false,
+            updatedItems: [],
         };
     },
     computed: {
@@ -357,6 +370,11 @@ export default {
         this.fetchItems();
     },
     methods: {
+        showToastSuccess(message) {
+            toast.success(message, {
+                autoClose: 1000,
+            });
+        },
         fetchItems() {
             this.isLoading = true;
             axios.get('/api/fetchItems')
@@ -381,36 +399,21 @@ export default {
             const id = this.$route.query.id;
             axios.get(`../api/viewPurchaseRequest/${id}`)
                 .then(response => {
-                    // console.log("Fetched data:", response.data);
-                    const data = response.data.purchaseRequest;
-                    // console.dir(data);
-                    // Assign other data
-                    this.purchaseRequestData.pr_no = data.pr_no;
-                    this.purchaseRequestData.office = data.office;
-                    this.purchaseRequestData.type = data.type;
-                    this.purchaseRequestData.pr_date = data.pr_date;
-                    this.purchaseRequestData.target_date = data.target_date;
-                    this.purchaseRequestData.particulars = data.particulars;
-                    this.purchaseRequestData.is_urgent = data.is_urgent;
-                    this.purchaseRequestData.qty = data.qty;
-                    this.purchaseRequestData.desc = data.desc;
-                    this.purchaseRequestData.stockno = data.serial_no;
-                    this.purchaseRequestData.item_title = data.item_title;
-                    this.purchaseRequestData.unit = data.unit;
-                    this.purchaseRequestData.status = data.status;
-                    this.purchaseRequestData.status_id = data.status_id;
-                    this.abc = data.abc || 0;
-                    this.items = response.data.pr_items.map(item => ({
+                    const { purchaseRequest, prItems } = response.data;
+                    // Handle your data here, update your modal and form
+                    this.purchaseRequestData = purchaseRequest;
+                    this.items = [...prItems.map(item => ({
+                        id: item.id,
                         stockno: item.serial_no,
                         unit: item.unit,
                         name: item.item_title,
                         descrip: item.description,
                         qty: item.qty,
                         price: item.price
-                    }));
+                    }))];
                 })
                 .catch(error => {
-                    // console.error("There was an error fetching the purchase request data!", error);
+                    console.error('Error fetching purchase request data:', error);
                 });
         },
         showAddItemModal() {
@@ -421,9 +424,17 @@ export default {
         },
         addNewItem() {
             const selectedItem = this.availableItems.find(item => item.id === this.addMoreItem.id);
-            if (selectedItem && this.addMoreItem.qty > 0) {
-                this.items.push({ ...selectedItem, qty: this.addMoreItem.qty, descrip: this.addMoreItem.descrip });
-                this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' };
+            if (selectedItem && Number(this.addMoreItem.qty) > 0) {
+                this.items.push({
+                    id: selectedItem.id,  // Ensure the `id` field is included
+                    stockno: selectedItem.stockno,
+                    unit: selectedItem.unit,
+                    name: selectedItem.name,
+                    descrip: this.addMoreItem.descrip,
+                    qty: this.addMoreItem.qty,
+                    price: selectedItem.price  // Ensure the `price` field is included
+                });
+                this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' };  // Reset the form
                 this.closeAddItemModal();
             } else {
                 alert('Please select an item and enter a valid quantity.');
@@ -437,28 +448,101 @@ export default {
                 this.addMoreItem.unit = selectedItem.unit;
             }
         },
+        EditItemModal(itemId) {
+            // Find the item by its ID
+            const itemIndex = this.items.findIndex(item => item.id === itemId);
+            if (itemIndex === -1) {
+                console.error("Item not found for editing:", itemId);
+                return;
+            }
+            this.editIndex = itemIndex; // Save the index for later reference
+            this.editItem = JSON.parse(JSON.stringify(this.items[itemIndex])); // Copy the item for editing
+            this.editItemModalVisible = true; // Open the modal
+        },
 
-        closeModal() {
-            this.modalVisible = false;
+        closeEdit() {
+            this.editItemModalVisible = false;
+            this.editItem = {};
+        },
+        editItemList() {
+            const qty = Number(this.editItem.qty);
+            if (this.editItem.id && qty > 0) {  // Ensure `id` and `qty` are valid
+                this.items.splice(this.editIndex, 1, { ...this.editItem });  // Update the existing item
+                this.editItemModalVisible = false;
+            } else {
+                alert('Please select an item and enter a valid quantity.');
+            }
+        },
+        updatePurchaseRequestDetails() {
+            console.log("Items being sent to backend:", this.items);  // Log the items array
+            axios.post('/api/post_update_purchaseRequest', {
+                pr_id: this.$route.query.id,
+                pmo: this.purchaseRequestData.office,
+                type: this.purchaseRequestData.type,
+                pr_date: this.purchaseRequestData.pr_date,
+                target_date: this.purchaseRequestData.target_date,
+                purpose: this.purchaseRequestData.particulars,
+                items: this.items.map(item => ({
+                    id: item.id, // Unique identifier for existing items
+                    qty: item.qty,
+                    price: item.price,
+                    descrip: item.descrip || null, // Optional description
+                })),
+            })
+                .then(response => {
+                    toast.success('Purchase request and items updated successfully!', { autoClose: 1000 });
+                    this.fetchPurchaseRequestData();
+                    this.closeEdit();
+                })
+                .catch(error => {
+                    console.error("Error updating purchase request:", error.response?.data || error.message);
+                    toast.error('Failed to update purchase request and items. Please check the console for details.', { autoClose: 1000 });
+                });
+        },
+        removeList(itemId) {
+            // Find the item by its ID
+            const itemIndex = this.items.findIndex(item => item.id === itemId);
+            if (itemIndex === -1) {
+                console.error("Item not found for deletion:", itemId);
+                return;
+            }
+
+            const item = this.items[itemIndex];
+            const item_id = item.id; // Use `id` from the item
+
+            // Use Swal.fire for confirmation
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This item will be permanently deleted.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Proceed with the deletion
+                    axios.post('../api/deletePurchaseRequestItem', {
+                        item_id: item_id // Send the item_id to delete
+                    })
+                        .then(response => {
+                            // Show success toast message
+                            this.showToastSuccess('Item successfully deleted.');
+
+                            // Remove the item from the list
+                            this.items.splice(itemIndex, 1);
+                        })
+                        .catch(error => {
+                            console.error("Failed to delete item:", error.response?.data?.message || error.message);
+                            Swal.fire('Error', 'Failed to delete the item. Please try again.', 'error');
+                        });
+                }
+            });
         },
         exportPurchaseRequest() {
             window.location.href = `../api/export-purchase-request/${this.$route.query.id}?export=true`;
         },
-        updatePurchaseRequestDetails() {
-            axios.post(`../api/post_update_purchaseRequestDetailsForm`, {
-                pr_id: this.$route.query.id,
-                pmo: this.purchaseRequestData.pmo,
-                type: this.purchaseRequestData.category,
-                pr_date: this.purchaseRequestData.pr_date,
-                target_date: this.purchaseRequestData.target_date,
-                purpose: this.purchaseRequestData.particulars,
-                step: 2
-            }).then(() => {
-                toast.success('Successfully added!', { autoClose: 100 });
-            }).catch((error) => {
-                console.error("There was an error updating the purchase request details!", error);
-            });
-        }
+
     },
 };
 </script>

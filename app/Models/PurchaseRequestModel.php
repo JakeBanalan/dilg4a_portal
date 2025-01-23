@@ -17,6 +17,7 @@ class PurchaseRequestModel extends Model
     protected $fillable = [
         'id',
         'pr_no',
+        'purpose',
         'pmo',
         'fund_source',
         'action_officer',

@@ -349,8 +349,8 @@ Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
 Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
-Route::post('post_update_purchaseRequestDetailsForm', [PurchaseRequestController::class, 'post_update_purchaseRequestDetailsForm']);
-
+Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);
+Route::post('deletePurchaseRequestItem', [PurchaseRequestController::class, 'deletePurchaseRequestItem']);
 Route::post('fetchPurchaseReqData', [PurchaseRequestController::class, 'fetchPurchaseReqData']);
 Route::post('updatePurchaseRequestStatus', [PurchaseRequestController::class, 'updatePurchaseRequestStatus']);
 Route::post('fetchSubmittedtoGSS', [PurchaseRequestController::class, 'fetchSubmittedtoGSS']);
