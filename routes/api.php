@@ -59,10 +59,6 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('get_purchase_request_details', [PurchaseRequestController::class, 'getPurchaseRequestDetails']);
-});
-
-Route::middleware('api')->group(function () {
     Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);
 });
 Route::middleware('api')->group(function () {
@@ -174,11 +170,6 @@ Route::middleware('api')->group(function () {
 //     Route::get('/countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
 // });
 
-
-Route::middleware('api')->group(function () {
-    Route::get('countPurchaseRequestStatistics/{cur_year}', [PurchaseRequestController::class, 'countPurchaseRequestStatistics']);
-});
-
 Route::middleware('api')->group(function () {
     Route::get('getActiveAccounts', [HRSController::class, 'getActiveAccounts']);
 });
@@ -191,9 +182,6 @@ Route::middleware('api')->group(function () {
     Route::get('countUserTotalPR/{userId}', [PurchaseRequestController::class, 'countUserTotalPR']);
 });
 
-Route::middleware('api')->group(function () {
-    Route::get('fetchCartItemInfo/{itemSelected}', [PurchaseRequestController::class, 'fetchCartItemInfo']);
-});
 
 
 Route::middleware('api')->group(function () {
@@ -364,9 +352,7 @@ Route::post('post_supplier_quote', [SupplierController::class, 'post_supplier_qu
 Route::post('post_create_abstract', [AbstractController::class, 'post_create_abstract']);
 Route::post('post_create_po', [PurchaseOrderController::class, 'post_create_po']);
 Route::post('total_amount', [PurchaseRequestController::class, 'total_amount']);
-// Route::post('post_update_status', 'PurchaseRequestController@post_update_status')->name('post.update.status');
 Route::post('post_update_status', [PurchaseRequestController::class, 'post_update_status']);
-Route::post('post_addCode', [PurchaseRequestController::class, 'post_addCode']);
 Route::post('fetch_ict_req_details', [RICTUController::class, 'fetch_ict_req_details']);
 
 

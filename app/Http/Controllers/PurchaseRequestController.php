@@ -6,11 +6,7 @@ use Carbon\Carbon;
 use App\Models\AppItemModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
-use Illuminate\Support\Facades\Log;
 use App\Models\PurchaseRequestModel;
-use Illuminate\Support\Facades\Auth;
-
 use App\Models\PurchaseRequestItemModel;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -43,13 +39,9 @@ class PurchaseRequestController extends Controller
     {
         // dd($request->all());
         try {
-            // Start a database transaction
             DB::beginTransaction();
-
-            // Create a new instance of PurchaseRequestModel
             $purchaseRequest = new PurchaseRequestModel();
 
-            // Set the purchase request fields
             $purchaseRequest->pr_no = $request->input('pr_no');
             $purchaseRequest->pmo = $request->input('pmo');
             $purchaseRequest->type = $request->input('type');
@@ -60,13 +52,10 @@ class PurchaseRequestController extends Controller
             $purchaseRequest->is_urgent = $request->input('isUrgent');
             $purchaseRequest->stat = 1;
 
-            // Save the purchase request
             $purchaseRequest->save();
 
-            // Get the PR ID of the newly created purchase request
             $pr_id = $purchaseRequest->id;
 
-            // Process the items array
             $items = $request->input('items');
             foreach ($items as $item) {
                 // Check if the PR ID and item ID combination already exists
@@ -88,40 +77,32 @@ class PurchaseRequestController extends Controller
                         'description'   => $item['description'],
                         'qty'           => $item['quantity'],
                         'abc'           => $item['quantity'] * $item['price'],
-                        'date_added'    => now(), // Automatically set the date_added field to the current date and time
-                        'flag'          => 1, // Set the flag field to a default value of 1
+                        'date_added'    => now(),
+                        'flag'          => 1,
                     ]);
                     $pr_opts->save();
                 }
             }
 
-            // Update the current step of the purchase request
+
             $purchaseRequest->current_step = $request->input('step');
             $purchaseRequest->save();
 
-            // Commit the database transaction
             DB::commit();
 
-            // Return a response indicating success
             return response()->json(['message' => 'Purchase request and items created successfully']);
         } catch (\Exception $e) {
-            // Rollback the database transaction in case of an error
             DB::rollback();
-            Log::error($e->getMessage());
-            // Return a response indicating failure
             return response()->json(['message' => 'Failed to create purchase request and items'], 500);
         }
     }
 
     public function post_update_purchaseRequest(Request $request)
     {
-        DB::beginTransaction();  // Start the transaction
+        DB::beginTransaction();
 
         try {
-            // Retrieve the purchase request using pr_id
             $purchaseRequest = PurchaseRequestModel::find($request->input('pr_id'));
-
-            // Check if the purchase request exists
             if (!$purchaseRequest) {
                 return response()->json(['message' => 'Purchase request not found'], 404);
             }
@@ -129,10 +110,10 @@ class PurchaseRequestController extends Controller
             // Validate the items array
             $validatedData = $request->validate([
                 'items' => 'required|array',
-                'items.*.id' => 'required|integer',  // Ensure every item has an 'id'
-                'items.*.qty' => 'required|numeric|min:1',  // Ensure 'qty' is a number >= 1
-                'items.*.price' => 'required|numeric|min:0',  // Ensure 'price' is a number >= 0
-                'items.*.descrip' => 'nullable|string',  // 'descrip' is optional
+                'items.*.id' => 'required|integer',
+                'items.*.qty' => 'required|numeric|min:1',
+                'items.*.price' => 'required|numeric|min:0',
+                'items.*.descrip' => 'nullable|string',
             ]);
 
             // Update or add items (if any)
@@ -148,9 +129,9 @@ class PurchaseRequestController extends Controller
                         'description' => $item['descrip'],
                     ]);
                 } else {
-                    // Check for duplicates before creating a new record
+
                     $isDuplicate = PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)
-                        ->where('pr_item_id', $item['id']) // Ensure item ID matches
+                        ->where('pr_item_id', $item['id'])
                         ->exists();
 
                     if (!$isDuplicate) {
@@ -168,16 +149,14 @@ class PurchaseRequestController extends Controller
             }
 
 
+            DB::commit();
 
-            DB::commit();  // Commit the transaction
-
-            // Return the updated items
             return response()->json([
                 'message' => 'Purchase request items updated successfully',
                 'items' => PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)->get(),
             ]);
         } catch (\Exception $e) {
-            DB::rollBack();  // Rollback the transaction if an error occurs
+            DB::rollBack();
             return response()->json(['message' => 'Failed to update purchase request items'], 500);
         }
     }
@@ -327,10 +306,10 @@ class PurchaseRequestController extends Controller
             }
         }
 
-        // Save the changes
+
         $purchaseRequest->save();
 
-        // Return a response
+
         return response()->json(['message' => 'Purchase request updated successfully']);
     }
 
@@ -338,24 +317,23 @@ class PurchaseRequestController extends Controller
     public function deletePurchaseRequestItem(Request $request)
     {
         try {
-            // Retrieve the item_id from the request
-            $item_id = $request->input('item_id');  // Assuming 'item_id' is the ID of the record in the 'pr_items' table
 
-            // Find and delete the item by its ID
-            $item = PurchaseRequestItemModel::find($item_id);  // Use `find()` to retrieve by primary key (id)
+            $item_id = $request->input('item_id');
+
+            $item = PurchaseRequestItemModel::find($item_id);
 
             if ($item) {
-                // Delete the item from the database
+
                 $item->delete();
 
-                // Return success response
+
                 return response()->json(['message' => 'Item deleted successfully.']);
             } else {
-                // If the item doesn't exist, return 'Item not found' message
+
                 return response()->json(['message' => 'Item not found'], 404);
             }
         } catch (\Exception $e) {
-            // In case of an exception, return error response
+
             return response()->json(['message' => 'Failed to delete item.'], 500);
         }
     }
@@ -458,90 +436,5 @@ class PurchaseRequestController extends Controller
         return response()->json(PurchaseRequestModel::select(PurchaseRequestModel::raw('count(*) as total_pr'))
             ->where('action_officer', $userId)
             ->get());
-    }
-
-    public function fetchCartItemInfo($itemSelected)
-    {
-
-        return response()->json(AppItemModel::select(AppItemModel::raw('unit.item_unit_title as `unit`,tbl_app.app_price'))
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
-            ->where('tbl_app.id', $itemSelected)
-            ->get());
-    }
-
-    public function post_update_cart(Request $request)
-    {
-        PurchaseRequestItemModel::where('pr_id', $request->input('pr_id'))
-            ->where('pr_item_id', $request->input('pr_item_id'))
-            ->update([
-                'qty' => $request->input('qty'),
-                'description' => $request->input('desc'),
-                'pr_item_id' => $request->input('sel_app_id')
-            ]);
-        return response()->json(['message' => 'Cart details updated successfully']);
-    }
-    public function post_update_status(Request $request)
-    {
-        if (!is_array($request->input('pr_id')) || $request->input('status') == 2) {
-
-            PurchaseRequestModel::where('id', $request->input('pr_id'))
-                ->update([
-                    'stat' => $request->input('status'),
-                    'submitted_date_budget' => Carbon::now(), // Set 'submitted_date_budget' to current date and time
-                ]);
-        } else {
-
-            PurchaseRequestModel::whereIn('id', $request->input('pr_id'))
-                ->update([
-                    'stat' => $request->input('status'),
-                ]);
-        }
-
-        // DB::enableQueryLog();
-
-        // dd(DB::getQueryLog());
-
-        return response()->json(['message' => 'Purchase Request updated successfully']);
-    }
-
-    public function countPurchaseRequestStatistics($cur_year)
-    {
-        return response()->json(
-            PurchaseRequestModel::select(
-                PurchaseRequestModel::raw('COUNT(*) as total_pr'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 1 THEN 1 END) as draft'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 2 THEN 1 END) as submitted_to_budget'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 3 THEN 1 END) as received_by_budget'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 4 THEN 1 END) as submitted_to_gss'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 5 THEN 1 END) as received_by_gss'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 6 THEN 1 END) as with_rfq'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 7 THEN 1 END) as awarded'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 8 THEN 1 END) as with_purchase_order'),
-            )
-                ->whereYear('date_added', 2024)
-                ->get()
-        );
-    }
-
-    public function getPurchaseRequest(Request $request)
-    {
-        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('id,pr_no,purpose,submitted_date_budget'))
-            ->where('stat', SUBMITTED_TO_BUDGET);
-        $pr_opts = $query->get();
-        return response()->json($pr_opts);
-    }
-    public function post_addCode(Request $request)
-    {
-
-        // Update the record
-        PurchaseRequestModel::where('id', $request->input('id'))
-            ->update([
-                'availability_code' => $request->input('code'),
-                'stat' => RECEIVED_BY_BUDGET
-            ]);
-
-
-        // You can return a response, if needed
-        return response()->json(['message' => 'Purchase request details updated successfully']);
     }
 }
