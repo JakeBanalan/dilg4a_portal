@@ -355,6 +355,7 @@ export default {
             isLoading: false,
             updatedItems: [],
             isExporting: false,
+            isTemporary:[]
         };
     },
     computed: {
@@ -428,15 +429,16 @@ export default {
             const selectedItem = this.availableItems.find(item => item.id === this.addMoreItem.id);
             if (selectedItem && Number(this.addMoreItem.qty) > 0) {
                 this.items.push({
-                    id: selectedItem.id,  // Ensure the `id` field is included
+                    id: selectedItem.id, // Retain the ID for lookup
                     stockno: selectedItem.stockno,
                     unit: selectedItem.unit,
                     name: selectedItem.name,
                     descrip: this.addMoreItem.descrip,
                     qty: this.addMoreItem.qty,
-                    price: selectedItem.price  // Ensure the `price` field is included
+                    price: selectedItem.price,
+                    isTemporary: true // Mark this item as temporary
                 });
-                this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' };  // Reset the form
+                this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' }; // Reset the form
                 this.closeAddItemModal();
             } else {
                 alert('Please select an item and enter a valid quantity.');
@@ -476,7 +478,6 @@ export default {
             }
         },
         updatePurchaseRequestDetails() {
-            console.log("Items being sent to backend:", this.items);  // Log the items array
             axios.post('/api/post_update_purchaseRequest', {
                 pr_id: this.$route.query.id,
                 pmo: this.purchaseRequestData.office,
@@ -497,12 +498,10 @@ export default {
                     this.closeEdit();
                 })
                 .catch(error => {
-                    console.error("Error updating purchase request:", error.response?.data || error.message);
                     toast.error('Failed to update purchase request and items. Please check the console for details.', { autoClose: 1000 });
                 });
         },
         removeList(itemId) {
-            // Find the item by its ID
             const itemIndex = this.items.findIndex(item => item.id === itemId);
             if (itemIndex === -1) {
                 console.error("Item not found for deletion:", itemId);
@@ -510,9 +509,27 @@ export default {
             }
 
             const item = this.items[itemIndex];
-            const item_id = item.id; // Use `id` from the item
 
-            // Use Swal.fire for confirmation
+            // If the item is temporary, remove it directly without making a backend call
+            if (item.isTemporary) {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: 'This temporary item will be removed.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, remove it!',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        this.items.splice(itemIndex, 1); // Remove from the list
+                        this.showToastSuccess('Temporary item removed.');
+                    }
+                });
+                return;
+            }
+
+            // For persisted items, send a request to the backend
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'This item will be permanently deleted.',
@@ -523,19 +540,14 @@ export default {
                 confirmButtonText: 'Yes, delete it!',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Proceed with the deletion
                     axios.post('../api/deletePurchaseRequestItem', {
-                        item_id: item_id // Send the item_id to delete
+                        item_id: item.id // Send the ID to the backend
                     })
                         .then(response => {
-                            // Show success toast message
                             this.showToastSuccess('Item successfully deleted.');
-
-                            // Remove the item from the list
-                            this.items.splice(itemIndex, 1);
+                            this.items.splice(itemIndex, 1); // Remove from the list
                         })
                         .catch(error => {
-                            console.error("Failed to delete item:", error.response?.data?.message || error.message);
                             Swal.fire('Error', 'Failed to delete the item. Please try again.', 'error');
                         });
                 }
