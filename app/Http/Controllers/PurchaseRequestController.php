@@ -235,6 +235,55 @@ class PurchaseRequestController extends Controller
         return response()->json($prData);
     }
 
+    public function perUserPurchaseReqData(Request $request)
+    {
+        $page = $request->query('page', 1); // Default to page 1 if not provided
+        $itemsPerPage = $request->query('itemsPerPage', 10); // Default to 10 items per page
+        $userId = $request->input('user_id', auth()->id()); // Use provided user_id or authenticated user
+
+        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
+            pr.id AS `id`,
+            MAX(pr.pr_no) AS `pr_no`,
+            MAX(pr.action_officer) AS `user_id`,
+            CONCAT(MAX(users.first_name), " ", MAX(users.last_name)) AS `created_by`,
+            MAX(pr.current_step) AS `step`,
+            MAX(pmo.pmo_title) AS `office`,
+            MAX(pr.submitted_by) AS `submitted_by`,
+            MAX(pr.purpose) AS `particulars`,
+            MAX(pr.pr_date) AS `pr_date`,
+            MAX(pr.target_date) AS `target_date`,
+            MAX(pr.is_urgent) AS `is_urgent`,
+            MAX(pr_items.qty) AS `quantity`,
+            MAX(pr_items.description) AS `desc`,
+            MAX(mode.mode_of_proc_title) AS `type`,
+            MAX(app.sn) AS `serial_no`,
+            MAX(app.item_title) AS `item_title`,
+            MAX(unit.item_unit_title) AS `unit`,
+            MAX(status.title) AS `status`,
+            MAX(status.id) AS `status_id`,
+            SUM(pr_items.qty * app.app_price) AS `app_price`
+        '))
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
+            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
+            ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
+            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
+            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id') // Adjusted join
+            ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
+            ->where('pr.action_officer', $userId) // Filter by the user_id
+            ->orderBy('pr.id', 'desc')
+            ->groupBy('pr.id');
+
+        try {
+            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching data.'], 500);
+        }
+
+        return response()->json($prData);
+    }
+
+
 
     public function viewPurchaseRequest($id)
     {

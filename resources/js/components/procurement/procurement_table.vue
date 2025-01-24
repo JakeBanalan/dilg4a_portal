@@ -159,7 +159,7 @@ export default {
     },
     components: {
         Pagination,
-        FontAwesomeIcon
+        FontAwesomeIcon,
     },
     computed: {
         totalRecords() {
@@ -175,115 +175,124 @@ export default {
             const end = Math.min(start + this.itemsPerPage - 1, this.totalRecords);
             return `Showing ${start} to ${end} of ${this.totalRecords} entries`;
         },
-
     },
     created() {
         this.userId = parseInt(localStorage.getItem('userId'));
         this.role = localStorage.getItem('user_role');
     },
     mounted() {
-        this.loadData();
+        // Load data for specific user or all users based on role
+        if (this.role === 'admin') {
+            this.loadData(); // Admin sees all requests
+        } else {
+            this.loadDataPerUser(); // Non-admin sees only their own requests
+        }
     },
     methods: {
-        isAdmin() {
-            return this.admins.includes(this.userId);
-        },
         dateFormat(date) {
             return formatDate(date);
         },
         loadData() {
-            axios.post(`../api/fetchPurchaseReqData`)
-                .then(response => {
-                    this.purchaseRequests = response.data.data.map(pr => ({
+            axios
+                .post(`../api/fetchPurchaseReqData`)
+                .then((response) => {
+                    this.purchaseRequests = response.data.data.map((pr) => ({
                         ...pr,
                         isBudgetSubmitted: false,
                         isGSSSubmitted: false,
                     }));
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Error fetching data:', error);
+                });
+        },
+        loadDataPerUser() {
+            axios
+                .post(`../api/perUserPurchaseReqData`, { user_id: this.userId }) // Send userId in the payload
+                .then((response) => {
+                    this.purchaseRequests = response.data.data.map((pr) => ({
+                        ...pr,
+                        isBudgetSubmitted: false,
+                        isGSSSubmitted: false,
+                    }));
+                })
+                .catch((error) => {
+                    console.error('Error fetching user-specific data:', error);
                 });
         },
         onPageChange(page) {
             this.currentPage = page;
-            this.loadData();
+            // Reload user-specific or general data based on role
+            if (this.role === 'admin') {
+                this.loadData();
+            } else {
+                this.loadDataPerUser();
+            }
         },
         viewPr(pr_id, step_no) {
             this.$router.push({ path: '/procurement/update_pr', query: { id: pr_id, step: step_no } });
         },
-        exportPurchaseRequest(pr_id) {
-            window.location.href = `../api/export-purchase-request/${pr_id}?export=true`;
-        },
         toBudget(id) {
-            axios.post(`../api/updatePurchaseRequestStatus`, {
-                id: id,
-                status: 2, // Update status to "Budget"
-                is_budget_submitted: true, // Mark as submitted to Budget
-                submitted_date: null, // Set submitted date
-            })
-                .then(response => {
-                    const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
+            axios
+                .post(`../api/updatePurchaseRequestStatus`, {
+                    id: id,
+                    status: 2,
+                    is_budget_submitted: true,
+                })
+                .then(() => {
+                    const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
-                        updatedRequest.isBudgetSubmitted = true; // Update frontend state for Budget
-                        // Do not update isGSSSubmitted here
+                        updatedRequest.isBudgetSubmitted = true;
                     }
                     toast.success('Successfully submitted to the Budget!', { autoClose: 2000 });
-
-                    // Reload data after 2 seconds
                     setTimeout(() => {
-                        this.loadData();
+                        this.loadDataPerUser();
                     }, 2000);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Error updating status:', error);
                     toast.error('Failed to submit to the Budget. Please try again.', { autoClose: 2000 });
                 });
         },
         toGSS(id) {
-            axios.post(`../api/updatePurchaseRequestStatus`, {
-                id: id,
-                status: 4, // Update status to "GSS"
-                is_gss_submitted: true, // Mark as submitted to GSS
-                submitted_date_gss: null, // Set submitted date
-            })
-                .then(response => {
-                    const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
+            axios
+                .post(`../api/updatePurchaseRequestStatus`, {
+                    id: id,
+                    status: 4,
+                    is_gss_submitted: true,
+                })
+                .then(() => {
+                    const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
-                        updatedRequest.isGSSSubmitted = true; // Update frontend state for GSS
-                        // Do not update isBudgetSubmitted here
+                        updatedRequest.isGSSSubmitted = true;
                     }
                     toast.success('Successfully submitted to the GSS!', { autoClose: 2000 });
-
-                    // Reload data after 2 seconds
                     setTimeout(() => {
-                        this.loadData();
+                        this.loadDataPerUser();
                     }, 2000);
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error('Error updating status:', error);
                     toast.error('Failed to submit to the GSS. Please try again.', { autoClose: 2000 });
                 });
         },
         cancelTransaction(id) {
             this.updatePurchaseRequestStatus(id, 9);
-            const updatedRequest = this.purchaseRequests.find(pr => pr.id === id);
+            const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
             if (updatedRequest) {
-                updatedRequest.status_id = 9; // Cancelled Transaction
+                updatedRequest.status_id = 9;
             }
             toast.success('Successfully Cancelled!', { autoClose: 2000 });
             setTimeout(() => {
-                this.loadData();
+                this.loadDataPerUser();
             }, 2000);
         },
         updatePurchaseRequestStatus(id, status) {
-            axios.post(`../api/updatePurchaseRequestStatus`, { id, status })
-                .then(response => {
-                    // console.log('Status updated:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error updating status:', error);
-                });
+            axios.post(`../api/updatePurchaseRequestStatus`, { id, status }).catch((error) => {
+                console.error('Error updating status:', error);
+            });
         },
     },
 };
+
 </script>

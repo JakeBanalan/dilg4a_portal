@@ -340,6 +340,7 @@ Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'p
 Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);
 Route::post('deletePurchaseRequestItem', [PurchaseRequestController::class, 'deletePurchaseRequestItem']);
 Route::post('fetchPurchaseReqData', [PurchaseRequestController::class, 'fetchPurchaseReqData']);
+Route::post('perUserPurchaseReqData', [PurchaseRequestController::class, 'perUserPurchaseReqData']);
 Route::post('updatePurchaseRequestStatus', [PurchaseRequestController::class, 'updatePurchaseRequestStatus']);
 Route::post('fetchSubmittedtoGSS', [PurchaseRequestController::class, 'fetchSubmittedtoGSS']);
 Route::post('fetch_app_item', [SupplierController::class, 'fetch_app_item']);
