@@ -73,20 +73,20 @@ export default {
         }
     },
     mounted() {
-        this.fetch_total_pr();
+        // this.fetch_total_pr();
     },
     methods: {
-        fetch_total_pr() {
-            this.$count('/api/countPurchaseRequestStatistics', 2024)
-                .then(data =>
-                {
-                    this.total_pr = data.total_pr;
-                    this.rfq_count = data.with_rfq;
-                    this.awarded = data.awarded;
-                    this.po_count = data.with_purchase_order;
-                })
-                .catch(error => { console.error(error) })
-        }
+        // fetch_total_pr() {
+        //     this.$count('/api/countPurchaseRequestStatistics', 2024)
+        //         .then(data =>
+        //         {
+        //             this.total_pr = data.total_pr;
+        //             this.rfq_count = data.with_rfq;
+        //             this.awarded = data.awarded;
+        //             this.po_count = data.with_purchase_order;
+        //         })
+        //         .catch(error => { console.error(error) })
+        // }
     },
 }
 </script>

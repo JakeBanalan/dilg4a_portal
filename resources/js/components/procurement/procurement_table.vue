@@ -125,6 +125,7 @@
         </tbody>
 
     </table>
+    <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
     <Pagination :total="totalRecords" :currentPage="currentPage" :itemsPerPage="itemsPerPage"
         @pageChange="onPageChange" />
 </template>
@@ -156,6 +157,22 @@ export default {
             required: false,
             default: () => ({}),
         },
+        filterParams: {
+            type: Object,
+            default: () => ({})
+        }
+    },
+    watch: {
+        filterParams: {
+            handler() {
+                if (this.role === 'admin') {
+                    this.loadData(this.filterParams);
+                } else {
+                    this.loadDataPerUser(this.filterParams);
+                }
+            },
+            deep: true
+        }
     },
     components: {
         Pagination,
@@ -166,9 +183,18 @@ export default {
             return this.purchaseRequests.length;
         },
         displayedItems() {
+            const filterParams = this.filterParams;
+            const filteredRequests = this.purchaseRequests.filter(item => {
+                return (
+                    (!filterParams.pr_no || item.pr_no.includes(filterParams.pr_no)) &&
+                    (!filterParams.pr_date || item.pr_date === filterParams.pr_date) &&
+                    (!filterParams.pmo || item.office === filterParams.pmo) &&
+                    (!filterParams.status || item.status === filterParams.status)
+                );
+            });
             const start = (this.currentPage - 1) * this.itemsPerPage;
             const end = start + this.itemsPerPage;
-            return this.purchaseRequests.slice(start, end);
+            return filteredRequests.slice(start, end);
         },
         showingEntriesMessage() {
             const start = (this.currentPage - 1) * this.itemsPerPage + 1;

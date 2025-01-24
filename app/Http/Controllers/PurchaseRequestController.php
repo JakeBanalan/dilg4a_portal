@@ -193,7 +193,11 @@ class PurchaseRequestController extends Controller
     {
         $page = $request->query('page', 1); // Default to page 1 if not provided
         $itemsPerPage = $request->query('itemsPerPage', 100); // Consider a lower default
-
+        $prNo = $request->input('pr_no');
+        $actionOfficer = $request->input('action_officer');
+        $prDate = $request->input('pr_date');
+        $pmo = $request->input('pmo');
+        $status = $request->input('status');
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
             pr.id AS `id`,
             MAX(pr.pr_no) AS `pr_no`,
@@ -225,6 +229,21 @@ class PurchaseRequestController extends Controller
             ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
             ->orderBy('pr.id', 'desc')
             ->groupBy('pr.id');
+        if ($prNo) {
+            $query->where('pr.pr_no', 'like', '%' . $prNo . '%');
+        }
+
+        if ($prDate) {
+            $query->whereDate('pr.pr_date', $prDate);
+        }
+
+        if ($pmo) {
+            $query->where('pmo.pmo_title', 'like', '%' . $pmo . '%');
+        }
+
+        if ($status) {
+            $query->where('status.title', 'like', '%' . $status . '%');
+        }
 
         try {
             $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
