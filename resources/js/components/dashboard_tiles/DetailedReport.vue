@@ -129,7 +129,7 @@ export default {
                 pr_no: '',
                 pr_date: '',
                 pmo: null,
-                status: null,
+                stat: null,
             },
             pmo: [
                 { label: "ORD-Legal", value: "ORD-Legal" },
@@ -142,7 +142,7 @@ export default {
                 { label: "LGMED", value: "LGMED" }
             ],
             stat: [
-                { label: 'Draft', value: "Draft" },
+                { label: 'DRAFT', value: "DRAFT" },
                 { label: 'Submitted to GSS', value: "Submitted to GSS" },
                 { label: 'Submitted to Budget', value: "Submitted to Budget" },
                 { label: 'Cancelled', value: "Cancelled" }

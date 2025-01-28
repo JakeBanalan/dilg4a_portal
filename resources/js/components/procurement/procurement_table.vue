@@ -183,8 +183,18 @@ export default {
     },
     computed: {
         totalRecords() {
-            return this.purchaseRequests.length;
+            const filterParams = this.filterParams;
+            const filteredRequests = this.purchaseRequests.filter(item => {
+                return (
+                    (!filterParams.pr_no || item.pr_no.includes(filterParams.pr_no)) &&
+                    (!filterParams.pr_date || item.pr_date === filterParams.pr_date) &&
+                    (!filterParams.pmo || item.office === filterParams.pmo) &&
+                    (!filterParams.status || item.status === filterParams.status)
+                );
+            });
+            return filteredRequests.length;
         },
+
         displayedItems() {
             const filterParams = this.filterParams;
             const filteredRequests = this.purchaseRequests.filter(item => {
@@ -199,6 +209,7 @@ export default {
             const end = start + this.itemsPerPage;
             return filteredRequests.slice(start, end);
         },
+
         showingEntriesMessage() {
             const start = (this.currentPage - 1) * this.itemsPerPage + 1;
             const end = Math.min(start + this.itemsPerPage - 1, this.totalRecords);

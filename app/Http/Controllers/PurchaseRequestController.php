@@ -192,7 +192,7 @@ class PurchaseRequestController extends Controller
     public function fetchPurchaseReqData(Request $request)
     {
         $page = $request->query('page', 1); // Default to page 1 if not provided
-        $itemsPerPage = $request->query('itemsPerPage', 100); // Consider a lower default
+        $itemsPerPage = $request->query('itemsPerPage', 10000); // Consider a lower default
         $prNo = $request->input('pr_no');
         $actionOfficer = $request->input('action_officer');
         $prDate = $request->input('pr_date');
@@ -257,7 +257,7 @@ class PurchaseRequestController extends Controller
     public function perUserPurchaseReqData(Request $request)
     {
         $page = $request->query('page', 1); // Default to page 1 if not provided
-        $itemsPerPage = $request->query('itemsPerPage', 10); // Default to 10 items per page
+        $itemsPerPage = $request->query('itemsPerPage', 10000); // Default to 10 items per page
         $userId = $request->input('user_id', auth()->id()); // Use provided user_id or authenticated user
 
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
