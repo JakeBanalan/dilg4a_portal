@@ -165,6 +165,7 @@ export default {
     watch: {
         filterParams: {
             handler() {
+                this.currentPage = 1; // Reset currentPage to 1
                 if (this.role === 'admin') {
                     this.loadData(this.filterParams);
                 } else {

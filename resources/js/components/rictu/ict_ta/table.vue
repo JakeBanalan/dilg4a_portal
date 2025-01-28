@@ -265,7 +265,7 @@ export default {
         },
         load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = null, quarter = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
-
+            this.currentPage = 1; // Reset currentPage to 1
             const params = {
                 ...(controlNo && { control_no: controlNo }),
                 ...(requestedBy && { requested_by: requestedBy }),

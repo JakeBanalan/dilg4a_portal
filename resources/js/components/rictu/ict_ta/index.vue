@@ -207,6 +207,7 @@ export default {
             this.modalVisible = false;
         },
         filter() {
+
             const status = this.selected_status ? this.selected_status.value : null;
             const controlNo = this.control_no;
             const requestedBy = this.requested_by;
