@@ -109,7 +109,9 @@
                 </td>
                 <td>
                     <div class="badge badge-default">
-                        <b>{{ purchaseRequest.pr_no }}</b><br><i>~{{ purchaseRequest.office }}~</i>
+                        <span style="font-size: 10pt; font-weight: bold;">{{ purchaseRequest.pr_no }}</span>
+                        <br>
+                        <span style="font-style: italic; user-select: none;">~{{ purchaseRequest.office }}~</span>
                         <br>
                         <div v-show="purchaseRequest.is_urgent == 1" class="badge badge-danger">
                             URGENT
