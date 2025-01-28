@@ -142,9 +142,14 @@ export default {
                 { label: "LGMED", value: "LGMED" }
             ],
             stat: [
-                { label: 'DRAFT', value: "DRAFT" },
+                { label: 'Draft', value: "Draft" },
                 { label: 'Submitted to GSS', value: "Submitted to GSS" },
                 { label: 'Submitted to Budget', value: "Submitted to Budget" },
+                { label: 'Received by Budget', value: "Received by Budget" },
+                { label: 'Received by GSS', value: "Received by GSS" },
+                { label: 'With RFQ', value: "With RFQ" },
+                { label: 'With Purchase Order', value: "With Purchase Order" },
+                { label: 'Awarded', value: "Awarded" },
                 { label: 'Cancelled', value: "Cancelled" }
             ],
             selected_status: null,

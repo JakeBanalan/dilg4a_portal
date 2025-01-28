@@ -284,14 +284,27 @@ export default {
                     if (updatedRequest) {
                         updatedRequest.isBudgetSubmitted = true;
                     }
-                    toast.success('Successfully submitted to the Budget!', { autoClose: 2000 });
-                    setTimeout(() => {
-                        this.loadDataPerUser();
-                    }, 2000);
+                    toast.success('Successfully submitted to the Budget!', {
+                        autoClose: 2000, onClose: () => {
+                            if (this.role === 'admin') {
+                                this.loadData();
+                            } else {
+                                this.loadDataPerUser();
+                            }
+                        }
+                    });
                 })
                 .catch((error) => {
                     console.error('Error updating status:', error);
-                    toast.error('Failed to submit to the Budget. Please try again.', { autoClose: 2000 });
+                    toast.error('Failed to submit to the Budget. Please try again.', {
+                        autoClose: 2000, onClose: () => {
+                            if (this.role === 'admin') {
+                                this.loadData();
+                            } else {
+                                this.loadDataPerUser();
+                            }
+                        }
+                    });
                 });
         },
         toGSS(id) {
@@ -306,14 +319,27 @@ export default {
                     if (updatedRequest) {
                         updatedRequest.isGSSSubmitted = true;
                     }
-                    toast.success('Successfully submitted to the GSS!', { autoClose: 2000 });
-                    setTimeout(() => {
-                        this.loadDataPerUser();
-                    }, 2000);
+                    toast.success('Successfully submitted to the GSS!', {
+                        autoClose: 2000, onClose: () => {
+                            if (this.role === 'admin') {
+                                this.loadData();
+                            } else {
+                                this.loadDataPerUser();
+                            }
+                        }
+                    });
                 })
                 .catch((error) => {
                     console.error('Error updating status:', error);
-                    toast.error('Failed to submit to the GSS. Please try again.', { autoClose: 2000 });
+                    toast.error('Failed to submit to the GSS. Please try again.', {
+                        autoClose: 2000, onClose: () => {
+                            if (this.role === 'admin') {
+                                this.loadData();
+                            } else {
+                                this.loadDataPerUser();
+                            }
+                        }
+                    });
                 });
         },
         cancelTransaction(id) {
