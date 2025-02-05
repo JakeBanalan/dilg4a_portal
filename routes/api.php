@@ -1,30 +1,31 @@
 <?php
 
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AppItemController;
-use App\Http\Controllers\PurchaseRequestController;
-use App\Http\Controllers\RFQController;
-use App\Http\Controllers\RICTUController;
-use App\Http\Controllers\CalendarController;
-use App\Http\Controllers\CRUDController;
-use App\Http\Controllers\AbstractController;
-use App\Http\Controllers\HRSController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Controllers\PositionController;
-use App\Http\Controllers\QMSController;
-use App\Http\Controllers\QMSQuarterlyExportController;
-use App\Http\Controllers\QMSMonthlyExportController;
-use App\Http\Controllers\QMSQuarterlyLNDController;
-use App\Http\Controllers\UserManagementController;
-
-use App\Models\AppItemModel;
-use App\Models\PurchaseRequestItemModel;
-use App\Models\PurchaseRequestModel;
 use App\Models\RICTUModel;
+use App\Models\AppItemModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use App\Models\PurchaseRequestModel;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HRSController;
+use App\Http\Controllers\QMSController;
+use App\Http\Controllers\RFQController;
+use App\Http\Controllers\CRUDController;
+use App\Http\Controllers\UserController;
+use App\Models\PurchaseRequestItemModel;
+use App\Http\Controllers\RICTUController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\AppItemController;
+use App\Http\Controllers\AbstractController;
+use App\Http\Controllers\CalendarController;
+
+use App\Http\Controllers\PositionController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\PurchaseRequestController;
+use App\Http\Controllers\QMSQuarterlyLNDController;
+use App\Http\Controllers\QMSMonthlyExportController;
+use App\Http\Controllers\QMSQuarterlyExportController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -59,9 +60,6 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);
-});
-Route::middleware('api')->group(function () {
     Route::get('appitems', [AppItemController::class, 'getAppData']);
 });
 
@@ -79,9 +77,6 @@ Route::middleware('api')->group(function () {
     Route::get('load_abstract_data', [AbstractController::class, 'load_abstract_data']);
 });
 
-Route::middleware('api')->group(function () {
-    Route::get('getPurchaseRequest', [PurchaseRequestController::class, 'getPurchaseRequest']);
-});
 
 Route::middleware('api')->group(function () {
     Route::get('generatePurchaseRequestNo', [PurchaseRequestController::class, 'generatePurchaseRequestNo']);
@@ -138,11 +133,11 @@ Route::middleware('api')->group(function () {
     Route::get('countTotalItem/{cur_year}', [AppItemController::class, 'countTotalItem']);
 });
 
-Route::middleware('api')->group(function(){
+Route::middleware('api')->group(function () {
     Route::get('totalCountICTRequest/{year}', [RICTUController::class, 'totalCountICTrequest']);
 });
 
-Route::middleware('api')->group(function(){
+Route::middleware('api')->group(function () {
     Route::get('totalCountDraft', [RICTUController::class, 'totalCountDraft']);
 });
 
@@ -290,6 +285,12 @@ Route::middleware('api')->group(function () {
     Route::get('fetchMonthlyData/{id}/{qoe_id}', [QMSController::class, 'fetchMonthlyData']);
 });
 
+//BUDGET GET
+
+Route::middleware('api')->group(function () {
+    Route::get('getPurchaseRequest', [BudgetController::class, 'getPurchaseRequest']);
+    Route::get('getPurchaseOrder', [BudgetController::class, 'getPurchaseOrder']);
+});
 
 //USER MANAGEMENT GET
 Route::middleware('api')->group(function () {
@@ -359,7 +360,8 @@ Route::post('post_complete', [CRUDController::class, 'post_complete']);
 Route::post('post_received_ict_request', [CRUDController::class, 'post_received_ict_request']);
 Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSmallestQuotationsForItems']);
 
-
+//BUDGET POST
+Route::post('post_addCode', [BudgetController::class, 'insertCode']);
 
 
 // R F Q

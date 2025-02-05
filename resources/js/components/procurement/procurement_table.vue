@@ -273,10 +273,12 @@ export default {
             this.$router.push({ path: '/procurement/update_pr', query: { id: pr_id, step: step_no } });
         },
         toBudget(id) {
+            const userId = localStorage.getItem('userId');
             axios
                 .post(`../api/updatePurchaseRequestStatus`, {
                     id: id,
                     status: 2,
+                    submitted_by: userId,
                     is_budget_submitted: true,
                 })
                 .then(() => {
@@ -308,10 +310,12 @@ export default {
                 });
         },
         toGSS(id) {
+            const userId = localStorage.getItem('userId');
             axios
                 .post(`../api/updatePurchaseRequestStatus`, {
                     id: id,
                     status: 4,
+                    submitted_by_gss: userId,
                     is_gss_submitted: true,
                 })
                 .then(() => {

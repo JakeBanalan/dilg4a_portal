@@ -372,13 +372,15 @@ class PurchaseRequestController extends Controller
         if ($request->has('is_budget_submitted')) {
             $purchaseRequest->is_budget_submitted = $request->input('is_budget_submitted');
             if ($purchaseRequest->is_budget_submitted) {
-                $purchaseRequest->submitted_date = Carbon::now();
+                $purchaseRequest->submitted_by = $request->input('submitted_by');
+                $purchaseRequest->submitted_date_budget = Carbon::now();
             }
         }
 
         if ($request->has('is_gss_submitted')) {
             $purchaseRequest->is_gss_submitted = $request->input('is_gss_submitted');
             if ($purchaseRequest->is_gss_submitted) {
+                $purchaseRequest->submitted_by_gss = $request->input('submitted_by_gss');
                 $purchaseRequest->submitted_date_gss = Carbon::now();
             }
         }

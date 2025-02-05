@@ -17,19 +17,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
 
 class SupplierController extends Controller
 {
-    public function getPurchaseOrder()
-    {
 
-        $result = DB::table('tbl_supplier_quotation')
-        ->select('s.id', 's.supplier_title', 'po.po_no', DB::raw('SUM(tbl_supplier_quotation.quotation) AS total_quotation'))
-        ->leftJoin('supplier as s', 's.id', '=', 'tbl_supplier_quotation.supplier_id')
-        ->leftJoin('tbl_abstract as a', 'a.rfq_id', '=', 'tbl_supplier_quotation.rfq_id')
-        ->leftJoin('tbl_purchase_order as po', 'po.abstract_id', '=', 'a.id')
-        ->where('tbl_supplier_quotation.winner', 1)
-        ->groupBy('s.id', 's.supplier_title', 'po.po_no')
-        ->get();
-        return response()->json($result);
-    }
 
 
     public function fetch_supplier()
@@ -42,7 +30,7 @@ class SupplierController extends Controller
     public function fetch_app_item(Request $req)
     {
         $id = $req->input('id');
-        
+
         $query = RFQModel::select('a.item_title', 'a.app_price', 'pi.qty', 'pi.pr_item_id')
             ->leftJoin('pr as p', 'p.id', '=', 'tbl_rfq.pr_id')
             ->leftJoin('pr_items as pi', 'pi.pr_id', '=', 'p.id')
@@ -125,8 +113,8 @@ class SupplierController extends Controller
     }
     public function fetch_supplier_quotation(Request $req)
     {
-        $id = $req->input('id');    
-    
+        $id = $req->input('id');
+
         $query = SupplierQuotationModel::select('a.id','s.supplier_title', 'a.item_title', 'a.app_price', 'tbl_supplier_quotation.quotation', 'tbl_supplier_quotation.winner')
             ->leftJoin('supplier as s', 's.id', '=', 'tbl_supplier_quotation.supplier_id')
             ->leftJoin('tbl_rfq as r', 'r.rfq_no', '=', 'tbl_supplier_quotation.rfq_no')
