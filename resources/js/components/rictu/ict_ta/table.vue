@@ -62,7 +62,6 @@ th {
             <tbody v-if="(role === 'admin' || role === 'user') && displayedItems.length > 0">
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
                     <td>
-                        <!-- Buttons based on ICT request status -->
                         <template v-if="role === 'admin'">
                             <div v-if="ict_data.status === 'Received'">
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
@@ -70,10 +69,12 @@ th {
                                     <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                                 </button>
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                    @click="openModal(ict_data.id)" aria-label="Open Modal" title="Complete">
+                                    @click="openModal(ict_data.id)" aria-label="Open Modal" title="Complete"
+                                    v-if="ict_data.ict_personnel_id == user_id">
                                     <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
                                 </button>
                             </div>
+
                             <div v-else-if="ict_data.status === 'Completed'">
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
                                     @click="view_ict_form(ict_data.id)" aria-label="View Details" title="Show">
@@ -175,7 +176,7 @@ export default {
     },
     data() {
         return {
-            user_id: null,
+            user_id: '',
             ict_data: [],
             role: null,
             currentPage: 1,
@@ -190,11 +191,12 @@ export default {
             started_date: null,
             request_type: null,
             sub_request_type: null,
+            assign_ict_officer: null
         }
 
     },
     created() {
-        this.user_id = localStorage.getItem('userId');
+        this.user_id = localStorage.getItem('userId')
         this.role = localStorage.getItem('user_role');
     },
     computed: {
@@ -274,7 +276,7 @@ export default {
                 ...(endDate && { end_date: endDate }),
                 ...(pmo && { pmo }),
                 ...(year && { year }),
-                ...(quarter && { quarter })
+                ...(quarter && { quarter }),
             };
 
             axios.get(url, { params })
@@ -334,11 +336,6 @@ export default {
                 toast.success('Success! This request has been received!', {
                     autoClose: 2000
                 });
-
-                // Refresh the page after 2000 milliseconds (2 seconds)
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
 
                 this.load_ict_request(6);
 

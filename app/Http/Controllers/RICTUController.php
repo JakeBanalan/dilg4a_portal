@@ -133,6 +133,7 @@ class RICTUController extends Controller
             itr.request_type AS request_type,
             c.TITLE AS sub_request_type,
             ip.ict_personnel AS ict_personnel,
+            ip.emp_id AS ict_personnel_id,
             is.status AS status,
             is.id AS status_id
         '))

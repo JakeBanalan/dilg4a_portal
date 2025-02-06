@@ -132,7 +132,7 @@ export default {
                     });
                     setTimeout(() => {
                         location.reload();
-                    }, 2000); // Adjust the delay as needed
+                    }, 2100);
                 })
                 .catch(error => {
                     // Handle error
