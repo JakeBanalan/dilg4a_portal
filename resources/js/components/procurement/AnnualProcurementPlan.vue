@@ -1,4 +1,3 @@
-
 <style>
 .table-responsive-custom {
     display: block;
@@ -72,9 +71,10 @@
                         <div class="col-md-12 grid-margin mb-4 stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <p class="card-title">Annual Procurement Plan for F.Y 2023</p>
+                                    <p class="card-title">Annual Procurement Plan for F.Y {{ currentYear }}</p>
                                     <div class="box-tools">
-                                        <button @click="addAppItem()" type="button" class="btn btn-primary btn-icon-text">
+                                        <button @click="addAppItem()" type="button"
+                                            class="btn btn-primary btn-icon-text">
                                             <i class="ti-plus btn-icon-prepend"></i>
                                             Create Item
                                         </button>
@@ -126,8 +126,10 @@ import axios from 'axios';
 
 export default {
     name: 'AnnualProcurementPlan',
+
     data() {
         return {
+            currentYear: new Date().getFullYear(),
             appItem: {
                 app_total: null
             }
@@ -142,7 +144,7 @@ export default {
     },
     mounted() {
         this.fetchAppData();
-        this.$countTotalItem(2023).then(appItem => { this.appItem.app_total = appItem}).catch(error => { console.error('Error fetching totalitem data:',error)})
+        this.$countTotalItem(2023).then(appItem => { this.appItem.app_total = appItem }).catch(error => { console.error('Error fetching totalitem data:', error) })
 
 
     },
@@ -150,39 +152,44 @@ export default {
         addAppItem() {
             this.$router.push("/procurement/add_app_item");
         },
-   
-        fetchAppData() {
-            let btn = null;
-            axios.get('../api/fetchAppData').then((response) => {
-                $('#app_table').DataTable({
-                    retrieve: true,
-                    data: response.data,
-                    ordering: false,
-                    paging: true,
-                    pageLength: 10,
-
-                    columns: [
-                        { data: 'sn' },
-                        { data: 'item_category_title' },
-                        { data: 'item_title' },
-                        { data: 'pmo_title' },
-                        { data: 'mode_of_proc_title' },
-                        { data: 'source_of_funds_title' },
-                        { data: 'price' },
-                        { data: 'app_year' },
-                        {
-                            data: null, orderable: false, render: function (data) {
-                                return '<label class="badge badge-info" @click="deletePid(' + data.id + ')">View</label>';
-                            },
-                        },
-
-                    ],
-
-                });
+        fetchAppData(appYear = new Date().getFullYear()) {
+            axios.get(`../api/fetchAppData`, {
+                params: { appYear } // Send year dynamically
             })
-            .catch((error) => console.log(error));
+                .then((response) => {
+                    $('#app_table').DataTable({
+                        retrieve: true,
+                        destroy: true,  // Ensure the table is refreshed
+                        data: response.data,
+                        ordering: false,
+                        paging: true,
+                        filter: true,
+                        pageLength: 10,
+                        columns: [
+                            { data: 'sn' },
+                            { data: 'item_category_title' },
+                            { data: 'item_title' },
+                            { data: 'pmo_title' },
+                            { data: 'mode_of_proc_title' },
+                            { data: 'source_of_funds_title' },
+                            { data: 'price' },
+                            { data: 'app_year' },
+                            {
+                                data: null,
+                                orderable: false,
+                                render: function (data) {
+                                    return `<button class="btn btn-info view-btn" data-id="${data.app_id}">View</button>`;
+                                },
+                            },
+                        ],
+                        columnDefs: [
+                            { targets: [0, 1, 3, 4, 5, 6, 7], searchable: false },
+                        ],
+                    });
+                })
+                .catch((error) => console.log(error));
+        }
 
-        },
     },
 
 }

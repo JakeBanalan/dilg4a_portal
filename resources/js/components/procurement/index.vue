@@ -105,7 +105,7 @@ import axios from 'axios';
 import { Transition } from 'vue';
 
 export default {
-    name: 'Procurement',
+    name: 'Procurement Request',
     props: {
     msg: String,
     visible: Boolean,

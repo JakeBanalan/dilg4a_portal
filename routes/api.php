@@ -124,7 +124,7 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('generateStockNumber', [AppItemController::class, 'generateStockNumber']);
+    Route::get('generate-stock-number', [AppItemController::class, 'generateStockNumber']);
 });
 
 
@@ -333,7 +333,7 @@ Route::post('login', [UserController::class, 'login']);
 
 
 Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
-Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
+Route::post('app-items', [AppItemController::class, 'post_add_appItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
 Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);

@@ -131,7 +131,7 @@ export default {
                         },
                         {
                             link: '/procurement/index',
-                            name: 'Procurement',
+                            name: 'Procurement Request',
                             tooltip: 'Buttons',
                             icon: 'store',
                         },
@@ -347,7 +347,7 @@ export default {
 
                         {
                             link: '/procurement/index',
-                            name: 'Procurement',
+                            name: 'Procurement Request',
                             tooltip: 'Buttons',
                             icon: 'store',
                         },

@@ -163,7 +163,7 @@ const routes = [
     },
     {
         path: '/procurement/index',
-        name: 'Procurement',
+        name: 'Procurement Request',
         component: Procurement,
         meta: {
             requiresAuth: true

@@ -1,92 +1,115 @@
 <template>
-        <div class="col-md-12 grid-margin mb-4 stretch-card">
-
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Total Purchase Request</p>
-                            <p class="fs-30 mb-2">{{ this.total_pr }}</p>
-                            <p>{{this.$formatDecimal((this.total_pr / 300)*100)}}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">With RFQ</p>
-                            <p class="fs-30 mb-2">{{ this.rfq_count }}</p>
-                            <p>{{this.$formatDecimal((this.rfq_count / 300)*100)}}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Awarded</p>
-                            <p class="fs-30 mb-2">{{ this.awarded }}</p>
-                            <p>{{this.$formatDecimal((this.awarded / 300)*100)}}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Purchase Order</p>
-                            <p class="fs-30 mb-2">{{ this.po_count }}</p>
-                            <p>{{this.$formatDecimal((this.po_count / 300)*100)}}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
+    <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Monthly Overview - {{ currentMonth }} {{ currentYear }}</h4>
+                <div class="chart-container" style="position: relative; height:400px; width:100%">
+                    <canvas ref="barChart"></canvas>
                 </div>
             </div>
         </div>
+    </div>
+    <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Department Overview - {{ currentYear }}</h4>
+                <div class="doughnutjs-wrapper" style="height: 400px; width: 100%;">
+                    <canvas id="doughnutChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
+import { Chart } from 'chart.js/auto';
+
 export default {
-    name: 'Procurement Statistics',
+    name: 'ProcurementStatistics',
     data() {
         return {
-            total_fund: null,
-            total_pr: null,
-            rfq_count: null,
-            awarded: null,
-            po_count: null
-        }
+            currentMonth: new Date().toLocaleString('default', { month: 'long' }),
+            currentYear: new Date().getFullYear(),
+            barChart: null,
+            doughnutChart: null,
+            barData: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                datasets: [{
+                    label: 'Pesos',
+                    data: [184061.73, 528990],
+                    backgroundColor: '#36A2EB',
+                    borderWidth: 1
+                }]
+            },
+            doughnutData: {
+                labels: ['ORD', 'FAD', 'LGMED', 'LGCDD'],
+                datasets: [{
+                    label: 'Pesos',
+                    data: [ 4886000.00,  1409811.73, 249000.00, 44700.00],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+                    hoverOffset: 4
+                }]
+            }
+        };
     },
     mounted() {
-        // this.fetch_total_pr();
+        this.$nextTick(() => {
+            if (!this.barChart) {
+                this.initBarChart();
+            }
+            if (!this.doughnutChart) {
+                this.initDoughnutChart();
+            }
+        });
+    },
+    beforeUnmount() {
+        if (this.barChart) {
+            this.barChart.destroy();
+            this.barChart = null;
+        }
+        if (this.doughnutChart) {
+            this.doughnutChart.destroy();
+            this.doughnutChart = null;
+        }
     },
     methods: {
-        // fetch_total_pr() {
-        //     this.$count('/api/countPurchaseRequestStatistics', 2024)
-        //         .then(data =>
-        //         {
-        //             this.total_pr = data.total_pr;
-        //             this.rfq_count = data.with_rfq;
-        //             this.awarded = data.awarded;
-        //             this.po_count = data.with_purchase_order;
-        //         })
-        //         .catch(error => { console.error(error) })
-        // }
-    },
+        initBarChart() {
+            const ctx = this.$refs.barChart?.getContext('2d');
+            if (!ctx) return;
+
+            this.barChart = new Chart(ctx, {
+                type: 'bar',
+                data: this.barData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Monthly Comparison' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { title: { display: true, text: 'Months' } }
+                    }
+                }
+            });
+        },
+        initDoughnutChart() {
+            const ctx = document.getElementById('doughnutChart').getContext('2d');
+            if (!ctx) return;
+
+            this.doughnutChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: this.doughnutData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'left' },
+                    }
+                }
+            });
+        }
+    }
 }
 </script>

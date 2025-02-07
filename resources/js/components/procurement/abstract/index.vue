@@ -26,7 +26,7 @@ td{
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <div class="row">
-                        <StatBox />
+                        <!-- <StatBox /> -->
 
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div v-if="isCardVisible">
@@ -67,7 +67,7 @@ td{
                                                     <th>PURCHASE ORDER</th>
                                                     <th style="max-width: 100px;">P.O AMOUNT</th>
                                                     <th>OFFICE</th>
-                                                    
+
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -96,7 +96,7 @@ td{
                                                         <div class="badge badge-success">{{ abstract_data.status }}
                                                         </div>
                                                     </td>
-                                                    
+
                                                     <td >
                                                         <b>{{ abstract_data.pr_no }}</b><br>~ PR Date: {{ abstract_data.pr_date }}~
 
@@ -136,7 +136,7 @@ import Navbar from '../../layout/Navbar.vue';
 import Sidebar from '../../layout/Sidebar.vue';
 import FooterVue from '../../layout/Footer.vue';
 import BreadCrumbs from '../../dashboard_tiles/BreadCrumbs.vue';
-import StatBox from '../stat_board.vue';
+// import StatBox from '../stat_board.vue';
 import UserInfo from '../../procurement/user_info.vue';
 import Pagination from '../Pagination.vue';
 import SelectSupplierModal from "./modal/modal_select_supplier.vue";
@@ -172,7 +172,7 @@ export default {
         FontAwesomeIcon,
         SelectSupplierModal,
         AbstractInfo,
-        StatBox
+        // StatBox
     },
     computed: {
 

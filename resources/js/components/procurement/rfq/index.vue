@@ -91,7 +91,7 @@ td {
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <div class="row">
-                        <StatBox />
+                        <RFQSTAT />
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="card">
                                 <div class="card-body">
@@ -210,7 +210,7 @@ import BreadCrumbs from '../../dashboard_tiles/BreadCrumbs.vue';
 import UserInfo from '../../procurement/user_info.vue';
 import Pagination from '../Pagination.vue';
 import ModalRFQ from './modal/modal_create_rfq.vue';
-import StatBox from '../stat_board.vue';
+import RFQSTAT from '../rfq/rfq_stat_board.vue';
 
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -257,7 +257,7 @@ export default {
         Pagination,
         FontAwesomeIcon,
         ModalRFQ,
-        StatBox
+        RFQSTAT
     },
     computed: {
         totalPages() {
