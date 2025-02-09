@@ -74,13 +74,11 @@
                                 <div class="card">
                                     <div class="card-body" style="overflow-y:scroll;">
                                         <p class="card-title">Ledger Filter</p>
-
                                         <div class="box box-widget widget-user-12">
                                             <div class="col-xs-2 col-sm-2 col-md-2 col-lg-12">
                                                 <table class="table table-bordered"
                                                     style="border-width: 3px;max-width:100%;">
                                                     <tbody>
-
                                                         <tr>
                                                             <td
                                                                 style="background-color: whitesmoke; color: black; padding: 9px; width: 50%;">
@@ -88,7 +86,6 @@
                                                                     name="offices[]" value="0" @change="filterEvents()">
                                                                 <label style="margin-left: 15%;">All offices</label>
                                                             </td>
-                                                            <!-- My Personal Events Checkbox -->
                                                             <td
                                                                 style="background-color: goldenrod; color: #fff; padding: 9px; width: 50%;">
                                                                 <input type="checkbox" v-model="showMyPersonalEvents"
@@ -97,7 +94,6 @@
                                                                     Events</label>
                                                             </td>
                                                         </tr>
-
                                                         <tr>
                                                             <td
                                                                 style="background-color: #D5D911; color:white;width:50%;">
@@ -219,9 +215,8 @@ import 'vue3-toastify/dist/index.css';
 import moment from 'moment';
 import axios from 'axios';
 import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/daygrid';
-import interactionPlugin from '@fullcalendar/interaction';
-
+import dayGridPlugin from '@fullcalendar/daygrid'
+import interactionPlugin from '@fullcalendar/interaction'
 export default {
     components: {
         EventModal,
@@ -253,7 +248,11 @@ export default {
             mode: '',
             userId: null,
             calendarOptions: {
-                plugins: [dayGridPlugin, interactionPlugin],
+                plugins: [
+                    dayGridPlugin,
+
+                    interactionPlugin,
+                ],
                 initialView: 'dayGridMonth',
                 headerToolbar: {
                     start: 'title',
@@ -262,17 +261,29 @@ export default {
                 },
                 eventClick: this.handleEventClick,
                 eventDrop: this.handleEventDrop,
+
                 editable: true,
                 events: [],
                 eventDisplay: 'block',
-                dayMaxEvents: 2,
+                dayMaxEvents: 3,
                 customButtons: {
                     AddEvent: {
                         text: '+ Add Event',
                         click: this.handleCustomButtonClick,
                     },
                 },
+                eventContent: (arg) => {
+                    const event = arg.event;
+                    const duration = moment(event.end).diff(moment(event.start), 'days');
+                    const isLongEvent = duration > 1;
 
+                    return {
+                        html: `<div class="fc-event-main-frame">
+                ${isLongEvent ? `<div class="fc-event-time">${moment(event.start).format('MMM D')} - ${moment(event.end).format('MMM D')}</div>` : ''}
+                <div class="fc-event-title">${event.title}</div>
+            </div>`
+                    };
+                },
             },
             selectedOffices: [0],
             showMyPersonalEvents: true,
@@ -370,6 +381,7 @@ export default {
                 },
             })
                 .then(response => {
+
                     this.UpcomingEvents = response.data.map(event => ({
                         ...event,
                         start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
@@ -439,6 +451,7 @@ export default {
                     this.calendarOptions.events = events;
                     this.events = events;
                     this.$refs.calendar.getApi().refetchEvents();
+
                     this.EventData();
                 })
                 .catch(error => {
@@ -600,8 +613,6 @@ export default {
                 }
             });
         },
-
-
     }
 };
 </script>
@@ -616,52 +627,42 @@ export default {
     color: blue;
 }
 
-.fc-daygrid-event {
+.fc {
+    /* the calendar root */
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.fc-event {
     margin: 1px 2px 0;
     padding: 2px 4px;
-    /* Adjusted padding for better display */
     overflow: visible;
-    /* Allow overflow for long text */
     white-space: normal;
     /* Allow text to wrap */
+    word-break: break-word;
+    /* Prevent text overflow */
 }
 
-.fc-daygrid-day-frame {
-    position: relative;
-    min-height: 100px;
-}
-
-.fc-daygrid-day-number {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
-.fc-daygrid-day-top {
+.fc-event-main-frame {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2px 4px;
 }
 
-.fc-daygrid-day-events {
-    margin-top: 4px;
-}
-
-.fc-daygrid-event-harness {
+.fc-event-time {
+    font-size: 0.8em;
+    font-weight: bold;
     margin-bottom: 2px;
 }
 
-.fc-daygrid-event-dot {
-    display: none;
-}
-
-.fc-daygrid-event-time {
-    font-weight: bold;
-}
-
-.fc-daygrid-event-title {
+.fc-event-title {
     font-size: 0.9em;
     color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 time.icon {
@@ -718,8 +719,6 @@ time.icon span {
     -webkit-animation: swing 0.6s ease-out;
     animation: swing 0.6s ease-out;
 }
-
-
 
 @-webkit-keyframes swing {
     0% {
