@@ -143,9 +143,11 @@
                                                     <td>{{ item.quantity }}</td>
                                                     <td>₱{{ item.price.toLocaleString('en-US', {
                                                         minimumFractionDigits:
-                                                        2, maximumFractionDigits: 2 }) }}</td>
+                                                            2, maximumFractionDigits: 2
+                                                    }) }}</td>
                                                     <td>₱{{ (item.quantity * item.price).toLocaleString('en-US', {
-                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</td>
+                                                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                                                    }) }}</td>
                                                     <td>
                                                         <button class="btn btn-warning btn-sm"
                                                             @click="showEditItemModal(index)">
@@ -389,8 +391,8 @@ export default {
         formatNumberWithCommas(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
-        fetchItems() {
-            axios.get('/api/fetchItems')
+        fetchItems(year = new Date().getFullYear()) {
+            axios.get(`/api/fetchItems/${year}`)
                 .then(response => {
                     this.availableItems = response.data;
                 })

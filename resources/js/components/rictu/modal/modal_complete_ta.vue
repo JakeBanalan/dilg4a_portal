@@ -128,11 +128,9 @@ export default {
             })
                 .then(response => {
                     toast.success('Success! This request has been completed!', {
-                        autoClose: 2000
+                        autoClose: 1500,
+                        onClose: () => location.reload()
                     });
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2100);
                 })
                 .catch(error => {
                     // Handle error

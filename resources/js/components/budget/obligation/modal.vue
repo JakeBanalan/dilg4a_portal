@@ -16,7 +16,7 @@
                             <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Insert Code for PR-{{
                                 prNo }}
                         </h5>
-                        <TextInput label="Code" iconValue="gear" v-model="availability_code" />
+                        <TextInput type="number" label="Code" iconValue="gear" v-model="availability_code" required />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-primary btn-fw btn-icon-text"
@@ -60,6 +60,12 @@ export default {
             this.$emit('close');
         },
         insertCode() {
+            if (!this.availability_code) {
+                toast.error('Please enter a value for Availability Code', {
+                    autoClose: 1500
+                });
+                return;
+            }
             axios.post(`../api/post_addCode`, {
                 id: this.prId,
                 availability_code: this.availability_code
@@ -67,18 +73,18 @@ export default {
                 .then((response) => {
                     if (response.status === 200) {
                         toast.success('Availability Code successfully added!', {
-                            autoClose: 100
+                            autoClose: 1500,
+                            onClose: () => location.reload()
                         });
-                        location.reload();
                     } else {
                         toast.error('Failed to add Availability Code', {
-                            autoClose: 100
+                            autoClose: 1500
                         });
                     }
                 })
                 .catch((error) => {
                     toast.error('Error adding Availability Code', {
-                        autoClose: 100
+                        autoClose: 1500
                     });
                     console.error(error);
                 })

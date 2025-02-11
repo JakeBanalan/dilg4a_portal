@@ -354,7 +354,11 @@ export default {
             }
             toast.success('Successfully Cancelled!', { autoClose: 2000 });
             setTimeout(() => {
-                this.loadDataPerUser();
+                if (this.role === 'admin') {
+                    this.loadData();
+                } else {
+                    this.loadDataPerUser();
+                }
             }, 2000);
         },
         updatePurchaseRequestStatus(id, status) {

@@ -8,7 +8,7 @@
                     <BreadCrumbs />
                     <div class="row">
                         <StatBox />
-                        <div class="col-lg-6 col-md-6 col-sm-6">
+                        <div class="col-12">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="card-title d-flex justify-content-between align-items-center">
@@ -18,7 +18,7 @@
                                         </h5>
                                     </div>
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered">
+                                        <table class="table table-striped table-bordered mb-3">
                                             <thead>
                                                 <tr>
                                                     <th>CODE</th>
@@ -55,49 +55,7 @@
                                     @pageChange="onViewChange" />
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="card-title d-flex justify-content-between align-items-center">
-                                        <h5 class="card-title">
-                                            <font-awesome-icon
-                                                :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Purchase Order
-                                        </h5>
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>CODE</th>
-                                                    <th>SUPPLIER</th>
-                                                    <th>AMOUNT</th>
-                                                    <th>ACTION</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="po in po_data" :key="po.id">
-                                                    <td>{{ po.po_no }}</td>
-                                                    <td>{{ po.supplier_title }}</td>
-                                                    <td>{{ formatAmount(po.total_quotation) }}</td>
-                                                    <td>
-                                                        <button class="btn btn-icon mr-1"
-                                                            style="background-color:#059886;color:#fff;">
-                                                            <font-awesome-icon
-                                                                :icon="['fas', 'search']"></font-awesome-icon>
-                                                        </button>
-                                                        <button class="btn btn-icon mr-1"
-                                                            style="background-color:#059886;color:#fff;">
-                                                            <font-awesome-icon
-                                                                :icon="['fas', 'undo']"></font-awesome-icon>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
             </div>

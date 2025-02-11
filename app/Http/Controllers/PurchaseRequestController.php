@@ -172,17 +172,23 @@ class PurchaseRequestController extends Controller
 
 
 
-    public function fetchItems()
+    public function fetchItems($year = null)
     {
         try {
-            $items = AppItemModel::select('tbl_app.id', 'tbl_app.item_title as name', 'tbl_app.app_price as price', 'tbl_app.sn as stockno', 'unit.item_unit_title as unit')
-                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
-                ->get();
+            $query = AppItemModel::select('tbl_app.id', 'tbl_app.item_title as name', 'tbl_app.app_price as price', 'tbl_app.sn as stockno', 'unit.item_unit_title as unit', 'tbl_app.app_year as AppYear')
+                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id');
+
+            if (!$year) {
+                $year = date('Y'); // Use the current year by default
+            }
+
+            $query->where('tbl_app.app_year', $year);
+
+            $items = $query->get();
 
             if ($items->isEmpty()) {
                 return response()->json(['message' => 'No items found'], 404);
             }
-
             return response()->json($items);
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while fetching items'], 500);

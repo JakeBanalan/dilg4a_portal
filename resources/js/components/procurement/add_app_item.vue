@@ -402,35 +402,18 @@ export default {
 
                 // Show success message
                 toast.success(response.data.message, {
-                    autoClose: 1000,  // Automatically close the toast after 1 second
+                    autoClose: 1000,
                 });
 
-                // Delay navigation until the toast is shown
                 setTimeout(() => {
                     this.$router.push({ path: '/procurement/AnnualProcurementPlan' });
-                }, 1000);  // Navigate after 1 second
+                }, 1000);
 
-                // Reset the form after successful submission
-                this.resetForm();
             } catch (error) {
                 // Show error message
                 toast.error(error.response?.data?.message || "An error occurred");
             }
         },
-        resetForm() {
-            this.formData = {
-                sn: "",
-                code: "",
-                item_title: "",
-                unit_id: "",
-                source_of_funds_id: "",
-                category_id: "",
-                pmo_id: "",
-                qty: 0,
-                app_price: 0,
-                mode: "",
-            };
-        }
 
     },
 

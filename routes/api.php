@@ -317,7 +317,7 @@ Route::middleware('api')->group(function () {
     Route::get('fetchUserOfficeCount', [UserManagementController::class, 'fetchUserOfficeCount']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('fetchItems', [PurchaseRequestController::class, 'fetchItems']);
+    Route::get('fetchItems/{year?}', [PurchaseRequestController::class, 'fetchItems']);
 });
 
 Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
