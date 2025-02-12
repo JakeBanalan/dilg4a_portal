@@ -57,6 +57,7 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']);
+    Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
 });
 
 Route::middleware('api')->group(function () {
@@ -170,7 +171,8 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countCancelledPR/{userId}', [PurchaseRequestController::class, 'countCancelledPR']);
+    Route::get('/monthly-overview', [PurchaseRequestController::class, 'getMonthlyOverview']);
+    Route::get('/department-overview', [PurchaseRequestController::class, 'getDepartmentOverview']);
 });
 
 Route::middleware('api')->group(function () {
@@ -331,9 +333,9 @@ Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']
 Route::post('login', [UserController::class, 'login']);
 // Route::post('logout',[UserController::class,'logout']);
 
-
 Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
 Route::post('app-items', [AppItemController::class, 'post_add_appItem']);
+Route::post('updateAppDataById/{id}',  [AppItemController::class, 'post_update_appItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
 Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);

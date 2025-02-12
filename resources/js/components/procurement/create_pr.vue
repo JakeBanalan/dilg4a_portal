@@ -69,6 +69,7 @@
                                                     <option v-for="office in pmo" :key="office.value"
                                                         :value="office.value">{{ office.label }}</option>
                                                 </select>
+
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -446,6 +447,27 @@ export default {
                     unit: item.unit
                 }))
             };
+
+            // Add validation for required fields
+            if (!requestData.pmo) {
+                this.showToastError('Office is required!');
+                return;
+            }
+
+            if (!requestData.type) {
+                this.showToastError('Purchase Type is required!');
+                return;
+            }
+
+            if (!requestData.target_date) {
+                this.showToastError('Purchase Request Target Date is required!');
+                return;
+            }
+
+            if (!requestData.purpose) {
+                this.showToastError('Particulars is required!');
+                return;
+            }
 
             axios.post('/api/post_create_purchaseRequest', requestData)
                 .then((response) => {

@@ -140,7 +140,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faDownload, faEye, faPaperPlane, faShareSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
 import { formatDate } from '../../globalMethods';
-
+import { eventBus } from '../eventBus.js';
 library.add(faEye, faPaperPlane, faDownload, faTrash, faShareSquare);
 
 export default {
@@ -282,6 +282,7 @@ export default {
                     is_budget_submitted: true,
                 })
                 .then(() => {
+
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
                         updatedRequest.isBudgetSubmitted = true;
@@ -295,6 +296,7 @@ export default {
                             }
                         }
                     });
+                    eventBus.emit('updateStats');
                 })
                 .catch((error) => {
                     console.error('Error updating status:', error);
@@ -319,6 +321,7 @@ export default {
                     is_gss_submitted: true,
                 })
                 .then(() => {
+
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
                         updatedRequest.isGSSSubmitted = true;
@@ -332,6 +335,7 @@ export default {
                             }
                         }
                     });
+                    eventBus.emit('updateStats');
                 })
                 .catch((error) => {
                     console.error('Error updating status:', error);

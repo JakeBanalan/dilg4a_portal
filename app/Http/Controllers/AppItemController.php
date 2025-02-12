@@ -94,6 +94,39 @@ class AppItemController extends Controller
         return response()->json($app_item->get());
     }
 
+    public function fetchAppDataById(Request $request)
+    {
+        $appId = $request->input('appId');
+
+        $app_item = AppItemModel::selectRaw('
+            tbl_app.id as app_id,
+            tbl_app.sn as sn,
+            tbl_app.item_title as item_title,
+            tbl_app.unit_id as unit_id,
+            tbl_app.qty as qty,
+            tbl_app.code as code,
+            pmo.pmo_title,
+            pmo.id as pmo_id,
+            source_of_funds.source_of_funds_title,
+            tbl_app.source_of_funds_id,
+            tbl_app.category_id as category_id,
+            tbl_app.mode as mode,
+            tbl_app.app_price as price,
+            tbl_app.app_year as app_year,
+            item_unit.item_unit_title as item_unit_title,
+            item_category.item_category_title as item_category_title,
+            mode_of_proc.mode_of_proc_title as mode_of_proc_title
+        ')
+            ->join('source_of_funds', 'tbl_app.source_of_funds_id', '=', 'source_of_funds.id')
+            ->join('pmo', 'tbl_app.pmo_id', '=', 'pmo.id')
+            ->join('item_category', 'tbl_app.category_id', '=', 'item_category.id')
+            ->join('mode_of_proc', 'tbl_app.mode', '=', 'mode_of_proc.id')
+            ->join('item_unit', 'tbl_app.unit_id', '=', 'item_unit.id')
+            ->where('tbl_app.id', $appId);
+
+        return response()->json($app_item->first());
+    }
+
     public function post_add_appItem(Request $request)
     {
         // Validate the incoming request
@@ -108,7 +141,6 @@ class AppItemController extends Controller
             'pmo_id' => 'nullable|integer',
             'qty' => 'nullable|numeric|min:1',
             'mode' => 'nullable|string|max:255',
-            'price' => 'nullable|numeric|min:0',
             'app_price' => 'nullable|numeric|min:0',
             'remarks' => 'nullable|string',
             'description' => 'nullable|string',
@@ -129,6 +161,61 @@ class AppItemController extends Controller
             return response()->json([
                 'error' => 'Failed to create item',
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function post_update_appItem(Request $request, $id)
+    {
+        try {
+            // Validate the incoming request
+            $validatedData = $request->validate([
+                'sn' => 'nullable|string|max:255',
+                'code' => 'nullable|string|max:255',
+                'merge_code' => 'nullable|string|max:255',
+                'item_title' => 'nullable|string|max:255',
+                'unit_id' => 'nullable|integer',
+                'source_of_funds_id' => 'nullable|integer',
+                'category_id' => 'nullable|integer',
+                'pmo_id' => 'nullable|integer',
+                'qty' => 'nullable|numeric|min:1',
+                'mode' => 'nullable|string|max:255',
+                'price' => 'nullable|numeric|min:0',
+                'app_price' => 'nullable|numeric|min:0',
+                'remarks' => 'nullable|string',
+                'description' => 'nullable|string',
+            ]);
+
+            // Find AppItem or fail
+            $appItem = AppItemModel::findOrFail($id);
+
+            // Apply updates
+            $appItem->fill($validatedData);
+
+            // Check if any changes were made
+            if (!$appItem->isDirty()) {
+                return response()->json([
+                    'message' => 'No changes detected.'
+                ], 200);
+            }
+
+            // Save changes
+            $appItem->saveOrFail();
+
+            return response()->json([
+                'message' => 'App item updated successfully!',
+                'data' => $appItem
+            ], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'App item not found',
+                'message' => 'App item with ID ' . $id . ' does not exist'
+            ], 404);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'error' => 'Failed to update App item',
+                'message' => 'An unexpected error occurred. Please try again later.'
             ], 500);
         }
     }

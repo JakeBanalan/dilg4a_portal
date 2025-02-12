@@ -527,6 +527,59 @@ class PurchaseRequestController extends Controller
     }
 
 
+    public function getDepartmentOverview()
+    {
+        try {
+            $monthlyData = PurchaseRequestItemModel::select(
+                DB::raw('SUM(pr_items.abc) as total_abc'),
+                'pmo.id as office',
+                'pmo.pmo_title'
+            )
+                ->leftJoin('pr', 'pr_items.pr_id', '=', 'pr.id') // ✅ Join PR table first
+                ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo') // ✅ Ensure correct column name
+                ->whereYear('pr_items.date_added', Carbon::now()->year)
+                ->whereNotIn('pr.stat', [1, 9])
+                ->groupBy('pmo.id', 'pmo.pmo_title')
+                ->orderBy('total_abc', 'DESC')
+                ->get();
+
+            return response()->json($monthlyData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+
+
+
+    public function getMonthlyOverview()
+    {
+        $monthlyData = PurchaseRequestItemModel::select(
+            DB::raw('SUM(pr_items.abc) as total_abc'),
+            DB::raw('MONTH(pr_items.date_added) as month')
+        )
+            ->join('pr', 'pr_items.pr_id', '=', 'pr.id') // Join with PR table
+            ->whereYear('pr_items.date_added', Carbon::now()->year) // Filter by current year
+            ->whereNotIn('pr.stat', [1, 9])
+            ->groupBy(DB::raw('MONTH(pr_items.date_added)'))
+            ->orderBy(DB::raw('MONTH(pr_items.date_added)'))
+            ->get();
+
+        // Format data for frontend
+        $formattedData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $formattedData[] = [
+                'month' => Carbon::create()->month($i)->format('F'),
+                'total_abc' => $monthlyData->firstWhere('month', $i)->total_abc ?? 0,
+            ];
+        }
+
+        return response()->json($formattedData);
+    }
+
+
+
 
 
 
