@@ -378,9 +378,9 @@ export default {
                 autoClose: 1000,
             });
         },
-        fetchItems() {
+        fetchItems(year = new Date().getFullYear()) {
             this.isLoading = true;
-            axios.get('/api/fetchItems')
+            axios.get(`/api/fetchItems/${year}`)
                 .then(response => {
                     if (Array.isArray(response.data)) {
                         this.availableItems = response.data;

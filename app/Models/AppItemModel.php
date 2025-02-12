@@ -27,7 +27,7 @@ class AppItemModel extends Model
         'source_of_funds_id',
         'category_id',
         'pmo_id',
-        'quantity',
+        'qty',
         'mode',
         'price',
         'app_price',

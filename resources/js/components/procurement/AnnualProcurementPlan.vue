@@ -106,14 +106,33 @@
                         </div>
                     </div>
                 </div>
-                <!-- content-wrapper ends -->
-                <!-- partial:partials/_footer.html -->
+
                 <FooterVue />
-                <!-- partial -->
+
             </div>
-            <!-- main-panel ends -->
+
         </div>
-        <!-- page-body-wrapper ends -->
+        <div class="modal fade" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="app-modal-label"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="modal-title">Edit Item</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ModalBodyComponent ref="modalBodyComponent" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" @click="handleSaveButton()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </template>
 <script>
@@ -123,6 +142,9 @@ import FooterVue from '../layout/Footer.vue';
 import BreadCrumbs from '../dashboard_tiles/BreadCrumbs.vue';
 import app_table from './app_table.vue';
 import axios from 'axios';
+import vSelect from 'vue-select';
+import { toast } from 'vue3-toastify';
+import ModalBodyComponent from './ModalBodyComponent';
 
 export default {
     name: 'AnnualProcurementPlan',
@@ -132,7 +154,8 @@ export default {
             currentYear: new Date().getFullYear(),
             appItem: {
                 app_total: null
-            }
+            },
+            stockNumber: null
         }
     },
     components: {
@@ -141,6 +164,8 @@ export default {
         FooterVue,
         BreadCrumbs,
         app_table,
+        vSelect,
+        ModalBodyComponent
     },
     mounted() {
         this.fetchAppData();
@@ -148,47 +173,142 @@ export default {
 
 
     },
+
     methods: {
+
         addAppItem() {
             this.$router.push("/procurement/add_app_item");
         },
-        fetchAppData(appYear = new Date().getFullYear()) {
-            axios.get(`../api/fetchAppData`, {
-                params: { appYear } // Send year dynamically
-            })
-                .then((response) => {
-                    $('#app_table').DataTable({
-                        retrieve: true,
-                        destroy: true,  // Ensure the table is refreshed
-                        data: response.data,
-                        ordering: false,
-                        paging: true,
-                        filter: true,
-                        pageLength: 10,
-                        columns: [
-                            { data: 'sn' },
-                            { data: 'item_category_title' },
-                            { data: 'item_title' },
-                            { data: 'pmo_title' },
-                            { data: 'mode_of_proc_title' },
-                            { data: 'source_of_funds_title' },
-                            { data: 'price' },
-                            { data: 'app_year' },
-                            {
-                                data: null,
-                                orderable: false,
-                                render: function (data) {
-                                    return `<button class="btn btn-info view-btn" data-id="${data.app_id}">View</button>`;
-                                },
+        async fetchAppData(appYear = new Date().getFullYear()) {
+            try {
+                const response = await axios.get(`../api/fetchAppData`, { params: { appYear } });
+                this.populateTable(response.data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        },
+
+        populateTable(data) {
+            if ($.fn.DataTable.isDataTable('#app_table')) {
+                $('#app_table').DataTable().clear().rows.add(data).draw();
+            } else {
+                $('#app_table').DataTable({
+                    retrieve: true,
+                    data: data,
+                    ordering: false,
+                    paging: true,
+                    filter: true,
+                    pageLength: 10,
+                    columns: [
+                        { data: 'sn' },
+                        { data: 'item_category_title' },
+                        { data: 'item_title' },
+                        { data: 'pmo_title' },
+                        { data: 'mode_of_proc_title' },
+                        { data: 'source_of_funds_title' },
+                        { data: 'price' },
+                        { data: 'app_year' },
+                        {
+                            data: null,
+                            orderable: false,
+                            render: function (data) {
+                                return `<button class="btn btn-info edit-btn" data-id="${data.app_id}">Edit</button>`;
                             },
-                        ],
-                        columnDefs: [
-                            { targets: [0, 1, 3, 4, 5, 6, 7], searchable: false },
-                        ],
-                    });
+                        },
+                    ],
+                    columnDefs: [
+                        { targets: [0, 1, 3, 4, 5, 6, 7], searchable: false },
+                    ],
+                });
+            }
+            $(document).on('click', '#app-modal .close, #app-modal .btn-secondary', function () {
+                $('#app-modal').modal('hide');
+            });
+
+            this.handleViewButton();
+        },
+
+        handleViewButton() {
+            $('#app_table').on('click', '.edit-btn', (event) => {
+                var appId = $(event.target).data('id');
+                axios.get(`../api/fetchAppDataById`, {
+                    params: { appId }
                 })
-                .catch((error) => console.log(error));
+                    .then((response) => {
+                        this.populateModal(response.data);
+                    })
+                    .catch((error) => {
+                        console.error('Error fetching data:', error);
+                    });
+            });
+        },
+        populateModal(data) {
+            this.id = data.app_id;
+            this.$refs.modalBodyComponent.populateModal(data);
+            $('#app-modal').modal('show');
+        },
+        handleSaveButton() {
+            // Get the data from the ModalBodyComponent
+            const modalBody = this.$refs.modalBodyComponent;
+
+            if (!modalBody) {
+                toast.error('Error: Modal body not found');
+                return;
+            }
+
+            // Extract data
+            const data = {
+                id: modalBody.id,
+                sn: modalBody.sn,
+                code: modalBody.itemCode,
+                merge_code: modalBody.merge_code,
+                item_title: modalBody.itemTitle,
+                unit_id: modalBody.unitTile,  // Now storing the correct ID
+                source_of_funds_id: modalBody.sourceOfFundsTitle,  // Correct ID
+                category_id: modalBody.itemCategory,  // Correct ID
+                pmo_id: modalBody.pmoTitle,  // Correct ID
+                qty: modalBody.itemQty,
+                mode: modalBody.modeOfProcTitle,  // Correct ID
+                app_price: modalBody.price,
+                remarks: modalBody.remarks,
+                description: modalBody.description,
+            };
+
+            if (!data.id) {
+                toast.error("Error: Item ID is missing.");
+                return;
+            }
+
+            // Send update request
+            axios.post(`../api/updateAppDataById/${data.id}`, data)
+                .then(async (response) => { // Make function async for better timing
+                    toast.success(response.data.message, { autoClose: 1000 });
+
+                    // Ensure the modal is hidden first before fetching new data
+                    $('#app-modal').modal('hide');
+
+                    // Add a small delay before fetching the updated data
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    // Fetch the latest data
+                    this.fetchAppData();
+                })
+                .catch((error) => {
+                    if (error.response) {
+                        if (error.response.status === 404) {
+                            toast.error('Error: App item not found.', { autoClose: 1000 });
+                        } else if (error.response.status === 500) {
+                            toast.error('Server Error: ' + error.response.data.message, { autoClose: 1000 });
+                        } else {
+                            toast.error('Unexpected error: ' + error.response.data.message, { autoClose: 1000 });
+                        }
+                    } else {
+                        toast.error('Network Error: ' + error.message, { autoClose: 1000 });
+                    }
+                    console.error('Error updating App item:', error);
+                });
         }
+
 
     },
 
