@@ -474,7 +474,8 @@ class PurchaseRequestController extends Controller
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->setCellValue('C7', 'PR No.: ' . $query[0]->pr_no);
-        $sheet->setCellValue('E7', 'Date: ' . $query[0]->pr_date);
+        $formattedDate = Carbon::parse($query[0]->pr_date)->format('F d, Y');
+        $sheet->setCellValue('E7', 'Date: ' . $formattedDate);
         $sheet->setCellValue('B7', $query[0]->pmo_title);
         $sheet->setCellValue('B23', $query[0]->particulars);
 
@@ -497,7 +498,8 @@ class PurchaseRequestController extends Controller
             $sheet->setCellValueByColumnAndRow(2, $row, $item->unit);
 
             // Populate item details
-            $sheet->setCellValueByColumnAndRow(3, $row, $item->item_title);
+            $sheet->setCellValueByColumnAndRow(3, $row, $item->item_title . "\n" .  $item->desc);
+            $sheet->getStyleByColumnAndRow(3, $row)->getAlignment()->setWrapText(true);
             $sheet->setCellValueByColumnAndRow(4, $row, $item->quantity);
             $sheet->setCellValueByColumnAndRow(5, $row, '₱ ' . number_format($item->price, 2));
             $sheet->setCellValueByColumnAndRow(6, $row, '₱ ' . number_format($item->quantity * $item->price, 2));
