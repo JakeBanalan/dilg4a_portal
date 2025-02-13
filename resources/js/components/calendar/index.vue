@@ -492,18 +492,24 @@ export default {
             });
         },
         handleEventDrop(info) {
-            // Check if the user has permission to update the event
-            if (this.eventDetails.postedBy !== this.posted_by) {
+
+            const event = this.events.find(e => e.id === +info.event.id);
+
+            const eventAuthor = event.postedBy || event.fname || event.createdBy;
+
+            if (String(eventAuthor) !== String(this.posted_by)) {
                 Swal.fire({
                     title: 'Error',
                     text: 'You do not have permission to update this event.',
                     icon: 'error',
                     confirmButtonColor: '#3085d6',
                 });
+
+                // Revert the event back to its original position
+                info.revert();
                 return;
             }
 
-            // Prepare the updated event data
             const updatedEvent = {
                 id: info.event.id,
                 start: moment(info.event.start).format('YYYY-MM-DD HH:mm:ss'),
@@ -513,14 +519,14 @@ export default {
             // Send the updated event data to the server
             axios.post('/api/PostUpdateDragDrop', updatedEvent)
                 .then(() => {
-                    toast.success('Event Updated!', {
-                        autoClose: 1000
-                    });
+                    toast.success('Event Updated!', { autoClose: 1000 });
                     this.FetchData();
                 })
-                .catch(error => console.error('Error updating event:', error));
+                .catch(error => {
+                    console.error('Error updating event:', error);
+                    info.revert();
+                });
         },
-
         saveEventData(formData) {
             if (this.mode == 'add') {
                 this.$fetchUserData(this.userId, '/api/fetchUser')
