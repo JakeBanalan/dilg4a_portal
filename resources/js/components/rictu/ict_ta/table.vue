@@ -165,6 +165,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
+import {eventBus} from "../eventBus.js";
 
 library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical);
 export default {
@@ -338,6 +339,7 @@ export default {
                 });
 
                 this.load_ict_request(6);
+                eventBus.emit('updateICTSTAT');
 
             }).catch((error) => {
 

@@ -187,6 +187,7 @@
 
 <script>
 import Swal from 'sweetalert2';
+import {eventBus} from "../eventBus.js";
 export default {
     data() {
         return {
@@ -218,6 +219,12 @@ export default {
         this.fetchDraftData();
         this.fetchICTAdminCount();
         this.fetchICTAdminDraft();
+        eventBus.on('updateICTSTAT', () => {
+            this.fetchICTRequestCount();
+            this.fetchDraftData();
+            this.fetchICTAdminCount();
+            this.fetchICTAdminDraft();
+        });
         // this.fetchHardwareCount();
         // this.fetchSoftwareCount();
 
