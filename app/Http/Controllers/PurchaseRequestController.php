@@ -473,60 +473,51 @@ class PurchaseRequestController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
+        // Set static values
         $sheet->setCellValue('C7', 'PR No.: ' . $query[0]->pr_no);
         $formattedDate = Carbon::parse($query[0]->pr_date)->format('F d, Y');
         $sheet->setCellValue('E7', 'Date: ' . $formattedDate);
         $sheet->setCellValue('B7', $query[0]->pmo_title);
         $sheet->setCellValue('B23', $query[0]->particulars);
-
-        $contactPerson = strtoupper($query[0]->pmo_contact_person);
-
-        $sheet->setCellValue('B29', $contactPerson);
-
-        $designationPerson = ($query[0]->designation);
-
-
-        $sheet->setCellValue('B30', $designationPerson);
+        $sheet->setCellValue('B29', strtoupper($query[0]->pmo_contact_person));
+        $sheet->setCellValue('B30', $query[0]->designation);
 
         $row = 11;
         $totalAmount = 0;
 
-        // Start populating dynamic fields (items data)
+        // Populate item data dynamically
         foreach ($query as $item) {
-            // Populate each row with the item data
-            $sheet->setCellValueByColumnAndRow(1, $row, $item->serial_no);
-            $sheet->setCellValueByColumnAndRow(2, $row, $item->unit);
-
-            // Populate item details
-            $sheet->setCellValueByColumnAndRow(3, $row, $item->item_title . "\n" .  $item->desc);
-            $sheet->getStyleByColumnAndRow(3, $row)->getAlignment()->setWrapText(true);
-            $sheet->setCellValueByColumnAndRow(4, $row, $item->quantity);
-            $sheet->setCellValueByColumnAndRow(5, $row, '₱ ' . number_format($item->price, 2));
-            $sheet->setCellValueByColumnAndRow(6, $row, '₱ ' . number_format($item->quantity * $item->price, 2));
-
+            $sheet->setCellValue('A' . $row, $item->serial_no);
+            $sheet->setCellValue('B' . $row, $item->unit);
+            $sheet->setCellValue('C' . $row, $item->item_title . "\n\n" . $item->desc);
+            $sheet->getStyle('C' . $row)->getAlignment()->setWrapText(true);
+            $sheet->getRowDimension($row)->setRowHeight(-1); // Auto height for wrapped text
+            $sheet->setCellValue('D' . $row, $item->quantity);
+            $sheet->setCellValue('E' . $row, '₱ ' . number_format($item->price, 2));
+            $sheet->setCellValue('F' . $row, '₱ ' . number_format($item->quantity * $item->price, 2));
 
             $totalAmount += $item->quantity * $item->price;
-
             $row++;
         }
 
+        // Set total amount
         $sheet->setCellValue('F22', '₱ ' . number_format($totalAmount, 2));
 
-
+        // Protect sheet with password
         $sheet->getProtection()->setSheet(true);
-
-        // Set password for the sheet
         $sheet->getProtection()->setPassword('dilg4a@2024');
 
-
+        // Generate the file and return as a download
         $fileName = "PurchaseRequest_" . $query[0]->pr_no . ".xlsx";
         $writer = new Xlsx($spreadsheet);
         $tempFile = tempnam(sys_get_temp_dir(), 'PurchaseRequest');
         $writer->save($tempFile);
+
         return response()->download($tempFile, $fileName, [
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
         ])->deleteFileAfterSend(true);
     }
+
 
 
     public function getDepartmentOverview()
