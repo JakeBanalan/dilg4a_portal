@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+const webpack = require('webpack');
 
 /*
  |--------------------------------------------------------------------------
@@ -14,5 +15,16 @@ const mix = require('laravel-mix');
 mix.js('resources/js/app.js', 'public/js')
     .vue()
     .sass('resources/sass/app.scss', 'public/css');
-    
-mix.disableNotifications()
+
+// Inject Vue feature flags
+mix.webpackConfig({
+    plugins: [
+        new webpack.DefinePlugin({
+            '__VUE_PROD_HYDRATION_MISMATCH_DETAILS__': JSON.stringify(false),
+            '__VUE_OPTIONS_API__': JSON.stringify(true),
+            '__VUE_PROD_DEVTOOLS__': JSON.stringify(false)
+        })
+    ]
+});
+
+mix.disableNotifications();
