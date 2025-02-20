@@ -231,7 +231,7 @@ export default {
         // this.fetchHardwareCount();
         // this.fetchSoftwareCount();
 
-        var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+        var pusher = new Pusher('29d53f8816252d29de52', {
             cluster: 'ap1'
         });
         // Listen for the update-table event on the ict-ta-channel channel
