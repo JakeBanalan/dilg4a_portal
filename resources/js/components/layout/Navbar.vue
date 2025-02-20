@@ -158,7 +158,7 @@ export default {
                         const subscribeAndBind = (channelName, eventName) => {
                             const channel = pusher.subscribe(channelName);
                             channel.bind(eventName, (data) => {
-
+                                
                             });
                         };
                         subscribeAndBind('received-ta-channel', 'received-ict-ta');

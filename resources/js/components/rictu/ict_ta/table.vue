@@ -227,6 +227,11 @@ export default {
                 cluster: 'ap1'
             });
             // Listen for the update-table event on the ict-ta-channel channel
+            const newChannel = pusher.subscribe('ict-ta-channel');
+            newChannel.bind('new-ict-ta', (data) => {
+                this.load_ict_request(6);
+            });
+
             const receivedChannel = pusher.subscribe('received-ta-channel');
             receivedChannel.bind('received-ict-ta', (data) => {
                 this.load_ict_request(6);
