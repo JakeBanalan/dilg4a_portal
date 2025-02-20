@@ -584,4 +584,6 @@ class RICTUController extends Controller
 
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
+
+
 }

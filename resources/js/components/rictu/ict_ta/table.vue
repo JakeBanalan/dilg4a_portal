@@ -165,7 +165,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
-import {eventBus} from "../eventBus.js";
+import { eventBus } from "../eventBus.js";
+import Pusher from 'pusher-js';
+
 
 library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical);
 export default {
@@ -192,7 +194,8 @@ export default {
             started_date: null,
             request_type: null,
             sub_request_type: null,
-            assign_ict_officer: null
+            assign_ict_officer: null,
+            pusher: null,
         }
 
     },
@@ -218,7 +221,37 @@ export default {
     mounted() {
         this.fetchRequests(this.role, 6);
 
+
+        if (this.role === 'admin') {
+            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+                cluster: 'ap1'
+            });
+            // Listen for the update-table event on the ict-ta-channel channel
+            const receivedChannel = pusher.subscribe('received-ta-channel');
+            receivedChannel.bind('received-ict-ta', (data) => {
+                this.load_ict_request(6);
+            });
+            const completedChannel = pusher.subscribe('completed-ta-channel');
+            completedChannel.bind('completed-ict-ta', (data) => {
+                this.load_ict_request(6);
+            });
+        } else if (this.role === 'user') {
+            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+                cluster: 'ap1'
+            });
+            const receivedChannel = pusher.subscribe('received-ta-channel');
+            receivedChannel.bind('received-ict-ta', (data) => {
+                this.load_ict_perUser_request(6);
+            });
+            // Listen for the update-table event on the ict-ta-channel channel
+            const completedChannel = pusher.subscribe('completed-ta-channel');
+            completedChannel.bind('completed-ict-ta', (data) => {
+                this.load_ict_perUser_request(6);
+            });
+        }
+
     },
+
     methods: {
         onPageChange(page) {
             this.currentPage = page;
@@ -235,8 +268,8 @@ export default {
         openModal(id) {
             this.selected_id = id;
             this.fetch_ict_req_details();
-
             this.modalVisible = true;
+
         },
         closeModal() {
             this.modalVisible = false;

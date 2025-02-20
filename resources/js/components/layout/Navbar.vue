@@ -32,8 +32,8 @@
 <template>
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
         <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-            <a class="navbar-brand brand-logo mr-5" href="#"><img src="../../../../assets/images/logo.png"
-                    class="mr-2" alt="logo" /></a>
+            <a class="navbar-brand brand-logo mr-5" href="#"><img src="../../../../assets/images/logo.png" class="mr-2"
+                    alt="logo" /></a>
             <a class="navbar-brand brand-logo-mini" href="#"><img src="../../../../assets/images/logo.png"
                     alt="logo" /></a>
         </div>
@@ -116,6 +116,8 @@
 <script>
 import Pusher from 'pusher-js';
 import { toast } from "vue3-toastify";
+import { eventBus } from "../eventBus.js";
+
 export default {
     name: 'Navbar',
     data() {
@@ -142,20 +144,21 @@ export default {
                     this.userRole = response.data.user_role;
 
                     // Initialize Pusher
-                    var pusher = new Pusher('29d53f8816252d29de52', {
+                    var pusher = new Pusher('ab9564fd50f2d6d9e627', {
                         cluster: 'ap1'
                     });
+
+
 
                     // Subscribe to the appropriate channel based on user role
                     if (this.userRole === 'admin') {
                         // Admin subscribes to the new TA request channel
                         this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index');
-
                         // Function to subscribe to a channel and bind an event
                         const subscribeAndBind = (channelName, eventName) => {
                             const channel = pusher.subscribe(channelName);
                             channel.bind(eventName, (data) => {
-                                window.location.reload();
+
                             });
                         };
                         subscribeAndBind('received-ta-channel', 'received-ict-ta');
@@ -207,7 +210,6 @@ export default {
                         time: new Date().toLocaleString(),
                         redirectUrl: redirectUrl
                     });
-
                     this.showAlert(`${notificationTitle} from ${data.name}`);
                     if (Notification.permission === 'granted') {
                         new Notification(`${notificationTitle} from ${data.name}`, {
@@ -236,6 +238,7 @@ export default {
                         }
                     }
                 }
+
             });
         },
         showAlert(title) {
