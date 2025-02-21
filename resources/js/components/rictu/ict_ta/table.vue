@@ -83,7 +83,8 @@ th {
                             </div>
                             <div v-else-if="ict_data.status === 'Draft'">
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                    @click="received_request(ict_data.id)" aria-label="Confirm Request" title="Confirm">
+                                    @click="received_request(ict_data.id)" aria-label="Confirm Request" title="Confirm"
+                                    :disabled="isReceiving">
                                     <font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon>
                                 </button>
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
@@ -196,11 +197,12 @@ export default {
             sub_request_type: null,
             assign_ict_officer: null,
             pusher: null,
+            isReceiving: false // Add a flag to track request state
         }
 
     },
     created() {
-        this.user_id = localStorage.getItem('userId')
+        this.user_id = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
     },
     computed: {
@@ -221,12 +223,10 @@ export default {
     mounted() {
         this.fetchRequests(this.role, 6);
 
-
         if (this.role === 'admin') {
             var pusher = new Pusher('29d53f8816252d29de52', {
                 cluster: 'ap1'
             });
-            // Listen for the update-table event on the ict-ta-channel channel
             const newChannel = pusher.subscribe('ict-ta-channel');
             newChannel.bind('new-ict-ta', (data) => {
                 this.load_ict_request(6);
@@ -236,6 +236,7 @@ export default {
             receivedChannel.bind('received-ict-ta', (data) => {
                 this.load_ict_request(6);
             });
+
             const completedChannel = pusher.subscribe('completed-ta-channel');
             completedChannel.bind('completed-ict-ta', (data) => {
                 this.load_ict_request(6);
@@ -248,13 +249,19 @@ export default {
             receivedChannel.bind('received-ict-ta', (data) => {
                 this.load_ict_perUser_request(6);
             });
-            // Listen for the update-table event on the ict-ta-channel channel
             const completedChannel = pusher.subscribe('completed-ta-channel');
             completedChannel.bind('completed-ict-ta', (data) => {
                 this.load_ict_perUser_request(6);
             });
         }
-
+    },
+    beforeDestroy() {
+        if (this.pusher) {
+            this.pusher.unsubscribe('ict-ta-channel');
+            this.pusher.unsubscribe('received-ta-channel');
+            this.pusher.unsubscribe('completed-ta-channel');
+            this.pusher.disconnect(); // Clean up Pusher connection
+        }
     },
 
     methods: {
@@ -365,23 +372,32 @@ export default {
             const url = this.$router.resolve({ path: '/rictu/ict_ta/pdf', query: { id: id } }).href;
             window.open(url, '_blank'); // Open in a new tab
         },
-        received_request(id) {
+        async received_request(id) {
+            if (this.isReceiving) return; // Prevent multiple calls
+
+            this.isReceiving = true;
             const userId = localStorage.getItem('userId');
 
-            axios.post('/api/post_received_ict_request', {
-                control_no_id: id,
-                cur_user: userId
-            }).then(() => {
+            try {
+                await axios.post('/api/post_received_ict_request', {
+                    control_no_id: id,
+                    cur_user: userId
+                });
+
                 toast.success('Success! This request has been received!', {
                     autoClose: 2000
                 });
 
                 this.load_ict_request(6);
                 eventBus.emit('updateICTSTAT');
-
-            }).catch((error) => {
-
-            })
+            } catch (error) {
+                console.error('Error receiving request:', error);
+                toast.error('Failed to receive request. Please try again.', {
+                    autoClose: 2000
+                });
+            } finally {
+                this.isReceiving = false;
+            }
         }
 
     }

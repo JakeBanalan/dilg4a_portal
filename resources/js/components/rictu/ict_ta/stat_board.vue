@@ -186,7 +186,6 @@
 </template>
 
 <script>
-import Swal from 'sweetalert2';
 import { eventBus } from "../eventBus.js";
 import Pusher from 'pusher-js';
 
@@ -210,7 +209,7 @@ export default {
             ict_adminHardware: 0,
             ict_adminSoftware: 0,
             isSurveyCompleted: false,
-            pusher: null
+            pusher: null,
         };
     },
     created() {
@@ -249,6 +248,14 @@ export default {
             this.fetchICTAdminCount();
             this.fetchICTAdminDraft();
         });
+    },
+    beforeDestroy() {
+        if (this.pusher) {
+            this.pusher.unsubscribe('received-ta-channel');
+            this.pusher.unsubscribe('completed-ta-channel');
+            this.pusher.disconnect();
+        }
+        eventBus.off('updateICTSTAT');
     },
     methods: {
         fetchICTAdminCount() {
