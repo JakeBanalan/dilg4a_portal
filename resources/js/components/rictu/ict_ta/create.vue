@@ -32,7 +32,6 @@ img {
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <BreadCrumbs />
                     <form @submit.prevent="create_ict_ta()">
                         <div class="row">
                             <div class="col-lg-9">
