@@ -117,7 +117,7 @@
                                                     </Multiselect>
                                                     <span class="text-danger" v-if="errors.pmo">{{ errors.pmo }}</span>
                                                 </div>
-                                                
+
                                                 <!-- <div class="form-group">
                                                     <label for="Position">Division</label>
                                                     <Multiselect :options="division" track-by="value"
@@ -149,7 +149,7 @@
                                                     <label for="Middle Name">Middle Name</label>
                                                     <input type="text" class="form-control" id="MiddleName"
                                                         v-model="data.middle_name" />
-                                                        
+
                                                 </div>
 
                                                 <div class="form-group">
