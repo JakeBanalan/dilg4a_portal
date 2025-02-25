@@ -136,7 +136,7 @@ th {
 
                     <td> {{ formatDate(ict_data.started_date) }}</td>
                     <td> {{ formatTime(ict_data.started_date) }}</td>
-                    <td>{{ ict_data.requested_by }}</td>
+                    <td>{{ ucwords(ict_data.requested_by) }}</td>
                     <td>{{ ict_data.office }}</td>
                     <td>{{ ict_data.ict_personnel }}</td>
                     <td> {{ formatDate(ict_data.completed_date) }}</td>
@@ -265,6 +265,11 @@ export default {
     },
 
     methods: {
+        ucwords(str) {
+            return str.replace(/\w\S*/g, function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        },
         onPageChange(page) {
             this.currentPage = page;
         },
