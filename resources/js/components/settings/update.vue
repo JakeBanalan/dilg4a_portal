@@ -1,6 +1,6 @@
 <template>
     <div class="container-scroller">
-        <Navbar></Navbar>
+        <Navbar />
         <div class="container-fluid page-body-wrapper">
             <Sidebar />
             <div class="main-panel">
@@ -12,7 +12,7 @@
                                 <div class="card-body">
                                     <div class="card-title d-flex justify-content-between align-items-center">
                                         <h5 class="card-title">
-                                            <font-awesome-icon :icon="['fas', 'circle-info']"></font-awesome-icon>
+                                            <font-awesome-icon :icon="['fas', 'circle-info']" />
                                             Update User Info: {{ data.name }}
                                         </h5>
                                     </div>
@@ -37,123 +37,124 @@
                                 <div class="card-body">
                                     <div class="card-title d-flex justify-content-between align-items-center">
                                         <h5 class="card-title">
-                                            <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;User
-                                            Details
+                                            <font-awesome-icon :icon="['fas', 'list']" />
+                                            &nbsp;User Details
                                         </h5>
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="Employee ID No.">Employee ID No.</label>
-                                                <input type="text" class="form-control" id="coverage"
+                                                <label for="EmployeeID">Employee ID No.</label>
+                                                <input type="text" class="form-control" id="EmployeeID"
                                                     v-model="data.employee_no" />
+                                                <span class="text-danger" v-if="errors.employee_no">{{
+                                                    errors.employee_no }}</span>
                                             </div>
                                             <div class="form-group">
                                                 <label for="Office">Office</label>
                                                 <Multiselect @update:modelValue="OfficeSelect" :options="OptsOffice"
-                                                    v-model="data.office" :multiple="false" track-by='id' label="office"
-                                                    :searchable="false" placeholder="Office">
-                                                </Multiselect>
+                                                    v-model="data.office" :multiple="false" track-by="id" label="office"
+                                                    :searchable="false" placeholder="Office" />
+                                                <span class="text-danger" v-if="errors.office">{{ errors.office
+                                                    }}</span>
                                             </div>
                                             <div class="form-group">
                                                 <label for="Province">Province</label>
                                                 <Multiselect @update:modelValue="provinceSelect" :options="Optsprovince"
                                                     track-by="value" v-model="data.province" :multiple="false"
                                                     label="label" :searchable="false" placeholder="Province"
-                                                    :disabled="isOfficeDisabled">
-                                                </Multiselect>
+                                                    :disabled="isOfficeDisabled" />
+                                                <span class="text-danger" v-if="errors.province">{{ errors.province
+                                                    }}</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="City/Municipality">City/Municipality</label>
+                                                <label for="CityMunicipality">City/Municipality</label>
                                                 <Multiselect :options="Optscitymun" track-by="value"
                                                     v-model="data.citymun" :multiple="false" label="label"
                                                     :searchable="false" placeholder="City/Municipality"
-                                                    :disabled="isProvinceDisabled">
-                                                </Multiselect>
+                                                    :disabled="isProvinceDisabled" />
+                                                <span class="text-danger" v-if="errors.citymun">{{ errors.citymun
+                                                    }}</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="Employment Status">Employment Status</label>
+                                                <label for="EmploymentStatus">Employment Status</label>
                                                 <Multiselect :options="emp_status" track-by="value"
                                                     v-model="data.employment_status" :multiple="false" label="label"
-                                                    :searchable="false" placeholder="Employment Status">
-                                                </Multiselect>
+                                                    :searchable="false" placeholder="Employment Status" />
+                                                <span class="text-danger" v-if="errors.employment_status">{{
+                                                    errors.employment_status }}</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="Position">Position</label>
                                                 <Multiselect :options="Optsposition" track-by="value"
                                                     v-model="data.position_id" :multiple="false" label="label"
-                                                    :searchable="true" placeholder="Position">
-                                                </Multiselect>
+                                                    :searchable="false" placeholder="Position" />
+                                                <span class="text-danger" v-if="errors.position_id">{{
+                                                    errors.position_id }}</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="Position">Division</label>
-                                                <Multiselect :options="Optsdivision" track-by="value"
-                                                    v-model="data.division" :multiple="false" label="label"
-                                                    :searchable="false" placeholder="Division">
-                                                </Multiselect>
+                                                <label for="OfficeDivision">Office/Division</label>
+                                                <Multiselect :options="pmo" track-by="value" v-model="data.pmo"
+                                                    :multiple="false" label="label" :searchable="false"
+                                                    placeholder="Division" />
+                                                <span class="text-danger" v-if="errors.pmo">{{ errors.pmo }}</span>
                                             </div>
-
-                                            <div class="form-group">
-                                                <label for="Position">Section</label>
-                                                <Multiselect :options="Optssection" track-by="value"
-                                                    v-model="data.section" :multiple="false" label="label"
-                                                    :searchable="false" placeholder="Section">
-                                                </Multiselect>
-                                            </div>
-
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label for="First Name">First Name</label>
+                                                <label for="FirstName">First Name</label>
                                                 <input type="text" class="form-control" id="FirstName"
                                                     v-model="data.first_name" />
+                                                <span class="text-danger" v-if="errors.first_name">{{ errors.first_name
+                                                    }}</span>
                                             </div>
                                             <div class="form-group">
-                                                <label for="Middle Name">Middle Name</label>
+                                                <label for="MiddleName">Middle Name</label>
                                                 <input type="text" class="form-control" id="MiddleName"
                                                     v-model="data.middle_name" />
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="Last Name">Last Name</label>
+                                                <label for="LastName">Last Name</label>
                                                 <input type="text" class="form-control" id="LastName"
                                                     v-model="data.last_name" />
+                                                <span class="text-danger" v-if="errors.last_name">{{ errors.last_name
+                                                    }}</span>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="Extension Name">Extension Name</label>
+                                                <label for="ExtensionName">Extension Name</label>
                                                 <input type="text" class="form-control" id="ExtensionName"
                                                     v-model="data.ext_name" />
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="Birth Date">Birth Date</label>
+                                                <label for="BirthDate">Birth Date</label>
                                                 <input type="date" class="form-control" id="BirthDate"
                                                     v-model="data.birthdate" />
+                                                <span class="text-danger" v-if="errors.birthdate">{{ errors.birthdate
+                                                    }}</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="Gender">Gender</label>
                                                 <Multiselect :options="gender_opts" track-by="value"
                                                     v-model="data.gender" :multiple="false" label="label"
-                                                    :searchable="false" placeholder="Position">
-                                                </Multiselect>
+                                                    :searchable="false" placeholder="Gender" />
+                                                <span class="text-danger" v-if="errors.gender">{{ errors.gender
+                                                    }}</span>
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="Mobilephone">Mobilephone</label>
                                                 <input type="text" class="form-control" id="Mobilephone"
                                                     v-model="data.contact_details" />
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label for="EmailAddress">Email Address</label>
-                                                <input type="text" class="form-control" id="EmailAddress"
-                                                    v-model="data.email" />
+                                                <span class="text-danger" v-if="errors.contact_details">{{
+                                                    errors.contact_details }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -163,29 +164,36 @@
                                 <div class="card-body">
                                     <div class="card-title d-flex justify-content-between align-items-center">
                                         <h5 class="card-title">
-                                            <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Account
-                                            Details
+                                            <font-awesome-icon :icon="['fas', 'list']" />
+                                            &nbsp;Account Details
                                         </h5>
                                     </div>
                                     <div class="col-lg-12">
+                                        <TextInput label="Email" iconValue="user" v-model="data.email"
+                                            :value="data.email" :readonly="false" />
+                                        <span class="text-danger d-block mb-3" v-if="errors.email">{{ errors.email
+                                            }}</span>
+
                                         <TextInput label="Username" iconValue="user" v-model="data.username"
                                             :value="data.username" :readonly="false" />
+                                        <span class="text-danger d-block mb-3" v-if="errors.username">{{ errors.username
+                                            }}</span>
+
                                         <TextInput label="Password" iconValue="key" type="password"
                                             v-model="data.password" value="" :readonly="false" style="height:40px;" />
-                                        <br>
-                                        <button class="btn btn-outline-primary"
-                                            @click="updateUserDetails();">Update</button>
+                                        <br />
+                                        <button class="btn btn-outline-primary" @click="submitForm">
+                                            Update
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </template>
 <script>
 import Navbar from '../layout/Navbar.vue';
@@ -216,7 +224,7 @@ export default {
             data: {
                 id: this.user_id,
                 employee_no: '',
-                pmo_id: '',
+                pmo: '',
                 position_id: '',
                 province: '',
                 city: '',
@@ -235,6 +243,7 @@ export default {
                 office: '',
                 password: ''
             },
+            errors: {},
             Optsposition: [],
             Optscitymun: [],
             Optsdivision: [
@@ -285,6 +294,23 @@ export default {
                 { value: 2, label: 'Contract of Service' },
                 { value: 3, label: 'Job Order' },
                 { value: 4, label: 'Consultant' }
+            ],
+            pmo: [
+                { value: '1', label: 'ORD-Legal' },
+                { value: '2', label: 'ORD-Planning' },
+                { value: '3', label: 'LGMED-MBRTG' },
+                { value: '4', label: 'LGCDD-PDMU' },
+                { value: '5', label: 'FAD' },
+                { value: '6', label: 'ORD-RICTU' },
+                { value: '7', label: 'LGCDD' },
+                { value: '8', label: 'LGMED' },
+                { value: '9', label: 'BATANGAS' },
+                { value: '10', label: 'CAVITE' },
+                { value: '11', label: 'LAGUNA' },
+                { value: '12', label: 'QUEZON' },
+                { value: '13', label: 'RIZAL' },
+                { value: '14', label: 'LUCENA CITY' },
+                { value: '15', label: 'ORD' },
             ]
         }
     },
@@ -311,20 +337,6 @@ export default {
                     return error;
                 })
         },
-        // ValidatedOP() {
-        //     const OfficeVal = this.data.office;
-        //     console.log(OfficeVal)
-        //     if (OfficeVal === 1) {
-        //         this.isOfficeDisabled = true;
-        //         this.isProvinceDisabled = true;
-        //     } else if (OfficeVal === 2) {
-        //         this.isOfficeDisabled = false;
-        //         this.isProvinceDisabled = true;
-        //     } else {
-        //         this.isOfficeDisabled = false;
-        //         this.isProvinceDisabled = false;
-        //     }
-        // },
         OfficeSelect(arg) {
             console.log(arg)
             if (arg.id === 1) {
@@ -405,8 +417,9 @@ export default {
             let province = data.province.value;
             let citymun = data.citymun.value;
             let office = data.office.id;
-            let section = data.section.value;
-            let division = data.division.value;
+            // let section = data.section.value;
+            // let division = data.division.value;
+            let pmo = data.pmo.value
             let employment_status = data.employment_status.value;
             axios.post(`../../api/updateUserDetails`,
                 {
@@ -416,8 +429,9 @@ export default {
                     province: province,
                     citymun: citymun,
                     office: office,
-                    section: section,
-                    division: division,
+                    // section: section,
+                    // division: division,
+                    pmo_id:pmo,
                     employment_status: employment_status,
                     first_name: data.first_name,
                     middle_name: data.middle_name,
@@ -450,9 +464,10 @@ export default {
                     const CityMunID = response.data.citymun;
                     const EmploymentID = response.data.employment_status;
                     const PositionID = response.data.position_id;
-                    const DivisionID = response.data.division;
-                    const SectionID = response.data.section;
+                    // const DivisionID = response.data.division;
+                    // const SectionID = response.data.section;
                     const GenderID = response.data.gender;
+                    const pmoID = response.data.pmo_id;
 
                     // Set office and province
                     // this.data.office = this.OptsOffice.find(office => office.value === userOfficeId);
@@ -467,10 +482,10 @@ export default {
                     this.data.office = userOfficeId ? this.OptsOffice.find(office => office.value === userOfficeId) : '';
                     this.data.province = provID ? this.Optsprovince.find(province => province.value === provID) : '';
                     this.data.employment_status = EmploymentID ? this.emp_status.find(emp_status => emp_status.value === EmploymentID) : '';
-                    this.data.division = DivisionID ? this.Optsdivision.find(Optsdivision => Optsdivision.value === DivisionID) : '';
-                    this.data.section = SectionID ? this.Optssection.find(Optssection => Optssection.value === SectionID) : '';
+                    // this.data.division = DivisionID ? this.Optsdivision.find(Optsdivision => Optsdivision.value === DivisionID) : '';
+                    // this.data.section = SectionID ? this.Optssection.find(Optssection => Optssection.value === SectionID) : '';
+                    this.data.pmo = pmoID ? this.pmo.find(pmo => Number(pmo.value) === Number(pmoID)) : '';
                     this.data.gender = GenderID ? this.gender_opts.find(gender_opts => gender_opts.value === GenderID) : '';
-
 
                     // Fetch city/municipality options based on the selected province
                     axios.get(`../../api/getCityMun/${provID}`)
@@ -479,7 +494,7 @@ export default {
                                 value: item.id,
                                 label: item.citymun
                             }));
-                            this.data.citymun = CityMunID ? this.Optscitymun.find(citymun => citymun.value === CityMunID): '';
+                            this.data.citymun = CityMunID ? this.Optscitymun.find(citymun => citymun.value === CityMunID) : '';
 
                         })
 
@@ -500,13 +515,72 @@ export default {
                             console.error('Error fetching positions:', error);
                         });
 
-                    console.log(this.data)
-
+                    // console.log(this.data)
                 })
                 .catch(error => {
                     console.error('Error fetching user details:', error);
                 });
-        }
+        },
+        // Form validation method
+        validateForm() {
+            this.errors = {};
+
+            // Check required fields (add more rules as needed)
+            if (!this.data.employee_no) {
+                this.errors.employee_no = 'Employee ID is required.';
+            }
+            if (!this.data.office) {
+                this.errors.office = 'Office is required.';
+            }
+            if (!this.data.first_name) {
+                this.errors.first_name = 'First Name is required.';
+            }
+            if (!this.data.last_name) {
+                this.errors.last_name = 'Last Name is required.';
+            }
+            if (!this.data.birthdate) {
+                this.errors.birthdate = 'Birth Date is required.';
+            }
+            if (!this.data.gender) {
+                this.errors.gender = 'Gender is required.';
+            }
+            if (!this.data.email) {
+                this.errors.email = 'Email is required.';
+            } else if (!this.validEmail(this.data.email)) {
+                this.errors.email = 'Please enter a valid email.';
+            }
+            if (!this.data.username) {
+                this.errors.username = 'Username is required.';
+            }
+            if (!this.data.employment_status) {
+                this.errors.employment_status = 'Employment Status is required.';
+            }
+            if (!this.data.position_id) {
+                this.errors.position_id = 'Position is required.';
+            }
+            if (!this.data.pmo) {
+                this.errors.pmo = 'Office/Division is required.';
+            }
+            // Add additional validations as necessary...
+
+            // Return true if no errors
+            return Object.keys(this.errors).length === 0;
+        },
+        // Simple email validation (you could use a more robust regex)
+        validEmail(email) {
+            const re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        },
+        // Submit handler for the form
+        submitForm() {
+            if (this.validateForm()) {
+                // Proceed with updating user details
+                this.updateUserDetails();
+            } else {
+                // Optionally scroll to the first error or display a notification
+                console.log('Validation errors:', this.errors);
+            }
+        },
     },
     components: {
         Multiselect,

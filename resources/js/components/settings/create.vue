@@ -36,7 +36,6 @@
                             </div>
                         </div>
                         <div class="col-lg-9 col-md-6 col-sm-6 mt-4">
-                            <form class="UserForm" @submit.prevent="PostUser">
 
                                 <div class="card">
                                     <div class="card-body">
@@ -54,6 +53,8 @@
                                                     <label for="Employee ID No.">Employee ID No.</label>
                                                     <input type="text" class="form-control" id="coverage"
                                                         v-model="data.employee_no" />
+                                                        <span class="text-danger" v-if="errors.employee_no">{{
+                                                    errors.employee_no }}</span>
                                                 </div>
 
                                                 <div class="form-group">
@@ -62,6 +63,8 @@
                                                         track-by="value" v-model="data.office" :multiple="false"
                                                         label="label" :searchable="false" placeholder="Office">
                                                     </Multiselect>
+                                                    <span class="text-danger" v-if="errors.office">{{ errors.office
+                                                    }}</span>
                                                 </div>
 
                                                 <div class="form-group">
@@ -71,6 +74,8 @@
                                                         label="label" :searchable="false" placeholder="Province"
                                                         :disabled="isOfficeDisabled">
                                                     </Multiselect>
+                                                    <span class="text-danger" v-if="errors.province">{{ errors.province
+                                                    }}</span>
                                                 </div>
 
                                                 <div class="form-group">
@@ -80,6 +85,8 @@
                                                         :searchable="false" placeholder="City/Municipality"
                                                         :disabled="isProvinceDisabled">
                                                     </Multiselect>
+                                                    <span class="text-danger" v-if="errors.citymun">{{ errors.citymun
+                                                    }}</span>
                                                 </div>
 
                                                 <div class="form-group">
@@ -88,6 +95,8 @@
                                                         v-model="data.employment_status" :multiple="false" label="label"
                                                         :searchable="false" placeholder="Employment Status">
                                                     </Multiselect>
+                                                    <span class="text-danger" v-if="errors.employment_status">{{
+                                                    errors.employment_status }}</span>
                                                 </div>
 
                                                 <div class="form-group">
@@ -96,9 +105,20 @@
                                                         v-model="data.position_id" :multiple="false" label="label"
                                                         :searchable="false" placeholder="Position">
                                                     </Multiselect>
+                                                    <span class="text-danger" v-if="errors.position_id">{{
+                                                    errors.position_id }}</span>
                                                 </div>
 
                                                 <div class="form-group">
+                                                    <label for="Position">Office/Division</label>
+                                                    <Multiselect :options="pmo" track-by="value"
+                                                        v-model="data.pmo" :multiple="false" label="label"
+                                                        :searchable="false" placeholder="Division">
+                                                    </Multiselect>
+                                                    <span class="text-danger" v-if="errors.pmo">{{ errors.pmo }}</span>
+                                                </div>
+                                                
+                                                <!-- <div class="form-group">
                                                     <label for="Position">Division</label>
                                                     <Multiselect :options="division" track-by="value"
                                                         v-model="data.division" :multiple="false" label="label"
@@ -112,7 +132,7 @@
                                                         v-model="data.section" :multiple="false" label="label"
                                                         :searchable="false" placeholder="Section">
                                                     </Multiselect>
-                                                </div>
+                                                </div> -->
 
                                             </div>
                                             <div class="col-lg-6">
@@ -121,18 +141,23 @@
                                                     <label for="First Name">First Name</label>
                                                     <input type="text" class="form-control" id="FirstName"
                                                         v-model="data.first_name" />
+                                                        <span class="text-danger" v-if="errors.first_name">{{ errors.first_name
+                                                    }}</span>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label for="Middle Name">Middle Name</label>
                                                     <input type="text" class="form-control" id="MiddleName"
                                                         v-model="data.middle_name" />
+                                                        
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label for="Last Name">Last Name</label>
                                                     <input type="text" class="form-control" id="LastName"
                                                         v-model="data.last_name" />
+                                                        <span class="text-danger" v-if="errors.last_name">{{ errors.last_name
+                                                    }}</span>
                                                 </div>
 
                                                 <div class="form-group">
@@ -145,6 +170,8 @@
                                                     <label for="Birth Date">Birth Date</label>
                                                     <input type="date" class="form-control" id="BirthDate"
                                                         v-model="data.birthdate" />
+                                                        <span class="text-danger" v-if="errors.birthdate">{{ errors.birthdate
+                                                    }}</span>
                                                 </div>
 
                                                 <div class="form-group">
@@ -153,19 +180,23 @@
                                                         v-model="data.gender" :multiple="false" label="label"
                                                         :searchable="false" placeholder="Gender">
                                                     </Multiselect>
+                                                    <span class="text-danger" v-if="errors.gender">{{ errors.gender
+                                                    }}</span>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <label for="Mobilephone">Mobilephone</label>
                                                     <input type="text" class="form-control" id="Mobilephone"
                                                         v-model="data.contact_details" />
+                                                        <span class="text-danger" v-if="errors.contact_details">{{
+                                                    errors.contact_details }}</span>
                                                 </div>
 
-                                                <div class="form-group">
+                                                <!-- <div class="form-group">
                                                     <label for="Email">Email Address</label>
                                                     <input type="text" class="form-control" id="Email"
                                                         v-model="data.email" />
-                                                </div>
+                                                </div> -->
                                             </div>
                                         </div>
                                     </div>
@@ -180,18 +211,23 @@
                                             </h5>
                                         </div>
                                         <div class="col-lg-12">
+                                            <TextInput label="Email Address" iconValue="user" v-model="data.email"
+                                            :value="data.email" :readonly="false" />
+                                            <span class="text-danger d-block mb-3" v-if="errors.email">{{ errors.email
+                                            }}</span>
                                             <TextInput label="Username" iconValue="user" v-model="data.username"
                                                 :value="data.username" :readonly="false" />
+                                                <span class="text-danger d-block mb-3" v-if="errors.username">{{ errors.username
+                                            }}</span>
                                             <TextInput label="Password" iconValue="key" type="password"
                                                 v-model="data.password" value="" :readonly="false"
                                                 style="height:40px;" />
                                             <br>
-                                            <button type="submit" class="btn btn-outline-primary">Save</button>
+                                            <button type="submit" class="btn btn-outline-primary" @click="submitForm">Save</button>
                                         </div>
                                     </div>
                                 </div>
 
-                            </form>
                         </div>
                     </div>
                 </div>
@@ -234,6 +270,7 @@ export default {
                 office: '',
                 section: '',
                 division: '',
+                pmo: '',
                 employment_status: '',
                 first_name: '',
                 middle_name: '',
@@ -246,6 +283,7 @@ export default {
                 username: '',
                 password: '',
             },
+            errors:{},
             position: [],
             province: [],
             citymun: [],
@@ -281,6 +319,23 @@ export default {
                 { value: '2', label: 'Contract of Service' },
                 { value: '3', label: 'Job Order' },
                 { value: '4', label: 'Consultant' }
+            ],
+            pmo:[
+                { value: '1', label: 'ORD-Legal' },
+                { value: '2', label: 'ORD-Planning' },
+                { value: '3', label: 'LGMED-MBRTG' },
+                { value: '4', label: 'LGCDD-PDMU' },
+                { value: '5', label: 'FAD' },
+                { value: '6', label: 'ORD-RICTU' },
+                { value: '7', label: 'LGCDD' },
+                { value: '8', label: 'LGMED' },
+                { value: '9', label: 'BATANGAS' },
+                { value: '10', label: 'CAVITE' },
+                { value: '11', label: 'LAGUNA' },
+                { value: '12', label: 'QUEZON' },
+                { value: '13', label: 'RIZAL' },
+                { value: '14', label: 'LUCENA CITY' },
+                { value: '15', label: 'ORD' },
             ]
         }
     },
@@ -304,6 +359,7 @@ export default {
             let office = data.office.value;
             let section = data.section.value;
             let division = data.division.value;
+            let pmo = data.pmo.value;
             let employment_status = data.employment_status.value;
             let gender = data.gender.value;
             let position_id = data.position_id.value;
@@ -316,6 +372,7 @@ export default {
                     office: office,
                     section: section,
                     division: division,
+                    pmo: pmo,
                     employment_status: employment_status,
                     first_name: data.first_name,
                     middle_name: data.middle_name,
@@ -400,7 +457,70 @@ export default {
                 }).catch(error => {
                     console.error('Error fetching positions:', error);
                 });
-        }
+        },
+         // Form validation method
+         validateForm() {
+            this.errors = {};
+
+            // Check required fields (add more rules as needed)
+            if (!this.data.employee_no) {
+                this.errors.employee_no = 'Employee ID is required.';
+            }
+            if (!this.data.office) {
+                this.errors.office = 'Office is required.';
+            }
+            if (!this.data.first_name) {
+                this.errors.first_name = 'First Name is required.';
+            }
+            if (!this.data.last_name) {
+                this.errors.last_name = 'Last Name is required.';
+            }
+            if (!this.data.birthdate) {
+                this.errors.birthdate = 'Birth Date is required.';
+            }
+            if (!this.data.gender) {
+                this.errors.gender = 'Gender is required.';
+            }
+            if (!this.data.email) {
+                this.errors.email = 'Email is required.';
+            } else if (!this.validEmail(this.data.email)) {
+                this.errors.email = 'Please enter a valid email.';
+            }
+            if (!this.data.username) {
+                this.errors.username = 'Username is required.';
+            }
+            if (!this.data.employment_status) {
+                this.errors.employment_status = 'Employment Status is required.';
+            }
+            if (!this.data.position_id) {
+                this.errors.position_id = 'Position is required.';
+            }
+            if (!this.data.pmo) {
+                this.errors.pmo = 'Office/Division is required.';
+            }
+            if (!this.data.contact_details) {
+                this.errors.contact_details = 'Contact Details is required.';
+            }
+            // Add additional validations as necessary...
+
+            // Return true if no errors
+            return Object.keys(this.errors).length === 0;
+        },
+        // Simple email validation (you could use a more robust regex)
+        validEmail(email) {
+            const re = /\S+@\S+\.\S+/;
+            return re.test(email);
+        },
+        // Submit handler for the form
+        submitForm() {
+            if (this.validateForm()) {
+                // Proceed with updating user details
+                this.PostUser();
+            } else {
+                // Optionally scroll to the first error or display a notification
+                console.log('Validation errors:', this.errors);
+            }
+        },
     },
     components: {
         Multiselect,
