@@ -25,7 +25,7 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                     <BreadCrumbs />
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-md-12 grid-margin mb-4 stretch-card">
 
                             <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
@@ -65,13 +65,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <div class="row">
                         <div class="col-md-12 grid-margin mb-4 stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <p class="card-title">Annual Procurement Plan for F.Y {{ currentYear }}</p>
+                                    <p class="card-title">APP for F.Y {{ currentYear }}</p>
                                     <div class="box-tools">
                                         <button @click="addAppItem()" type="button"
                                             class="btn btn-primary btn-icon-text">
@@ -79,6 +79,7 @@
                                             Create Item
                                         </button>
                                     </div>
+                                    <br>
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="table-responsive">
