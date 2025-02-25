@@ -5,8 +5,10 @@
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="modal demo-modal" v-if="modalVisible">
-                        <div class="modal-dialog">
+                    <div class="modal demo-modal" v-if="modalVisible"
+                        style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent;overflow-y: auto; width: 600px;">
+                        <div class="modal-dialog"
+                            style=" margin: auto; position: relative; transform: translateY(60%);">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <div
@@ -67,6 +69,7 @@
                                                     <option v-for="office in pmo" :key="office.value"
                                                         :value="office.value">{{ office.label }}</option>
                                                 </select>
+
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -108,15 +111,18 @@
                             <div class="card">
                                 <div class="card-body">
                                     <button type="button" class="btn btn-primary" style="float: left;"
-                                        @click="showAddItemModal"><font-awesome-icon :icon="['fas', 'plus']" /> &nbsp;
-                                        Add Item</button>
+                                        @click="showAddItemModal">
+                                        <font-awesome-icon :icon="['fas', 'plus']" /> &nbsp; Add Item
+                                    </button>
                                     <br>
-                                    <h3 style="float: right; font-size: 30px; font-weight: 900;">&nbsp; &nbsp;GRAND
-                                        TOTAL: Php <span style="font-weight: bold;">₱{{ formattedGrandTotal }}</span>
+                                    <h3 style="float: right; font-size: 30px; font-weight: 900;">
+                                        &nbsp; &nbsp;GRAND TOTAL: Php <span style="font-weight: bold;">₱{{
+                                            formattedGrandTotal }}</span>
                                     </h3>
                                     <br><br>
-                                    <div class="forms-sample">
-                                        <table class="table table-bordered table-hover">
+                                    <div class="forms-sample table-responsive"
+                                        style="overflow-y: auto; max-height: 400px;">
+                                        <table class="table table-bordered table-hover" style="width: 100%;">
                                             <thead>
                                                 <tr>
                                                     <th>Stock Number</th>
@@ -138,14 +144,20 @@
                                                     <td>{{ item.quantity }}</td>
                                                     <td>₱{{ item.price.toLocaleString('en-US', {
                                                         minimumFractionDigits:
-                                                        2, maximumFractionDigits: 2 }) }}</td>
+                                                            2, maximumFractionDigits: 2
+                                                    }) }}</td>
                                                     <td>₱{{ (item.quantity * item.price).toLocaleString('en-US', {
-                                                        minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</td>
+                                                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                                                    }) }}</td>
                                                     <td>
                                                         <button class="btn btn-warning btn-sm"
-                                                            @click="showEditItemModal(index)">Edit</button>
+                                                            @click="showEditItemModal(index)">
+                                                            <font-awesome-icon :icon="['fas', 'pen']" /> &nbsp;Edit
+                                                        </button>
                                                         <button class="btn btn-danger btn-sm"
-                                                            @click="deleteItem(index)">Delete</button>
+                                                            @click="deleteItem(index)">
+                                                            <font-awesome-icon :icon="['fas', 'trash']" /> &nbsp;Delete
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -155,8 +167,10 @@
                             </div>
                         </div>
                         <!--ADD ITEM MODAL-->
-                        <div class="modal demo-modal" v-if="addItemModalVisible" id="addItemModal">
-                            <div class="modal-dialog">
+                        <div class="modal" v-if="addItemModalVisible" id="addItemModal"
+                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            <div class="modal-dialog"
+                                style=" margin: auto; position: relative; transform: translateY(15%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -207,8 +221,10 @@
                         </div>
 
                         <!--EDIT ITEM MODAL-->
-                        <div class="modal demo-modal" v-if="editItemModalVisible" id="editItemModal">
-                            <div class="modal-dialog">
+                        <div class="modal" v-if="editItemModalVisible" id="editItemModal"
+                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            <div class="modal-dialog"
+                                style=" margin: auto; position: relative; transform: translateY(15%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -376,8 +392,8 @@ export default {
         formatNumberWithCommas(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
-        fetchItems() {
-            axios.get('/api/fetchItems')
+        fetchItems(year = new Date().getFullYear()) {
+            axios.get(`/api/fetchItems/${year}`)
                 .then(response => {
                     this.availableItems = response.data;
                 })
@@ -431,6 +447,27 @@ export default {
                     unit: item.unit
                 }))
             };
+
+            // Add validation for required fields
+            if (!requestData.pmo) {
+                this.showToastError('Office is required!');
+                return;
+            }
+
+            if (!requestData.type) {
+                this.showToastError('Purchase Type is required!');
+                return;
+            }
+
+            if (!requestData.target_date) {
+                this.showToastError('Purchase Request Target Date is required!');
+                return;
+            }
+
+            if (!requestData.purpose) {
+                this.showToastError('Particulars is required!');
+                return;
+            }
 
             axios.post('/api/post_create_purchaseRequest', requestData)
                 .then((response) => {
@@ -553,25 +590,6 @@ select {
     border: 1px solid #cbced4;
     box-sizing: border-box;
     padding: 0px 10px;
-}
-
-.modal.demo-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 5px;
-    z-index: 1050;
-    display: block;
-    background-color: rgba(0, 0, 0, 0.5);
-    overflow-y: auto;
-
-}
-
-.modal-dialog {
-    margin: auto;
-    position: relative;
-    transform: translateY(20%);
 }
 
 .modal-content .container h1 {

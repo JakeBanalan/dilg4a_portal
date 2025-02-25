@@ -8,6 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 
 use Illuminate\Notifications\Notifiable;
+
 class PurchaseRequestItemModel extends Model
 {
     use HasFactory;
@@ -25,4 +26,9 @@ class PurchaseRequestItemModel extends Model
         'date_added',
         'flag'
     ];
+
+    public function appItem()
+    {
+        return $this->belongsTo(AppItemModel::class, 'pr_item_id', 'id');
+    }
 }

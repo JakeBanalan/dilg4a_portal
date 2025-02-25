@@ -17,6 +17,7 @@ class PurchaseRequestModel extends Model
     protected $fillable = [
         'id',
         'pr_no',
+        'purpose',
         'pmo',
         'fund_source',
         'action_officer',
@@ -36,4 +37,9 @@ class PurchaseRequestModel extends Model
         'name',
         'email'
     ];
+
+    public function items()
+    {
+        return $this->hasMany(PurchaseRequestItemModel::class, 'pr_id');
+    }
 }

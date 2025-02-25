@@ -58,7 +58,7 @@ import TextInput from "../../micro/TextInput.vue";
 import TextAreaInput from "../../micro/TextAreaInput.vue";
 import axios from 'axios'; // Import Axios library
 import { toast } from "vue3-toastify";
-
+import { eventBus } from "../eventBus.js";
 export default {
     name: 'modal_complete_ta',
     data() {
@@ -128,11 +128,11 @@ export default {
             })
                 .then(response => {
                     toast.success('Success! This request has been completed!', {
-                        autoClose: 2000
+                        autoClose: 1000,
+                        onClose: () => {
+                            this.close();
+                        }
                     });
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000); // Adjust the delay as needed
                 })
                 .catch(error => {
                     // Handle error

@@ -62,7 +62,6 @@ th {
             <tbody v-if="(role === 'admin' || role === 'user') && displayedItems.length > 0">
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
                     <td>
-                        <!-- Buttons based on ICT request status -->
                         <template v-if="role === 'admin'">
                             <div v-if="ict_data.status === 'Received'">
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
@@ -70,10 +69,12 @@ th {
                                     <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                                 </button>
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                    @click="openModal(ict_data.id)" aria-label="Open Modal" title="Complete">
+                                    @click="openModal(ict_data.id)" aria-label="Open Modal" title="Complete"
+                                    v-if="ict_data.ict_personnel_id == user_id">
                                     <font-awesome-icon :icon="['fas', 'layer-group']"></font-awesome-icon>
                                 </button>
                             </div>
+
                             <div v-else-if="ict_data.status === 'Completed'">
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
                                     @click="view_ict_form(ict_data.id)" aria-label="View Details" title="Show">
@@ -82,7 +83,8 @@ th {
                             </div>
                             <div v-else-if="ict_data.status === 'Draft'">
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                    @click="received_request(ict_data.id)" aria-label="Confirm Request" title="Confirm">
+                                    @click="received_request(ict_data.id)" aria-label="Confirm Request" title="Confirm"
+                                    :disabled="isReceiving">
                                     <font-awesome-icon :icon="['fas', 'circle-check']"></font-awesome-icon>
                                 </button>
                                 <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
@@ -134,7 +136,7 @@ th {
 
                     <td> {{ formatDate(ict_data.started_date) }}</td>
                     <td> {{ formatTime(ict_data.started_date) }}</td>
-                    <td>{{ ict_data.requested_by }}</td>
+                    <td>{{ ucwords(ict_data.requested_by) }}</td>
                     <td>{{ ict_data.office }}</td>
                     <td>{{ ict_data.ict_personnel }}</td>
                     <td> {{ formatDate(ict_data.completed_date) }}</td>
@@ -164,6 +166,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
+import { eventBus } from "../eventBus.js";
+import Pusher from 'pusher-js';
+
 
 library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical);
 export default {
@@ -175,7 +180,7 @@ export default {
     },
     data() {
         return {
-            user_id: null,
+            user_id: '',
             ict_data: [],
             role: null,
             currentPage: 1,
@@ -190,6 +195,9 @@ export default {
             started_date: null,
             request_type: null,
             sub_request_type: null,
+            assign_ict_officer: null,
+            pusher: null,
+            isReceiving: false // Add a flag to track request state
         }
 
     },
@@ -215,8 +223,53 @@ export default {
     mounted() {
         this.fetchRequests(this.role, 6);
 
+        if (this.role === 'admin') {
+            var pusher = new Pusher('29d53f8816252d29de52', {
+                cluster: 'ap1'
+            });
+            const newChannel = pusher.subscribe('ict-ta-channel');
+            newChannel.bind('new-ict-ta', (data) => {
+                this.load_ict_request(6);
+            });
+
+            const receivedChannel = pusher.subscribe('received-ta-channel');
+            receivedChannel.bind('received-ict-ta', (data) => {
+                this.load_ict_request(6);
+            });
+
+            const completedChannel = pusher.subscribe('completed-ta-channel');
+            completedChannel.bind('completed-ict-ta', (data) => {
+                this.load_ict_request(6);
+            });
+        } else if (this.role === 'user') {
+            var pusher = new Pusher('29d53f8816252d29de52', {
+                cluster: 'ap1'
+            });
+            const receivedChannel = pusher.subscribe('received-ta-channel');
+            receivedChannel.bind('received-ict-ta', (data) => {
+                this.load_ict_perUser_request(6);
+            });
+            const completedChannel = pusher.subscribe('completed-ta-channel');
+            completedChannel.bind('completed-ict-ta', (data) => {
+                this.load_ict_perUser_request(6);
+            });
+        }
     },
+    beforeDestroy() {
+        if (this.pusher) {
+            this.pusher.unsubscribe('ict-ta-channel');
+            this.pusher.unsubscribe('received-ta-channel');
+            this.pusher.unsubscribe('completed-ta-channel');
+            this.pusher.disconnect(); // Clean up Pusher connection
+        }
+    },
+
     methods: {
+        ucwords(str) {
+            return str.replace(/\w\S*/g, function (txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        },
         onPageChange(page) {
             this.currentPage = page;
         },
@@ -232,8 +285,8 @@ export default {
         openModal(id) {
             this.selected_id = id;
             this.fetch_ict_req_details();
-
             this.modalVisible = true;
+
         },
         closeModal() {
             this.modalVisible = false;
@@ -265,7 +318,7 @@ export default {
         },
         load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = null, quarter = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
-
+            this.currentPage = 1;
             const params = {
                 ...(controlNo && { control_no: controlNo }),
                 ...(requestedBy && { requested_by: requestedBy }),
@@ -274,7 +327,7 @@ export default {
                 ...(endDate && { end_date: endDate }),
                 ...(pmo && { pmo }),
                 ...(year && { year }),
-                ...(quarter && { quarter })
+                ...(quarter && { quarter }),
             };
 
             axios.get(url, { params })
@@ -324,27 +377,32 @@ export default {
             const url = this.$router.resolve({ path: '/rictu/ict_ta/pdf', query: { id: id } }).href;
             window.open(url, '_blank'); // Open in a new tab
         },
-        received_request(id) {
+        async received_request(id) {
+            if (this.isReceiving) return; // Prevent multiple calls
+
+            this.isReceiving = true;
             const userId = localStorage.getItem('userId');
 
-            axios.post('/api/post_received_ict_request', {
-                control_no_id: id,
-                cur_user: userId
-            }).then(() => {
+            try {
+                await axios.post('/api/post_received_ict_request', {
+                    control_no_id: id,
+                    cur_user: userId
+                });
+
                 toast.success('Success! This request has been received!', {
                     autoClose: 2000
                 });
 
-                // Refresh the page after 2000 milliseconds (2 seconds)
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
-
                 this.load_ict_request(6);
-
-            }).catch((error) => {
-
-            })
+                eventBus.emit('updateICTSTAT');
+            } catch (error) {
+                console.error('Error receiving request:', error);
+                toast.error('Failed to receive request. Please try again.', {
+                    autoClose: 2000
+                });
+            } finally {
+                this.isReceiving = false;
+            }
         }
 
     }

@@ -5,7 +5,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <div
-                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 44%;">
                             <img :src="logo" style="width:60px; height:60px;">
                         </div>
                     </div>
@@ -125,7 +125,10 @@
                                 @click="toggleEditMode" v-if="mode === 'edit'">
                                 {{ isEditMode ? 'Cancel Edit' : 'Edit' }}
                             </button>
-
+                            <button type="button" class="btn btn-danger" style="float: right;margin-left:5px;"
+                                v-if="mode === 'edit'" @click="$emit('delete', eventDetails.id)">
+                                Delete Event
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -187,10 +190,20 @@ export default {
             return (this.mode === 'edit' && !this.isEditMode);
         }
     },
+
     methods: {
         toggleEditMode() {
-            this.isEditMode = !this.isEditMode;
-            this.isDisabledFlag = !this.isDisabledFlag;
+            if (this.eventDetails.postedBy === this.Author) {
+                this.isEditMode = !this.isEditMode;
+                this.isDisabledFlag = !this.isDisabledFlag;
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'You do not have permission to edit this event.',
+                    icon: 'error',
+                    confirmButtonColor: '#3085d6',
+                });
+            }
         },
         validateForm() {
             this.errors = {};
@@ -237,9 +250,6 @@ export default {
             this.isEditMode = false; // Reset edit mode
             this.errors = {}; // Clear validation errors
             this.$emit('close'); // Emit the close event
-        },
-        getUserInfo() {
-
         },
         showToatSuccess(message) {
             toast.success(message, {
@@ -298,17 +308,23 @@ export default {
 /* Style for dimming the background */
 .modal-background {
     position: fixed;
-    width: 100%;
-    height: 100%;
+    left: 50%;
+    border-radius: 5px;
+    z-index: 1050;
+    display: block;
     background-color: rgba(0, 0, 0, 0.5);
     overflow-y: auto;
 }
 
 /* Style for centering the modal */
 .modal-dialog {
-    max-height: 700px;
+    overflow: visible !important;
     overflow-y: auto;
+    margin-top: 10%;
+    max-width: 80%;
+    /* Adjust as needed */
 }
+
 
 .selected img {
     border: 2px solid #007bff;

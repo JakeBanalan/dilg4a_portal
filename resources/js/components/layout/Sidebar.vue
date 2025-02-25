@@ -131,16 +131,16 @@ export default {
                         },
                         {
                             link: '/procurement/index',
-                            name: 'Procurement',
+                            name: 'Procurement Request',
                             tooltip: 'Buttons',
                             icon: 'store',
                         },
-                        {
-                            link: '/procurement/budget/index',
-                            name: 'Budgeting',
-                            tooltip: 'Buttons',
-                            icon: 'coins',
-                        },
+                        // {
+                        //     link: '/procurement/budget/index',
+                        //     name: 'Budgeting',
+                        //     tooltip: 'Buttons',
+                        //     icon: 'coins',
+                        // },
                         {
                             link: '/procurement/rfq/index',
                             name: 'R.F.Q',
@@ -344,14 +344,14 @@ export default {
                     class: 'menu-icon-custom',
 
                     children: [
-                       
+
                         {
                             link: '/procurement/index',
-                            name: 'Procurement',
+                            name: 'Procurement Request',
                             tooltip: 'Buttons',
                             icon: 'store',
                         },
-                       
+
                         {
                             link: '/procurement/statistic',
                             name: 'Statistics',
@@ -367,8 +367,8 @@ export default {
                     ],
 
                 },
-               
-               
+
+
                 {
                     link: '',
                     name: 'RICTU',
@@ -383,8 +383,8 @@ export default {
                             tooltip: 'Buttons',
                             icon: 'group-arrows-rotate',
                         },
-                      
-                    
+
+
                     ]
                 },
                 {
@@ -395,7 +395,7 @@ export default {
                     class: 'menu-icon-custom',
 
                     children: [
-                       
+
                         {
                             link: '/qms/reports_submission/index',
                             name: 'Reports Submission',

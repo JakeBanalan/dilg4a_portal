@@ -239,4 +239,13 @@ class CalendarController extends Controller
                 'end' => $end->format('Y-m-d H:i:s')
             ]);
     }
+
+    public function deleteEvent(Request $request)
+    {
+        $id = $request->input('id');
+
+        DB::table('events')->where('id', $id)->delete();
+
+        return response()->json(['message' => 'Event deleted successfully']);
+    }
 }

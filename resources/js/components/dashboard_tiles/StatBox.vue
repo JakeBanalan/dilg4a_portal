@@ -7,61 +7,63 @@
                 <button @click="nextImage" class="arrow right-arrow">&#9654;</button>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-6 grid-margin">
-                <div class="card">
-                    <div class="card-body scrollable-card-body">
-                        <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
-                        <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                            v-for="(events, i) in UpcomingEvents" :key="i">
-                            <div class="move-calendar ms-3">
-                                <span style="display: inline-block;">
-                                    <time class="icon">
-                                        <em>{{ FormattedDay(events.start) }}</em>
-                                        <strong>{{ FormattedMonth(events.start) }}</strong>
-                                        <span>{{ FormattedDate(events.start) }}</span>
-                                    </time>
-                                </span>
-                            </div>
-                            <div class="ms-3" style="padding-left: 0.3em;">
-                                <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
-                                    class="mb-0">{{ events.title }}</h6>
-                                <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
-                                    FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
-                                    }}</small>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6 grid-margin">
+                    <div class="card">
+                        <div class="card-body scrollable-card-body">
+                            <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
+                            <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                                v-for="(events, i) in UpcomingEvents" :key="i">
+                                <div class="move-calendar ms-3">
+                                    <span style="display: inline-block;">
+                                        <time class="icon">
+                                            <em>{{ FormattedDay(events.start) }}</em>
+                                            <strong>{{ FormattedMonth(events.start) }}</strong>
+                                            <span>{{ FormattedDate(events.start) }}</span>
+                                        </time>
+                                    </span>
+                                </div>
+                                <div class="ms-3" style="padding-left: 0.3em;">
+                                    <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                        class="mb-0">{{ events.title }}</h6>
+                                    <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
+                                        FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
+                                        }}</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 grid-margin">
-                <div class="card">
-                    <div class="card-body scrollable-card-body">
-                        <p class="card-title">My Personal Events - {{ currentMonth }}</p>
-                        <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                            v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
-                            <div class="move-calendar ms-3">
-                                <span style="display: inline-block;">
-                                    <time class="icon">
-                                        <em>{{ FormattedDay(myEvents.start) }}</em>
-                                        <strong>{{ FormattedMonth(myEvents.start) }}</strong>
-                                        <span>{{ FormattedDate(myEvents.start) }}</span>
-                                    </time>
-                                </span>
-                            </div>
-                            <div class="ms-3" style="padding-left: 0.3em;">
-                                <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
-                                    class="mb-0 text-blue">{{ myEvents.title }}</h6>
-                                <small class="text-blue mb-0"><i class="ti-timer me-1"></i> {{
-                                    FormattedFDate(myEvents.start) }} - {{ FormattedFDate(myEvents.end)
-                                    }}</small>
+                <div class="col-md-6 grid-margin">
+                    <div class="card">
+                        <div class="card-body scrollable-card-body">
+                            <p class="card-title">My Personal Events - {{ currentMonth }}</p>
+                            <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
+                                v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
+                                <div class="move-calendar ms-3">
+                                    <span style="display: inline-block;">
+                                        <time class="icon">
+                                            <em>{{ FormattedDay(myEvents.start) }}</em>
+                                            <strong>{{ FormattedMonth(myEvents.start) }}</strong>
+                                            <span>{{ FormattedDate(myEvents.start) }}</span>
+                                        </time>
+                                    </span>
+                                </div>
+                                <div class="ms-3" style="padding-left: 0.3em;">
+                                    <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
+                                        class="mb-0 text-blue">{{ myEvents.title }}</h6>
+                                    <small class="text-blue mb-0"><i class="ti-timer me-1"></i> {{
+                                        FormattedFDate(myEvents.start) }} - {{ FormattedFDate(myEvents.end)
+                                        }}</small>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 

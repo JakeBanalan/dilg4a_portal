@@ -186,7 +186,9 @@
 </template>
 
 <script>
-import Swal from 'sweetalert2';
+import { eventBus } from "../eventBus.js";
+import Pusher from 'pusher-js';
+
 export default {
     data() {
         return {
@@ -206,7 +208,8 @@ export default {
             ict_adminReturned: 0,
             ict_adminHardware: 0,
             ict_adminSoftware: 0,
-            isSurveyCompleted: false
+            isSurveyCompleted: false,
+            pusher: null,
         };
     },
     created() {
@@ -218,9 +221,41 @@ export default {
         this.fetchDraftData();
         this.fetchICTAdminCount();
         this.fetchICTAdminDraft();
+        eventBus.on('updateICTSTAT', () => {
+            this.fetchICTRequestCount();
+            this.fetchDraftData();
+            this.fetchICTAdminCount();
+            this.fetchICTAdminDraft();
+        });
         // this.fetchHardwareCount();
         // this.fetchSoftwareCount();
 
+        var pusher = new Pusher('29d53f8816252d29de52', {
+            cluster: 'ap1'
+        });
+        // Listen for the update-table event on the ict-ta-channel channel
+        const receivedChannel = pusher.subscribe('received-ta-channel');
+        receivedChannel.bind('received-ict-ta', (data) => {
+            this.fetchICTRequestCount();
+            this.fetchDraftData();
+            this.fetchICTAdminCount();
+            this.fetchICTAdminDraft();
+        });
+        const completedChannel = pusher.subscribe('completed-ta-channel');
+        completedChannel.bind('completed-ict-ta', (data) => {
+            this.fetchICTRequestCount();
+            this.fetchDraftData();
+            this.fetchICTAdminCount();
+            this.fetchICTAdminDraft();
+        });
+    },
+    beforeDestroy() {
+        if (this.pusher) {
+            this.pusher.unsubscribe('received-ta-channel');
+            this.pusher.unsubscribe('completed-ta-channel');
+            this.pusher.disconnect();
+        }
+        eventBus.off('updateICTSTAT');
     },
     methods: {
         fetchICTAdminCount() {

@@ -61,7 +61,7 @@ class UserController extends Controller
             pmo.id,
             DIVISION_COLOR,
             tblposition.position_title,
-            CONCAT(users.first_name," ", users.middle_name," ",users.last_name)  as name,
+            CONCAT(users.last_name," ", users.first_name," ",users.middle_name)  as name,
             users.email as email
             ')
             ->leftJoin('pr', 'pr.action_officer', '=', 'users.id')

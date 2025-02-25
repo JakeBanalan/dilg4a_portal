@@ -4,6 +4,7 @@ import { createStore } from 'vuex';
 export default createStore({
     state: {
         userId: null,
+        filterParams: {}
         // Add other state properties as needed
     },
     mutations: {
@@ -19,3 +20,4 @@ export default createStore({
         // Add getters as needed
     },
 });
+

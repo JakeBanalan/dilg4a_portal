@@ -20,9 +20,27 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access 1 year"
+    ExpiresByType image/jpeg "access 1 year"
+    ExpiresByType image/gif "access 1 year"
+    ExpiresByType image/png "access 1 year"
+    ExpiresByType text/css "access 1 month"
+    ExpiresByType text/html "access 1 month"
+    ExpiresByType application/javascript "access 1 month"
+    ExpiresByType application/x-javascript "access 1 month"
+    ExpiresByType application/x-font-woff "access 1 year"
+    ExpiresByType application/x-font-ttf "access 1 year"
+    ExpiresByType application/x-font-eot "access 1 year"
+    ExpiresByType application/x-font-otf "access 1 year"
+    ExpiresByType image/svg+xml "access 1 year"
+    ExpiresDefault "access 1 month"
+</IfModule>
+
 <IfModule mod_deflate.c>
-    # Compress HTML, CSS, JavaScript, Text, XML and fonts
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/x-javascript application/json application/xml font/ttf font/otf font/x-woff font/eot
+    # Compress HTML, CSS, JavaScript, Text, XML, fonts, and more
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml application/rss+xml application/atom+xml font/ttf font/otf font/x-woff font/eot image/svg+xml
 
     # Remove browser bugs
     BrowserMatch ^Mozilla/4 gzip-only-text/html
@@ -30,12 +48,36 @@
     BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
 
     # Don't compress images
-    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp)$ no-gzip dont-vary
 
     # Don't compress if the request is for an already compressed file
     SetEnvIfNoCase Request_URI \.(?:zip|gz|tgz|bz2|xz)$ no-gzip dont-vary
 </IfModule>
 
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml application/rss+xml application/atom+xml font/ttf font/otf font/x-woff font/eot image/svg+xml
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header set X-Content-Type-Options "nosniff"
+
+    # Enable Cross-Origin Resource Sharing (CORS)
+    Header set Access-Control-Allow-Origin "*"
+
+    # Protect against clickjacking
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # Enable XSS protection
+    Header set X-XSS-Protection "1; mode=block"
+
+    # Enforce HTTPS (if your site uses HTTPS)
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+
+    # Disable ETags
+    Header unset ETag
+</IfModule>
+FileETag None
 
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php82” package as the default “PHP” programming language.

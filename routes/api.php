@@ -1,30 +1,31 @@
 <?php
 
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\AppItemController;
-use App\Http\Controllers\PurchaseRequestController;
-use App\Http\Controllers\RFQController;
-use App\Http\Controllers\RICTUController;
-use App\Http\Controllers\CalendarController;
-use App\Http\Controllers\CRUDController;
-use App\Http\Controllers\AbstractController;
-use App\Http\Controllers\HRSController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Controllers\PositionController;
-use App\Http\Controllers\QMSController;
-use App\Http\Controllers\QMSQuarterlyExportController;
-use App\Http\Controllers\QMSMonthlyExportController;
-use App\Http\Controllers\QMSQuarterlyLNDController;
-use App\Http\Controllers\UserManagementController;
-
-use App\Models\AppItemModel;
-use App\Models\PurchaseRequestItemModel;
-use App\Models\PurchaseRequestModel;
 use App\Models\RICTUModel;
+use App\Models\AppItemModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use App\Models\PurchaseRequestModel;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HRSController;
+use App\Http\Controllers\QMSController;
+use App\Http\Controllers\RFQController;
+use App\Http\Controllers\CRUDController;
+use App\Http\Controllers\UserController;
+use App\Models\PurchaseRequestItemModel;
+use App\Http\Controllers\RICTUController;
+use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\AppItemController;
+use App\Http\Controllers\AbstractController;
+use App\Http\Controllers\CalendarController;
+
+use App\Http\Controllers\PositionController;
+use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\PurchaseOrderController;
+use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\PurchaseRequestController;
+use App\Http\Controllers\QMSQuarterlyLNDController;
+use App\Http\Controllers\QMSMonthlyExportController;
+use App\Http\Controllers\QMSQuarterlyExportController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -56,15 +57,9 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']);
+    Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
 });
 
-Route::middleware('api')->group(function () {
-    Route::get('get_purchase_request_details', [PurchaseRequestController::class, 'getPurchaseRequestDetails']);
-});
-
-Route::middleware('api')->group(function () {
-    Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);
-});
 Route::middleware('api')->group(function () {
     Route::get('appitems', [AppItemController::class, 'getAppData']);
 });
@@ -83,9 +78,6 @@ Route::middleware('api')->group(function () {
     Route::get('load_abstract_data', [AbstractController::class, 'load_abstract_data']);
 });
 
-Route::middleware('api')->group(function () {
-    Route::get('getPurchaseRequest', [PurchaseRequestController::class, 'getPurchaseRequest']);
-});
 
 Route::middleware('api')->group(function () {
     Route::get('generatePurchaseRequestNo', [PurchaseRequestController::class, 'generatePurchaseRequestNo']);
@@ -133,7 +125,7 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('generateStockNumber', [AppItemController::class, 'generateStockNumber']);
+    Route::get('generate-stock-number', [AppItemController::class, 'generateStockNumber']);
 });
 
 
@@ -142,11 +134,11 @@ Route::middleware('api')->group(function () {
     Route::get('countTotalItem/{cur_year}', [AppItemController::class, 'countTotalItem']);
 });
 
-Route::middleware('api')->group(function(){
+Route::middleware('api')->group(function () {
     Route::get('totalCountICTRequest/{year}', [RICTUController::class, 'totalCountICTrequest']);
 });
 
-Route::middleware('api')->group(function(){
+Route::middleware('api')->group(function () {
     Route::get('totalCountDraft', [RICTUController::class, 'totalCountDraft']);
 });
 
@@ -174,26 +166,19 @@ Route::middleware('api')->group(function () {
 //     Route::get('/countSoftwareRequest/{userId}', [RICTUController::class, 'countSoftwareRequest']);
 // });
 
-
-Route::middleware('api')->group(function () {
-    Route::get('countPurchaseRequestStatistics/{cur_year}', [PurchaseRequestController::class, 'countPurchaseRequestStatistics']);
-});
-
 Route::middleware('api')->group(function () {
     Route::get('getActiveAccounts', [HRSController::class, 'getActiveAccounts']);
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('countCancelledPR/{userId}', [PurchaseRequestController::class, 'countCancelledPR']);
+    Route::get('/monthly-overview', [PurchaseRequestController::class, 'getMonthlyOverview']);
+    Route::get('/department-overview', [PurchaseRequestController::class, 'getDepartmentOverview']);
 });
 
 Route::middleware('api')->group(function () {
     Route::get('countUserTotalPR/{userId}', [PurchaseRequestController::class, 'countUserTotalPR']);
 });
 
-Route::middleware('api')->group(function () {
-    Route::get('fetchCartItemInfo/{itemSelected}', [PurchaseRequestController::class, 'fetchCartItemInfo']);
-});
 
 
 Route::middleware('api')->group(function () {
@@ -302,6 +287,12 @@ Route::middleware('api')->group(function () {
     Route::get('fetchMonthlyData/{id}/{qoe_id}', [QMSController::class, 'fetchMonthlyData']);
 });
 
+//BUDGET GET
+
+Route::middleware('api')->group(function () {
+    Route::get('getPurchaseRequest', [BudgetController::class, 'getPurchaseRequest']);
+    Route::get('getPurchaseOrder', [BudgetController::class, 'getPurchaseOrder']);
+});
 
 //USER MANAGEMENT GET
 Route::middleware('api')->group(function () {
@@ -328,10 +319,8 @@ Route::middleware('api')->group(function () {
     Route::get('fetchUserOfficeCount', [UserManagementController::class, 'fetchUserOfficeCount']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('fetchItems', [PurchaseRequestController::class, 'fetchItems']);
+    Route::get('fetchItems/{year?}', [PurchaseRequestController::class, 'fetchItems']);
 });
-
-
 
 Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
 
@@ -344,14 +333,15 @@ Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']
 Route::post('login', [UserController::class, 'login']);
 // Route::post('logout',[UserController::class,'logout']);
 
-
 Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
-Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
+Route::post('app-items', [AppItemController::class, 'post_add_appItem']);
+Route::post('updateAppDataById/{id}',  [AppItemController::class, 'post_update_appItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
-Route::post('post_update_purchaseRequestDetailsForm', [PurchaseRequestController::class, 'post_update_purchaseRequestDetailsForm']);
-
+Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);
+Route::post('deletePurchaseRequestItem', [PurchaseRequestController::class, 'deletePurchaseRequestItem']);
 Route::post('fetchPurchaseReqData', [PurchaseRequestController::class, 'fetchPurchaseReqData']);
+Route::post('perUserPurchaseReqData', [PurchaseRequestController::class, 'perUserPurchaseReqData']);
 Route::post('updatePurchaseRequestStatus', [PurchaseRequestController::class, 'updatePurchaseRequestStatus']);
 Route::post('fetchSubmittedtoGSS', [PurchaseRequestController::class, 'fetchSubmittedtoGSS']);
 Route::post('fetch_app_item', [SupplierController::class, 'fetch_app_item']);
@@ -364,9 +354,7 @@ Route::post('post_supplier_quote', [SupplierController::class, 'post_supplier_qu
 Route::post('post_create_abstract', [AbstractController::class, 'post_create_abstract']);
 Route::post('post_create_po', [PurchaseOrderController::class, 'post_create_po']);
 Route::post('total_amount', [PurchaseRequestController::class, 'total_amount']);
-// Route::post('post_update_status', 'PurchaseRequestController@post_update_status')->name('post.update.status');
 Route::post('post_update_status', [PurchaseRequestController::class, 'post_update_status']);
-Route::post('post_addCode', [PurchaseRequestController::class, 'post_addCode']);
 Route::post('fetch_ict_req_details', [RICTUController::class, 'fetch_ict_req_details']);
 
 
@@ -374,7 +362,8 @@ Route::post('post_complete', [CRUDController::class, 'post_complete']);
 Route::post('post_received_ict_request', [CRUDController::class, 'post_received_ict_request']);
 Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSmallestQuotationsForItems']);
 
-
+//BUDGET POST
+Route::post('post_addCode', [BudgetController::class, 'insertCode']);
 
 
 // R F Q
@@ -392,7 +381,7 @@ Route::post('post_create_event', [CalendarController::class, 'post_create_event'
 //C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
 Route::post('PostUpdateDragDrop', [CalendarController::class, 'PostUpdateDragDrop']);
-
+Route::post('DeleteEvent', [CalendarController::class, 'deleteEvent']);
 
 //QMS POST
 Route::post('DeleteProcessOwner', [QMSController::class, 'DeleteProcessOwner']);
@@ -417,8 +406,9 @@ Route::post('PostUser', [UserManagementController::class, 'PostUser']);
 // E X P O R T
 // routes/web.php or routes/api.php
 Route::middleware('api')->group(function () {
-    Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
+    Route::get('/export-purchase-request/{id}', [PurchaseRequestController::class, 'exportPurchaseRequest']);
 });
+
 
 Route::middleware('api')->group(function () {
     Route::get('export-rfq/{id}', [RFQController::class, 'viewRFQItems']);

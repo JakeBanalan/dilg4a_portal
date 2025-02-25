@@ -58,9 +58,12 @@
                                 <div class="box-header with-border" style="background-color: #000;color:#fff;">
                                     <h4 class="box-title">ICT Technical Assistance Reference Number</h4>
                                 </div>
-                                <center><span style="text-align:center;color:red;font-weight:bold;font-size:24px;">
+                                <div style="display: flex; justify-content: center; align-items: center;">
+                                    <span style="color: red; font-weight: bold; font-size: 24px;">
                                         {{ data.control_no }}
-                                    </span></center>
+                                    </span>
+                                </div>
+
                             </div>
                         </div>
 
@@ -160,7 +163,7 @@
                                             <TextInput label="Request Category" iconValue="hashtag"
                                                 v-model="data.others" :value="data.others" disabled />
                                         </div>
-                                        <div class="col-lg-6 mb-4" v-else-if="data.req_id = 7">
+                                        <div class="col-lg-6 mb-4" v-else-if="data.req_id === 7">
 
                                             <TextInput label="Request Category" iconValue="hashtag"
                                                 v-model="data.sub_request_type" :value="data.sub_request_type"
@@ -180,12 +183,12 @@
 
                                         <div class="col-lg-6">
                                             <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
-                                                v-model="remarks" :value="data.remarks" />
+                                                v-model="remarks" :value="data.remarks" disabled/>
                                         </div>
 
                                         <div class="col-lg-6">
                                             <TextAreaInput label="RECOMMENDATION" v-model="remarks"
-                                                :value="data.ict_officer_remarks" />
+                                                :value="data.ict_officer_remarks"  disabled/>
                                         </div>
 
                                     </div>
@@ -210,8 +213,8 @@
                                         </div>
                                         <div class="col-lg-3">
                                             <TextInput disabled label="Date/Time" iconValue="calendar"
-                                                v-model="data.requested_date"
-                                                :value="formatDateTime(data.requested_date)" />
+                                                v-model="data.completed_date"
+                                                :value="formatDateTime(data.completed_date)" />
                                         </div>
                                     </div>
                                 </div>
@@ -319,14 +322,14 @@ export default {
                 return formattedDate;
             }
         },
-        formatTime(date) {
-            if (!date || date === '0000-00-00') {
-                return null; // Return null if the date is null or '0000-00-00'
+        formatTime(time) {
+            if (!time || time === '0000-00-00') {
+                return null;
             } else {
-                const formattedTime = new Date(date).toLocaleString('en-US', {
+                const formattedTime = new Date(time).toLocaleTimeString('en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true // Change to false for 24-hour format
+                    hour12: true
                 });
                 return formattedTime;
             }

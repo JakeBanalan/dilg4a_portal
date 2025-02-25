@@ -1,7 +1,8 @@
 <template>
-    <div v-if="visible" class="modal-background">
+    <div v-if="visible" class="modal-background"
+        style="  position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1050;">
         <div class="modal" tabindex="1" style="display: block;">
-            <div class="modal-dialog modal-xl">
+            <div class="modal-dialog modal-xl" style="margin-top: 10%; max-width: 80%;">
                 <div class="modal-content">
                     <div class="modal-header">
                         <div
@@ -14,8 +15,10 @@
                             <div class="col-lg-12">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <SelectInput label="Mode of Procurement" v-model="rfqData.mode_id" :value="rfqData.mode_id">
-                                            <option value="1" data-id="1" data-value="1">Small Value Procurement</option>
+                                        <SelectInput label="Mode of Procurement" v-model="rfqData.mode_id"
+                                            :value="rfqData.mode_id">
+                                            <option value="1" data-id="1" data-value="1">Small Value Procurement
+                                            </option>
                                             <option value="2" data-id="2" data-value="2">Shopping</option>
                                             <option value="3" data-id="3" data-value="3">NP Lease of Venue</option>
                                             <option value="4" data-id="4" data-value="4">Direct Contracting</option>
@@ -27,24 +30,29 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>RFQ Date</label>
-                                            <input class="form-control typehead" type="datetime-local" v-model="rfqData.rfq_dateTime" />
+                                            <input class="form-control typehead" type="datetime-local"
+                                                v-model="rfqData.rfq_dateTime" />
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>RFQ Deadline</label>
-                                            <input class="form-control typehead" type="datetime-local" v-model="rfqData.rfq_deadlineTime" />
+                                            <input class="form-control typehead" type="datetime-local"
+                                                v-model="rfqData.rfq_deadlineTime" />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <TextAreaInput v-model="rfqData.particulars" :value="rfqData.particulars" label="Particulars" />
+                                    <TextAreaInput v-model="rfqData.particulars" :value="rfqData.particulars"
+                                        label="Particulars" />
                                 </div>
 
-                                <button type="button" class="btn btn-primary" style="float: right;margin-left:5px;" @click="close();">Close</button>
+                                <button type="button" class="btn btn-primary" style="float: right;margin-left:5px;"
+                                    @click="close();">Close</button>
 
-                                <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="saveChanges()" style="float: right;">
+                                <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="saveChanges()"
+                                    style="float: right;">
                                     Save
                                 </button>
                             </div>
@@ -146,6 +154,7 @@ export default {
         margin-top: 5%;
         max-width: 100%;
     }
+
     .multiselect__tag #modal_multi {
         max-width: 80%;
     }

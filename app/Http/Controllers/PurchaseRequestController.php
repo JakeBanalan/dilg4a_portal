@@ -6,11 +6,8 @@ use Carbon\Carbon;
 use App\Models\AppItemModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
-use Illuminate\Support\Facades\Log;
 use App\Models\PurchaseRequestModel;
-use Illuminate\Support\Facades\Auth;
-
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\PurchaseRequestItemModel;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -43,13 +40,9 @@ class PurchaseRequestController extends Controller
     {
         // dd($request->all());
         try {
-            // Start a database transaction
             DB::beginTransaction();
-
-            // Create a new instance of PurchaseRequestModel
             $purchaseRequest = new PurchaseRequestModel();
 
-            // Set the purchase request fields
             $purchaseRequest->pr_no = $request->input('pr_no');
             $purchaseRequest->pmo = $request->input('pmo');
             $purchaseRequest->type = $request->input('type');
@@ -60,13 +53,10 @@ class PurchaseRequestController extends Controller
             $purchaseRequest->is_urgent = $request->input('isUrgent');
             $purchaseRequest->stat = 1;
 
-            // Save the purchase request
             $purchaseRequest->save();
 
-            // Get the PR ID of the newly created purchase request
             $pr_id = $purchaseRequest->id;
 
-            // Process the items array
             $items = $request->input('items');
             foreach ($items as $item) {
                 // Check if the PR ID and item ID combination already exists
@@ -88,64 +78,117 @@ class PurchaseRequestController extends Controller
                         'description'   => $item['description'],
                         'qty'           => $item['quantity'],
                         'abc'           => $item['quantity'] * $item['price'],
-                        'date_added'    => now(), // Automatically set the date_added field to the current date and time
-                        'flag'          => 1, // Set the flag field to a default value of 1
+                        'date_added'    => now(),
+                        'flag'          => 1,
                     ]);
                     $pr_opts->save();
                 }
             }
 
-            // Update the current step of the purchase request
+
             $purchaseRequest->current_step = $request->input('step');
             $purchaseRequest->save();
 
-            // Commit the database transaction
             DB::commit();
 
-            // Return a response indicating success
             return response()->json(['message' => 'Purchase request and items created successfully']);
         } catch (\Exception $e) {
-            // Rollback the database transaction in case of an error
             DB::rollback();
-            Log::error($e->getMessage());
-            // Return a response indicating failure
             return response()->json(['message' => 'Failed to create purchase request and items'], 500);
         }
     }
 
-    public function post_update_purchaseRequestDetailsForm(Request $request)
+    public function post_update_purchaseRequest(Request $request)
     {
-        // Assuming your model is named PurchaseRequestModel
-        $purchaseRequest = PurchaseRequestModel::where('pr_no', $request->input('pr_no'))->first();
+        DB::beginTransaction();
 
-        // Update the record
-        PurchaseRequestModel::where('id', $request->input('pr_id'))
-            ->update([
+        try {
+            $purchaseRequest = PurchaseRequestModel::find($request->input('pr_id'));
+            if (!$purchaseRequest) {
+                return response()->json(['message' => 'Purchase request not found'], 404);
+            }
+
+            // Update the main fields of the purchase request
+            $purchaseRequest->update([
                 'pmo' => $request->input('pmo'),
                 'type' => $request->input('type'),
                 'pr_date' => $request->input('pr_date'),
                 'target_date' => $request->input('target_date'),
                 'purpose' => $request->input('purpose'),
-                'current_step' => $request->input('step'),
             ]);
 
+            // Validate the items array
+            $validatedData = $request->validate([
+                'items' => 'required|array',
+                'items.*.id' => 'required|integer',
+                'items.*.qty' => 'required|numeric|min:1',
+                'items.*.price' => 'required|numeric|min:0',
+                'items.*.descrip' => 'nullable|string',
+            ]);
 
-        // You can return a response, if needed
-        return response()->json(['message' => 'Purchase request details updated successfully']);
+            // Update or add items (if any)
+            $items = $validatedData['items'];
+            foreach ($items as $item) {
+                $existingItem = PurchaseRequestItemModel::find($item['id']);
+
+                if ($existingItem) {
+                    // Update the existing item
+                    $existingItem->update([
+                        'qty' => $item['qty'],
+                        'abc' => $item['qty'] * $item['price'],
+                        'description' => $item['descrip'],
+                    ]);
+                } else {
+                    $isDuplicate = PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)
+                        ->where('pr_item_id', $item['id'])
+                        ->exists();
+
+                    if (!$isDuplicate) {
+                        PurchaseRequestItemModel::create([
+                            'pr_id' => $purchaseRequest->id,
+                            'pr_item_id' => $item['id'],
+                            'description' => $item['descrip'],
+                            'qty' => $item['qty'],
+                            'abc' => $item['qty'] * $item['price'],
+                            'date_added' => now(),
+                            'flag' => 1,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Purchase request and items updated successfully',
+                'items' => PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)->get(),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed to update purchase request and items'], 500);
+        }
     }
 
 
-    public function fetchItems()
+
+
+    public function fetchItems($year = null)
     {
         try {
-            $items = AppItemModel::select('tbl_app.id', 'tbl_app.item_title as name', 'tbl_app.app_price as price', 'tbl_app.sn as stockno', 'unit.item_unit_title as unit')
-                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
-                ->get();
+            $query = AppItemModel::select('tbl_app.id', 'tbl_app.item_title as name', 'tbl_app.app_price as price', 'tbl_app.sn as stockno', 'unit.item_unit_title as unit', 'tbl_app.app_year as AppYear')
+                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id');
+
+            if (!$year) {
+                $year = date('Y'); // Use the current year by default
+            }
+
+            $query->where('tbl_app.app_year', $year);
+
+            $items = $query->get();
 
             if ($items->isEmpty()) {
                 return response()->json(['message' => 'No items found'], 404);
             }
-
             return response()->json($items);
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while fetching items'], 500);
@@ -155,8 +198,12 @@ class PurchaseRequestController extends Controller
     public function fetchPurchaseReqData(Request $request)
     {
         $page = $request->query('page', 1); // Default to page 1 if not provided
-        $itemsPerPage = $request->query('itemsPerPage', 100); // Consider a lower default
-
+        $itemsPerPage = $request->query('itemsPerPage', 10000); // Consider a lower default
+        $prNo = $request->input('pr_no');
+        $actionOfficer = $request->input('action_officer');
+        $prDate = $request->input('pr_date');
+        $pmo = $request->input('pmo');
+        $status = $request->input('status');
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
             pr.id AS `id`,
             MAX(pr.pr_no) AS `pr_no`,
@@ -188,6 +235,69 @@ class PurchaseRequestController extends Controller
             ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
             ->orderBy('pr.id', 'desc')
             ->groupBy('pr.id');
+        if ($prNo) {
+            $query->where('pr.pr_no', 'like', '%' . $prNo . '%');
+        }
+
+        if ($prDate) {
+            $query->whereDate('pr.pr_date', $prDate);
+        }
+
+        if ($pmo) {
+            $query->where('pmo.pmo_title', 'like', '%' . $pmo . '%');
+        }
+
+        if ($status) {
+            $query->where('status.title', 'like', '%' . $status . '%');
+        }
+
+        try {
+            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching data.'], 500);
+        }
+
+        return response()->json($prData);
+    }
+
+    public function perUserPurchaseReqData(Request $request)
+    {
+        $page = $request->query('page', 1); // Default to page 1 if not provided
+        $itemsPerPage = $request->query('itemsPerPage', 10000); // Default to 10 items per page
+        $userId = $request->input('user_id', auth()->id()); // Use provided user_id or authenticated user
+
+        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
+            pr.id AS `id`,
+            MAX(pr.pr_no) AS `pr_no`,
+            MAX(pr.action_officer) AS `user_id`,
+            CONCAT(MAX(users.first_name), " ", MAX(users.last_name)) AS `created_by`,
+            MAX(pr.current_step) AS `step`,
+            MAX(pmo.pmo_title) AS `office`,
+            MAX(pr.submitted_by) AS `submitted_by`,
+            MAX(pr.purpose) AS `particulars`,
+            MAX(pr.pr_date) AS `pr_date`,
+            MAX(pr.target_date) AS `target_date`,
+            MAX(pr.is_urgent) AS `is_urgent`,
+            MAX(pr_items.qty) AS `quantity`,
+            MAX(pr_items.description) AS `desc`,
+            MAX(mode.mode_of_proc_title) AS `type`,
+            MAX(app.sn) AS `serial_no`,
+            MAX(app.item_title) AS `item_title`,
+            MAX(unit.item_unit_title) AS `unit`,
+            MAX(status.title) AS `status`,
+            MAX(status.id) AS `status_id`,
+            SUM(pr_items.qty * app.app_price) AS `app_price`
+        '))
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
+            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
+            ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
+            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
+            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id') // Adjusted join
+            ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
+            ->where('pr.action_officer', $userId) // Filter by the user_id
+            ->orderBy('pr.id', 'desc')
+            ->groupBy('pr.id');
 
         try {
             $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
@@ -199,26 +309,29 @@ class PurchaseRequestController extends Controller
     }
 
 
+
     public function viewPurchaseRequest($id)
     {
+        // Get the main purchase request details
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-            pr.id AS `id`,
-            pr.type AS `type`,
-            pr.pr_no AS `pr_no`,
-            pr.action_officer AS `user_id`,
-            users.last_name AS `created_by`,
-            pmo.id AS `office`,
-            pr.purpose AS `particulars`,
-            pr.pr_date AS `pr_date`,
-            pr.target_date AS `target_date`,
-            pr.is_urgent AS `is_urgent`,
-            pr_items.qty AS `quantity`,
-            pr_items.description AS `desc`,
-            app.sn AS `serial_no`,
-            app.item_title AS `item_title`,
-            unit.item_unit_title as  `unit`,
-            app.app_price AS `price`
-        '))
+                pr.id AS `id`,
+                pr.type AS `type`,
+                pr.pr_no AS `pr_no`,
+                pr.action_officer AS `user_id`,
+                users.last_name AS `created_by`,
+                pmo.id AS `office`,
+                pr.purpose AS `particulars`,
+                pr.pr_date AS `pr_date`,
+                pr.target_date AS `target_date`,
+                pr.is_urgent AS `is_urgent`,
+                pr_items.id,
+                pr_items.qty AS `quantity`,
+                pr_items.description AS `desc`,
+                app.sn AS `serial_no`,
+                app.item_title AS `item_title`,
+                unit.item_unit_title as  `unit`,
+                app.app_price AS `price`
+            '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
             ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
@@ -227,17 +340,25 @@ class PurchaseRequestController extends Controller
             ->where('pr.id', $id)
             ->first();
 
+        // If no purchase request is found, return a 404 response
+        if (!$query) {
+            return response()->json(['message' => 'Purchase request not found'], 404);
+        }
+
+        // Get related pr_items
         $prItems = PurchaseRequestItemModel::where('pr_id', $id)
             ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
             ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
             ->select('pr_items.*', 'app.app_price AS price', 'app.sn as serial_no', 'app.item_title as item_title', 'unit.item_unit_title as unit')
             ->get();
 
+        // Return the data in a structured format
         return response()->json([
             'purchaseRequest' => $query,
-            'pr_items' => $prItems
+            'prItems' => $prItems
         ]);
     }
+
 
     public function updatePurchaseRequestStatus(Request $request)
     {
@@ -257,78 +378,201 @@ class PurchaseRequestController extends Controller
         if ($request->has('is_budget_submitted')) {
             $purchaseRequest->is_budget_submitted = $request->input('is_budget_submitted');
             if ($purchaseRequest->is_budget_submitted) {
-                $purchaseRequest->submitted_date = Carbon::now();
+                $purchaseRequest->submitted_by = $request->input('submitted_by');
+                $purchaseRequest->submitted_date_budget = Carbon::now();
             }
         }
 
         if ($request->has('is_gss_submitted')) {
             $purchaseRequest->is_gss_submitted = $request->input('is_gss_submitted');
             if ($purchaseRequest->is_gss_submitted) {
+                $purchaseRequest->submitted_by_gss = $request->input('submitted_by_gss');
                 $purchaseRequest->submitted_date_gss = Carbon::now();
             }
         }
 
-        // Save the changes
+
         $purchaseRequest->save();
 
-        // Return a response
+
         return response()->json(['message' => 'Purchase request updated successfully']);
     }
 
+    //Removed Items
+    public function deletePurchaseRequestItem(Request $request)
+    {
+        try {
+
+            $item_id = $request->input('item_id');
+
+            $item = PurchaseRequestItemModel::find($item_id);
+
+            if ($item) {
+
+                $item->delete();
+
+
+                return response()->json(['message' => 'Item deleted successfully.']);
+            } else {
+
+                return response()->json(['message' => 'Item not found'], 404);
+            }
+        } catch (\Exception $e) {
+
+            return response()->json(['message' => 'Failed to delete item.'], 500);
+        }
+    }
+
+
+
+
+
 
     // GENERATE REPORTS
-    public function exportToExcel($data)
+    public function exportPurchaseRequest(Request $request, $id)
     {
-        // Load the existing Excel template
-        $templatePath = public_path('templates/purchase_request_template.xlsx');
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
+        // Fetch the purchase request data based on the ID, along with its items
+        $query = DB::table('pr')
+            ->select([
+                'pr.id AS id',
+                'pr.type',
+                'pr.pr_no',
+                'pr.action_officer',
+                'users.first_name',
+                'users.middle_name',
+                'users.last_name',
+                'pmo.id AS office',
+                'pmo.pmo_title',
+                'pmo.pmo_contact_person',
+                'pmo.designation',
+                'pr.purpose AS particulars',
+                'pr.pr_date',
+                'pr.target_date',
+                'pr.is_urgent',
+                'pr_items.id AS item_id',
+                'pr_items.qty AS quantity',
+                'pr_items.description AS desc',
+                'app.sn AS serial_no',
+                'app.item_title',
+                'unit.item_unit_title AS unit',
+                'app.app_price AS price'
+            ])
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
+            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
+            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
+            ->leftJoin('tbl_app AS app', 'app.id', '=', 'pr_items.pr_item_id')
+            ->leftJoin('item_unit AS unit', 'unit.id', '=', 'app.unit_id')
+            ->where('pr.id', $id)
+            ->get();
 
-        // Get the active sheet
+        if ($query->isEmpty()) {
+            return response()->json(['error' => 'Purchase Request not found.'], 404);
+        }
+
+        $templatePath = public_path('templates/purchase_request_template.xlsx');
+        $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Define column headers
-        $headers = ['pr_no', 'serial_no', 'procurement'];
+        // Set static values
+        $sheet->setCellValue('C7', 'PR No.: ' . $query[0]->pr_no);
+        $formattedDate = Carbon::parse($query[0]->pr_date)->format('F d, Y');
+        $sheet->setCellValue('E7', 'Date: ' . $formattedDate);
+        $sheet->setCellValue('B7', $query[0]->pmo_title);
+        $sheet->setCellValue('B23', $query[0]->particulars);
+        $sheet->setCellValue('B29', strtoupper($query[0]->pmo_contact_person));
+        $sheet->setCellValue('B30', $query[0]->designation);
 
-        // Initialize row counter
-        $row = 11; // Assuming your data starts from the second row in the template
-        $particulars = $data[0]['particulars'];
-        $pr_date = Carbon::createFromFormat('Y-m-d', $data[0]['pr_date'])->format('F d, Y');
-        $office = $data[0]['office'];
-        $signatories = $data[0]['signatory'];
-        $designation = $data[0]['designation'];
+        $row = 11;
+        $totalAmount = 0;
 
-        $sheet->setCellValueByColumnAndRow(2, 36, $particulars);
-        $sheet->setCellValueByColumnAndRow(5, 7, "Date:" . $pr_date);
-        $sheet->setCellValueByColumnAndRow(2, 7, $office);
-        $sheet->setCellValueByColumnAndRow(2, 42, $signatories);
-        $sheet->setCellValueByColumnAndRow(2, 43, $designation);
-        $sheet->setCellValueByColumnAndRow(6, 35, "=SUM(F11:F34)");
+        // Populate item data dynamically
+        foreach ($query as $item) {
+            $sheet->setCellValue('A' . $row, $item->serial_no);
+            $sheet->setCellValue('B' . $row, $item->unit);
+            $sheet->setCellValue('C' . $row, $item->item_title . "\n\n" . $item->desc);
+            $sheet->getStyle('C' . $row)->getAlignment()->setWrapText(true);
+            $sheet->getRowDimension($row)->setRowHeight(-1); // Auto height for wrapped text
+            $sheet->setCellValue('D' . $row, $item->quantity);
+            $sheet->setCellValue('E' . $row, '₱ ' . number_format($item->price, 2));
+            $sheet->setCellValue('F' . $row, '₱ ' . number_format($item->quantity * $item->price, 2));
 
-        // Iterate through data
-        foreach ($data as $rowData) {
-            // Iterate through columns
-            foreach ($data as $index => $field) {
-                // Set the cell value using the field name and row index
-                $sheet->setCellValueByColumnAndRow(1, $row, $rowData['serial_no']);
-                $sheet->setCellValueByColumnAndRow(2, $row, $rowData['unit']);
-                $sheet->setCellValueByColumnAndRow(3, $row, $rowData['procurement']);
-                $sheet->setCellValueByColumnAndRow(4, $row, $rowData['quantity']);
-                $sheet->setCellValueByColumnAndRow(5, $row, $rowData['app_price']);
-                $sheet->setCellValueByColumnAndRow(6, $row, $rowData['quantity'] * $rowData['app_price']);
-            }
-            // Increment the row counter
+            $totalAmount += $item->quantity * $item->price;
             $row++;
         }
+
+        // Set total amount
+        $sheet->setCellValue('F22', '₱ ' . number_format($totalAmount, 2));
+
+        // Protect sheet with password
+        $sheet->getProtection()->setSheet(true);
         $sheet->getProtection()->setPassword('dilg4a@2024');
 
-        // Create a writer and save the spreadsheet to a new file
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $fileName = $data[0]['pr_no'] . '.xlsx';
-        $writer->save($fileName);
+        // Generate the file and return as a download
+        $fileName = "PurchaseRequest_" . $query[0]->pr_no . ".xlsx";
+        $writer = new Xlsx($spreadsheet);
+        $tempFile = tempnam(sys_get_temp_dir(), 'PurchaseRequest');
+        $writer->save($tempFile);
 
-        // Download the file and delete it after sending
-        return response()->download($fileName)->deleteFileAfterSend(true);
+        return response()->download($tempFile, $fileName, [
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
+        ])->deleteFileAfterSend(true);
     }
+
+
+
+    public function getDepartmentOverview()
+    {
+        try {
+            $monthlyData = PurchaseRequestItemModel::select(
+                DB::raw('SUM(pr_items.abc) as total_abc'),
+                'pmo.id as office',
+                'pmo.pmo_title'
+            )
+                ->leftJoin('pr', 'pr_items.pr_id', '=', 'pr.id') // ✅ Join PR table first
+                ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo') // ✅ Ensure correct column name
+                ->whereYear('pr_items.date_added', Carbon::now()->year)
+                ->whereNotIn('pr.stat', [1, 9])
+                ->groupBy('pmo.id', 'pmo.pmo_title')
+                ->orderBy('total_abc', 'DESC')
+                ->get();
+
+            return response()->json($monthlyData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+
+
+
+    public function getMonthlyOverview()
+    {
+        $monthlyData = PurchaseRequestItemModel::select(
+            DB::raw('SUM(pr_items.abc) as total_abc'),
+            DB::raw('MONTH(pr_items.date_added) as month')
+        )
+            ->join('pr', 'pr_items.pr_id', '=', 'pr.id') // Join with PR table
+            ->whereYear('pr_items.date_added', Carbon::now()->year) // Filter by current year
+            ->whereNotIn('pr.stat', [1, 9])
+            ->groupBy(DB::raw('MONTH(pr_items.date_added)'))
+            ->orderBy(DB::raw('MONTH(pr_items.date_added)'))
+            ->get();
+
+        // Format data for frontend
+        $formattedData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $formattedData[] = [
+                'month' => Carbon::create()->month($i)->format('F'),
+                'total_abc' => $monthlyData->firstWhere('month', $i)->total_abc ?? 0,
+            ];
+        }
+
+        return response()->json($formattedData);
+    }
+
+
+
 
 
 
@@ -370,90 +614,5 @@ class PurchaseRequestController extends Controller
         return response()->json(PurchaseRequestModel::select(PurchaseRequestModel::raw('count(*) as total_pr'))
             ->where('action_officer', $userId)
             ->get());
-    }
-
-    public function fetchCartItemInfo($itemSelected)
-    {
-
-        return response()->json(AppItemModel::select(AppItemModel::raw('unit.item_unit_title as `unit`,tbl_app.app_price'))
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
-            ->where('tbl_app.id', $itemSelected)
-            ->get());
-    }
-
-    public function post_update_cart(Request $request)
-    {
-        PurchaseRequestItemModel::where('pr_id', $request->input('pr_id'))
-            ->where('pr_item_id', $request->input('pr_item_id'))
-            ->update([
-                'qty' => $request->input('qty'),
-                'description' => $request->input('desc'),
-                'pr_item_id' => $request->input('sel_app_id')
-            ]);
-        return response()->json(['message' => 'Cart details updated successfully']);
-    }
-    public function post_update_status(Request $request)
-    {
-        if (!is_array($request->input('pr_id')) || $request->input('status') == 2) {
-
-            PurchaseRequestModel::where('id', $request->input('pr_id'))
-                ->update([
-                    'stat' => $request->input('status'),
-                    'submitted_date_budget' => Carbon::now(), // Set 'submitted_date_budget' to current date and time
-                ]);
-        } else {
-
-            PurchaseRequestModel::whereIn('id', $request->input('pr_id'))
-                ->update([
-                    'stat' => $request->input('status'),
-                ]);
-        }
-
-        // DB::enableQueryLog();
-
-        // dd(DB::getQueryLog());
-
-        return response()->json(['message' => 'Purchase Request updated successfully']);
-    }
-
-    public function countPurchaseRequestStatistics($cur_year)
-    {
-        return response()->json(
-            PurchaseRequestModel::select(
-                PurchaseRequestModel::raw('COUNT(*) as total_pr'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 1 THEN 1 END) as draft'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 2 THEN 1 END) as submitted_to_budget'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 3 THEN 1 END) as received_by_budget'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 4 THEN 1 END) as submitted_to_gss'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 5 THEN 1 END) as received_by_gss'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 6 THEN 1 END) as with_rfq'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 7 THEN 1 END) as awarded'),
-                PurchaseRequestModel::raw('COUNT(CASE WHEN stat = 8 THEN 1 END) as with_purchase_order'),
-            )
-                ->whereYear('date_added', 2024)
-                ->get()
-        );
-    }
-
-    public function getPurchaseRequest(Request $request)
-    {
-        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('id,pr_no,purpose,submitted_date_budget'))
-            ->where('stat', SUBMITTED_TO_BUDGET);
-        $pr_opts = $query->get();
-        return response()->json($pr_opts);
-    }
-    public function post_addCode(Request $request)
-    {
-
-        // Update the record
-        PurchaseRequestModel::where('id', $request->input('id'))
-            ->update([
-                'availability_code' => $request->input('code'),
-                'stat' => RECEIVED_BY_BUDGET
-            ]);
-
-
-        // You can return a response, if needed
-        return response()->json(['message' => 'Purchase request details updated successfully']);
     }
 }
