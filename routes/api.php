@@ -212,6 +212,12 @@ Route::middleware('api')->group(function () {
     Route::get('getUserDetails/{id}', [UserManagementController::class, 'getUserDetails']);
 });
 
+Route::middleware('api')->group(function () {
+    Route::get('getAllUsers', [UserController::class, 'getAllUsers']);
+});
+
+
+
 
 
 Route::middleware('api')->group(function () {
