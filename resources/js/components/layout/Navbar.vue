@@ -74,14 +74,21 @@
 
                         <!-- Render notifications if there are any -->
                         <a v-for="notification in notifications" :key="notification.id"
-                            class="dropdown-item preview-item" @click="redirectTo(notification)">
+                            class="dropdown-item preview-item" @click="redirectTo(notification)"
+                            :data-notification-id="notification.id">
                             <div class="preview-thumbnail">
                                 <div :class="['preview-icon', notification.iconColor]">
                                     <i :class="['mx-0', notification.icon]"></i>
                                 </div>
                             </div>
                             <div class="preview-item-content">
-                                <h6 class="preview-subject font-weight-normal">{{ notification.title }}</h6>
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="preview-subject font-weight-normal">{{ notification.title }}</h6>
+                                    <button class="btn btn-link p-0"
+                                        @click.stop="clearSingleNotification(notification.id)">
+                                        <i class="ti-close text-danger"></i>
+                                    </button>
+                                </div>
                                 <p class="font-weight-light small-text mb-0 text-muted">{{ notification.time }}</p>
                             </div>
                         </a>
@@ -181,7 +188,10 @@ export default {
     },
 
     methods: {
-
+        clearSingleNotification(notificationId) {
+            this.notifications = this.notifications.filter(notification => notification.id !== notificationId);
+            this.$forceUpdate();
+        },
         logout() {
             const apiToken = localStorage.getItem('api_token');
 
