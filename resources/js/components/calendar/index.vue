@@ -27,7 +27,7 @@
                                         <!-- Scrollable Content -->
                                         <div class="card-body scrollable-card-body">
                                             <div class="row">
-                                                <div class="col-md-6" v-for="(event, i) in mergedEvents" :key="i">
+                                                <div class="col-md-6" v-for="(event, i) in filteredHolidays" :key="i">
                                                     <div class="d-flex align-items-center pb-3 pt-3 border-bottom">
                                                         <div class="move-calendar ms-3">
                                                             <span style="display: inline-block;">
@@ -98,7 +98,7 @@
                                                 <p class="card-title">My Personal Events - {{ currentMonth }}</p>
                                             </div>
                                             <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                                                v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
+                                                v-for="(myEvents, i) in filteredPersonalEvents" :key="i">
                                                 <div class="move-calendar ms-3">
                                                     <span style="display: inline-block;">
                                                         <time class="icon">
@@ -363,9 +363,11 @@ export default {
                 return moment(DateString).format('MMMM DD, YYYY');
             };
         },
-        mergedEvents() {
-            // Filter only personal events and holidays
-            return this.events.filter(event => event.isHoliday || event.personnalevent);
+        filteredHolidays() {
+            return this.events.filter(event => event.isHoliday);
+        },
+        filteredPersonalEvents() {
+            return this.events.filter(event => event.personnalevent);
         },
         FormattedMonth() {
             return function (DateString) {
