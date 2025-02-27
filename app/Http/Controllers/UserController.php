@@ -122,6 +122,29 @@ class UserController extends Controller
         return response()->json($data);
     }
 
+    public function getGenderEmpStatus()
+    {
+        $employmentMap = [
+            '1' => 'Permanent',
+            '2' => 'Contract of Service',
+            '3' => 'Job Order',
+            '4' => 'Consultant'
+        ];
+
+        $users = User::select('gender', 'employment_status')->get();
+
+        // Map employment status and gender values
+        $users->transform(function ($user) use ($employmentMap) {
+            return [
+                'gender' => $user->gender === 'M' ? 'Male' : ($user->gender === 'F' ? 'Female' : 'Unknown'),
+                'employment_status' => $employmentMap[$user->employment_status] ?? 'Unknown'
+            ];
+        });
+
+        return response()->json($users);
+    }
+
+
     public function updateUserDetails(Request $request)
     {
         // Validate the incoming request
@@ -188,7 +211,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        $user = Auth::guard('api')->user();
+        $user = User::find(Auth::id());
         if ($user) {
             $user->tokens()->delete(); // Invalidate all user tokens
         }

@@ -17,7 +17,7 @@
                     <BirthdayTable />
                     <!-- <ProcurementDetails /> -->
                     <!-- <DetailedReport /> -->
-                    <ICTTechnicalReport />
+                    <StatisticDashboard />
 
                 </div>
                 <!-- content-wrapper ends -->
@@ -52,7 +52,7 @@ import BreadCrumbs from "./dashboard_tiles/BreadCrumbs.vue";
 import StatBox from "./dashboard_tiles/StatBox.vue";
 import ProcurementDetails from "./dashboard_tiles/ProcurementDetails.vue";
 import DetailedReport from "./dashboard_tiles/DetailedReport.vue";
-import ICTTechnicalReport from "./dashboard_tiles/ICTTechnicalReport.vue";
+import StatisticDashboard from "./dashboard_tiles/StatisticDashboard.vue";
 import BirthdayTable from "./dashboard_tiles/BirthdayTable.vue";
 import NotifModal from "./NotifModal.vue";
 
@@ -67,7 +67,7 @@ export default {
         StatBox,
         ProcurementDetails,
         DetailedReport,
-        ICTTechnicalReport,
+        StatisticDashboard,
         BirthdayTable,
         NotifModal
     },

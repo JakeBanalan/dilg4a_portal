@@ -216,6 +216,11 @@ Route::middleware('api')->group(function () {
     Route::get('getAllUsers', [UserController::class, 'getAllUsers']);
 });
 
+Route::middleware('api')->group(function () {
+    Route::get('getGenderEmpStat', [UserController::class, 'getGenderEmpStatus']);
+});
+
+
 
 
 
