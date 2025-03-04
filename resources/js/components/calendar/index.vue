@@ -6,6 +6,11 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                     <BreadCrumbs />
+                    <!-- <div class="row">
+                        <div class="col-md-12">
+                            Weather Forecast Card
+                        </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-md-7">
                             <div class="card">
