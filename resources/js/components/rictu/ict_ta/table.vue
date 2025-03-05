@@ -166,9 +166,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
-import { eventBus } from "../eventBus.js";
 import Pusher from 'pusher-js';
-
+import _ from 'lodash';
 
 library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical);
 export default {
@@ -224,35 +223,36 @@ export default {
         this.fetchRequests(this.role, 6);
 
         if (this.role === 'admin') {
-            var pusher = new Pusher('29d53f8816252d29de52', {
+            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
                 cluster: 'ap1'
             });
             const newChannel = pusher.subscribe('ict-ta-channel');
-            newChannel.bind('new-ict-ta', (data) => {
+            newChannel.bind('new-ict-ta', _.debounce((data) => {
                 this.load_ict_request(6);
-            });
+            }, 500));
 
             const receivedChannel = pusher.subscribe('received-ta-channel');
-            receivedChannel.bind('received-ict-ta', (data) => {
+            receivedChannel.bind('received-ict-ta', _.debounce((data) => {
                 this.load_ict_request(6);
-            });
+            }, 500));
 
             const completedChannel = pusher.subscribe('completed-ta-channel');
-            completedChannel.bind('completed-ict-ta', (data) => {
+            completedChannel.bind('completed-ict-ta', _.debounce((data) => {
                 this.load_ict_request(6);
-            });
+            }, 500));
         } else if (this.role === 'user') {
-            var pusher = new Pusher('29d53f8816252d29de52', {
+            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
                 cluster: 'ap1'
             });
             const receivedChannel = pusher.subscribe('received-ta-channel');
-            receivedChannel.bind('received-ict-ta', (data) => {
+            receivedChannel.bind('received-ict-ta', _.debounce((data) => {
                 this.load_ict_perUser_request(6);
-            });
+            }, 500));
+
             const completedChannel = pusher.subscribe('completed-ta-channel');
-            completedChannel.bind('completed-ict-ta', (data) => {
+            completedChannel.bind('completed-ict-ta', _.debounce((data) => {
                 this.load_ict_perUser_request(6);
-            });
+            }, 500));
         }
     },
     beforeDestroy() {
@@ -394,7 +394,6 @@ export default {
                 });
 
                 this.load_ict_request(6);
-                eventBus.emit('updateICTSTAT');
             } catch (error) {
                 console.error('Error receiving request:', error);
                 toast.error('Failed to receive request. Please try again.', {

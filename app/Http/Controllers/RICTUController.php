@@ -299,6 +299,7 @@ class RICTUController extends Controller
             'id' => $ict_opts->id, // Unique ID of the request
             'username' => $user->username, // Username of the requester
             'name' => $user->name, // Full name of the requester
+            'requester_id' => $userId, // Requester ID
         ];
 
         // Trigger the event for admins

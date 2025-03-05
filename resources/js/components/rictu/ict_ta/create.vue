@@ -454,9 +454,7 @@ export default {
                             timer: 1500
                         });
                         setTimeout(() => {
-                            this.$router.push({ path: '/rictu/ict_ta/index' }).then(() => {
-                                window.location.reload();
-                            });
+                            this.$router.replace({ path: '/rictu/ict_ta/index' })
                         });
                     }).catch((error) => {
                         console.error('Error creating ICT request:', error);

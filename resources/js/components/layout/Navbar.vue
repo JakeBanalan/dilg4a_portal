@@ -123,7 +123,6 @@
 <script>
 import Pusher from 'pusher-js';
 import { toast } from "vue3-toastify";
-import { eventBus } from "../eventBus.js";
 
 export default {
     name: 'Navbar',
@@ -151,7 +150,7 @@ export default {
                     this.userRole = response.data.user_role;
 
                     // Initialize Pusher
-                    var pusher = new Pusher('29d53f8816252d29de52', {
+                    var pusher = new Pusher('ab9564fd50f2d6d9e627', {
                         cluster: 'ap1'
                     });
 
@@ -160,7 +159,7 @@ export default {
                     // Subscribe to the appropriate channel based on user role
                     if (this.userRole === 'admin') {
                         // Admin subscribes to the new TA request channel
-                        this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index');
+                        this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index', this.userId);
                         // Function to subscribe to a channel and bind an event
                         const subscribeAndBind = (channelName, eventName) => {
                             const channel = pusher.subscribe(channelName);
@@ -208,10 +207,10 @@ export default {
                     console.error('Logout failed:', error);
                 });
         },
-        subscribeToChannel(pusher, channelName, eventName, notificationTitle, iconColor, iconClass, redirectUrl) {
+        subscribeToChannel(pusher, channelName, eventName, notificationTitle, iconColor, iconClass, redirectUrl, requesterId) {
             let channel = pusher.subscribe(channelName);
             channel.bind(eventName, (data) => {
-                if (this.userRole === 'admin') {
+                if (this.userRole === 'admin' && data.requester_id !== requesterId) {
                     this.notifications.push({
                         id: data.id,
                         title: `${notificationTitle} from ${data.name}`, // Show sender's name
@@ -220,6 +219,7 @@ export default {
                         time: new Date().toLocaleString(),
                         redirectUrl: redirectUrl
                     });
+
                     this.showAlert(`${notificationTitle} from ${data.name}`);
                     if (Notification.permission === 'granted') {
                         new Notification(`${notificationTitle} from ${data.name}`, {
@@ -239,7 +239,12 @@ export default {
                             time: new Date().toLocaleString(),
                             redirectUrl: redirectUrl
                         });
-                        this.showAlert(`${notificationTitle} by ${data.receiverName}`);
+                        Swal.fire({
+                            icon: 'success',
+                            title: `${notificationTitle} by ${data.receiverName}`,
+                            showConfirmButton: true,
+                            confirmButtonText: 'OK',
+                        });
                         if (Notification.permission === 'granted') {
                             new Notification(`${notificationTitle} by ${data.receiverName}`, {
                                 icon: iconClass,

@@ -186,7 +186,6 @@
 </template>
 
 <script>
-import { eventBus } from "../eventBus.js";
 import Pusher from 'pusher-js';
 
 export default {
@@ -221,33 +220,40 @@ export default {
         this.fetchDraftData();
         this.fetchICTAdminCount();
         this.fetchICTAdminDraft();
-        eventBus.on('updateICTSTAT', () => {
-            this.fetchICTRequestCount();
-            this.fetchDraftData();
-            this.fetchICTAdminCount();
-            this.fetchICTAdminDraft();
-        });
         // this.fetchHardwareCount();
         // this.fetchSoftwareCount();
 
-        var pusher = new Pusher('29d53f8816252d29de52', {
-            cluster: 'ap1'
-        });
-        // Listen for the update-table event on the ict-ta-channel channel
-        const receivedChannel = pusher.subscribe('received-ta-channel');
-        receivedChannel.bind('received-ict-ta', (data) => {
-            this.fetchICTRequestCount();
-            this.fetchDraftData();
-            this.fetchICTAdminCount();
-            this.fetchICTAdminDraft();
-        });
-        const completedChannel = pusher.subscribe('completed-ta-channel');
-        completedChannel.bind('completed-ict-ta', (data) => {
-            this.fetchICTRequestCount();
-            this.fetchDraftData();
-            this.fetchICTAdminCount();
-            this.fetchICTAdminDraft();
-        });
+        if (this.role === 'admin') {
+            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+                cluster: 'ap1'
+            });
+            const receivedChannel = pusher.subscribe('received-ta-channel');
+            receivedChannel.bind('received-ict-ta', (data) => {
+                this.fetchICTAdminCount();
+                this.fetchICTAdminDraft();
+            });
+            const completedChannel = pusher.subscribe('completed-ta-channel');
+            completedChannel.bind('completed-ict-ta', (data) => {
+                this.fetchICTAdminCount();
+                this.fetchICTAdminDraft();
+            });
+        } else if (this.role === 'user') {
+            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+                cluster: 'ap1'
+            });
+            const receivedChannel = pusher.subscribe('received-ta-channel');
+            receivedChannel.bind('received-ict-ta', (data) => {
+                this.fetchICTRequestCount();
+                this.fetchDraftData();
+            });
+            const completedChannel = pusher.subscribe('completed-ta-channel');
+            completedChannel.bind('completed-ict-ta', (data) => {
+                this.fetchICTRequestCount();
+                this.fetchDraftData();
+            });
+        }
+
+
     },
     beforeDestroy() {
         if (this.pusher) {
@@ -255,58 +261,62 @@ export default {
             this.pusher.unsubscribe('completed-ta-channel');
             this.pusher.disconnect();
         }
-        eventBus.off('updateICTSTAT');
     },
     methods: {
         fetchICTAdminCount() {
-            // Fetch total ICT requests
-            axios.get(`/api/totalCountICTRequest`)
-                .then(response => {
-                    // console.log(response.data); // Log the response to check the structure
-                    this.ict_adminTotal = response.data.ictTotal;
-                })
-                .catch(error => {
-                    console.error('Error fetching ICT admin total:', error);
-                });
+            setTimeout(() => {
+                axios.get(`/api/totalCountICTRequest`)
+                    .then(response => {
+                        this.ict_adminTotal = response.data.ictTotal;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching ICT admin total:', error);
+                    });
+            }, 500); // Add a 500ms delay between requests
         },
 
         fetchICTAdminDraft() {
-            // Fetch draft data
-            axios.get('../../api/totalCountDraft')
-                .then(response => {
-                    // console.log('test',response.data);
-                    const data = response.data;
-                    this.ict_adminDraft = response.data[0].draft;
-                    this.ict_adminReceived = response.data[0].received;
-                    this.ict_adminCompleted = response.data[0].completed;
-                    this.ict_adminReturned = response.data[0].returned;
-                })
-                .catch(error => {
-                    console.error('Error fetching draft data:', error);
-                });
+            setTimeout(() => {
+                axios.get('../../api/totalCountDraft')
+                    .then(response => {
+                        const data = response.data;
+                        this.ict_adminDraft = response.data[0].draft;
+                        this.ict_adminReceived = response.data[0].received;
+                        this.ict_adminCompleted = response.data[0].completed;
+                        this.ict_adminReturned = response.data[0].returned;
+                    })
+                    .catch(error => {
+                        console.error('Error fetching draft data:', error);
+                    });
+            }, 500); // Add a 500ms delay between requests
+        },
 
-        },
         fetchICTRequestCount() {
-            const currentYear = new Date().getFullYear();
-            axios.get(`/api/countICTRequest/${this.user_id}`)
-                .then(response => {
-                    this.ict_total = response.data.ict;
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+            setTimeout(() => {
+                const currentYear = new Date().getFullYear();
+                axios.get(`/api/countICTRequest/${this.user_id}`)
+                    .then(response => {
+                        this.ict_total = response.data.ict;
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }, 500); // Add a 500ms delay between requests
         },
+
         fetchDraftData() {
-            axios.get(`/api/countDRAFT/${this.user_id}`)
-                .then(response => {
-                    this.ict_draft = response.data[0].draft;
-                    this.ict_received = response.data[0].received;
-                    this.ict_completed = response.data[0].completed;
-                    this.ict_returned = response.data[0].returned;
-                })
-                .catch(error => {
-                    console.error(error);
-                });
+            setTimeout(() => {
+                axios.get(`/api/countDRAFT/${this.user_id}`)
+                    .then(response => {
+                        this.ict_draft = response.data[0].draft;
+                        this.ict_received = response.data[0].received;
+                        this.ict_completed = response.data[0].completed;
+                        this.ict_returned = response.data[0].returned;
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }, 500); // Add a 500ms delay between requests
         },
         // fetchHardwareCount() {
         //     axios.get(`/api/countHardwareRequest/${this.user_id}`)
