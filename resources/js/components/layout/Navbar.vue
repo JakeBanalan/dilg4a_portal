@@ -217,7 +217,7 @@ export default {
                         iconColor: iconColor,
                         icon: iconClass,
                         time: new Date().toLocaleString(),
-                        redirectUrl: redirectUrl
+                        redirectUrl: "/rictu/ict_ta/index" // Redirect to the TA request page
                     });
 
                     this.showAlert(`${notificationTitle} from ${data.name}`);
@@ -229,7 +229,6 @@ export default {
                     }
                 }
                 else if (this.userRole === 'user') {
-
                     if (data.requester_id === this.userId) {
                         this.notifications.push({
                             id: data.id,
@@ -237,14 +236,32 @@ export default {
                             iconColor: iconColor,
                             icon: iconClass,
                             time: new Date().toLocaleString(),
-                            redirectUrl: redirectUrl
+                            redirectUrl: "/rictu/ict_ta/index"
                         });
-                        Swal.fire({
-                            icon: 'success',
-                            title: `${notificationTitle} by ${data.receiverName}`,
-                            showConfirmButton: true,
-                            confirmButtonText: 'OK',
-                        });
+                        if (channelName === 'completed-ta-channel') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: `${notificationTitle} by ${data.receiverName}`,
+                                showConfirmButton: true,
+                                confirmButtonText: 'OK',
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    if (data.link) {
+                                        window.open(data.link, '_blank'); // Opens in a new tab
+                                    } else {
+                                        Swal.fire('No Survey Available', 'There is no survey link for this month.', 'info');
+                                    }
+                                }
+                            });
+                        }
+                        else {
+                            Swal.fire({
+                                icon: 'success',
+                                title: `${notificationTitle} by ${data.receiverName}`,
+                                showConfirmButton: true,
+                                confirmButtonText: 'OK',
+                            });
+                        }
                         if (Notification.permission === 'granted') {
                             new Notification(`${notificationTitle} by ${data.receiverName}`, {
                                 icon: iconClass,
