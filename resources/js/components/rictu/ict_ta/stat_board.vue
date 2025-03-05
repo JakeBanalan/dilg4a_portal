@@ -224,7 +224,7 @@ export default {
         // this.fetchSoftwareCount();
 
         if (this.role === 'admin') {
-            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+            var pusher = new Pusher('29d53f8816252d29de52', {
                 cluster: 'ap1'
             });
             const receivedChannel = pusher.subscribe('received-ta-channel');
@@ -238,7 +238,7 @@ export default {
                 this.fetchICTAdminDraft();
             });
         } else if (this.role === 'user') {
-            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+            var pusher = new Pusher('29d53f8816252d29de52', {
                 cluster: 'ap1'
             });
             const receivedChannel = pusher.subscribe('received-ta-channel');

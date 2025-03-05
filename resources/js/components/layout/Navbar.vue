@@ -150,7 +150,7 @@ export default {
                     this.userRole = response.data.user_role;
 
                     // Initialize Pusher
-                    var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+                    var pusher = new Pusher('29d53f8816252d29de52', {
                         cluster: 'ap1'
                     });
 

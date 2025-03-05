@@ -223,7 +223,7 @@ export default {
         this.fetchRequests(this.role, 6);
 
         if (this.role === 'admin') {
-            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+            var pusher = new Pusher('29d53f8816252d29de52', {
                 cluster: 'ap1'
             });
             const newChannel = pusher.subscribe('ict-ta-channel');
@@ -241,7 +241,7 @@ export default {
                 this.load_ict_request(6);
             }, 500));
         } else if (this.role === 'user') {
-            var pusher = new Pusher('ab9564fd50f2d6d9e627', {
+            var pusher = new Pusher('29d53f8816252d29de52', {
                 cluster: 'ap1'
             });
             const receivedChannel = pusher.subscribe('received-ta-channel');
