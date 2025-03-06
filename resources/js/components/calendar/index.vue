@@ -523,10 +523,14 @@ export default {
                 });
         },
         handleEventClick(arg) {
-            const event = this.events.find(event => event.id === +arg.event.id) || this.events.find(event => event.title === arg.event.title);
+            const event = this.events.find(e => e.id == arg.event.id) ||
+                this.events.find(e => e.title === arg.event.title) ||
+                this.philippineHolidays.find(e => e.title === arg.event.title);
+
             if (!event) return;
 
             const formatDateForInput = (date) => {
+                if (!date) return '';
                 const dateObj = new Date(date);
                 return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
             };
@@ -535,7 +539,7 @@ export default {
                 Swal.fire({
                     icon: 'info',
                     title: event.title,
-                    text: `This is a public holiday on ${formatDateForInput(event.start)}.`,
+                    text: `This is a public holiday on ${moment(event.start).format('MMMM D, YYYY')}.`,
                     confirmButtonText: 'OK'
                 });
                 return;
@@ -546,14 +550,14 @@ export default {
                 allDay: true,
                 title: event.title,
                 start: formatDateForInput(event.start),
-                end: formatDateForInput(event.end), // Exact end date, no +1 or -1
-                office: event.office,
-                description: event.description,
-                venue: event.venue,
-                enp: event.enp,
-                postedBy: event.fname,
-                remarks: event.remarks,
-                personnalevent: event.personnalevent
+                end: formatDateForInput(event.end),
+                office: event.office || '',
+                description: event.description || '',
+                venue: event.venue || '',
+                enp: event.enp || '',
+                postedBy: event.fname || '',
+                remarks: event.remarks || '',
+                personnalevent: event.personnalevent || ''
             };
 
             this.$nextTick(() => this.openModal('edit'));
