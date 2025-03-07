@@ -253,9 +253,12 @@ img {
 
 
                                             </div>
+
                                             <div class="col-lg-6">
-                                                <TextInput label="ICT Technical Personnel " iconValue="user"
-                                                    v-model="ict_personnel" />
+                                                <label style="font-weight: bold;"> ICT Technical Personnel</label>
+                                                <multiselect v-model="selected_ict_personnel"
+                                                    :options="ictPersonnelOptions" label="ict_personnel"
+                                                    track-by="emp_id" placeholder="Select ICT Officer" />
                                             </div>
                                         </div>
                                     </div>
@@ -300,7 +303,8 @@ export default {
             accessToken: null,
             remarks: null,
             acceptance: null,
-            ict_personnel: null,
+            selected_ict_personnel: null, // Ensure it's defined
+            ict_personnel: [],
             abstract_no: null,
             selected: null,
             ict_no: null,
@@ -391,17 +395,38 @@ export default {
         },
         internetConnect() {
             return this.selectedSubRequest && this.selectedSubRequest.value == 26;
+        },
+        ictPersonnelOptions() {
+            return this.ict_personnel ?? []; // ✅ Ensures it's always an array
         }
     },
     mounted() {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
+        this.getICTpersonnel();
     },
     created() {
 
     },
     methods: {
+        async getICTpersonnel() {
+            try {
+                const response = await axios.get('/api/get-ict-personnel');
 
+                // ✅ Ensure the response is valid
+                if (!response.data || !Array.isArray(response.data)) {
+                    throw new Error('Invalid response from the server');
+                }
+
+                // ✅ Always set `ict_personnel` as an array
+                this.ict_personnel = response.data;
+            } catch (error) {
+                console.error('Error getting ICT personnel:', error.message);
+
+                // ✅ Instead of setting a string, set an empty array to prevent errors in VueMultiselect
+                this.ict_personnel = [];
+            }
+        },
         formatTime(time) {
             if (!time) return '';
             const [hours, minutes] = time.split(':');
@@ -420,7 +445,6 @@ export default {
         },
         async create_ict_ta() {
             if (this.isSaving) return;
-
             this.isSaving = true;
 
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
@@ -445,25 +469,30 @@ export default {
                         remarks: this.remarks,
                         portal_sys: portal_system,
                         web_access: web_access,
-                        status: 1
-                    }).then(() => {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'TA Created!',
-                            showConfirmButton: false,
-                            timer: 1500
+                        status: this.selected_ict_personnel ? 2 : 1,
+                        assign_ict_officer: this.selected_ict_personnel ? this.selected_ict_personnel.emp_id : null
+                    })
+                        .then(() => {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'TA Created!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                            setTimeout(() => {
+                                this.$router.replace({ path: '/rictu/ict_ta/index' })
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error creating ICT request:', error);
+                            toast.error("Failed to create ICT request. Please try again.", {
+                                autoClose: 2500,
+                            });
+                        })
+                        .finally(() => {
+                            this.isSaving = false;
                         });
-                        setTimeout(() => {
-                            this.$router.replace({ path: '/rictu/ict_ta/index' })
-                        });
-                    }).catch((error) => {
-                        console.error('Error creating ICT request:', error);
-                        toast.error("Failed to create ICT request. Please try again.", {
-                            autoClose: 2500,
-                        });
-                    }).finally(() => {
-                        this.isSaving = false;
-                    });
                 })
         },
         fetchEndUserInfo() {

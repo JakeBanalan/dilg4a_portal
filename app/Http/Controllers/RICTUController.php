@@ -59,6 +59,14 @@ class RICTUController extends Controller
         }
     }
 
+    public function getICTpersonnel()
+    {
+        $ict_personnel = DB::table('tbl_ict_personnel')
+            ->select('emp_id', 'ict_personnel')
+            ->get();
+        return response()->json($ict_personnel);
+    }
+
     public function getICTData($id)
     {
         $query = RICTUModel::select(RICTUModel::raw('
@@ -246,10 +254,10 @@ class RICTUController extends Controller
 
         $userId = $request->input('requested_by');
         $user = UserModel::selectRaw('
-        users.id as id,
-        CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
-        users.username
-    ')
+            users.id as id,
+            CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
+            users.username
+        ')
             ->where('users.id', $userId)
             ->first();
 
@@ -257,6 +265,14 @@ class RICTUController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
+        // ✅ Define and process `$assignedOfficer` properly
+        $assignedOfficer = $request->input('assign_ict_officer', null); // Get the input value, default to null
+        // dd($assignedOfficer);
+        if (is_array($assignedOfficer)) { // If it's an array, convert to a string
+            $assignedOfficer = implode(',', $assignedOfficer);
+        }
+
+        // Create the ICT request
         // Create the ICT request
         $ict_opts = new RICTUModel([
             'control_no' => $request->input('control_no'),
@@ -273,11 +289,12 @@ class RICTUController extends Controller
             'website_access' => $website_access,
             'request_type_category_id' => $req == 9 ? 37 : $request->input('subRequest'),
             'request_type_id' => $req,
-            'assign_ict_officer' => 0,
-            'status_id' => self::STATUS_DRAFT,
+            'assign_ict_officer' => $assignedOfficer, // ✅ Assign ICT officer properly
+            'status_id' => $assignedOfficer ? self::STATUS_RECEIVED : self::STATUS_DRAFT, // ✅ Now updates based on ICT officer
             'remarks' => $request->input('remarks'),
             'css_link' => $month
         ]);
+
 
         $ict_opts->save();
 
@@ -304,9 +321,11 @@ class RICTUController extends Controller
 
         // Trigger the event for admins
         $pusher->trigger('ict-ta-channel', 'new-ict-ta', $data);
+
         // Return a success response
         return response()->json(['message' => 'ICT request created successfully.'], 201);
     }
+
 
 
 
