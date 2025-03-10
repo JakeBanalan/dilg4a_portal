@@ -83,17 +83,15 @@ class UserController extends Controller
     {
         $query = User::selectRaw('
         users.id,
+        pmo.id as pmo_id,
         CONCAT(users.last_name," ", users.first_name," ",users.middle_name)  as name,
         users.email as email
         ')
             ->leftJoin('pr', 'pr.action_officer', '=', 'users.id')
             ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id');
+            ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id')
+            ->distinct('users.id'); // Use distinct to remove duplicates
 
-        // Optionally, you can print the SQL query to check
-        // dd($query->toSql());
-
-        // Execute the query and return the result
         $allUsers = $query->get(); // Use get() to retrieve all results
         return response()->json($allUsers);
     }

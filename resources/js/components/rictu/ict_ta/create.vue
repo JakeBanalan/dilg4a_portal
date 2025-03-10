@@ -252,7 +252,8 @@ img {
                                                     Rendered</label> &nbsp;
                                                 <a href="#" class="text-decoration-none"
                                                     :class="{ 'text-primary': !isEditMode, 'text-danger': isEditMode }"
-                                                    @click.prevent="toggleEditMode" v-if="this.role == 'admin'">
+                                                    @click.prevent="isEditMode ? cancelEditMode() : toggleEditMode()"
+                                                    v-if="this.role == 'admin'">
                                                     {{ isEditMode ? 'Cancel' : 'Edit' }}
                                                 </a>
                                                 <multiselect v-model="acceptance" :options="acceptanceOptions"
@@ -313,6 +314,7 @@ export default {
             remarks: null,
             acceptance: null,
             allUsers: [],
+            originalAcceptance: null,
             isEditMode: false,
             selected_ict_personnel: null, // Ensure it's defined
             ict_personnel: [],
@@ -411,7 +413,7 @@ export default {
             return this.ict_personnel ?? []; // ✅ Ensures it's always an array
         },
         acceptanceOptions() {
-            return this.allUsers.map(user => ({ id: user.id, name: user.name }));
+            return this.allUsers.map(user => ({ id: user.id, name: user.name, pmo_id: user.pmo_id }));
         }
 
     },
@@ -426,7 +428,13 @@ export default {
     },
     methods: {
         updateAcceptance(value) {
-            this.acceptance = value;
+            if (value?.id) {
+                this.acceptance = value;
+                const selectedUser = this.allUsers.find(user => user.id === value.id);
+                this.acceptance.pmo_id = selectedUser.pmo_id; // Update the pmo_id of the acceptance object
+            } else {
+                this.acceptance = { id: this.userData.user_id, name: this.userData.name, pmo_id: this.userData.pmo_id };
+            }
         },
         fetchAllUsers() {
             axios.get('/api/fetchAllUsers')
@@ -439,6 +447,15 @@ export default {
         },
         toggleEditMode() {
             this.isEditMode = !this.isEditMode;
+            if (this.isEditMode) {
+                // Store the original value before entering edit mode
+                this.originalAcceptance = this.acceptance;
+            }
+        },
+        cancelEditMode() {
+            // Revert to original value on cancel
+            this.acceptance = this.originalAcceptance;
+            this.isEditMode = false;
         },
         async getICTpersonnel() {
             try {
@@ -488,7 +505,7 @@ export default {
                 control_no: this.ict_no,
                 requested_by: this.acceptance.id,
                 requested_date: `${this.requested_date} ${this.formatTime(this.requested_time)}`,
-                pmo: this.userData.id,
+                pmo: this.acceptance.pmo_id || this.userData.id,
                 email: this.userData.email,
                 equipment_type: this.hardwareInfo.etype,
                 brand: this.hardwareInfo.brand,
