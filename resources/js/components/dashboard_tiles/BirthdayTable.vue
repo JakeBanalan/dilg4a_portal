@@ -230,7 +230,7 @@ export default {
     },
     methods: {
         fetchUsers() {
-            axios.get('/api/getAllUsers')
+            axios.get('/api/fetchAllUsers')
                 .then(response => {
                     this.users = response.data.filter(user => {
                         const birthdate = new Date(user.birthdate);

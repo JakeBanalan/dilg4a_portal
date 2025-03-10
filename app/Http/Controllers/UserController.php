@@ -84,6 +84,7 @@ class UserController extends Controller
         $query = User::selectRaw('
         users.id,
         pmo.id as pmo_id,
+        DATE_FORMAT(users.birthdate, "%M %d %Y") as birthdate,
         CONCAT(users.last_name," ", users.first_name," ",users.middle_name)  as name,
         users.email as email
         ')
@@ -125,20 +126,6 @@ class UserController extends Controller
         $data = $query->first(); // Use first() instead of get() to retrieve a single result
         return response()->json($data);
     }
-    public function getAllUsers()
-    {
-        $query = User::selectRaw('
-        users.last_name,
-        users.first_name,
-        users.middle_name,
-        DATE_FORMAT(users.birthdate, "%M %d %Y") as birthdate,
-        CONCAT(users.first_name," ", users.middle_name," ",users.last_name)  as name
-
-        ');
-        $data = $query->get(); // Use get() instead of first() to retrieve all results
-        return response()->json($data);
-    }
-
     public function getGenderEmpStatus()
     {
         $employmentMap = [
