@@ -56,7 +56,7 @@ class UserController extends Controller
     public function fetchUserData($userId)
     {
         $query = User::selectRaw('
-            users.id,
+            users.id as user_id,
             pmo.pmo_title,
             pmo.id,
             DIVISION_COLOR,
@@ -77,6 +77,25 @@ class UserController extends Controller
         // Execute the query and return the result
         $userData = $query->first(); // Use first() instead of get() to retrieve a single result
         return response()->json($userData);
+    }
+
+    public function fetchAllUsers()
+    {
+        $query = User::selectRaw('
+        users.id,
+        CONCAT(users.last_name," ", users.first_name," ",users.middle_name)  as name,
+        users.email as email
+        ')
+            ->leftJoin('pr', 'pr.action_officer', '=', 'users.id')
+            ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
+            ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id');
+
+        // Optionally, you can print the SQL query to check
+        // dd($query->toSql());
+
+        // Execute the query and return the result
+        $allUsers = $query->get(); // Use get() to retrieve all results
+        return response()->json($allUsers);
     }
 
     public function getUserDetails($id)

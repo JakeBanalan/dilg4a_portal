@@ -247,15 +247,23 @@ img {
                                     <div class="card-body">
 
                                         <div class="row">
-                                            <div class="col-lg-6">
-                                                <TextInput label="Acceptance of Service Rendered" iconValue="user"
-                                                    v-model="acceptance" :value="userData.name" :readonly="true" />
-
-
+                                            <div class="col-lg-6 ">
+                                                <label style="font-weight: bold;"> Acceptance of Service
+                                                    Rendered</label> &nbsp;
+                                                <a href="#" class="text-decoration-none"
+                                                    :class="{ 'text-primary': !isEditMode, 'text-danger': isEditMode }"
+                                                    @click.prevent="toggleEditMode" v-if="this.role == 'admin'">
+                                                    {{ isEditMode ? 'Cancel' : 'Edit' }}
+                                                </a>
+                                                <multiselect v-model="acceptance" :options="acceptanceOptions"
+                                                    label="name" track-by="id" :readonly="!isEditMode" :multiple="false"
+                                                    :close-on-select="true" :clear-on-select="false"
+                                                    :preserve-search="true" placeholder="Select Acceptance"
+                                                    :disabled="!isEditMode" @input="updateAcceptance" />
                                             </div>
 
                                             <div class="col-lg-6">
-                                                <label style="font-weight: bold;"> ICT Technical Personnel</label>
+                                                <label style="font-weight: bold;"> Assign ICT Personnel</label>
                                                 <multiselect v-model="selected_ict_personnel"
                                                     :options="ictPersonnelOptions" label="ict_personnel"
                                                     track-by="emp_id" placeholder="Select ICT Officer" />
@@ -297,12 +305,15 @@ export default {
     components: { Multiselect },
     data() {
         return {
+            role: null,
             isSaving: false,
             dilg_logo: logo,
             folderId: '1AmuHQn3YkNEEVdR3RbpijsaX9NKT1oub', // Replace 'YOUR_FOLDER_ID' with the ID of your target folder
             accessToken: null,
             remarks: null,
             acceptance: null,
+            allUsers: [],
+            isEditMode: false,
             selected_ict_personnel: null, // Ensure it's defined
             ict_personnel: [],
             abstract_no: null,
@@ -327,7 +338,6 @@ export default {
                 name: null,
                 pmo_title: null,
                 email: null,
-                // Set current date in dd/mm/yyyy format
 
             },
             options: [
@@ -378,6 +388,7 @@ export default {
                 { label: 'POSTING/UPDATING OF INFORMATION IN THE DILG WEBSITE', value: '27', type: 8 },
             ]
         }
+
     },
     computed: {
         filteredSubRequests() {
@@ -398,17 +409,37 @@ export default {
         },
         ictPersonnelOptions() {
             return this.ict_personnel ?? []; // ✅ Ensures it's always an array
+        },
+        acceptanceOptions() {
+            return this.allUsers.map(user => ({ id: user.id, name: user.name }));
         }
+
     },
     mounted() {
         this.generateICTControlNo();
         this.fetchEndUserInfo();
         this.getICTpersonnel();
+        this.fetchAllUsers();
     },
     created() {
-
+        this.role = localStorage.getItem('user_role');
     },
     methods: {
+        updateAcceptance(value) {
+            this.acceptance = value;
+        },
+        fetchAllUsers() {
+            axios.get('/api/fetchAllUsers')
+                .then(response => {
+                    this.allUsers = response.data;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+        toggleEditMode() {
+            this.isEditMode = !this.isEditMode;
+        },
         async getICTpersonnel() {
             try {
                 const response = await axios.get('/api/get-ict-personnel');
@@ -447,59 +478,60 @@ export default {
             if (this.isSaving) return;
             this.isSaving = true;
 
+            await this.fetchEndUserInfo();
+
             const selectedRequest = (this.selectedType.value == 9) ? this.selectedSubRequest : this.selectedSubRequest.value;
             const portal_system = (this.selectedType.value == 4) ? this.portal_system : null;
             const web_access = (this.selectedType.value == 7) ? this.website_access : null;
-            const userId = localStorage.getItem('userId');
 
-            this.$fetchUserData(userId, '../../../../api/fetchUser')
-                .then(emp_data => {
-                    axios.post('/api/post_create_ict_request', {
-                        control_no: this.ict_no,
-                        requested_by: userId,
-                        requested_date: `${this.requested_date} ${this.formatTime(this.requested_time)}`,
-                        pmo: emp_data.id,
-                        email: emp_data.email,
-                        equipment_type: this.hardwareInfo.etype,
-                        brand: this.hardwareInfo.brand,
-                        property_no: this.hardwareInfo.pNumber,
-                        equipment_sn: this.hardwareInfo.eSerial,
-                        type_of_request: this.selectedType.value,
-                        subRequest: selectedRequest,
-                        remarks: this.remarks,
-                        portal_sys: portal_system,
-                        web_access: web_access,
-                        status: this.selected_ict_personnel ? 2 : 1,
-                        assign_ict_officer: this.selected_ict_personnel ? this.selected_ict_personnel.emp_id : null
-                    })
-                        .then(() => {
+            axios.post('/api/post_create_ict_request', {
+                control_no: this.ict_no,
+                requested_by: this.acceptance.id,
+                requested_date: `${this.requested_date} ${this.formatTime(this.requested_time)}`,
+                pmo: this.userData.id,
+                email: this.userData.email,
+                equipment_type: this.hardwareInfo.etype,
+                brand: this.hardwareInfo.brand,
+                property_no: this.hardwareInfo.pNumber,
+                equipment_sn: this.hardwareInfo.eSerial,
+                type_of_request: this.selectedType.value,
+                subRequest: selectedRequest,
+                remarks: this.remarks,
+                portal_sys: portal_system,
+                web_access: web_access,
+                status: this.selected_ict_personnel ? 2 : 1,
+                assign_ict_officer: this.selected_ict_personnel ? this.selected_ict_personnel.emp_id : null
+            })
+                .then(() => {
 
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'TA Created!',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                            setTimeout(() => {
-                                this.$router.replace({ path: '/rictu/ict_ta/index' })
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error creating ICT request:', error);
-                            toast.error("Failed to create ICT request. Please try again.", {
-                                autoClose: 2500,
-                            });
-                        })
-                        .finally(() => {
-                            this.isSaving = false;
-                        });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'TA Created!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    setTimeout(() => {
+                        this.$router.replace({ path: '/rictu/ict_ta/index' })
+                    });
                 })
+                .catch(error => {
+                    console.error('Error creating ICT request:', error);
+                    toast.error("Failed to create ICT request. Please try again.", {
+                        autoClose: 2500,
+                    });
+                })
+                .finally(() => {
+                    this.isSaving = false;
+                });
         },
         fetchEndUserInfo() {
             const userId = localStorage.getItem('userId');
             axios.get(`../../../api/fetchUser/${userId}`)
                 .then((response) => {
-                    this.userData = response.data
+                    this.userData = response.data;
+                    if (!this.acceptance) {
+                        this.acceptance = { id: this.userData.user_id, name: this.userData.name };
+                    }
                 }).catch(error => {
                     return null;
                 });

@@ -210,6 +210,11 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetchAllUsers', [UserController::class, 'fetchAllUsers']);
+});
+
+
+Route::middleware('api')->group(function () {
     Route::get('getICTData/{id}', [RICTUController::class, 'getICTData']);
 });
 Route::middleware('api')->group(function () {
