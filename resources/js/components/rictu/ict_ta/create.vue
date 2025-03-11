@@ -505,6 +505,7 @@ export default {
                 control_no: this.ict_no,
                 requested_by: this.acceptance.id,
                 requested_date: `${this.requested_date} ${this.formatTime(this.requested_time)}`,
+                received_date: this.selected_ict_personnel ? `${this.requested_date} ${this.formatTime(this.requested_time)}` : null,
                 pmo: this.acceptance.pmo_id || this.userData.id,
                 email: this.userData.email,
                 equipment_type: this.hardwareInfo.etype,

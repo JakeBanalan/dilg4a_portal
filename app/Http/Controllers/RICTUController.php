@@ -245,6 +245,7 @@ class RICTUController extends Controller
 
     public function post_create_ict_request(Request $request)
     {
+        // dd($request->all());
         $portal_system = $request->input('portal_sys') ?? null;
         $website_access = $request->input('web_access') ?? null;
 
@@ -262,7 +263,7 @@ class RICTUController extends Controller
             ->first();
 
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['error' => 'User  not found'], 404);
         }
 
         // ✅ Define and process `$assignedOfficer` properly
@@ -272,58 +273,69 @@ class RICTUController extends Controller
             $assignedOfficer = implode(',', $assignedOfficer);
         }
 
-        // Create the ICT request
-        // Create the ICT request
-        $ict_opts = new RICTUModel([
-            'control_no' => $request->input('control_no'),
-            'request_by' => $userId,
-            'request_date' => $requestedDate,
-            'office_id' => $request->input('pmo'),
-            'unit_id' => $request->input('email'),
-            'equipment_type' => $request->input('equipment_type'),
-            'brand' => $request->input('brand'),
-            'property_no' => $request->input('property_no'),
-            'serial_no' => $request->input('equipment_sn'),
-            'others' => $req == 9 ? $request->input('subRequest') : null,
-            'portal_system' => $portal_system,
-            'website_access' => $website_access,
-            'request_type_category_id' => $req == 9 ? 37 : $request->input('subRequest'),
-            'request_type_id' => $req,
-            'assign_ict_officer' => $assignedOfficer, // ✅ Assign ICT officer properly
-            'status_id' => $assignedOfficer ? self::STATUS_RECEIVED : self::STATUS_DRAFT, // ✅ Now updates based on ICT officer
-            'remarks' => $request->input('remarks'),
-            'css_link' => $month
-        ]);
+        DB::beginTransaction();
 
+        try {
+            // Create the ICT request
+            $ict_opts = new RICTUModel([
+                'control_no' => $request->input('control_no'),
+                'request_by' => $userId,
+                'request_date' => $requestedDate,
+                'received_date' => $assignedOfficer  ? $requestedDate : null,
+                'started_date' => $assignedOfficer ? $requestedDate : null,
+                'office_id' => $request->input('pmo'),
+                'unit_id' => $request->input('email'),
+                'equipment_type' => $request->input('equipment_type'),
+                'brand' => $request->input('brand'),
+                'property_no' => $request->input('property_no'),
+                'serial_no' => $request->input('equipment_sn'),
+                'others' => $req == 9 ? $request->input('subRequest') : null,
+                'portal_system' => $portal_system,
+                'website_access' => $website_access,
+                'request_type_category_id' => $req == 9 ? 37 : $request->input('subRequest'),
+                'request_type_id' => $req,
+                'assign_ict_officer' => $assignedOfficer,
+                'status_id' => $assignedOfficer ? self::STATUS_RECEIVED : self::STATUS_DRAFT,
+                'remarks' => $request->input('remarks'),
+                'css_link' => $month
+            ]);
 
-        $ict_opts->save();
+            $ict_opts->save();
 
-        // Send notification via Pusher
-        $options = [
-            'cluster' => env('PUSHER_APP_CLUSTER'),
-            'useTLS' => true
-        ];
+            // Send notification via Pusher
+            $options = [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true
+            ];
 
-        $pusher = new Pusher(
-            env('PUSHER_APP_KEY'),
-            env('PUSHER_APP_SECRET'),
-            env('PUSHER_APP_ID'),
-            $options
-        );
+            $pusher = new Pusher(
+                env('PUSHER_APP_KEY'),
+                env('PUSHER_APP_SECRET'),
+                env('PUSHER_APP_ID'),
+                $options
+            );
 
-        // Prepare the data for the notification
-        $data = [
-            'id' => $ict_opts->id, // Unique ID of the request
-            'username' => $user->username, // Username of the requester
-            'name' => $user->name, // Full name of the requester
-            'requester_id' => $userId, // Requester ID
-        ];
+            // Prepare the data for the notification
+            $data = [
+                'id' => $ict_opts->id, // Unique ID of the request
+                'username' => $user->username, // Username of the requester
+                'name' => $user->name, // Full name of the requester
+                'requester_id' => $userId, // Requester ID
+            ];
 
-        // Trigger the event for admins
-        $pusher->trigger('ict-ta-channel', 'new-ict-ta', $data);
+            // Trigger the event for admins
+            $pusher->trigger('ict-ta-channel', 'new-ict-ta', $data);
 
-        // Return a success response
-        return response()->json(['message' => 'ICT request created successfully.'], 201);
+            DB::commit();
+
+            // Return a success response
+            return response()->json(['message' => 'ICT request created successfully.'], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Return an error response
+            return response()->json(['error' => 'Failed to create ICT request.'], 500);
+        }
     }
 
 
