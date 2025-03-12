@@ -175,7 +175,14 @@ class PurchaseRequestController extends Controller
     public function fetchItems($year = null)
     {
         try {
-            $query = AppItemModel::select('tbl_app.id', 'tbl_app.item_title as name', 'tbl_app.app_price as price', 'tbl_app.sn as stockno', 'unit.item_unit_title as unit', 'tbl_app.app_year as AppYear')
+            $query = AppItemModel::select(
+                'tbl_app.id',
+                'tbl_app.item_title as name',
+                'tbl_app.app_price as price',
+                'tbl_app.sn as stockno',
+                'unit.item_unit_title as unit',
+                'tbl_app.app_year as AppYear'
+            )
                 ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id');
 
             if (!$year) {
@@ -186,14 +193,13 @@ class PurchaseRequestController extends Controller
 
             $items = $query->get();
 
-            if ($items->isEmpty()) {
-                return response()->json(['message' => 'No items found'], 404);
-            }
-            return response()->json($items);
+            // ✅ Return an empty array instead of 404 when no items exist
+            return response()->json($items, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while fetching items'], 500);
         }
     }
+
 
     public function fetchPurchaseReqData(Request $request)
     {

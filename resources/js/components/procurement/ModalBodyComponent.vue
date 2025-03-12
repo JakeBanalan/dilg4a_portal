@@ -4,17 +4,17 @@
         <div class="col-md-6">
             <h5 style="font-size: 15pt;">Stock #: {{ stockNumber }}</h5>
 
-            <label for="item-code-input">Code</label>
+            <label>Code</label>
             <input type="text" id="item-code-input" v-model="itemCode" class="form-control" />
 
-            <label for="item-title-input">Item Title</label>
+            <label>Item Title</label>
             <input type="text" id="item-title-input" v-model="itemTitle" class="form-control" />
 
-            <label for="unit-select">Unit</label>
+            <label>Unit</label>
             <v-select id="unit-select" v-model="unitTile" :options="unitOption" label="label"
                 :reduce="option => option.value" />
 
-            <label for="source-fund-select">Source of Funds</label>
+            <label>Source of Funds</label>
             <v-select id="source-fund-select" v-model="sourceOfFundsTitle" :options="sourceOfFundsOption" label="label"
                 :reduce="option => option.value"></v-select>
 
@@ -24,21 +24,21 @@
         <div class="col-md-6">
             <h5 style="font-size: 15pt;">App Year: {{ appYear }}</h5>
 
-            <label for="category-select">Category</label>
+            <label >Category</label>
             <v-select id="category-select" v-model="itemCategory" :options="categoriesOption" label="label"
                 :reduce="option => option.value" />
 
-            <label for="office-select">Office</label>
+            <label>Office</label>
             <v-select id="office-select" v-model="pmoTitle" :options="pmoOptions" label="label"
                 :reduce="option => option.value" />
 
-            <label for="item-qty-input">Quantity</label>
+            <label >Quantity</label>
             <input type="number" id="item-qty-input" v-model="itemQty" class="form-control" min="0" />
 
-            <label for="price-input">APP Price</label>
+            <label >APP Price</label>
             <input type="number" id="price-input" class="form-control" v-model="price" />
 
-            <label for="procurement-select">Mode of Procurement</label>
+            <label>Mode of Procurement</label>
             <v-select id="procurement-select" v-model="modeOfProcTitle" :options="pr_typeOption" label="label"
                 :reduce="option => option.value"></v-select>
 
