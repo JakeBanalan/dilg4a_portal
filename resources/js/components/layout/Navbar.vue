@@ -134,154 +134,241 @@ export default {
             userId: '',
             loading: true,
             pusher: null,
+            channels: [] // Store channel references to properly unsubscribe later
         }
     },
     created() {
         this.userId = localStorage.getItem('userId');
     },
-    mounted() {
-        if (localStorage.getItem('api_token')) {
-            axios.get('/api/getUserData', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('api_token')
-                }
-            })
-                .then(response => {
-                    this.userRole = response.data.user_role;
-
-                    // Initialize Pusher
-                    var pusher = new Pusher('29d53f8816252d29de52', {
-                        cluster: 'ap1'
-                    });
-
-
-
-                    // Subscribe to the appropriate channel based on user role
-                    if (this.userRole === 'admin') {
-                        // Admin subscribes to the new TA request channel
-                        this.subscribeToChannel(pusher, 'ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index', this.userId);
-                        // Function to subscribe to a channel and bind an event
-                        const subscribeAndBind = (channelName, eventName) => {
-                            const channel = pusher.subscribe(channelName);
-                            channel.bind(eventName, (data) => {
-
-                            });
-                        };
-                        subscribeAndBind('received-ta-channel', 'received-ict-ta');
-                        subscribeAndBind('completed-ta-channel', 'completed-ict-ta');
-                    }
-                    else if (this.userRole === 'user') {
-                        this.subscribeToChannel(pusher, 'completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
-                        this.subscribeToChannel(pusher, 'received-ta-channel', 'received-ict-ta', 'Your Request has been Received', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
-                    }
-                    this.loading = false;
-                })
-                .catch(error => {
-                    console.error(error);
-                    this.loading = false;
-                });
-        } else {
-            console.error('Unauthorized access');
-            this.loading = false;
-        }
+    beforeUnmount() {
+        // Clean up Pusher connections before component is destroyed
+        this.cleanupPusherConnections();
     },
-
+    mounted() {
+        this.initializeUserData();
+    },
     methods: {
+        async initializeUserData() {
+            if (!localStorage.getItem('api_token')) {
+                console.error('Unauthorized access');
+                this.loading = false;
+                return;
+            }
+
+            try {
+                const response = await axios.get('/api/getUserData', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('api_token')
+                    }
+                });
+
+                this.userRole = response.data.user_role;
+                this.initializePusher();
+                this.loading = false;
+            } catch (error) {
+                console.error('Failed to fetch user data:', error);
+                this.loading = false;
+            }
+        },
+
+        initializePusher() {
+            // Initialize Pusher with error handling
+            try {
+                this.pusher = new Pusher('29d53f8816252d29de52', {
+                    cluster: 'ap1',
+                    // Add proper error handling
+                    enabledTransports: ['ws', 'wss'],
+                    disabledTransports: []
+                });
+
+                this.pusher.connection.bind('error', (err) => {
+                    console.error('Pusher connection error:', err);
+                });
+
+                // Set up channels based on user role
+                if (this.userRole === 'admin') {
+                    this.setupAdminChannels();
+                } else if (this.userRole === 'user') {
+                    this.setupUserChannels();
+                }
+            } catch (err) {
+                console.error('Error initializing Pusher:', err);
+            }
+        },
+
+        setupAdminChannels() {
+            // Admin subscribes to the new TA request channel
+            this.subscribeToChannel('ict-ta-channel', 'new-ict-ta', 'New TA Request', 'bg-success', 'ti-alert', '/rictu/ict_ta/index', this.userId);
+
+            // // Subscribe to additional channels
+            // this.subscribeToChannel('received-ta-channel', 'received-ict-ta');
+            // this.subscribeToChannel('completed-ta-channel', 'completed-ict-ta');
+        },
+
+        setupUserChannels() {
+            this.subscribeToChannel('completed-ta-channel', 'completed-ict-ta', 'Your Request has been Completed. Please take the Survey! Thank you!', 'bg-info', 'ti-thumb-up', '/rictu/ict_ta/index');
+            this.subscribeToChannel('received-ta-channel', 'received-ict-ta', 'Your Request has been Received', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
+        },
+
         clearSingleNotification(notificationId) {
+            // Prevent event bubbling and safely remove notification
             this.notifications = this.notifications.filter(notification => notification.id !== notificationId);
             this.$forceUpdate();
         },
-        logout() {
-            const apiToken = localStorage.getItem('api_token');
 
-            axios.post('/api/logout', null, {
-                headers: {
-                    Authorization: `Bearer ${apiToken}`
-                }
-            })
-                .then(() => {
-                    localStorage.removeItem('api_token');
-                    this.$router.push('/');
-                })
-                .catch(error => {
-                    console.error('Logout failed:', error);
+        async logout() {
+            try {
+                // Clean up Pusher connections before logout
+                this.cleanupPusherConnections();
+
+                const apiToken = localStorage.getItem('api_token');
+                await axios.post('/api/logout', null, {
+                    headers: {
+                        Authorization: `Bearer ${apiToken}`
+                    }
                 });
+
+                localStorage.removeItem('api_token');
+                this.$router.push('/');
+            } catch (error) {
+                console.error('Logout failed:', error);
+            }
         },
-        subscribeToChannel(pusher, channelName, eventName, notificationTitle, iconColor, iconClass, redirectUrl, requesterId) {
-            let channel = pusher.subscribe(channelName);
-            channel.bind(eventName, (data) => {
-                if (this.userRole === 'admin' && data.requester_id !== requesterId) {
-                    this.notifications.push({
-                        id: data.id,
-                        title: `${notificationTitle} from ${data.name}`, // Show sender's name
-                        iconColor: iconColor,
-                        icon: iconClass,
-                        time: new Date().toLocaleString(),
-                        redirectUrl: "/rictu/ict_ta/index" // Redirect to the TA request page
-                    });
 
-                    this.showAlert(`${notificationTitle} from ${data.name}`);
-                    if (Notification.permission === 'granted') {
-                        new Notification(`${notificationTitle} from ${data.name}`, {
-                            icon: iconClass,
-                            tag: data.id
-                        });
-                    }
-                }
-                else if (this.userRole === 'user') {
-                    if (data.requester_id === this.userId) {
-                        this.notifications.push({
-                            id: data.id,
-                            title: `${notificationTitle} by ${data.receiverName}`,
-                            iconColor: iconColor,
-                            icon: iconClass,
-                            time: new Date().toLocaleString(),
-                            redirectUrl: "/rictu/ict_ta/index"
-                        });
-                        if (channelName === 'completed-ta-channel') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: `${notificationTitle} by ${data.receiverName}`,
-                                showConfirmButton: true,
-                                confirmButtonText: 'OK',
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    if (data.link) {
-                                        window.open(data.link, '_blank'); // Opens in a new tab
-                                    } else {
-                                        Swal.fire('No Survey Available', 'There is no survey link for this month.', 'info');
-                                    }
-                                }
-                            });
-                        }
-                        else {
-                            Swal.fire({
-                                icon: 'success',
-                                title: `${notificationTitle} by ${data.receiverName}`,
-                                showConfirmButton: true,
-                                confirmButtonText: 'OK',
-                            });
-                        }
-                        if (Notification.permission === 'granted') {
-                            new Notification(`${notificationTitle} by ${data.receiverName}`, {
-                                icon: iconClass,
-                                tag: data.id
-                            });
-                        }
-                    }
+        subscribeToChannel(channelName, eventName, notificationTitle, iconColor, iconClass, redirectUrl, requesterId) {
+            if (!this.pusher) {
+                console.error('Pusher not initialized');
+                return;
+            }
+
+            try {
+                const channel = this.pusher.subscribe(channelName);
+                // Store channel reference for cleanup
+                this.channels.push({ name: channelName, channel });
+
+                channel.bind(eventName, (data) => {
+                    // Handle notifications differently based on user role
+                    this.handleNotificationEvent(data, channelName, eventName, notificationTitle, iconColor, iconClass, requesterId);
+                });
+
+                // Handle subscription errors
+                channel.bind('pusher:subscription_error', (status) => {
+                    console.error(`Subscription to ${channelName} failed with status ${status}`);
+                });
+            } catch (err) {
+                console.error(`Error subscribing to channel ${channelName}:`, err);
+            }
+        },
+
+        handleNotificationEvent(data, channelName, eventName, notificationTitle, iconColor, iconClass, requesterId) {
+            // Extract notification processing logic to separate method
+            if (this.userRole === 'admin') {
+                this.handleAdminNotification(data, notificationTitle, iconColor, iconClass, requesterId);
+            } else if (this.userRole === 'user') {
+                this.handleUserNotification(data, channelName, notificationTitle, iconColor, iconClass);
+            }
+        },
+
+        handleAdminNotification(data, notificationTitle, iconColor, iconClass, requesterId) {
+            // Only handle notifications meant for this admin (avoid duplicate processing)
+            if (data.requester_id !== requesterId) {
+                const notification = {
+                    id: data.id,
+                    title: `${notificationTitle} from ${data.name}`,
+                    iconColor: iconColor,
+                    icon: iconClass,
+                    time: new Date().toLocaleString(),
+                    redirectUrl: "/rictu/ict_ta/index"
+                };
+
+                this.notifications.push(notification);
+                this.showAlert(`${notificationTitle} from ${data.name}`);
+
+                // Show browser notification if permission granted
+                this.showBrowserNotification(notification.title, iconClass, data.id);
+            }
+        },
+
+        handleUserNotification(data, channelName, notificationTitle, iconColor, iconClass) {
+            // Only process notifications for this user
+            if (data.requester_id === this.userId) {
+                const notification = {
+                    id: data.id,
+                    title: `${notificationTitle} by ${data.receiverName}`,
+                    iconColor: iconColor,
+                    icon: iconClass,
+                    time: new Date().toLocaleString(),
+                    redirectUrl: "/rictu/ict_ta/index"
+                };
+
+                this.notifications.push(notification);
+                this.showAlert(`${notificationTitle} by ${data.receiverName}`);
+                // Handle completed notifications specially
+                if (channelName === 'completed-ta-channel') {
+                    this.showCompletedNotification(data, notificationTitle);
+                } else {
+                    this.showReceivedNotification(data, notificationTitle);
                 }
 
+                // Show browser notification
+                this.showBrowserNotification(notification.title, iconClass, data.id);
+            }
+        },
+
+        showCompletedNotification(data, notificationTitle) {
+            Swal.fire({
+                icon: 'success',
+                title: `${notificationTitle} by ${data.receiverName}`,
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
+            }).then((result) => {
+                if (result.isConfirmed && data.link) {
+                    window.open(data.link, '_blank');
+                } else if (result.isConfirmed && !data.link) {
+                    Swal.fire('No Survey Available', 'There is no survey link for this month.', 'info');
+                }
             });
         },
+
+        showReceivedNotification(data, notificationTitle) {
+            Swal.fire({
+                icon: 'success',
+                title: `${notificationTitle} by ${data.receiverName}`,
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
+            });
+        },
+
+        showBrowserNotification(title, iconClass, id) {
+            if (Notification.permission === 'granted') {
+                new Notification(title, {
+                    icon: iconClass,
+                    tag: id
+                });
+            }
+        },
+
         showAlert(title) {
             toast.success(title, {
                 autoClose: 1500,
             });
         },
+
         redirectTo(notification) {
             window.location.href = notification.redirectUrl;
-        }
+        },
 
+        cleanupPusherConnections() {
+            // Properly unsubscribe from all channels before unmounting
+            if (this.pusher) {
+                this.channels.forEach(channel => {
+                    this.pusher.unsubscribe(channel.name);
+                });
+                this.pusher.disconnect();
+                this.pusher = null;
+                this.channels = [];
+            }
+        }
     }
 }
 </script>
