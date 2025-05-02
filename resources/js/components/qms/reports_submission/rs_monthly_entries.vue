@@ -17,7 +17,12 @@
                                         Procedures
                                     </h5>
                                     <div class="d-flex">
-                                        <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                        <button type="button" @click="Return()"
+                                            class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Return
+                                        </button>
+                                        <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                            :disabled="form.status != 0">
                                             Submit
                                         </button>
                                     </div>
@@ -83,63 +88,63 @@
                                             <th class="text-center" width="7.5%">OCT</th>
                                             <th class="text-center" width="7.5%">NOV</th>
                                             <th class="text-center" width="7.5%">DEC</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['01']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['01']"
+                                                    :disabled="qp_covered !== 'January'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['02']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['02']"
+                                                    :disabled="qp_covered !== 'February'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['03']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['03']"
+                                                    :disabled="qp_covered !== 'March'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['04']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['04']"
+                                                    :disabled="qp_covered !== 'April'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['05']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['05']"
+                                                    :disabled="qp_covered !== 'May'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['06']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['06']"
+                                                    :disabled="qp_covered !== 'June'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['07']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['07']"
+                                                    :disabled="qp_covered !== 'July'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['08']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['08']"
+                                                    :disabled="qp_covered !== 'August'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['09']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['09']"
+                                                    :disabled="qp_covered !== 'September'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['10']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['10']"
+                                                    :disabled="qp_covered !== 'October'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['11']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['11']"
+                                                    :disabled="qp_covered !== 'November'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[0]['12']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[0]['12']"
+                                                    :disabled="qp_covered !== 'December'" />
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">00.0</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%" style="vertical-align: middle;">00.0</td> -->
                                         </tr>
+
                                     </tbody>
                                 </table>
                             </div>
@@ -167,62 +172,62 @@
                                             <th class="text-center" width="7.5%">OCT</th>
                                             <th class="text-center" width="7.5%">NOV</th>
                                             <th class="text-center" width="7.5%">DEC</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['01']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['01']"
+                                                    :disabled="qp_covered !== 'January'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['02']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['02']"
+                                                    :disabled="qp_covered !== 'February'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['03']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['03']"
+                                                    :disabled="qp_covered !== 'March'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['04']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['04']"
+                                                    :disabled="qp_covered !== 'April'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['05']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['05']"
+                                                    :disabled="qp_covered !== 'May'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['06']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['06']"
+                                                    :disabled="qp_covered !== 'June'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['07']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['07']"
+                                                    :disabled="qp_covered !== 'July'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['08']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['08']"
+                                                    :disabled="qp_covered !== 'August'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['09']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['09']"
+                                                    :disabled="qp_covered !== 'September'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['10']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['10']"
+                                                    :disabled="qp_covered !== 'October'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['11']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['11']"
+                                                    :disabled="qp_covered !== 'November'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[1]['12']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[1]['12']"
+                                                    :disabled="qp_covered !== 'December'" />
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">00.0</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">00.0</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -252,62 +257,62 @@
                                             <th class="text-center" width="7.5%">OCT</th>
                                             <th class="text-center" width="7.5%">NOV</th>
                                             <th class="text-center" width="7.5%">DEC</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['01']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['01']"
+                                                    :disabled="qp_covered !== 'January'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['02']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['02']"
+                                                    :disabled="qp_covered !== 'February'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['03']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['03']"
+                                                    :disabled="qp_covered !== 'March'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['04']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['04']"
+                                                    :disabled="qp_covered !== 'April'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['05']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['05']"
+                                                    :disabled="qp_covered !== 'May'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['06']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['06']"
+                                                    :disabled="qp_covered !== 'June'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['07']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['07']"
+                                                    :disabled="qp_covered !== 'July'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['08']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['08']"
+                                                    :disabled="qp_covered !== 'August'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['09']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['09']"
+                                                    :disabled="qp_covered !== 'September'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['10']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['10']"
+                                                    :disabled="qp_covered !== 'October'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['11']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['11']"
+                                                    :disabled="qp_covered !== 'November'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[2]['12']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[2]['12']"
+                                                    :disabled="qp_covered !== 'December'" />
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">00.0</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">00.0</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -336,63 +341,64 @@
                                             <th class="text-center" width="7.5%">OCT</th>
                                             <th class="text-center" width="7.5%">NOV</th>
                                             <th class="text-center" width="7.5%">DEC</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['01']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['01']"
+                                                    :disabled="qp_covered !== 'January'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['02']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['02']"
+                                                    :disabled="qp_covered !== 'February'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['03']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['03']"
+                                                    :disabled="qp_covered !== 'March'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['04']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['04']"
+                                                    :disabled="qp_covered !== 'April'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['05']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['05']"
+                                                    :disabled="qp_covered !== 'May'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['06']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['06']"
+                                                    :disabled="qp_covered !== 'June'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['07']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['07']"
+                                                    :disabled="qp_covered !== 'July'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['08']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['08']"
+                                                    :disabled="qp_covered !== 'August'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['09']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['09']"
+                                                    :disabled="qp_covered !== 'September'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['10']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['10']"
+                                                    :disabled="qp_covered !== 'October'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['11']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['11']"
+                                                    :disabled="qp_covered !== 'November'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[3]['12']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[3]['12']"
+                                                    :disabled="qp_covered !== 'December'" />
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">00.0</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">00.0</td> -->
                                         </tr>
+
                                     </tbody>
                                 </table>
                             </div>
@@ -420,63 +426,64 @@
                                             <th class="text-center" width="7.5%">OCT</th>
                                             <th class="text-center" width="7.5%">NOV</th>
                                             <th class="text-center" width="7.5%">DEC</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['01']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['01']"
+                                                    :disabled="qp_covered !== 'January'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['02']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['02']"
+                                                    :disabled="qp_covered !== 'February'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['03']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['03']"
+                                                    :disabled="qp_covered !== 'March'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['04']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['04']"
+                                                    :disabled="qp_covered !== 'April'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['05']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['05']"
+                                                    :disabled="qp_covered !== 'May'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['06']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['06']"
+                                                    :disabled="qp_covered !== 'June'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['07']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['07']"
+                                                    :disabled="qp_covered !== 'July'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['08']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['08']"
+                                                    :disabled="qp_covered !== 'August'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['09']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['09']"
+                                                    :disabled="qp_covered !== 'September'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['10']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['10']"
+                                                    :disabled="qp_covered !== 'October'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['11']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['11']"
+                                                    :disabled="qp_covered !== 'November'" />
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control"
-                                                    v-model="monthlyData[4]['12']" />
+                                                <input type="text" class="form-control" v-model="monthlyData[4]['12']"
+                                                    :disabled="qp_covered !== 'December'" />
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">00.0</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">00.0</td> -->
                                         </tr>
+
                                     </tbody>
                                 </table>
                             </div>
@@ -523,7 +530,8 @@ export default {
     },
     data() {
         return {
-
+            qp_covered: this.$route.query.pq,
+            status: this.$route.query.stat,
             monthlyData: [
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, '01': '', '02': '', '03': '', '04': '', '05': '', '06': '', '07': '', '08': '', '09': '', '10': '', '11': '', '12': '' },
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, '01': '', '02': '', '03': '', '04': '', '05': '', '06': '', '07': '', '08': '', '09': '', '10': '', '11': '', '12': '' },
@@ -549,6 +557,24 @@ export default {
         // console.log(this.quarterData)
     },
     methods: {
+        Return() {
+
+            Swal.fire({
+                title: 'Are you sure you want to return?',
+                text: 'Make sure to submit the form to avoid losing data.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, return',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let id = this.$route.params.id;
+                    this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
+                }
+            });
+
+
+        },
         toggleGapAnalysis() {
             if (this.form.is_gap_analysis) {
                 this.form.gap_analysis = '';
@@ -576,45 +602,60 @@ export default {
                 })
         },
         updateMonthlyRating() {
-            if (this.form.is_gap_analysis === true) {
-                this.form.is_gap_analysis = '1';
-            } else {
-                this.form.is_gap_analysis = '0';
-            }
-            // console.log(this.monthlyData);
-            // Assuming you have Axios installed and imported
-                axios.post(`/api/saveMonthlyData`, {
-                    formData: this.form,
-                    monthlyData: this.monthlyData
-                })
-                    .then(response => {
-                        console.log('Updated successfully:', response);
-                        // Optionally, handle success response
-                        toast.success('Report Successfully Submitted!', {
-                        autoClose: 1000
-                    });
-                    this.fetchQOPRUserData();
-                    this.fetchData();
+
+            Swal.fire({
+                title: 'Do you want to Continue?',
+                // text: "You won't be able to revert this!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    if (this.form.is_gap_analysis === true) {
+                        this.form.is_gap_analysis = '1';
+                    } else {
+                        this.form.is_gap_analysis = '0';
+                    }
+                    axios.post(`/api/saveMonthlyData`, {
+                        formData: this.form,
+                        monthlyData: this.monthlyData
                     })
-                    .catch(error => {
-                        console.error('Error updating:', error);
-                        // Optionally, handle error response
-                    });
+                        .then(response => {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Report Successfully Submitted!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            setTimeout(() => {
+                                this.fetchQOPRUserData();
+                                this.fetchData();
+                            }, 200);
+                        })
+                        .catch(error => {
+                            console.error('Error updating:', error);
+                            // Optionally, handle error response
+                        });
+
+                }
+            });
         },
         fetchData() {
-        let qoe_id = this.$route.params.qoe_id1;
-        let id = this.$route.params.id;
+            let qoe_id = this.$route.params.qoe_id1;
+            let id = this.$route.params.id;
 
-        axios.get(`/api/fetchMonthlyData/${id}/${qoe_id}`)
-            .then(response => {
-                console.log('API Response:', response.data);
-                this.monthlyData = response.data.monthly; // Assign quarters array to monthlyData
-                this.sqlQuery = response.data.sql_query;   // Assign SQL query to sqlQuery for debugging
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }
+            axios.get(`/api/fetchMonthlyData/${id}/${qoe_id}`)
+                .then(response => {
+                    console.log('API Response:', response.data);
+                    this.monthlyData = response.data.monthly; // Assign quarters array to monthlyData
+                    this.sqlQuery = response.data.sql_query;   // Assign SQL query to sqlQuery for debugging
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
     }
 }
 </script>

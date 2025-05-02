@@ -233,8 +233,9 @@
                                                     <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
                                                         aria-label="Quote#" style="width: 10px; text-align: center;">
                                                         Username</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
-                style="width: 10px; text-align: center;">Email</th>
+                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
+                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
+                                                        Email</th>
                                                     <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
                                                         aria-label="Quote#" style="width: 10px; text-align: center;">
                                                         Contact Number</th>
@@ -252,10 +253,11 @@
                                                     <td>{{ ed.name }}</td>
                                                     <td>{{ ed.username }}</td>
                                                     <td>{{ ed.contact_details }}</td>
-                                                    <td> 
+                                                    <td>
                                                         <button @click="UpdateUser(ed.id)" class="btn btn-icon mr-1"
                                                             style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
-                                                            <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                                                            <font-awesome-icon
+                                                                :icon="['fas', 'eye']"></font-awesome-icon>
                                                         </button>
                                                     </td>
                                                 </tr>

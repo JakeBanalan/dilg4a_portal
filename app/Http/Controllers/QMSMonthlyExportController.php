@@ -236,6 +236,7 @@ class QMSMonthlyExportController extends Controller
                     'b.is_gap_analysis',
                     'b.gap_analysis',
                 )
+                ->orderBy('a.id', 'asc')
                 ->get();
 
             // Map over the result to transform the data
@@ -259,9 +260,17 @@ class QMSMonthlyExportController extends Controller
             $indicator = 'Objective ' . ++$counter . ': ' . $entry['objective'];
             $sheet->getCell('A' . $row)->setValue($indicator);
             $sheet->getStyle("A" . $row . ':X' . $row)->applyFromArray($style2);
+            $char_len = strlen($indicator);
+            if ($char_len > 100) {
+                $sheet->getRowDimension($row)->setRowHeight('40');
+            } else if ($char_len > 150) {
+                $sheet->getRowDimension($row)->setRowHeight('70');
+            }
             // $sheet->getStyle("A".$row)->applyFromArray($style3);
             // $sheet->getStyle("X".$row)->applyFromArray($style3);
             $sheet->mergeCells('A' . $row . ':X' . $row++);
+            $sheet->getRowDimension($row)->setRowHeight('45');
+
 
             $formula = '';
             $gap_analysis = '';

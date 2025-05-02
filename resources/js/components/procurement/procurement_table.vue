@@ -228,6 +228,7 @@ export default {
             this.loadDataPerUser(); // Non-admin sees only their own requests
         }
     },
+    
     methods: {
         dateFormat(date) {
             return formatDate(date);

@@ -57,10 +57,17 @@ Route::middleware('auth:api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']);
-    Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('get_purchase_request_details', [PurchaseRequestController::class, 'getPurchaseRequestDetails']);
+});
+    Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
+
+    Route::middleware('api')->group(function () {
+        Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);
+    });
+    Route::middleware('api')->group(function () {
     Route::get('appitems', [AppItemController::class, 'getAppData']);
 });
 
@@ -78,6 +85,9 @@ Route::middleware('api')->group(function () {
     Route::get('load_abstract_data', [AbstractController::class, 'load_abstract_data']);
 });
 
+Route::middleware('api')->group(function () {
+    Route::get('getPurchaseRequest', [PurchaseRequestController::class, 'getPurchaseRequest']);
+});
 
 Route::middleware('api')->group(function () {
     Route::get('generatePurchaseRequestNo', [PurchaseRequestController::class, 'generatePurchaseRequestNo']);
@@ -279,6 +289,9 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('fetchQOPR', [QMSController::class, 'fetchQOPR']);
 });
+Route::middleware('api')->group(function () {
+    Route::get('fetchQOPRperUser/{id}', [QMSController::class, 'fetchQOPRperUser']);
+});
 
 Route::middleware('api')->group(function () {
     Route::get('fetchQOPRUserData/{id}/{qoe_id}', [QMSController::class, 'fetchQOPRUserData']);
@@ -325,7 +338,19 @@ Route::middleware('api')->group(function () {
     Route::get('fetchUserOfficeCount', [UserManagementController::class, 'fetchUserOfficeCount']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('fetchItems/{year?}', [PurchaseRequestController::class, 'fetchItems']);
+    Route::get('fetchItems', [PurchaseRequestController::class, 'fetchItems']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('viewAOQ/{id}', [AbstractController::class, 'viewAOQ']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetch_supplier_list', [AbstractController::class, 'fetch_supplier_list']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetch_supplier_quote/{id}', [AbstractController::class, 'fetch_supplier_quote']);
 });
 
 Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
@@ -340,6 +365,7 @@ Route::post('login', [UserController::class, 'login']);
 // Route::post('logout',[UserController::class,'logout']);
 
 Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
+Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
 Route::post('app-items', [AppItemController::class, 'post_add_appItem']);
 Route::post('updateAppDataById/{id}',  [AppItemController::class, 'post_update_appItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
@@ -347,6 +373,7 @@ Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'p
 Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);
 Route::post('deletePurchaseRequestItem', [PurchaseRequestController::class, 'deletePurchaseRequestItem']);
 Route::post('fetchPurchaseReqData', [PurchaseRequestController::class, 'fetchPurchaseReqData']);
+Route::post('fetchPRMonitor', [PurchaseRequestController::class, 'fetchPRMonitor']);
 Route::post('perUserPurchaseReqData', [PurchaseRequestController::class, 'perUserPurchaseReqData']);
 Route::post('updatePurchaseRequestStatus', [PurchaseRequestController::class, 'updatePurchaseRequestStatus']);
 Route::post('fetchSubmittedtoGSS', [PurchaseRequestController::class, 'fetchSubmittedtoGSS']);
@@ -360,7 +387,9 @@ Route::post('post_supplier_quote', [SupplierController::class, 'post_supplier_qu
 Route::post('post_create_abstract', [AbstractController::class, 'post_create_abstract']);
 Route::post('post_create_po', [PurchaseOrderController::class, 'post_create_po']);
 Route::post('total_amount', [PurchaseRequestController::class, 'total_amount']);
+// Route::post('post_update_status', 'PurchaseRequestController@post_update_status')->name('post.update.status');
 Route::post('post_update_status', [PurchaseRequestController::class, 'post_update_status']);
+Route::post('post_addCode', [PurchaseRequestController::class, 'post_addCode']);
 Route::post('fetch_ict_req_details', [RICTUController::class, 'fetch_ict_req_details']);
 
 
@@ -370,6 +399,9 @@ Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSma
 
 //BUDGET POST
 Route::post('post_addCode', [BudgetController::class, 'insertCode']);
+//A B S T R A C T
+Route::post('PostAbstract', [AbstractController::class, 'PostAbstract']);
+Route::post('PostSupplierQuotation', [AbstractController::class, 'PostSupplierQuotation']);
 
 
 // R F Q
@@ -393,6 +425,7 @@ Route::post('DeleteEvent', [CalendarController::class, 'deleteEvent']);
 Route::post('DeleteProcessOwner', [QMSController::class, 'DeleteProcessOwner']);
 Route::post('addProcessOwner', [QMSController::class, 'addProcessOwner']);
 Route::post('postQualityProcedure', [QMSController::class, 'postQualityProcedure']);
+Route::post('UpdateQualityProcedure', [QMSController::class, 'UpdateQualityProcedure']);
 Route::post('postQualityObjectives', [QMSController::class, 'postQualityObjectives']);
 Route::post('postUpdateQualityObjectives', [QMSController::class, 'postUpdateQualityObjectives']);
 Route::post('DeleteQualityObjective', [QMSController::class, 'DeleteQualityObjective']);
@@ -402,6 +435,7 @@ Route::post('submitReport', [QMSController::class, 'submitReport']);
 Route::post('deleteRS', [QMSController::class, 'deleteRS']);
 Route::post('saveQuarterData', [QMSController::class, 'saveQuarterData']);
 Route::post('saveMonthlyData', [QMSController::class, 'saveMonthlyData']);
+Route::post('ValidateReportEntry', [QMSController::class, 'ValidateReportEntry']);
 
 //U S E R  M A N A G E M E N T
 Route::post('PostUser', [UserManagementController::class, 'PostUser']);
@@ -412,7 +446,7 @@ Route::post('PostUser', [UserManagementController::class, 'PostUser']);
 // E X P O R T
 // routes/web.php or routes/api.php
 Route::middleware('api')->group(function () {
-    Route::get('/export-purchase-request/{id}', [PurchaseRequestController::class, 'exportPurchaseRequest']);
+    Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'showPurchaseRequest']);
 });
 
 
@@ -421,7 +455,7 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('export-abstract/{id}', [AbstractController::class, 'load_abstract_info']);
+    Route::get('export-abstract/{absID}', [AbstractController::class, 'ExportAbstract']);
 });
 
 

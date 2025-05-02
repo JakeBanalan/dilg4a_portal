@@ -13,26 +13,27 @@
                         <table id="user_table" style="width:100%" class="table table-striped table-bordered">
                             <thead>
                                 <tr role="row">
-                                    <th>OFFICE</th>
                                     <th>NAME</th>
                                     <th>POSITION</th>
-                                    <th>ACTION</th>
+                                    <th>OFFICE</th>
+                                    <th style="width:1%">ACTION</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="user in UserList" :key="user.id">
-                                    <td>{{ user.pmo_title }}</td>
                                     <td>{{ user.fname }}</td>
                                     <td>{{ user.position_title }}</td>
+                                    <td>{{ user.pmo_title }}</td>
                                     <td>
-                                        <button class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
-                                            @click="AddProcessOwner(user.id)">
+                                        <button @click="AddProcessOwner(user.id)" class="btn btn-icon mr-1"
+                                            style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                             <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
                                         </button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" style="float: right;margin-left:5px;"
@@ -41,7 +42,10 @@
                 </div>
             </div>
         </div>
+        <div class="modal-backdrop fade show"></div>
     </div>
+
+
 </template>
 
 
@@ -74,33 +78,21 @@ export default {
         fetchUser() {
             axios.get('/api/fetchAllUser').then((response) => {
                 this.UserList = response.data;
-                const vm = this; // Save Vue instance context
-
-                if ($.fn.DataTable.isDataTable('#user_table')) {
-                    $('#user_table').DataTable().destroy();
-                }
+                this.initializeDataTable();
+            }).catch((error) => console.log(error));
+        },
+        initializeDataTable() {
+            $('#user_table').DataTable().destroy(); // clean up
+            this.$nextTick(() => {
                 $('#user_table').DataTable({
                     retrieve: true,
                     ordering: false,
                     paging: true,
                     pageLength: 10,
-                    columns: [
-                        { data: 'pmo_title' },
-                        { data: 'fname' },
-                        { data: 'position_title' },
-                        {
-                            data: null, orderable: false, render: function (data) {
-                                return '<button class="btn btn-primary btn-fw btn-icon-text mx-2" data-id="' + data.id + '">Add</button>';
-                            },
-                        },
-                    ],
                 });
+                this.dataTableInitialized = true;
 
-                // $('#user_table tbody').on('click', 'button', function () {
-                //     const id = $(this).data('id');
-                //     vm.AddProcessOwner(id);
-                // });
-            }).catch((error) => console.log(error));
+            });
         },
         AddProcessOwner(id) {
             this.$emit('addprocessowner', id);

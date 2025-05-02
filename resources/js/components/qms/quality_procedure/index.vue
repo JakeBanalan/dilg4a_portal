@@ -33,26 +33,26 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="qp in QualityProcedure" :key="qp.id">
-                                            <td                                                 
-                                            style=" width:5%; overflow-wrap: initial; white-space: normal;">
+                                            <td style=" width:5%; overflow-wrap: initial; white-space: normal;">
                                                 {{ qp.frequency_monitoring }}</td>
                                             <td style="width: 10%;">{{ qp.qp_code }}</td>
                                             <td
                                                 style=" word-break: break-word; overflow-wrap: break-word; white-space: normal;">
                                                 {{ qp.procedure_title }}</td>
-                                            <td 
-                                            style=" width:10%; word-break: break-word; overflow-wrap: break-word; white-space: normal;">
+                                            <td
+                                                style=" width:10%; word-break: break-word; overflow-wrap: break-word; white-space: normal;">
 
-                                            {{ qp.process_owner }}</td>
+                                                {{ qp.process_owner }}</td>
                                             <td style="width:7.5%;">{{ qp.office }}</td>
                                             <td style="width:5%;">
                                                 <div style="  display: flex;gap: 0.1em; justify-content: center;">
-                                                    <button @click="viewQP(qp.id)" class="btn btn-icon mr-1" 
-                                                    style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                    <button @click="viewQP(qp.id)" class="btn btn-icon mr-1"
+                                                        style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                         <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                                                     </button>
-                                                    <button @click="deleteQualityProcedure(qp.id)" class="btn btn-icon mr-1" 
-                                                    style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                    <button @click="deleteQualityProcedure(qp.id)"
+                                                        class="btn btn-icon mr-1"
+                                                        style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                         <font-awesome-icon :icon="['fas', 'trash']"></font-awesome-icon>
                                                     </button>
                                                 </div>
@@ -113,7 +113,6 @@ export default {
                 QPCode: '',
                 ProcedureTitle: ''
             },
-            dataTableInitialized: false
         }
     },
     created() {
@@ -146,39 +145,53 @@ export default {
                 });
         },
         initializeDataTable() {
+            $('#qp_table').DataTable().destroy(); // clean up
             this.$nextTick(() => {
-                if (!this.dataTableInitialized) {
-                    $('#qp_table').DataTable({
-                        retrieve: true,
-                        ordering: false,
-                        paging: true,
-                        pageLength: 10,
-                    });
-                    this.dataTableInitialized = true;
-                } else {
-                    $('#qp_table').DataTable().clear().rows.add(this.QualityProcedure).draw();
-                }
+                $('#qp_table').DataTable({
+                    retrieve: true,
+                    ordering: false,
+                    paging: true,
+                    pageLength: 10,
+                });
             });
         },
         viewQP(id) {
             this.$router.push({ path: `/qms/quality_procedure/qp_update/${id}` });
         },
         deleteQualityProcedure(id) {
-            console.log(id)
+            // console.log(id)
             // let qop_id = this.$route.params.id;
-            axios.post('/api/deleteQualityProcedure', {
-                id: id
-            })
-                .then(() => {
-                    toast.success('Quality Procedure Successfully Deleted!', {
-                        autoClose: 1000
-                    });
-                    this.fetchQualityProcedure();
 
-                })
-                .catch(error => {
-                    console.error('error saving data', error);
-                })
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/api/deleteQualityProcedure', {
+                        id: id
+                    })
+                    .then(() => {
+                            Swal.fire({
+                            icon: 'success',
+                            title: 'Quality Procedure Successfully Deleted!',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                        setTimeout(() => {
+                            this.fetchQualityProcedure();
+                        }, 200);
+                        })
+                        .catch(error => {
+                            console.error('error saving data', error);
+                        })
+                }
+            });
+
+
+
 
         }
     }

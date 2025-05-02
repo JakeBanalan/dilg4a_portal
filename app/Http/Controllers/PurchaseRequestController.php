@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\AppItemModel;
+use App\Models\RFQModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseRequestModel;
@@ -195,6 +196,68 @@ class PurchaseRequestController extends Controller
         }
     }
 
+    public function fetchPRMonitor(Request $request)
+    {
+        $PRs = PurchaseRequestModel::select([
+            'pr.id as pr_id',
+            'pr.pr_no',
+            'pr.action_officer as user_id',
+            'pr.purpose as particulars',
+            'pr.pr_date',
+            'pr.target_date',
+            'rfq.id as rfq_id',
+            'pr.submitted_by',
+            DB::raw('GROUP_CONCAT(DISTINCT rfq.rfq_no SEPARATOR ",") as rfq_no'),
+            DB::raw('GROUP_CONCAT(DISTINCT abstract.abstract_no SEPARATOR ",") as abstract_no'),
+            DB::raw('SUM(items.qty * app.app_price) as total_qty')
+        ])
+        ->leftJoin('tbl_rfq as rfq', function ($join) {
+            $join->whereRaw('FIND_IN_SET(pr.id, rfq.pr_id) > 0');
+        })
+        ->leftJoin('tbl_abstract as abstract', 'abstract.rfq_id', '=', 'rfq.id')
+        ->leftJoin('pr_items as items', 'items.pr_id', '=', 'pr.id')
+        ->leftJoin('tbl_app as app', 'app.id', '=', 'items.pr_item_id')
+        ->groupBy('pr.id', 'pr.pr_no', 'pr.action_officer', 'pr.purpose', 'pr.pr_date', 'pr.target_date', 'rfq.id')
+        ->orderByDesc(DB::raw('MAX(rfq.rfq_no)')) // Ensure ordering by highest RFQ number per PR
+        ->get();
+    
+    return response()->json($PRs);
+    
+        // $get_PRID = RFQModel::select('pr_id','rfq_no')
+        //     ->get();
+
+        // if ($get_PRID->isEmpty()) {
+        //     return response()->json(['error' => 'RFQ not found'], 404);
+        // }
+
+        // $pr_ids = $get_PRID->pluck('pr_id')->toArray();
+
+        // $PRs = [];
+
+        // foreach ($pr_ids as $pr_id) {
+        //     $prid = explode(',', $pr_id);
+
+        //     foreach ($prid as $id) {
+        //         $id = trim($id); // Trim whitespace
+        //         $query = PurchaseRequestModel::select(
+        //         'pr.id AS id',
+        //         'pr.pr_no AS pr_no',
+        //         'pr.action_officer AS user_id',
+        //         'pr.purpose AS particulars',
+        //         'pr.pr_date AS pr_date',
+        //         'pr.target_date AS target_date',
+        //         'rfq.rfq_no AS rfq_no'
+        //         )
+        //         ->leftjoin('tbl_rfq as rfq', function($join){
+        //             $join->on(DB::raw('FIND_IN_SET(pr.id, rfq.pr_id)'),'>', DB::raw('0'));
+        //     });
+
+        //         $PRs = array_merge($PRs, $query->get()->toArray());
+        //     }
+        // }
+
+        // return response()->json($PRs);
+    }
     public function fetchPurchaseReqData(Request $request)
     {
         $page = $request->query('page', 1); // Default to page 1 if not provided

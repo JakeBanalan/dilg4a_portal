@@ -36,7 +36,7 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="list in QOPRList" :key="list.id">
-                                            <td style="width: 5%;" >{{ list.qp_code }}</td>
+                                            <td style="width: 5%;">{{ list.qp_code }}</td>
                                             <td style="width: 5%;" class="ellipsis"> {{ list.frequency_monitoring }}
                                             </td>
                                             <td
@@ -47,7 +47,9 @@
                                             <td style="width: 5%;"><b>{{ list.qp_covered }}</b><br><i>~{{ list.year
                                                     }}~</i></td>
                                             <td style="width: 5%;"><b v-if="list.status == 0">Draft</b> <b
-                                                    v-if="list.status == 1">Submitted</b><br><i>~ljbanalan~</i></td>
+                                                    v-if="list.status == 1">Submitted</b>
+                                                <br><i>~{{ list.username }}~</i>
+                                            </td>
 
 
                                             <td style="width:5%;">
@@ -120,7 +122,17 @@ export default {
 
     },
     created() {
-        this.fetchQOPR();
+        this.userId = parseInt(localStorage.getItem('userId'));
+        this.role = localStorage.getItem('user_role');
+        // this.fetchQOPR();
+    },
+    mounted() {
+        // Load data for specific user or all users based on role
+        if (this.role === 'admin') {
+            this.fetchQOPR(); // Admin sees all requests
+        } else {
+            this.fetchQOPRperUser(); // Non-admin sees only their own requests
+        }
     },
     methods: {
         viewReport(arg) {
@@ -130,39 +142,86 @@ export default {
 
         },
         submitReport(arg) {
-            let id = arg;
-            axios.post(`/api/submitReport`, {
-                id: id,
-                status: '1'
-            })
-                .then(response => {
-                    toast.success('Process Owner Successfully Deleted!', {
-                        autoClose: 1000
-                    });
-                    this.fetchQOPR();
-                })
-                .catch(error => {
-                    console.error('Error Submitting items:', error)
+            Swal.fire({
+                title: 'Submit Report?',
+                text: "You won't be able to revert this!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Submit'
+            }).then((result) => {
+                if (result.isConfirmed) {
 
-                })
+                    let id = arg;
+                    axios.post(`/api/submitReport`, {
+                        id: id,
+                        status: '1'
+                    })
+                        .then(response => {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Report Successfully Submitted!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            setTimeout(() => {
+                                this.fetchQOPR();
+                            }, 200);
+                        })
+                        .catch(error => {
+                            console.error('Error Submitting report:', error)
+                        })
+
+                }
+            });
+
+
         },
         addsubmission() {
             this.$router.push({ path: '/qms/reports_submission/rs_entry' });
         },
         deleteReport(arg) {
-            axios.post('/api/deleteRS', {
-                id: arg,
-            })
-                .then(() => {
-                    toast.success('Report Successfully Deleted!', {
-                        autoClose: 1000
-                    });
-                    this.fetchQOPR();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/api/deleteRS', {
+                        id: arg,
+                    })
+                        .then(() => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Report Successfully Deleted!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            setTimeout(() => {
+                                this.fetchQOPR();
+                            }, 200);
+                        })
+                        .catch(error => {
+                            console.error('error saving data', error);
+                        })
+
+                }
+            });
 
 
+        },
+        fetchQOPRperUser() {
+            axios.get(`/api/fetchQOPRperUser/${this.userId}`)
+                .then(response => {
+
+                    this.QOPRList = response.data
+                    // console.log(this.QOPRList)
+                    this.initializeDataTable();
                 })
                 .catch(error => {
-                    console.error('error saving data', error);
+                    console.error('Error Fetching items:', error)
                 })
         },
         fetchQOPR() {
@@ -178,19 +237,17 @@ export default {
                 })
         },
         initializeDataTable() {
+
+            $('#rs_table').DataTable().destroy(); // clean up
             this.$nextTick(() => {
-                if (this.dataTableInitialized) {
-                    let table = $('#rs_table').DataTable()
-                    table.clear().rows.add(this.QOPRList).draw();
-                } else {
-                    let table = $('#rs_table').DataTable({
-                        retrieve: true,
-                        ordering: false,
-                        paging: true,
-                        pageLength: 10,
-                    });
-                    this.dataTableInitialized = true;
-                }
+                $('#rs_table').DataTable({
+                    retrieve: true,
+                    ordering: false,
+                    paging: true,
+                    pageLength: 10,
+                });
+                this.dataTableInitialized = true;
+
             });
         },
     }
@@ -214,7 +271,8 @@ th {
     max-width: 80px;
     /* Adjust the width as needed */
 }
-.table1{
+
+.table1 {
     width: 100%;
     overflow-x: auto;
 }

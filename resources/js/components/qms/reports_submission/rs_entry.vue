@@ -159,26 +159,28 @@ export default {
         this.fetchQualityProcedure()
         // this.fetchEntryData();
         // console.log(this.OOptions);
+
     },
     methods: {
         fetchQPdata(arg) {
             let qp_code_id = arg.value
             axios.get(`/api/fetchQPdata/${qp_code_id}`)
                 .then(response => {
+                    // console.log(response.data)
                     // console.log(response.data[0].frequency_monitoring)
                     if (response.data[0].frequency_monitoring === 'Monthly') {
                         this.period_covered = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
                     } else if (response.data[0].frequency_monitoring === 'Quarterly' || response.data[0].frequency_monitoring === 'Quarterly (Learning and Development)') {
                         this.period_covered = ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter'];
                     }
-                    console.log(qp_code_id)
+                    // console.log(qp_code_id)
                     this.form = {
                         ...response.data[0],
                         qp_code: this.form.qp_code,
 
                     }
                     this.qoe_id = response.data.map(item => item.qoe_id);
-                    // console.log(this.form)
+                    // console.log(this.qoe_id)
                 })
                 .catch(error => {
                     console.error('Error Fetching items:', error)
@@ -200,8 +202,16 @@ export default {
                 })
         },
         postRS() {
-            console.log(this.form)
-            axios.post('/api/postReportEntry',
+            Swal.fire({
+                title: 'Do you want to continue?',
+                // text: "You won't be able to revert this!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    axios.post('/api/postReportEntry',
                 {
                     qop_id: this.form.id,
                     qoe_id: this.qoe_id,
@@ -212,15 +222,25 @@ export default {
                 }
             )
                 .then(response => {
-                    toast.success('Success!', {
-                        autoClose: 1000
-                    });
-                    const id = response.data.id
-                    this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
+
+                    Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            setTimeout(() => {
+                                const id = response.data.id
+                                this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
+                            }, 200);
+
                 })
                 .catch(error => {
                     console.error('error saving data', error);
                 })
+
+                }
+            });
         }
     }
 

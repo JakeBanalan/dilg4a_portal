@@ -160,7 +160,7 @@ export default {
                         //     icon: 'chart-simple',
                         // },
                         {
-                            link: '/procurement/index',
+                            link: '/procurement/pr_monitoring',
                             name: 'Monitoring',
                             tooltip: 'Buttons',
                             icon: 'clipboard-list',

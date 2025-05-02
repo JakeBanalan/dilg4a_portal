@@ -1,10 +1,14 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {
+    createRouter,
+    createWebHistory
+} from "vue-router";
 
 import LoginForm from "../components/LoginForm.vue";
 import ExampleComponent from "../components/ExampleComponent.vue";
 import DashboardComponent from "../components/DashboardComponent.vue";
 import LoginComponent from "../components/LoginComponent.vue";
 import Procurement from "../components/procurement/index.vue";
+import ProcurementMonitoring from "../components/procurement/pr_monitoring.vue";
 import AnnualProcurementPlan from "../components/procurement/AnnualProcurementPlan.vue";
 
 // FORMS
@@ -24,6 +28,7 @@ import rfq_details from "../components/procurement/rfq/rfq_details.vue";
 import view_rfq from "../components/procurement/rfq/view_rfq.vue";
 
 //ABSTRACT
+import view_abstract from "../components/procurement/abstract/view_abstract.vue";
 import dashboard_abstract from "../components/procurement/abstract/index.vue";
 import awarding from "../components/procurement/abstract/panel/awarding.vue";
 import quotation from "../components/procurement/abstract/panel/quotation.vue";
@@ -71,11 +76,11 @@ import qms_report_submission_quarterly_lnd_entry from "../components/qms/reports
 import settingPanel from "../components/settings/user-management.vue";
 import UpdateUserPanel from "../components/settings/update.vue";
 import CreateUserPanel from "../components/settings/create.vue";
+import View_abstract from "../components/procurement/abstract/view_abstract.vue";
 
 
 // import _ from "lodash";
-const routes = [
-    {
+const routes = [{
         path: '/',
         name: 'Login',
         component: LoginComponent,
@@ -103,10 +108,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -128,10 +137,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -153,17 +166,21 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
     },
     {
         path: '/procurement/index',
-        name: 'Procurement Request',
+        name: 'Procurement',
         component: Procurement,
         meta: {
             requiresAuth: true
@@ -178,10 +195,42 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/procurement/pr_monitoring',
+        name: 'Procurement Monitoring',
+        component: ProcurementMonitoring,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -202,10 +251,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -226,10 +279,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -250,10 +307,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -274,10 +335,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         },
         props: true, // Automatically bind route parameters as props
@@ -303,10 +368,47 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
+            });
+        },
+        props: true, // Automatically bind route parameters as props
+        // beforeEnter: (to, from, next) => {
+        //     // Your beforeEnter logic if needed
+        //     next();
+        // },
+    },
+    {
+        path: '/procurement/abstract',
+        name: 'View Abstract of Quotation',
+        component: view_abstract,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
             });
         },
         props: true, // Automatically bind route parameters as props
@@ -332,10 +434,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
         // beforeEnter: (to, from, next) => {
@@ -366,10 +472,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -390,10 +500,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -414,10 +528,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -438,10 +556,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -462,10 +584,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -486,10 +612,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -510,10 +640,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -534,10 +668,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -558,10 +696,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -582,10 +724,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -607,10 +753,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -633,10 +783,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -657,10 +811,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -681,10 +839,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -705,10 +867,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -730,10 +896,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -756,10 +926,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -780,10 +954,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -804,10 +982,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -828,10 +1010,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -852,10 +1038,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -877,10 +1067,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -902,10 +1096,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -927,10 +1125,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -952,10 +1154,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -977,10 +1183,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
 
@@ -1002,10 +1212,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -1026,10 +1240,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -1050,10 +1268,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -1074,10 +1296,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -1098,10 +1324,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -1122,10 +1352,14 @@ const routes = [
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     }
@@ -1155,26 +1389,32 @@ router.beforeEach((to, from, next) => {
         // If the route requires authentication, check if the token is present
         if (!token) {
             // If token is not present, redirect to the sign-in page
-            next({ name: 'Login' });
+            next({
+                name: 'Login'
+            });
         } else {
             // If token is present, validate the token with the backend
             axios.get('/api/authenticated', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
                 .then(response => {
                     if (response.data.authenticated) {
                         // If token is valid, proceed with the navigation
                         next();
                     } else {
                         // If token is invalid, redirect to the sign-in page
-                        next({ name: 'Login' });
+                        next({
+                            name: 'Login'
+                        });
                     }
                 })
                 .catch(() => {
                     // If an error occurs during token validation, redirect to the sign-in page
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 });
         }
     } else {

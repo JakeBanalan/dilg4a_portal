@@ -29,25 +29,25 @@
                                             <th>Office</th>
                                             <th>Email</th>
                                             <th>Mobile Number</th>
-                                            <th>Actions</th>
+                                            <th style="width: 7%;">Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- <tr v-for="owner in ProcessOwner" :key="owner.id">
+                                        <tr v-for="owner in ProcessOwner" :key="owner.id">
                                             <td>{{ owner.fname }}</td>
                                             <td>{{ owner.position_title }}</td>
                                             <td>{{ owner.pmo_title }}</td>
                                             <td>{{ owner.email }}</td>
                                             <td>{{ owner.contact_details }}</td>
                                             <td>
-                                                <button class="btn btn-icon mr-1"
-                                                    style="background-color:#059886;color:#fff;"
-                                                    @click="DeleteProcessOwner(owner.emp_id)">
+                                                <button @click="DeleteProcessOwner(owner.emp_id)"
+                                                    class="btn btn-icon mr-1"
+                                                    style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                     <font-awesome-icon :icon="['fas', 'trash']"></font-awesome-icon>
                                                 </button>
                                             </td>
 
-                                        </tr> -->
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -58,14 +58,12 @@
                 <FooterVue />
             </div>
         </div>
-        <POModal 
-        :visible="modalVisible" 
-        @addprocessowner="AddProcessOwner" 
-        @close="CloseModal" />
+        <POModal :visible="modalVisible" @addprocessowner="AddProcessOwner" @close="CloseModal" />
     </div>
 </template>
 
 <script>
+import Swal from 'sweetalert2';
 import axios from 'axios';
 import POModal from './POModal.vue';
 import Navbar from "../../layout/Navbar.vue";
@@ -108,87 +106,31 @@ export default {
     },
 
     methods: {
-        
+
         fetchProcessOwner() {
-        axios.get('/api/fetchProcessOwner')
-            .then(response => {
-                // console.log(response.data);
-                const vm = this; // Save Vue instance context
-                let table = $('#po_table').DataTable({
+            axios.get('/api/fetchProcessOwner')
+                .then(response => {
+                    this.ProcessOwner = response.data;
+                    this.initializeDataTable();
+                })
+                .catch(error => {
+                    console.error("Error fetching process owner data:", error);
+                });
+        },
+
+        initializeDataTable() {
+            $('#po_table').DataTable().destroy(); // clean up
+            this.$nextTick(() => {
+                $('#po_table').DataTable({
                     retrieve: true,
-                    data: response.data,
                     ordering: false,
                     paging: true,
                     pageLength: 10,
-                    columns: [
-                        { data: 'fname' },
-                        { data: 'position_title' },
-                        { data: 'pmo_title' },
-                        { data: 'email' },
-                        { data: 'contact_details' },
-                        {
-                            data: null, orderable: false, render: function (data) {
-                                return '<button class="btn btn-danger btn-fw btn-icon-text mx-2" data-id="' + data.emp_id + '">Delete</button>';
-                            },
-                        },
-                    ],
                 });
+                this.dataTableInitialized = true;
 
-                // Clear and destroy the DataTable before reinitializing it
-                table.clear().destroy();
-
-                // Reinitialize DataTable with new data
-                table = $('#po_table').DataTable({
-                    data: response.data,
-                    ordering: false,
-                    paging: true,
-                    pageLength: 10,
-                    columns: [
-                        { data: 'fname' },
-                        { data: 'position_title' },
-                        { data: 'pmo_title' },
-                        { data: 'email' },
-                        { data: 'contact_details' },
-                        {
-                            data: null, orderable: false, render: function (data) {
-                                return '<button class="btn btn-danger btn-fw btn-icon-text mx-2" data-id="' + data.emp_id + '">Delete</button>';
-                            },
-                        },
-                    ],
-                });
-
-                // Attach event listener to dynamically created buttons
-                $('#po_table tbody').on('click', 'button', function () {
-                    const empId = $(this).data('id');
-                    vm.DeleteProcessOwner(empId);
-                });
-            })
-            .catch(error => {
-                console.error("There was an error fetching the process owner data:", error);
             });
-    },
-        // fetchUser() {
-
-        //     axios.get('/api/fetchAllUser').then((response) => {
-        //         console.log(response)
-        //         this.UserList = response.data
-        //         // $('#user_table').DataTable({
-        //         //     retrieve: true,
-        //         //     data: response.data,
-        //         //     ordering: false,
-        //         //     paging: true,
-        //         //     pageLength: 10,
-
-        //         //     columns: [
-        //         //         { data: 'pmo_title' },
-        //         //         { data: 'fname' },
-        //         //         { data: 'position_title' },
-        //         //         { data: 'pmo_title' },
-        //         //     ],
-
-        //         // });
-        //     }).catch((error) => console.log(error));
-        // },
+        },
         OpenModal() {
             this.modalVisible = true;
 
@@ -197,33 +139,50 @@ export default {
             this.modalVisible = false;
         },
         DeleteProcessOwner(id) {
-            axios.post('/api/DeleteProcessOwner', {
-                id: id,
-            })
-                .then(() => {
-                    toast.success('Process Owner Successfully Deleted!', {
-                        autoClose: 1000
-                    });
-                    setTimeout(() => {
-                        this.fetchProcessOwner()
-                        this.fetchUser()
-                    }, 200);
-              
-                })
-                .catch(error => {
-                    console.error('error saving data', error);
-                })
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    axios.post('/api/DeleteProcessOwner', {
+                        id: id,
+                    })
+                        .then(() => {
+                            Swal.fire({
+                            icon: 'success',
+                            title: 'Process Owner Successfully Deleted!',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                        setTimeout(() => {
+                            this.fetchProcessOwner()
+                        }, 200);
+                        })
+                        .catch(error => {
+                            console.error('error deleting data', error);
+                        })
+                }
+            });
+
         },
         AddProcessOwner(id) {
+            
             axios.post('/api/addProcessOwner', {
                 id: id,
             })
                 .then(() => {
-                    toast.success('Process Owner Successfully Added!', {
-                        autoClose: 300
-                    });
-                    this.fetchProcessOwner();
-                    // this.fetchUser();
+                    Swal.fire({
+                            icon: 'success',
+                            title: 'Process Owner Successfully Added!',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                        setTimeout(() => {
+                            this.fetchProcessOwner()
+                        }, 200);
                 })
                 .catch(error => {
                     console.error('error saving data', error);

@@ -17,7 +17,12 @@
                                         Procedures
                                     </h5>
                                     <div class="d-flex">
-                                        <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                        <button type="button" @click="Return()"
+                                            class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Return
+                                        </button>
+                                        <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
+                                            :disabled="form.status != 0">
                                             Submit
                                         </button>
                                     </div>
@@ -50,7 +55,7 @@
                                                 class="form-control" v-model="form.objective" disabled></textarea>
                                         </div>
                                         <div class="col-md-6">
-                                            <label>Gap Analysis:</label>    
+                                            <label>Gap Analysis:</label>
                                             <textarea rows="3" col="100" style="height:110px !important;"
                                                 id="gap_analysis" class="form-control" v-model="form.gap_analysis"
                                                 :disabled="form.is_gap_analysis"></textarea>
@@ -61,7 +66,8 @@
                         </div>
 
                         <!-- INDICATOR 1 -->
-                        <div class="card" style="margin-top:1%;" v-if="form.indicator_a !== null && form.formula == null">
+                        <div class="card" style="margin-top:1%;"
+                            v-if="form.indicator_a !== null && form.formula == null">
                             <div class="card-body">
                                 <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
                                     <thead>
@@ -101,28 +107,31 @@
                                             <th class="text-center" width="7.5%">2ND QUARTER</th>
                                             <th class="text-center" width="7.5%">3RD QUARTER</th>
                                             <th class="text-center" width="7.5%">4TH QUARTER</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="hidden" class="form-control"
-                                                    >
-                                                <input type="text" class="form-control" v-model="quarterData[0].Q1">
+                                                <input type="hidden" class="form-control">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q1"
+                                                    :disabled="qp_covered !== '1st Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[0].Q2">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q2"
+                                                    :disabled="qp_covered !== '2nd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[0].Q3">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q3"
+                                                    :disabled="qp_covered !== '3rd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[0].Q4">
+                                                <input type="text" class="form-control" v-model="quarterData[0].Q4"
+                                                    :disabled="qp_covered !== '4th Quarter'">
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">0.00</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -143,28 +152,31 @@
                                             <th class="text-center" width="7.5%">2ND QUARTER</th>
                                             <th class="text-center" width="7.5%">3RD QUARTER</th>
                                             <th class="text-center" width="7.5%">4TH QUARTER</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="hidden" class="form-control"
-                                                    >
-                                                <input type="text" class="form-control" v-model="quarterData[1].Q1">
+                                                <input type="hidden" class="form-control">
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q1"
+                                                    :disabled="qp_covered !== '1st Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[1].Q2">
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q2"
+                                                    :disabled="qp_covered !== '2nd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[1].Q3">
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q3"
+                                                    :disabled="qp_covered !== '3rd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[1].Q4">
+                                                <input type="text" class="form-control" v-model="quarterData[1].Q4"
+                                                    :disabled="qp_covered !== '4th Quarter'">
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">0.00</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -185,28 +197,31 @@
                                             <th class="text-center" width="7.5%">2ND QUARTER</th>
                                             <th class="text-center" width="7.5%">3RD QUARTER</th>
                                             <th class="text-center" width="7.5%">4TH QUARTER</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="hidden" class="form-control"
-                                                    >
-                                                <input type="text" class="form-control" v-model="quarterData[2].Q1">
+                                                <input type="hidden" class="form-control">
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q1"
+                                                    :disabled="qp_covered !== '1st Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[2].Q2">
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q2"
+                                                    :disabled="qp_covered !== '2nd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[2].Q3">
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q3"
+                                                    :disabled="qp_covered !== '3rd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[2].Q4">
+                                                <input type="text" class="form-control" v-model="quarterData[2].Q4"
+                                                    :disabled="qp_covered !== '4th Quarter'">
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">0.00</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -227,28 +242,31 @@
                                             <th class="text-center" width="7.5%">2ND QUARTER</th>
                                             <th class="text-center" width="7.5%">3RD QUARTER</th>
                                             <th class="text-center" width="7.5%">4TH QUARTER</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="hidden" class="form-control"
-                                                    >
-                                                <input type="text" class="form-control" v-model="quarterData[3].Q1">
+                                                <input type="hidden" class="form-control">
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q1"
+                                                    :disabled="qp_covered !== '1st Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[3].Q2">
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q2"
+                                                    :disabled="qp_covered !== '2nd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[3].Q3">
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q3"
+                                                    :disabled="qp_covered !== '3rd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[3].Q4">
+                                                <input type="text" class="form-control" v-model="quarterData[3].Q4"
+                                                    :disabled="qp_covered !== '4th Quarter'">
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">0.00</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -269,28 +287,31 @@
                                             <th class="text-center" width="7.5%">2ND QUARTER</th>
                                             <th class="text-center" width="7.5%">3RD QUARTER</th>
                                             <th class="text-center" width="7.5%">4TH QUARTER</th>
-                                            <th rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">TOTAL</th>
+                                            <!-- <th rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">TOTAL</th> -->
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
                                             <td class="text-center" width="7.5%">
-                                                <input type="hidden" class="form-control"
-                                                    >
-                                                <input type="text" class="form-control" v-model="quarterData[4].Q1">
+                                                <input type="hidden" class="form-control">
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q1"
+                                                    :disabled="qp_covered !== '1st Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[4].Q2">
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q2"
+                                                    :disabled="qp_covered !== '2nd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[4].Q3">
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q3"
+                                                    :disabled="qp_covered !== '3rd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
-                                                <input type="text" class="form-control" v-model="quarterData[4].Q4">
+                                                <input type="text" class="form-control" v-model="quarterData[4].Q4"
+                                                    :disabled="qp_covered !== '4th Quarter'">
                                             </td>
-                                            <td rowspan="2" class="text-center" width="7.5%"
-                                                style="vertical-align: middle;">0.00</td>
+                                            <!-- <td rowspan="2" class="text-center" width="7.5%"
+                                                style="vertical-align: middle;">0.00</td> -->
                                         </tr>
                                     </tbody>
                                 </table>
@@ -338,7 +359,8 @@ export default {
     },
     data() {
         return {
-
+            qp_covered: this.$route.query.pq,
+            status: this.$route.query.stat,
             quarterData: [
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
@@ -370,6 +392,24 @@ export default {
     },
 
     methods: {
+        Return() {
+
+            Swal.fire({
+                title: 'Are you sure you want to return?',
+                text: 'Make sure to submit the form to avoid losing data.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, return',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let id = this.$route.params.id;
+                    this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
+                }
+            });
+
+
+        },
         toggleGapAnalysis() {
             if (this.form.is_gap_analysis) {
                 this.form.gap_analysis = '';
@@ -397,31 +437,47 @@ export default {
                 })
         },
         updateQuarterRating() {
-            if (this.form.is_gap_analysis === true) {
-                this.form.is_gap_analysis = '1';
-            } else {
-                this.form.is_gap_analysis = '0';
-            }
-            // console.log(this.form);
-            // console.log(this.quarterData);
-            // Assuming you have Axios installed and imported
-            axios.post(`/api/saveQuarterData`, {
-                quarterData: this.quarterData,
-                formData: this.form
-            })
-                .then(response => {
-                    console.log('Updated successfully:', response);
-                    // Optionally, handle success response
-                    toast.success('Report Successfully Submitted!', {
-                        autoClose: 1000
-                    });
-                    this.fetchQOPRUserData();
-                    this.fetchData();
-                })
-                .catch(error => {
-                    console.error('Error updating:', error);
-                    // Optionally, handle error response
-                });
+
+            Swal.fire({
+                title: 'Do you want to Continue?',
+                // text: "You won't be able to revert this!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    if (this.form.is_gap_analysis === true) {
+                        this.form.is_gap_analysis = '1';
+                    } else {
+                        this.form.is_gap_analysis = '0';
+                    }
+                    // console.log(this.form);
+                    // console.log(this.quarterData);
+                    // Assuming you have Axios installed and imported
+                    axios.post(`/api/saveQuarterData`, {
+                        quarterData: this.quarterData,
+                        formData: this.form
+                    })
+                        .then(response => {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Report Successfully Submitted!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            setTimeout(() => {
+                                this.fetchQOPRUserData();
+                                this.fetchData();
+                            }, 200);
+                        })
+                        .catch(error => {
+                            console.error('Error updating:', error);
+                            // Optionally, handle error response
+                        });
+
+                }
+            });
         },
         fetchData() {
             // Assuming you fetch data and update quarterData

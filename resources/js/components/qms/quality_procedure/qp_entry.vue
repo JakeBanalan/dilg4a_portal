@@ -259,20 +259,6 @@ export default {
                 });
         },
         postQualityProcedure() {
-            // const formData = {
-            //         created_by:this.form.CreatedBy,
-            //        date_created:this.form.DateCreated,
-            //        EffDate:this.form.EffDate,
-            //        procedure_title:this.form.ProcedureTitle,
-            //        qp_code:this.form.QPCode,
-            //        rev_no:this.form.RevNo,
-
-            //        coverage:this.selected_C,
-            //        frequency_monitoring:this.selected_FM,
-            //        office:this.selected_O,
-            //        process_owner:this.selected_PO.join(', ')
-            //     }
-            //     console.log(formData)
             axios.post('/api/postQualityProcedure',
                 {
                     created_by: this.form.created_by,
@@ -290,25 +276,20 @@ export default {
                 }
             )
                 .then(response => {
-                    toast.success('Process Owner Successfully Deleted!', {
-                        autoClose: 1000
-                    });
+                    Swal.fire({
+                            icon: 'success',
+                            title: 'Quality Procedure Successfully Created!',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                        setTimeout(() => {
+                            this.$router.push({ path: `/qms/quality_procedure/qp_update/${id}` });
+                        }, 200);
                     const id = response.data.id
-                    this.$router.push({ path: `/qms/quality_procedure/qp_update/${id}` });
                 })
                 .catch(error => {
                     console.error('error saving data', error);
                 })
-
-
-            //         const formData = {
-            //     ...this.form,
-            //     selected_FM: this.selected_FM,
-            //     selected_C: this.selected_C,
-            //     selected_O: this.selected_O,
-            //     selected_PO: this.selected_PO.join(', ')
-            //   };
-            //   console.log(formData);
         }
     }
 

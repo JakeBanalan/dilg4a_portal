@@ -110,7 +110,7 @@ class UserManagementController extends Controller
 
         $PostUser = new UserModel([
             'id'                   => null,
-            'pmo_id' => 1,
+            'pmo_id'                => $request->pmo,
             'employee_no'           => $request->employee_no,
             'position_id'             => $request->position_id,
             'province'               => $request->province,

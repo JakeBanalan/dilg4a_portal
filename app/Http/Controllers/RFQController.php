@@ -110,7 +110,7 @@ class RFQController extends Controller
                 $id = trim($id); // Trim whitespace
 
                 $items = PurchaseRequestItemModel::select(
-                    'pr_items.id',
+                    'pr_items.id as item_id',
                     'pr_items.pr_id',
                     'pr_items.description',
                     'pr_items.qty',

@@ -103,7 +103,7 @@
                                     </h3>
                                     <br><br>
                                     <div class="forms-sample table-responsive" style="max-height: auto;">
-                                        <table class="table table-bordered table-hover" style="width: 100%;">
+                                        <table class="table table-bordered" style="width: 100%;">
                                             <thead>
                                                 <tr>
                                                     <th>Stock Number</th>
@@ -117,7 +117,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="item in items" :key="item.id">
+                                                <tr v-for="item in items" :key="item.id" id="hover">
                                                     <td>{{ item.stockno }}</td>
                                                     <td>{{ item.unit }}</td>
                                                     <td>{{ item.name }}</td>
@@ -622,5 +622,10 @@ export default {
 
 input[type="checkbox"]:checked+.custom-checkbox::after {
     opacity: 1;
+}
+
+#hover:hover {
+    background-color: rgba(5, 152, 135, 0.258);
+    cursor: pointer;
 }
 </style>

@@ -159,7 +159,7 @@ class UserController extends Controller
         User::where('id', $request->id)
             ->update([
                 'employee_no' => $request->employee_no,
-                'pmo_id' => 1,
+                'pmo_id'            => $request->pmo_id,
                 'position_id'             => $request->position_id,
                 'office'              => $request->office,
                 'province'               => $request->province,

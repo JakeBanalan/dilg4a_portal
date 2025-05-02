@@ -47,12 +47,12 @@
                                         <div class="col-md-3">
                                             <label>Date Created</label>
                                             <input type="text" class="form-control" id="date_created"
-                                                v-model="form.date_created" disabled/>
+                                                v-model="form.date_created" disabled />
                                         </div>
                                         <div class="col-md-3">
                                             <label>Created By</label>
                                             <input type="text" class="form-control" id="created_by"
-                                                v-model="form.created_by" disabled/>
+                                                v-model="form.created_by" disabled />
                                         </div>
                                     </div>
                                     <div class="row">
@@ -122,7 +122,8 @@
                                                         :icon="['fas', 'pen-to-square']"></font-awesome-icon>
                                                 </button>
                                                 <button class="btn btn-sm mr-1"
-                                                    style="background-color:#059886;color:#fff;" @click="deleteQualityObjective(qop.id)">
+                                                    style="background-color:#059886;color:#fff;"
+                                                    @click="deleteQualityObjective(qop.id)">
                                                     <font-awesome-icon :icon="['fas', 'trash']"></font-awesome-icon>
                                                 </button>
                                             </td>
@@ -187,17 +188,17 @@ export default {
                 coverage: '',
                 office: '',
             },
-            QObjectives:{
-                id:'',
-                qop_id:'',
-                objective:'',
-                target_percentage:'',
-                formula:'',
-                indicator_a:'',
-                indicator_b:'',
-                indicator_c:'',
-                indicator_d:'',
-                indicator_e:''
+            QObjectives: {
+                id: '',
+                qop_id: '',
+                objective: '',
+                target_percentage: '',
+                formula: '',
+                indicator_a: '',
+                indicator_b: '',
+                indicator_c: '',
+                indicator_d: '',
+                indicator_e: ''
             },
             process_owner: [],
             FMOptions: ['Monthly', 'Quarterly'],
@@ -218,9 +219,9 @@ export default {
         // console.log(this.form);
     },
     methods: {
-        AddQOE(){
+        AddQOE() {
             let id = this.$route.params.id;
-            this.$router.push({ path: `/qms/quality_procedure/qp_objectives_entry/${id}`});
+            this.$router.push({ path: `/qms/quality_procedure/qp_objectives_entry/${id}` });
         },
         fetchEntryData() {
             let id = this.$route.params.id;
@@ -259,15 +260,15 @@ export default {
                 });
         },
         postQualityProcedure() {
-            axios.post('/api/postQualityProcedure',
+            axios.post('/api/UpdateQualityProcedure',
                 {
-                    created_by: this.form.created_by,
+                    id: this.$route.params.id,
+                    // created_by: this.form.created_by,
                     date_created: this.form.date_created,
                     EffDate: this.form.EffDate,
                     procedure_title: this.form.procedure_title,
                     qp_code: this.form.qp_code,
                     rev_no: this.form.rev_no,
-
                     coverage: this.form.coverage,
                     frequency_monitoring: this.form.frequency_monitoring,
                     office: this.form.office,
@@ -275,35 +276,62 @@ export default {
                 }
             )
                 .then(response => {
-                    toast.success('Quality Procedure Successfully Added!', {
-                        autoClose: 1000
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Quality Procedure Successfully Updated!',
+                        showConfirmButton: false,
+                        timer: 1000
                     });
+                    setTimeout(() => {
+                        this.fetchEntryData();
+                        this.fetchQualityObjective();
+                    }, 200);
+
+                    // console.log(response.data);
                 })
                 .catch(error => {
                     console.error('error saving data', error);
                 })
         },
-        updateQualityObjective(qoeID){
+        updateQualityObjective(qoeID) {
             let qoe_id = qoeID;
             let id = this.$route.params.id;
-            this.$router.push({ path: `/qms/quality_procedure/qp_objectives_update/${id}/${qoe_id}`});
+            this.$router.push({ path: `/qms/quality_procedure/qp_objectives_update/${id}/${qoe_id}` });
         },
-        deleteQualityObjective(id){
-            let qop_id = this.$route.params.id;
-            axios.post('/api/DeleteQualityObjective', {
-                id: id,
-                qop_id: qop_id
-            })
-                .then(() => {
-                    toast.success('Quality Procedure Successfully Deleted!', {
-                        autoClose: 1000
-                    });
-                    this.fetchEntryData();
-                    this.fetchQualityObjective();
-                })
-                .catch(error => {
-                    console.error('error saving data', error);
-                })
+        deleteQualityObjective(id) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    let qop_id = this.$route.params.id;
+                    axios.post('/api/DeleteQualityObjective', {
+                        id: id,
+                        qop_id: qop_id
+                    })
+                        .then(() => {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Quality Objective Successfully Deleted!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            setTimeout(() => {
+                                this.fetchEntryData();
+                                this.fetchQualityObjective();
+                            }, 200);
+                        })
+                        .catch(error => {
+                            console.error('error saving data', error);
+                        })
+                }
+            });
+
         }
     }
 

@@ -15,14 +15,19 @@
                                         Information
                                     </h5>
                                     <div class="d-flex" style="float:right;margin-top:-50px;">
-                                        <button type="button" class="btn btn-warning btn-icon-text"
+                                        <button type="button" class="btn btn-primary btn-icon-text mx-2"
+                                            @click="RouteAbstract()">
+                                            <font-awesome-icon :icon="['fas', 'share']"></font-awesome-icon>
+                                            Create Abstract</button>
+
+                                        <button type="button" class="btn btn-warning btn-icon-text mx-2"
                                             @click="openModal()">
                                             <font-awesome-icon :icon="['fas', 'pen']"></font-awesome-icon>
                                             Update</button>
 
                                         <button type="button" class="btn btn-success btn-icon-text mx-2"
                                             @click="ExportRFQ()">
-                                            <font-awesome-icon :icon="['fas', 'download']"></font-awesome-icon>
+                                            <font-awesome-icon :icon="['fas', 'file-export']"></font-awesome-icon>
                                             Export</button>
                                     </div>
 
@@ -109,7 +114,7 @@
                                     </h5> -->
                                     <!-- <dtable :data="rfq_opts" :columns="tableColumns" /> -->
                                     <div class="table-responsive">
-                                        <table class="table table-striped table-bordered">
+                                        <table class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>DESCRIPTION</th>
@@ -120,7 +125,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="item in rfq_opts" :key="item.id">
+                                                <tr v-for="item in rfq_opts" :key="item.id" id="hover">
                                                     <td>{{ item.description }}</td>
                                                     <td>{{ item.qty }}</td>
                                                     <td>{{ item.unit }}</td>
@@ -140,6 +145,7 @@
             </div>
         </div>
         <ModalRFQ :visible="modalVisible" :rfqData="rfqData" @close="closeModal" @update="handleUpdate" />
+        <ModalAOQ :visible="modalVisible1" :rfq_no="rfq_no" :id="id" @close="closeModal" />
 
     </div>
 </template>
@@ -147,7 +153,7 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
 import { formatTotalAmount } from "../../../globalMethods.js";
-import { faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faDownload, faPen, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faDownload, faPen, faCalendar, faFileExport, faShare } from '@fortawesome/free-solid-svg-icons';
 
 import Navbar from "../../layout/Navbar.vue";
 import Sidebar from "../../layout/Sidebar.vue";
@@ -156,12 +162,13 @@ import BreadCrumbs from "../../dashboard_tiles/BreadCrumbs.vue";
 import StatBox from "../../procurement/stat_board.vue";
 import dtable from "../../procurement/table.vue";
 import ModalRFQ from './modal/modal_update_rfq.vue';
+import ModalAOQ from '../../procurement/abstract/modal/modal_confirm_abstract.vue';
 
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import { readonly } from 'vue';
 
-library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faDownload, faPen, faCalendar);
+library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faDownload, faPen, faCalendar, faFileExport, faShare);
 
 export default {
     name: 'View RFQ Details',
@@ -170,6 +177,8 @@ export default {
             // tableColumns: ['description', 'qty', 'unit', 'abc', 'total_abc'],
             rfq_opts: [],
             userId: null,
+            rfq_no: null,
+            id: null,
             rfqData: {
                 rfq_id: this.$route.query.id,
                 rfq_no: null,
@@ -185,6 +194,7 @@ export default {
                 app_price: null
             },
             modalVisible: false,
+            modalVisible1: false,
         }
     },
     components: {
@@ -195,7 +205,8 @@ export default {
         BreadCrumbs,
         StatBox,
         dtable,
-        ModalRFQ
+        ModalRFQ,
+        ModalAOQ
     },
     // created() {
     //     this.userId = this.$store.state.user.id;
@@ -206,6 +217,16 @@ export default {
         this.userId = localStorage.getItem('userId');
     },
     methods: {
+        RouteAbstract() {
+            this.rfq_no = this.rfqData.rfq_no;
+            this.id = this.$route.query.id;
+            // const rfq_no = this.rfqData.rfq_no;
+            // const id = this.$route.query.id;
+            this.modalVisible1 = true;
+
+            // this.$router.push({ path: '/procurement/abstract',query:{id:id, rfq_no:rfq_no} });
+            // console.log(rfq_no)
+        },
         formatNumber(value) {
             if (!value) return '0';
             return Number(value).toLocaleString();
@@ -216,7 +237,9 @@ export default {
                 this.modalVisible = true;
         },
         closeModal() {
+            this.modalVisible1 = false;
             this.modalVisible = false;
+
         },
         handleUpdate(updatedData) {
             // console.log("modal Data:",updatedData)
@@ -231,7 +254,7 @@ export default {
                 updated_by: this.userId
             }
 
-            console.log(rfqq)
+            // console.log(rfqq)
 
             axios.post('/api/PostUpdateRFQ',
                 {
@@ -343,4 +366,10 @@ export default {
     font-size: 18px !important;
     font-weight: bold !important;
 }
+
+#hover:hover {
+    background-color: rgba(5, 152, 135, 0.258);
+    cursor: pointer;
+}
+
 </style>

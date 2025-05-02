@@ -232,6 +232,7 @@ class QMSQuarterlyExportController extends Controller
                     'b.is_gap_analysis',
                     'b.gap_analysis',
                 )
+                ->orderBy('a.id', 'asc')
                 ->get();
             // return response()->json($qmes);
 
@@ -250,7 +251,7 @@ class QMSQuarterlyExportController extends Controller
                     'gap_analysis'  => $row->gap_analysis
                 ];
             })->toArray();
-            // return response()->json($qmes[0]['rate']);
+            // return response()->json($qmes[0]);
 
 
 

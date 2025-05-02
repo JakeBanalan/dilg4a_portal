@@ -16,11 +16,17 @@
                                         Procedures
                                     </h5>
                                     <div class="d-flex">
-                                        <button @click="generateReport()"
+                                        <button @click="Return()"
                                             class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Return
+                                        </button>
+                                        <button @click="generateReport()"
+                                            class="btn btn-outline-warning btn-fw btn-icon-text mx-2">
                                             Export
                                         </button>
-                                        <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                        <button @click="PostReport()"
+                                            class="btn btn-outline-success btn-fw btn-icon-text mx-2"
+                                            :disabled="form.status != 0">
                                             Submit
                                         </button>
                                     </div>
@@ -196,30 +202,82 @@ export default {
         // is_new: String
     },
     created() {
-        // this.fetchProcessOwner();
-        // this.fetchQualityProcedure()
-        // this.fetchEntryData();
-        // console.log(this.OOptions);
         this.fetchQoprData();
         this.fetchQoprEntryData();
     },
     methods: {
+        Return() {
+            this.$router.push({ path: `/qms/reports_submission/index` });
+        },
+        PostReport() {
+            Swal.fire({
+                title: 'Submit Report?',
+                text: "You won't be able to revert this!",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Submit'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    let id = this.$route.params.id;
+                    axios.post(`/api/submitReport`, {
+                        id: id,
+                        status: '1'
+                    })
+                        .then(response => {
+
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Report Successfully Submitted!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                            setTimeout(() => {
+                                this.$router.push({ path: `/qms/reports_submission/index` });
+                            }, 200);
+                        })
+                        .catch(error => {
+                            console.error('Error Submitting report:', error)
+                        })
+
+                }
+            });
+
+
+        },
         viewReportSubmission(qoe_id) {
             // console.log(qoe_id)
             let qoe_id1 = qoe_id;
             let id = this.$route.params.id;
             let fq = this.form.frequency_monitoring
+            let pq = this.form.qp_covered
+            let status = this.form.status
             if (fq === "Quarterly") {
-                this.$router.push({ path: `/qms/reports_submission/rs_obj_entries/${id}/${qoe_id1}` });
+                this.$router.push({
+                    path: `/qms/reports_submission/rs_obj_entries/${id}/${qoe_id1}`,
+                    query: { pq: pq,
+                        stat: status
+                     }
+                });
             } else if (fq === "Monthly") {
-                this.$router.push({ path: `/qms/reports_submission/rs_monthly_entries/${id}/${qoe_id1}` });
+                this.$router.push({
+                    path: `/qms/reports_submission/rs_monthly_entries/${id}/${qoe_id1}`,
+                    query: { pq: pq,
+                        stat: status
+                     }
+                });
             } else if (fq === "Quarterly (Learning and Development)") {
-                this.$router.push({ path: `/qms/reports_submission/rs_quarterly_lnd_entries/${id}/${qoe_id1}` });
+                this.$router.push({
+                    path: `/qms/reports_submission/rs_quarterly_lnd_entries/${id}/${qoe_id1}`,
+                    query: { pq: pq,
+                        stat: status
+                     }
+                });
             }
         },
         fetchQoprData() {
             let id = this.$route.params.id;
-            console.log("tbl_qop_report ID:", id)
+            // console.log("tbl_qop_report ID:", id)
             axios.get(`/api/fetchQoprData/${id}`)
                 .then(response => {
                     if (Array.isArray(response.data) && response.data.length > 0) {
@@ -227,7 +285,7 @@ export default {
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }
-                    console.log(response.data)
+                    // console.log(response.data)
                 })
                 .catch(error => {
                     console.error('Error Fetching items:', error)
@@ -255,37 +313,24 @@ export default {
         generateReport() {
             let id = this.$route.params.id;
             let fm = this.form.frequency_monitoring;
-            console.log(this.form.frequency_monitoring)
-            // console.log(id)
-            // axios.get(`/api/generateReport/${id}?export=true`)
-            //     .then(response => {
-            //         console.log(response.data);
-            //         // this.showToatSuccess('Successfully downloaded!');
-            //         // setTimeout(() => {
-            //         //     location.reload();
-            //         // }, 1000); // Adjust the delay as needed
-            //     })
-            //     .catch(error => {
-            //         console.error('Error Fetching items:', error)
-            //     })
-            if(fm === 'Monthly'){
+            if (fm === 'Monthly') {
                 window.location.href = `/../api/generateReportM/${id}?export=true`;
-            this.showToatSuccess('Successfully downloaded!');
-            setTimeout(() => {
-               location.reload();
-            }, 1000); // Adjust the delay as needed
-            }else if (fm ==='Quarterly'){
+                this.showToatSuccess('Successfully downloaded!');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000); // Adjust the delay as needed
+            } else if (fm === 'Quarterly') {
                 window.location.href = `/../api/generateReportQ/${id}?export=true`;
-            this.showToatSuccess('Successfully downloaded!');
-            setTimeout(() => {
-               location.reload();
-            }, 1000); // Adjust the delay as needed
-            }else if(fm === 'Quarterly (Learning and Development)'){
+                this.showToatSuccess('Successfully downloaded!');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000); // Adjust the delay as needed
+            } else if (fm === 'Quarterly (Learning and Development)') {
                 window.location.href = `/../api/generateReportQLND/${id}?export=true`;
-            this.showToatSuccess('Successfully downloaded!');
-            setTimeout(() => {
-               location.reload();
-            }, 1000); // Adjust the delay as needed
+                this.showToatSuccess('Successfully downloaded!');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000); // Adjust the delay as needed
             }
 
         }

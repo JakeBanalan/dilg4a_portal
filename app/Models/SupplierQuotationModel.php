@@ -16,8 +16,11 @@ class SupplierQuotationModel extends Model
     protected $fillable = [
         'id',
         'supplier_id',
+        'abstract_id',
         'rfq_id',
         'item_id',
+        'offer',
+        'total_offer',
         'quotation',
         'winner'
     ];

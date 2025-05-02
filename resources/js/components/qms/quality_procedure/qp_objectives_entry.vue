@@ -145,19 +145,6 @@ export default {
     methods: {
         postQualityObjectives(){
             let id = this.$route.params.id;
-
-            // const formData = {
-            //          qop_id: id,
-            //         quality_objective:this.form.quality_objective,
-            //        target:this.form.target,
-            //        formula:this.form.formula,
-            //        indicator_a:this.form.indicator_a,
-            //        indicator_b:this.form.indicator_b,
-            //        indicator_c:this.form.indicator_c,
-            //        indicator_d:this.form.indicator_d,
-            //        indicator_e:this.form.indicator_e,
-            //     }
-            //     console.log(formData)
                 
                 axios.post('/api/postQualityObjectives',
                 {
@@ -174,11 +161,16 @@ export default {
                 }
             )
                 .then(response => {
-                    toast.success('Process Owner Successfully Deleted!', {
-                        autoClose: 1000
-                    });
-                    const id = this.$route.params.id
-                    this.$router.push({ path: `/qms/quality_procedure/qp_update/${id}`});
+                    Swal.fire({
+                            icon: 'success',
+                            title: 'Quality Objective Successfully Created!',
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                        setTimeout(() => {
+                            const id = this.$route.params.id
+                            this.$router.push({ path: `/qms/quality_procedure/qp_update/${id}`});
+                        }, 200);
                 })
                 .catch(error => {
                     console.error('error saving data', error);

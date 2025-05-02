@@ -49,6 +49,27 @@ class QMSController extends Controller
 
     public function fetchAllUser()
     {
+
+        $ProcessOwner = QMSModel::select(
+            'tbl_qms_process_owners.id',
+            'tbl_qms_process_owners.emp_id',
+            'tbl_qms_process_owners.date_created',
+            'tbl_qms_process_owners.created_by',
+            'users.first_name',
+            'users.last_name',
+            'tblposition.position_title',
+            'pmo.pmo_title',
+            'users.contact_details',
+            'users.email',
+            DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
+        )
+            ->leftJoin('users', 'users.id', '=', 'tbl_qms_process_owners.emp_id')
+            ->leftJoin('tblposition', 'tblposition.position_C', '=', 'users.position_id')
+            ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
+            ->get();
+
+        $powner = $ProcessOwner->pluck('emp_id')->toArray();
+
         $query = UserModel::select(
             'users.id',
             'users.pmo_id',
@@ -65,13 +86,12 @@ class QMSController extends Controller
             'p.pmo_title',
             'pos.position_title',
             DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
-
-
         )
-
             ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
             ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
+            ->whereNotIn('users.id', $powner)
             ->get();
+
         return response()->json($query);
     }
 
@@ -112,12 +132,35 @@ class QMSController extends Controller
             'process_owner'        => $request->input('process_owner'),
             'qp_code'              => $request->input('qp_code'),
             'procedure_title'      => $request->input('procedure_title'),
-            'created_by'           => $request->input('created_by'),
+            // 'created_by'           => $request->input('created_by'),
             'date_created'         => $request->input('date_created'),
         ]);
         // dd($postQP);
         $postQP->save();
         return response()->json($postQP);
+    }
+
+    public function UpdateQualityProcedure(Request $request){
+        $id = $request->input('id');
+        $EffDate = $request->input('EffDate');
+        $frequency_monitoring = $request->input('frequency_monitoring');
+        $coverage = $request->input('coverage');
+        $office = $request->input('office');
+        $rev_no = $request->input('rev_no');
+        $process_owner = $request->input('process_owner');
+        $qp_code = $request->input('qp_code');
+        $procedure_title = $request->input('procedure_title');
+        
+        QPModel::where('id', $id)->update([
+            'EffDate' => $EffDate,
+            'frequency_monitoring' => $frequency_monitoring,
+            'coverage' => $coverage,
+            'office' => $office,
+            'rev_no' => $rev_no,
+            'process_owner' => $process_owner,
+            'qp_code' => $qp_code,
+            'procedure_title' => $procedure_title,
+        ]);
     }
 
     public function fetchQualityProcedure()
@@ -239,7 +282,6 @@ class QMSController extends Controller
                 'indicator_d'       => $request->input('indicator_d'),
                 'indicator_e'       => $request->input('indicator_e'),
             ]);
-
     }
 
 
@@ -412,12 +454,12 @@ class QMSController extends Controller
     {
         $monthlyData = $request->monthlyData;
         $formData = $request->formData;
-        
+
         $GA = [
             'is_gap_analysis' => $formData['is_gap_analysis'],
             'gap_analysis' => $formData['gap_analysis'],
         ];
-        
+
         QGAModel::where('id', $formData['id'])->update($GA);
 
         foreach ($monthlyData as $item) {
@@ -464,12 +506,12 @@ class QMSController extends Controller
         // if (!isset($formData['id'], $formData['is_gap_analysis'], $formData['gap_analysis'])) {
         //     return response()->json(['error' => 'Incomplete form data'], 400);
         // }
-        
+
         $GA = [
             'is_gap_analysis' => $formData['is_gap_analysis'],
             'gap_analysis' => $formData['gap_analysis'],
         ];
-        
+
         QGAModel::where('id', $formData['id'])->update($GA);
 
         foreach ($quarterData as $item) {
@@ -500,6 +542,10 @@ class QMSController extends Controller
         return response()->json(['message' => 'Data updated successfully']);
     }
 
+    // public function ValidateReportEntry(Request $request)
+    // {
+
+    // }
 
     public function postReportEntry(Request $request)
     {
@@ -527,7 +573,7 @@ class QMSController extends Controller
                 "03" => "",
                 "04" => ""
             ];
-        } elseif ($request->frequency_monitoring == 'Quarterly (Learning and Development)'){
+        } elseif ($request->frequency_monitoring == 'Quarterly (Learning and Development)') {
             $period = [
                 "01" => "",
                 "02" => "",
@@ -551,11 +597,13 @@ class QMSController extends Controller
         // Save the main record first
         $postRS->save();
 
+        // gap_analysis
         // Fetch the created ID
         $createdId = $postRS->id;
         $qoe_ids = $request->qoe_id; // Assuming $request->qoe_id is an array [14, 15]
+        $qop_id = $request->qop_id;
 
-        foreach( $qoe_ids as $qoe_id){
+        foreach ($qoe_ids as $qoe_id) {
             $post_gap_analysis = new QGAModel([
                 'qop_entry_id' => $createdId,
                 'qoe_id'   => $qoe_id,
@@ -564,25 +612,66 @@ class QMSController extends Controller
             $post_gap_analysis->save();
         }
 
+        $existing = QOPFrequencyModel::whereIn('qoe_id', $request->qoe_id)
+            ->where('qop_id', $qop_id)
+            ->get();
 
-        // Loop over each qoe_id and insert it 5 times
-        foreach ($qoe_ids as $qoe_id) {
-            for ($i = 1; $i <= 5; $i++) {
-                // Create a new QOPFrequencyModel instance for the related entry
-                $update_qp_entry = new QOPFrequencyModel([
-                    'qop_entry_id' => $createdId,
-                    'qoe_id' => $qoe_id,
-                    'indicator' => $i,
-                    'rate' => json_encode($period),
-                    'updated_by' => null, //current user
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
 
-                // Save the related entry
-                $update_qp_entry->save();
+        if ($existing->isNotEmpty()) {
+
+            // Get the latest qop_entry_id
+            $lastEntryId = QOPFrequencyModel::max('qop_entry_id');
+
+            // Get all rows related to the last qop_entry_id
+            $lastEntries = QOPFrequencyModel::where('qop_entry_id', $lastEntryId)->get();
+
+            $grouped = $lastEntries->groupBy('qoe_id');
+            // $grouped = $existing->groupBy('qoe_id');
+            foreach ($qoe_ids as $qoe_id) {
+                if (isset($grouped[$qoe_id])) {
+                    foreach ($grouped[$qoe_id] as $entry) {
+                        // Create a new QOPFrequencyModel instance for the related entry
+                        $update_qp_entry = new QOPFrequencyModel([
+                            'qop_entry_id' => $createdId,
+                            'qop_id' => $qop_id,
+                            'qoe_id' => $qoe_id,
+                            'indicator' => $entry->indicator,
+                            'rate' => $entry->rate,
+                            'updated_by' => null, //current user
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ]);
+
+                        // Save the related entry
+                        $update_qp_entry->save();
+                    }
+                }
             }
+        } else {
+            // qoe_freuency_entry
+            // Loop over each qoe_id and insert it 5 times
+            foreach ($qoe_ids as $qoe_id) {
+                for ($i = 1; $i <= 5; $i++) {
+                    // Create a new QOPFrequencyModel instance for the related entry
+                    $update_qp_entry = new QOPFrequencyModel([
+                        'qop_entry_id' => $createdId,
+                        'qop_id' => $qop_id,
+                        'qoe_id' => $qoe_id,
+                        'indicator' => $i,
+                        'rate' => json_encode($period),
+                        'updated_by' => null, //current user
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ]);
+
+                    // Save the related entry
+                    $update_qp_entry->save();
+                }
+            }
+            // return response()->json($postRS);
+
         }
+
 
         return response()->json($postRS);
     }
@@ -660,10 +749,44 @@ class QMSController extends Controller
             'qop.frequency_monitoring',
             'qop.procedure_title',
             'qop.process_owner',
+            'qop.office',
+            'users.username',
+        )
+
+            ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
+            ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
+            ->get();
+        return response()->json($fetchQOPR);
+    }
+
+    public function fetchQOPRperUser($id)
+    {
+        $fetchUser = UserModel::select(
+            DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
+
+        )
+            ->where('users.id', $id)
+            ->get();
+
+        $userFullName = $fetchUser[0]->fname;
+
+        $fetchQOPR = QOPRModel::select(
+            'tbl_qop_report.id',
+            'tbl_qop_report.qop_id',
+            'tbl_qop_report.created_by',
+            'tbl_qop_report.date_created',
+            'tbl_qop_report.status',
+            'tbl_qop_report.qp_covered',
+            'tbl_qop_report.year',
+            'qop.qp_code',
+            'qop.frequency_monitoring',
+            'qop.procedure_title',
+            'qop.process_owner',
             'qop.office'
         )
 
             ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
+            ->where('qop.process_owner', 'LIKE', '%' . $userFullName . '%')
             ->get();
         return response()->json($fetchQOPR);
     }
@@ -707,11 +830,11 @@ class QMSController extends Controller
     {
         QOPRModel::where('id', $request->id)
 
-        ->delete();
+            ->delete();
 
         QOPFrequencyModel::where('qop_entry_id', $request->id)
-        ->delete();
+            ->delete();
 
-    return response()->json(['message' => 'Item deleted successfully']);
+        return response()->json(['message' => 'Item deleted successfully']);
     }
 }
