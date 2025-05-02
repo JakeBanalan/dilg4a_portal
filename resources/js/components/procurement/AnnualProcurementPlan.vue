@@ -113,8 +113,7 @@
             </div>
 
         </div>
-        <div class="modal fade" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="app-modal-label"
-            aria-hidden="true">
+        <div class="modal fade" id="app-modal" tabindex="-1" role="dialog" aria-labelledby="app-modal-label">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">

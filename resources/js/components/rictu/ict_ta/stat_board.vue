@@ -1,103 +1,5 @@
 <template>
-    <!-- <div v-if="this.role == 'admin'">
-        <div class="col-md-12 grid-margin mb-4 stretch-card">
-
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">ICT Technical Assistance Request</p>
-                            <p class="fs-30 mb-2">{{ this.ict_total }}</p>
-
-                            <p>{{ this.$formatDecimal((this.ict_total / 300) * 100) }}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Draft ICT Technical Assistance</p>
-                            <p class="fs-30 mb-2">{{ this.ict_draft }}</p>
-
-                            <p>{{ this.$formatDecimal((this.ict_draft / 300) * 100) }}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Received Technical Assistance</p>
-                            <p class="fs-30 mb-2">{{ this.ict_received }}</p>
-
-                            <p>{{ this.$formatDecimal((this.ict_received / 300) * 100) }}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent" v-if="this.role == 'admin'">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Completed Technical Assistance</p>
-                            <p class="fs-30 mb-2">{{ this.ict_completed }}</p>
-
-                            <p>{{ this.$formatDecimal((this.ict_completed / 300) * 100) }}% as of today</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'square-poll-vertical']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-12 grid-margin mb-4 stretch-card">
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Hardware Request</p>
-                            <p class="fs-30 mb-2">{{ this.ict_hardware }}</p>
-                            <p>{{ this.$formatDecimal((this.ict_hardware / 500) * 100) }}% as of this year</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'computer']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-12 col-xs-12 mb-6 stretch-card transparent">
-                <div class="card card-dark-blue">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-4">Software Request</p>
-                            <p class="fs-30 mb-2">{{ this.ict_software }}</p>
-                            <p>{{ this.$formatDecimal((this.ict_software / 500) * 100) }}% as of this year</p>
-                        </div>
-                        <div>
-                            <font-awesome-icon :icon="['fas', 'gear']" class="fa-6x" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <div v-if="this.role == 'user'">
+    <div>
         <div class="container col-md-12">
             <div class="header">
                 <h1>
@@ -110,69 +12,26 @@
             <div class="content">
                 <div class="technical-assistance">
                     <p style="font-weight: 600;">Need ICT Technical Assistance?</p>
-                    <button class="submit-request" @click="$router.replace({ path: '/rictu/ict_ta/create' })">
+                    <button class="submit-request" @click="navigateToCreateRequest">
                         Submit a Request
                     </button>
                 </div>
                 <div class="requests-info">
                     <div class="request-card all-requests">
-                        <p style="font-size: 1rem; font-weight: bold;">User Requests</p>
-                        <p class="count">{{ this.ict_total }}</p>
+                        <p style="font-size: 1rem; font-weight: bold;">{{ isAdmin ? 'Total Requests' : 'User Requests' }}</p>
+                        <p class="count">{{ isAdmin ? ictStats.adminTotal : ictStats.total }}</p>
                     </div>
                     <div class="request-card completed">
                         <p style="font-size: 1rem; font-weight: bold;">Completed Requests</p>
-                        <p class="count">{{ this.ict_completed }}</p>
+                        <p class="count">{{ isAdmin ? ictStats.adminCompleted : ictStats.completed }}</p>
                     </div>
                     <div class="request-card ongoing">
                         <p style="font-size: 1rem; font-weight: bold;">Ongoing Requests</p>
-                        <p class="count">{{ this.ict_received }}</p>
+                        <p class="count">{{ isAdmin ? ictStats.adminReceived : ictStats.received }}</p>
                     </div>
                     <div class="request-card pending">
                         <p style="font-size: 1rem; font-weight: bold;">Pending Request</p>
-                        <p class="count">{{ this.ict_draft }}</p>
-                    </div>
-                </div>
-                <div class="contact-info">
-                    <p style="font-size: 1rem !important;">
-                        Still having problems? Contact RICTU at local 7406 or dilg4a.it@gmail.com
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div v-if="this.role == 'admin'">
-        <div class="container col-md-12">
-            <div class="header">
-                <h1>
-                    QP-DILG-ISTMS-RO-17: Provision of Preventive Maintenance and Technical Assistance on Information and
-                    Communications Technology (ICT) Resources
-                </h1>
-            </div>
-        </div>
-        <div class="stat col-md-12">
-            <div class="content">
-                <div class="technical-assistance">
-                    <p style="font-weight: 600;">Need ICT Technical Assistance?</p>
-                    <button class="submit-request" @click="$router.replace({ path: '/rictu/ict_ta/create' })">
-                        Submit a Request
-                    </button>
-                </div>
-                <div class="requests-info">
-                    <div class="request-card all-requests">
-                        <p style="font-size: 1rem; font-weight: bold;">Total Requests</p>
-                        <p class="count">{{ ict_adminTotal }}</p> <!-- Remove 'this.' -->
-                    </div>
-                    <div class="request-card completed">
-                        <p style="font-size: 1rem; font-weight: bold;">Completed Requests</p>
-                        <p class="count">{{ ict_adminCompleted }}</p>
-                    </div>
-                    <div class="request-card ongoing">
-                        <p style="font-size: 1rem; font-weight: bold;">Ongoing Requests</p>
-                        <p class="count">{{ ict_adminReceived }}</p>
-                    </div>
-                    <div class="request-card pending">
-                        <p style="font-size: 1rem; font-weight: bold;">Pending Request</p>
-                        <p class="count">{{ ict_adminDraft }}</p>
+                        <p class="count">{{ isAdmin ? ictStats.adminDraft : ictStats.draft }}</p>
                     </div>
                 </div>
                 <div class="contact-info">
@@ -186,147 +45,183 @@
 </template>
 
 <script>
-import { eventBus } from "../eventBus.js";
 import Pusher from 'pusher-js';
 
 export default {
+    name: 'ICTDashboard',
+
     data() {
         return {
-            user_id: null,
+            userId: null,
             role: null,
-            ict_total: 0,
-            ict_draft: 0,
-            ict_received: 0,
-            ict_completed: 0,
-            ict_returned: 0,
-            ict_hardware: 0,
-            ict_software: 0,
-            ict_adminTotal: 0,
-            ict_adminDraft: 0,
-            ict_adminReceived: 0,
-            ict_adminCompleted: 0,
-            ict_adminReturned: 0,
-            ict_adminHardware: 0,
-            ict_adminSoftware: 0,
-            isSurveyCompleted: false,
             pusher: null,
+            channels: [],
+            ictStats: {
+                // User stats
+                total: 0,
+                draft: 0,
+                received: 0,
+                completed: 0,
+                returned: 0,
+
+                // Admin stats
+                adminTotal: 0,
+                adminDraft: 0,
+                adminReceived: 0,
+                adminCompleted: 0,
+                adminReturned: 0
+            }
         };
     },
+
+    computed: {
+        isAdmin() {
+            return this.role === 'admin';
+        }
+    },
+
     created() {
-        this.user_id = localStorage.getItem('userId');
+        this.userId = localStorage.getItem('userId');
         this.role = localStorage.getItem('user_role');
     },
+
     mounted() {
-        this.fetchICTRequestCount();
-        this.fetchDraftData();
-        this.fetchICTAdminCount();
-        this.fetchICTAdminDraft();
-        eventBus.on('updateICTSTAT', () => {
-            this.fetchICTRequestCount();
-            this.fetchDraftData();
-            this.fetchICTAdminCount();
-            this.fetchICTAdminDraft();
-        });
-        // this.fetchHardwareCount();
-        // this.fetchSoftwareCount();
+        this.initializeData();
+        this.setupPusherConnection();
+    },
 
-        var pusher = new Pusher('29d53f8816252d29de52', {
-            cluster: 'ap1'
-        });
-        // Listen for the update-table event on the ict-ta-channel channel
-        const receivedChannel = pusher.subscribe('received-ta-channel');
-        receivedChannel.bind('received-ict-ta', (data) => {
-            this.fetchICTRequestCount();
-            this.fetchDraftData();
-            this.fetchICTAdminCount();
-            this.fetchICTAdminDraft();
-        });
-        const completedChannel = pusher.subscribe('completed-ta-channel');
-        completedChannel.bind('completed-ict-ta', (data) => {
-            this.fetchICTRequestCount();
-            this.fetchDraftData();
-            this.fetchICTAdminCount();
-            this.fetchICTAdminDraft();
-        });
+    beforeUnmount() {
+        this.cleanupPusherConnection();
     },
-    beforeDestroy() {
-        if (this.pusher) {
-            this.pusher.unsubscribe('received-ta-channel');
-            this.pusher.unsubscribe('completed-ta-channel');
-            this.pusher.disconnect();
-        }
-        eventBus.off('updateICTSTAT');
-    },
+
     methods: {
-        fetchICTAdminCount() {
-            // Fetch total ICT requests
-            axios.get(`/api/totalCountICTRequest`)
-                .then(response => {
-                    // console.log(response.data); // Log the response to check the structure
-                    this.ict_adminTotal = response.data.ictTotal;
-                })
-                .catch(error => {
-                    console.error('Error fetching ICT admin total:', error);
-                });
+        navigateToCreateRequest() {
+            this.$router.replace({ path: '/rictu/ict_ta/create' });
         },
 
-        fetchICTAdminDraft() {
-            // Fetch draft data
-            axios.get('../../api/totalCountDraft')
-                .then(response => {
-                    // console.log('test',response.data);
-                    const data = response.data;
-                    this.ict_adminDraft = response.data[0].draft;
-                    this.ict_adminReceived = response.data[0].received;
-                    this.ict_adminCompleted = response.data[0].completed;
-                    this.ict_adminReturned = response.data[0].returned;
-                })
-                .catch(error => {
-                    console.error('Error fetching draft data:', error);
+        initializeData() {
+            // Load appropriate data based on user role
+            if (this.isAdmin) {
+                this.fetchAdminData();
+            } else {
+                this.fetchUserData();
+            }
+        },
+
+        setupPusherConnection() {
+            try {
+                this.pusher = new Pusher('29d53f8816252d29de52', {
+                    cluster: 'ap1'
                 });
 
-        },
-        fetchICTRequestCount() {
-            const currentYear = new Date().getFullYear();
-            axios.get(`/api/countICTRequest/${this.user_id}`)
-                .then(response => {
-                    this.ict_total = response.data.ict;
-                })
-                .catch(error => {
-                    console.error(error);
+                // Subscribe to channels and handle events
+                const receivedChannel = this.pusher.subscribe('received-ta-channel');
+                const completedChannel = this.pusher.subscribe('completed-ta-channel');
+
+                // Store channels for cleanup
+                this.channels = [
+                    { name: 'received-ta-channel', channel: receivedChannel },
+                    { name: 'completed-ta-channel', channel: completedChannel }
+                ];
+
+                // Set up event handlers
+                receivedChannel.bind('received-ict-ta', this.handleDataRefresh);
+                completedChannel.bind('completed-ict-ta', this.handleDataRefresh);
+
+                // Handle connection errors
+                this.pusher.connection.bind('error', (err) => {
+                    console.error('Pusher connection error:', err);
                 });
+            } catch (error) {
+                console.error('Error setting up Pusher connection:', error);
+            }
         },
-        fetchDraftData() {
-            axios.get(`/api/countDRAFT/${this.user_id}`)
-                .then(response => {
-                    this.ict_draft = response.data[0].draft;
-                    this.ict_received = response.data[0].received;
-                    this.ict_completed = response.data[0].completed;
-                    this.ict_returned = response.data[0].returned;
-                })
-                .catch(error => {
-                    console.error(error);
+
+        handleDataRefresh() {
+            // Refresh the appropriate data based on user role
+            if (this.isAdmin) {
+                this.fetchAdminData();
+            } else {
+                this.fetchUserData();
+            }
+        },
+
+        cleanupPusherConnection() {
+            if (this.pusher) {
+                // Unsubscribe from all channels
+                this.channels.forEach(channel => {
+                    this.pusher.unsubscribe(channel.name);
                 });
+
+                // Disconnect Pusher
+                this.pusher.disconnect();
+                this.pusher = null;
+                this.channels = [];
+            }
         },
-        // fetchHardwareCount() {
-        //     axios.get(`/api/countHardwareRequest/${this.user_id}`)
-        //         .then(response => {
-        //             this.ict_hardware = response.data.hardware_count;
-        //         })
-        //         .catch(error => {
-        //             console.error('Error fetching hardware count:', error);
-        //         });
-        // },
-        // fetchSoftwareCount() {
-        //     axios.get(`/api/countSoftwareRequest/${this.user_id}`)
-        //         .then(response => {
-        //             this.ict_software = response.data.software_count;
-        //         })
-        //         .catch(error => {
-        //             console.error('Error fetching software count:', error);
-        //         });
-        // },
-    },
+
+        fetchUserData() {
+            // Use Promise.all to fetch data in parallel for better performance
+            Promise.all([
+                this.fetchWithTimeout(() => axios.get(`/api/countICTRequest/${this.userId}`)),
+                this.fetchWithTimeout(() => axios.get(`/api/countDRAFT/${this.userId}`))
+            ])
+            .then(([totalResponse, draftsResponse]) => {
+                // Update user stats
+                this.ictStats.total = totalResponse.data.ict;
+
+                const drafts = draftsResponse.data[0];
+                this.ictStats.draft = drafts.draft;
+                this.ictStats.received = drafts.received;
+                this.ictStats.completed = drafts.completed;
+                this.ictStats.returned = drafts.returned;
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
+            });
+        },
+
+        fetchAdminData() {
+            // Use Promise.all to fetch admin data in parallel
+            Promise.all([
+                this.fetchWithTimeout(() => axios.get('/api/totalCountICTRequest')),
+                this.fetchWithTimeout(() => axios.get('/api/totalCountDraft'))
+            ])
+            .then(([totalResponse, draftsResponse]) => {
+                // Update admin stats
+                this.ictStats.adminTotal = totalResponse.data.ictTotal;
+
+                const drafts = draftsResponse.data[0];
+                this.ictStats.adminDraft = drafts.draft;
+                this.ictStats.adminReceived = drafts.received;
+                this.ictStats.adminCompleted = drafts.completed;
+                this.ictStats.adminReturned = drafts.returned;
+            })
+            .catch(error => {
+                console.error('Error fetching admin data:', error);
+            });
+        },
+
+        fetchWithTimeout(fetchFunction, timeout = 5000) {
+            return new Promise((resolve, reject) => {
+                // Set a timeout for the fetch operation
+                const timeoutId = setTimeout(() => {
+                    reject(new Error('Request timed out'));
+                }, timeout);
+
+                // Execute the fetch function
+                fetchFunction()
+                    .then(response => {
+                        clearTimeout(timeoutId);
+                        resolve(response);
+                    })
+                    .catch(error => {
+                        clearTimeout(timeoutId);
+                        reject(error);
+                    });
+            });
+        }
+    }
 };
 </script>
 

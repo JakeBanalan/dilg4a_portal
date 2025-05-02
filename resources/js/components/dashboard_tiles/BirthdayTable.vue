@@ -105,7 +105,8 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td><span style="font-weight: bold; font-size: 12pt;">BATANGAS (OIC-PM)</span>
+                                            <td><span style="font-weight: bold; font-size: 12pt;">BATANGAS
+                                                    (OIC-PM)</span>
                                             </td>
                                             <td><span style="font-weight: bold; font-size: 12pt;">7411</span></td>
                                         </tr>
@@ -175,8 +176,6 @@
                         <img src="../../../../assets/images/logo.png" alt="DILG Logo"
                             style="width: 50px; height: 50px; margin-right: 10px;">
                         Birthday Celebrants
-                        <!-- <img src="../../../../assets/images/logo.png" alt="DILG Logo"
-                            style="width: 50px; height: 50px; margin-right: 10px;"> -->
                     </p>
                     <div class="row">
                         <div class="col-12">
@@ -184,17 +183,18 @@
                                 <table id="example" class="display expandable-table" style="width:100%">
                                     <thead>
                                         <tr>
-                                            <th>Name</th>
-                                            <th>Birthdate</th>
-                                            <th>Age</th>
+                                            <th style="text-align: left;">Name</th>
+                                            <th  style="text-align: left;">Birthdate</th>
+                                            <th  style="text-align: left;">Age</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="user in users" :key="user.id">
-                                            <td><font-awesome-icon :icon="['fas', 'gift']" />&nbsp; {{ user.name
-                                            }}</td>
-                                            <td>{{ user.birthdate }}</td>
-                                            <td>{{ user.age }}</td>
+                                            <td @click="launchConfetti(user.name)" style="cursor: pointer; text-align: left;">
+                                                <font-awesome-icon :icon="['fas', 'gift']" />&nbsp; {{ user.name }}
+                                            </td>
+                                            <td  style="text-align: left;">{{ user.birthdate }}</td>
+                                            <td  style="text-align: left;">{{ user.age }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -204,16 +204,18 @@
                 </div>
             </div>
         </div>
-
     </div>
+    <canvas id="confettiCanvas"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
 </template>
 
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faGroupArrowsRotate, faCoins, faBirthdayCake, faGift } from '@fortawesome/free-solid-svg-icons';
+import { faGift } from '@fortawesome/free-solid-svg-icons';
+import confetti from 'canvas-confetti';
 
-library.add(faGroupArrowsRotate, faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faCoins, faBirthdayCake, faGift);
+library.add(faGift);
 
 export default {
     name: 'BirthdayTable',
@@ -221,34 +223,41 @@ export default {
     data() {
         return {
             users: []
-        }
+        };
     },
     mounted() {
         this.fetchUsers();
     },
     methods: {
         fetchUsers() {
-            axios.get('/api/getAllUsers')
+            axios.get('/api/fetchAllUsers')
                 .then(response => {
                     this.users = response.data.filter(user => {
                         const birthdate = new Date(user.birthdate);
                         const currentMonth = new Date().getMonth();
-                        const currentDay = new Date().getDate();
-                        return birthdate.getMonth() === currentMonth && birthdate.getDate() === currentDay;
+                        return birthdate.getMonth() === currentMonth;
                     });
                     this.users.forEach(user => {
                         const birthdate = new Date(user.birthdate);
-                        const age = Math.floor((new Date() - birthdate) / 31536000000);
-                        user.age = age;
+                        user.age = Math.floor((new Date() - birthdate) / 31536000000);
                     });
                 })
                 .catch(error => {
                     console.error(error);
                 });
+        },
+        launchConfetti(name) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+
         }
     }
-}
+};
 </script>
+
 <style>
 .table-wrapper {
     max-height: 300px;

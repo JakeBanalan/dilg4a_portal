@@ -6,8 +6,13 @@
             <div class="main-panel">
                 <div class="content-wrapper">
                     <BreadCrumbs />
+                    <!-- <div class="row">
+                        <div class="col-md-12">
+                            Weather Forecast Card
+                        </div>
+                    </div> -->
                     <div class="row">
-                        <div class="col-md-7 stretch-card">
+                        <div class="col-md-7">
                             <div class="card">
                                 <div class="card-body">
                                     <FullCalendar ref="calendar" :options="calendarOptions" />
@@ -16,12 +21,54 @@
                         </div>
                         <div class="col-md-5">
                             <div class="row">
+                                <div class="col-md-12 grid-margin">
+                                    <div class="card">
+                                        <div class="card-header fixed-header">
+                                            <p class="card-title">Philippine Holidays - {{ currentYear }}</p>
+                                        </div>
+                                        <div class="card-body scrollable-card-body">
+                                            <div class="row">
+                                                <div class="col-md-6" v-for="(event, i) in filteredHolidays" :key="i">
+                                                    <div class="d-flex align-items-center pb-3 pt-3 border-bottom">
+                                                        <div class="move-calendar ms-3">
+                                                            <span style="display: inline-block;">
+                                                                <time class="icon">
+                                                                    <em>{{ FormattedDay(event.start) }}</em>
+                                                                    <strong>{{ FormattedMonth(event.start) }}</strong>
+                                                                    <span>{{ FormattedDate(event.start) }}</span>
+                                                                </time>
+                                                            </span>
+                                                        </div>
+                                                        <div class="ms-3" style="padding-left: 0.3em;">
+                                                            <h6 class="mb-0"
+                                                                :class="event.isHoliday ? 'text-danger' : 'text-blue'"
+                                                                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                                {{ event.title }}
+                                                            </h6>
+                                                            <small class="mb-0"
+                                                                :class="event.isHoliday ? 'text-danger' : 'text-blue'">
+                                                                <i class="ti-timer me-1"></i> {{
+                                                                    FormattedFDate(event.start) }} - {{
+                                                                    FormattedFDate(event.end) }}
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
                                 <div class="col-md-6 grid-margin">
                                     <div class="card">
                                         <div class="card-body scrollable-card-body">
-                                            <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
+                                            <div class="card-header fixed-header">
+                                                <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
+                                            </div>
                                             <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                                                v-for="(events, i) in UpcomingEvents" :key="i">
+                                                v-for="(events, i) in filteredAlloffices" :key="i">
                                                 <div class="move-calendar ms-3">
                                                     <span style="display: inline-block;">
                                                         <time class="icon">
@@ -33,10 +80,13 @@
                                                 </div>
                                                 <div class="ms-3" style="padding-left: 0.3em;">
                                                     <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
-                                                        class="mb-0">{{ events.title }}</h6>
-                                                    <small class="text-muted mb-0"><i class="ti-timer me-1"></i> {{
-                                                        FormattedFDate(events.start) }} - {{ FormattedFDate(events.end)
-                                                        }}</small>
+                                                        class="mb-0">
+                                                        {{ events.title }}
+                                                    </h6>
+                                                    <small class="text-muted mb-0">
+                                                        <i class="ti-timer me-1"></i> {{ FormattedFDate(events.start) }}
+                                                        - {{ FormattedFDate(events.end) }}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
@@ -45,9 +95,11 @@
                                 <div class="col-md-6 grid-margin">
                                     <div class="card">
                                         <div class="card-body scrollable-card-body">
-                                            <p class="card-title">My Personal Events - {{ currentMonth }}</p>
+                                            <div class="card-header fixed-header">
+                                                <p class="card-title">My Personal Events - {{ currentMonth }}</p>
+                                            </div>
                                             <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                                                v-for="(myEvents, i) in MyUpcomingEvents" :key="i">
+                                                v-for="(myEvents, i) in filteredPersonalEvents" :key="i">
                                                 <div class="move-calendar ms-3">
                                                     <span style="display: inline-block;">
                                                         <time class="icon">
@@ -59,17 +111,20 @@
                                                 </div>
                                                 <div class="ms-3" style="padding-left: 0.3em;">
                                                     <h6 style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;"
-                                                        class="mb-0 text-blue">{{ myEvents.title }}</h6>
-                                                    <small class="text-blue mb-0"><i class="ti-timer me-1"></i> {{
-                                                        FormattedFDate(myEvents.start) }} - {{
-                                                            FormattedFDate(myEvents.end)
-                                                        }}</small>
+                                                        class="mb-0 text-blue">
+                                                        {{ myEvents.title }}
+                                                    </h6>
+                                                    <small class="text-blue mb-0">
+                                                        <i class="ti-timer me-1"></i> {{ FormattedFDate(myEvents.start)
+                                                        }} - {{ FormattedFDate(myEvents.end) }}
+                                                    </small>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="col-md-12 grid-margin">
                                 <div class="card">
                                     <div class="card-body" style="overflow-y:scroll;">
@@ -77,7 +132,7 @@
                                         <div class="box box-widget widget-user-12">
                                             <div class="col-xs-2 col-sm-2 col-md-2 col-lg-12">
                                                 <table class="table table-bordered"
-                                                    style="border-width: 3px;max-width:100%;">
+                                                    style="border-width: 3px; max-width: 100%;">
                                                     <tbody>
                                                         <tr>
                                                             <td
@@ -96,14 +151,14 @@
                                                         </tr>
                                                         <tr>
                                                             <td
-                                                                style="background-color: #D5D911; color:white;width:50%;">
+                                                                style="background-color: #D5D911; color:white; width:50%;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
                                                                     :value="6" @change="filterEvents()">
                                                                 <label style="margin-left:15%;">ORD</label>
                                                             </td>
                                                             <td
-                                                                style="background-color: #607D8B; color:#fff;padding:9px;width:50%;">
+                                                                style="background-color: #607D8B; color:#fff; padding:9px; width:50%;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
                                                                     :value="9" @change="filterEvents()">
@@ -114,75 +169,75 @@
                                                             <td style="background-color: #E60785; color:white;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="5" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">FAD</label>
+                                                                    :value="5" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">FAD</label>
                                                             </td>
                                                             <td
-                                                                style="background-color:#FF9800 ; color:white;;padding:9px;">
+                                                                style="background-color:#FF9800; color:white; padding:9px;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="10" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">Cavite</label>
+                                                                    :value="10" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">Cavite</label>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td style="background-color: #48BD0D; color:white;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="7" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">LGCDD</label>
+                                                                    :value="7" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">LGCDD</label>
                                                             </td>
                                                             <td
-                                                                style="background-color:#009688; color:white;;padding:9px;">
+                                                                style="background-color:#009688; color:white; padding:9px;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="11" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">Laguna</label>
+                                                                    :value="11" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">Laguna</label>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td style="background-color: #E6680E; color:white;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="3" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">MBRTG</label>
+                                                                    :value="3" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">MBRTG</label>
                                                             </td>
                                                             <td
-                                                                style="background-color:#81D4FA; color:white;;padding:9px;">
+                                                                style="background-color:#81D4FA; color:white; padding:9px;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="13" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">Rizal</label>
+                                                                    :value="13" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">Rizal</label>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td style="background-color: #0071c5; color:white;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="8" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">LGMED</label>
+                                                                    :value="8" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">LGMED</label>
                                                             </td>
                                                             <td
-                                                                style="background-color:#d50000; color:white;;padding:9px;">
+                                                                style="background-color:#d50000; color:white; padding:9px;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="12" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">Quezon</label>
+                                                                    :value="12" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">Quezon</label>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td style="background-color: #8F0CC7; color:white;">
-                                                                <input class="calFilter" data-id="9" type="checkbox"
-                                                                    name="offices[]" v-model="selectedOffices"
-                                                                    :value="4" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">PDMU</label>
-                                                            </td>
-                                                            <td
-                                                                style="background-color: #FFEB3B; color:white;;padding:9px;">
                                                                 <input class="calFilter" type="checkbox"
                                                                     name="offices[]" v-model="selectedOffices"
-                                                                    :value="14" @change="filterEvents()"><label
-                                                                    style="margin-left:15%;">Lucena City</label>
+                                                                    :value="4" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">PDMU</label>
+                                                            </td>
+                                                            <td
+                                                                style="background-color: #FFEB3B; color:white; padding:9px;">
+                                                                <input class="calFilter" type="checkbox"
+                                                                    name="offices[]" v-model="selectedOffices"
+                                                                    :value="14" @change="filterEvents()">
+                                                                <label style="margin-left:15%;">Lucena City</label>
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -211,12 +266,12 @@ import BreadCrumbs from "../dashboard_tiles/BreadCrumbs.vue";
 import EventModal from './EventModal.vue';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-
 import moment from 'moment';
 import axios from 'axios';
-import FullCalendar from '@fullcalendar/vue3'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin from '@fullcalendar/interaction'
+import FullCalendar from '@fullcalendar/vue3';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
 export default {
     components: {
         EventModal,
@@ -232,7 +287,7 @@ export default {
             events: [],
             posted_by: null,
             eventDetails: {
-                personnalevent: 0, // Ensure it's initialized to 0 or 1
+                personnalevent: 0,
                 id: null,
                 allDay: true,
                 title: '',
@@ -247,12 +302,9 @@ export default {
             },
             mode: '',
             userId: null,
+            isDisabledFlag: true,
             calendarOptions: {
-                plugins: [
-                    dayGridPlugin,
-
-                    interactionPlugin,
-                ],
+                plugins: [dayGridPlugin, interactionPlugin],
                 initialView: 'dayGridMonth',
                 headerToolbar: {
                     start: 'title',
@@ -261,7 +313,6 @@ export default {
                 },
                 eventClick: this.handleEventClick,
                 eventDrop: this.handleEventDrop,
-
                 editable: true,
                 events: [],
                 eventDisplay: 'block',
@@ -272,66 +323,90 @@ export default {
                         click: this.handleCustomButtonClick,
                     },
                 },
+                eventDidMount: function (info) {
+                    const event = info.event;
+                    if (event.extendedProps.isHoliday) {
+                        event.setProp('editable', false);
+                    }
+                },
                 eventContent: (arg) => {
                     const event = arg.event;
-                    const duration = moment(event.end).diff(moment(event.start), 'days');
+                    const startDate = moment(event.start);
+                    const endDate = moment(event.end || event.start);
+                    const duration = endDate.diff(startDate, 'days') + 1;
                     const isLongEvent = duration > 1;
 
                     return {
-                        html: `<div class="fc-event-main-frame">
-                ${isLongEvent ? `<div class="fc-event-time">${moment(event.start).format('MMM D')} - ${moment(event.end).format('MMM D')}</div>` : ''}
-                <div class="fc-event-title">${event.title}</div>
-            </div>`
+                        html: `
+                <div class="fc-event-main-frame">
+                    ${isLongEvent
+                                ? `<div class="fc-event-time">
+                                ${startDate.format('MMM D')} -
+                                ${endDate.format('MMM D')} <!-- Exact end date, no adjustment -->
+                            </div>`
+                                : ''
+                            }
+                    <div class="fc-event-title">${event.title}</div>
+                </div>
+            `,
                     };
                 },
             },
             selectedOffices: [0],
             showMyPersonalEvents: true,
             UpcomingEvents: [],
-            MyUpcomingEvents: []
-        }
+            MyUpcomingEvents: [],
+            philippineHolidays: [],
+        };
     },
     created() {
         this.userId = localStorage.getItem('userId');
         this.EventData();
         this.FetchData();
         this.fetchAuthor();
+        this.FetchHolidays();
     },
     computed: {
         currentMonth() {
-            return moment().format('MMMM YYYY'); // Returns the current month and year
+            return moment().format('MMMM YYYY');
+        },
+        currentYear() {
+            return moment().format('YYYY');
         },
         FormattedFDate() {
-            return function (DateString) {
-                return moment(DateString).format('MMMM DD, YYYY');
-            };
+            return (dateString) => moment(dateString).format('MMMM DD, YYYY');
+        },
+        filteredAlloffices() {
+            return this.eventsByMonth.filter(event => !event.personnalevent);
+        },
+        filteredHolidays() {
+            return this.philippineHolidays; // Use the separate holidays array
+        },
+        filteredPersonalEvents() {
+            return this.eventsByMonth.filter(event => event.personnalevent);
+        },
+        eventsByMonth() {
+            return this.events.filter(event => moment(event.start).format('MMMM YYYY') === this.currentMonth);
         },
         FormattedMonth() {
-            return function (DateString) {
-                return moment(DateString).format('MMMM');
-            };
+            return (dateString) => moment(dateString).format('MMMM');
         },
         FormattedDate() {
-            return function (DateString) {
-                return moment(DateString).format('DD');
-            };
+            return (dateString) => moment(dateString).format('DD');
         },
         FormattedDay() {
-            return function (DateString) {
-                return moment(DateString).format('dddd');
-            };
-        }
+            return (dateString) => moment(dateString).format('dddd');
+        },
     },
     methods: {
         filterEvents() {
             this.FetchData();
         },
-
         fetchAuthor() {
             const userId = localStorage.getItem('userId');
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
-                    this.posted_by = emp_data.name
+                    this.posted_by = emp_data.name;
                 });
         },
         ClearEvents() {
@@ -345,70 +420,59 @@ export default {
                 enp: "",
                 postedBy: "",
                 remarks: "",
-            }
+            };
         },
         closeModal() {
-            this.modalVisible = false; // Hide the modal
-            this.mode = ''; // Reset the mode
+            this.modalVisible = false;
+            this.mode = '';
         },
         openModal(mode) {
-            this.mode = mode; // Set the mode ('add' or 'edit')
-            this.modalVisible = true; // Show the modal
-
-            // Set isDisabledFlag and isEditMode based on the mode
-            if (mode === 'edit') {
-                this.isDisabledFlag = false; // Enable fields in 'edit' mode initially
-                this.isEditMode = true; // Set edit mode to true
-            } else if (mode === 'add') {
-                this.isDisabledFlag = false; // Enable fields in 'add' mode
-            }
+            this.mode = mode;
+            this.modalVisible = true;
         },
         handleCustomButtonClick() {
-            this.ClearEvents()
+            this.ClearEvents();
             this.eventDetails.postedBy = this.posted_by;
-            this.openModal('add')
+            this.openModal('add');
         },
         EventData() {
-            // Get the start and end of the current month
             const startOfMonth = moment().startOf('month').format('YYYY-MM-DD HH:mm:ss');
             const endOfMonth = moment().endOf('month').format('YYYY-MM-DD HH:mm:ss');
 
-            // Fetch data for all events
             axios.get(`/api/dashboardEventData`, {
-                params: {
-                    start: startOfMonth,
-                    end: endOfMonth,
-                },
+                params: { start: startOfMonth, end: endOfMonth }
             })
                 .then(response => {
-
                     this.UpcomingEvents = response.data.map(event => ({
                         ...event,
-                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
+                        start: moment(event.start).format('YYYY-MM-DD'),
+                        end: moment(event.end).format('YYYY-MM-DD'),
                     }));
+                    this.MyUpcomingEvents = this.UpcomingEvents.filter(event => event.userId === this.userId);
+                })
+                .catch(error => console.error('Error Fetching events:', error));
+        },
+        FetchHolidays() {
+            // Fetch holidays independently
+            axios.get(`https://date.nager.at/api/v3/PublicHolidays/${new Date().getFullYear()}/PH`)
+                .then(holidayResponse => {
+                    this.philippineHolidays = holidayResponse.data.map(holiday => ({
+                        title: holiday.localName,
+                        start: holiday.date,
+                        end: holiday.date,
+                        allDay: true,
+                        backgroundColor: '#665878',
+                        borderColor: '#665878',
+                        textColor: '#FFFFFF',
+                        isHoliday: true,
+                        editable: false
+                    }));
+                    // Update calendar events with holidays
+                    this.calendarOptions.events = [...this.events, ...this.philippineHolidays];
+                    this.$refs.calendar.getApi().refetchEvents();
                 })
                 .catch(error => {
-                    console.error('Error Fetching items:', error);
-                });
-
-            // Fetch data for the user's personal events
-            axios.get(`/api/dashboardEventData`, {
-                params: {
-                    start: startOfMonth,
-                    end: endOfMonth,
-                    userId: this.userId, // Pass the user ID as a parameter
-                },
-            })
-                .then(response => {
-                    this.MyUpcomingEvents = response.data.map(event => ({
-                        ...event,
-                        start: moment(event.start).format('YYYY-MM-DD HH:mm:ss'),
-                        end: moment(event.end).format('YYYY-MM-DD HH:mm:ss'),
-                    }));
-                })
-                .catch(error => {
-                    console.error('Error Fetching items:', error);
+                    console.error('Error fetching Philippine holidays:', error);
                 });
         },
         FetchData() {
@@ -417,13 +481,12 @@ export default {
             const userId = this.userId;
 
             if (this.selectedOffices.length === 0 && !showPersonalEvents) {
-                this.calendarOptions.events = [];
                 this.events = [];
+                this.calendarOptions.events = [...this.philippineHolidays];
                 this.$refs.calendar.getApi().refetchEvents();
                 return;
             }
 
-            // Send request to fetch events with the correct filters
             axios.get('/api/fetchEventData', {
                 params: {
                     office: allOfficesSelected ? '0' : this.selectedOffices.join(','),
@@ -432,24 +495,20 @@ export default {
                 }
             })
                 .then(response => {
-                    // Process the events response data
-                    const events = response.data.map(event => {
+                    this.events = response.data.map(event => {
                         const startDate = moment(event.start);
-                        const endDate = moment(event.end);
-                        const duration = endDate.diff(startDate, 'days');
-
+                        const endDate = moment(event.end || event.start);
                         return {
                             ...event,
-                            allDay: duration > 1,
-                            start: startDate.format('YYYY-MM-DD HH:mm:ss'),
-                            end: endDate.format('YYYY-MM-DD HH:mm:ss'),
+                            allDay: true,
+                            start: startDate.format('YYYY-MM-DD'),
+                            end: endDate.format('YYYY-MM-DD'), // Exact end date, no +1 day
                             backgroundColor: event.color || '#48BD0D',
+                            editable: true,
                         };
                     });
 
-
-                    this.calendarOptions.events = events;
-                    this.events = events;
+                    this.calendarOptions.events = [...this.events, ...this.philippineHolidays];
                     this.$refs.calendar.getApi().refetchEvents();
 
                     this.EventData();
@@ -464,14 +523,27 @@ export default {
                 });
         },
         handleEventClick(arg) {
-            const event = this.events.find(event => event.id === +arg.event.id);
+            const event = this.events.find(e => e.id == arg.event.id) ||
+                this.events.find(e => e.title === arg.event.title) ||
+                this.philippineHolidays.find(e => e.title === arg.event.title);
+
+            if (!event) return;
+
             const formatDateForInput = (date) => {
+                if (!date) return '';
                 const dateObj = new Date(date);
-                const year = dateObj.getFullYear();
-                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const day = String(dateObj.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
+                return `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
             };
+
+            if (event.isHoliday) {
+                Swal.fire({
+                    icon: 'info',
+                    title: event.title,
+                    text: `This is a public holiday on ${moment(event.start).format('MMMM D, YYYY')}.`,
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
 
             this.eventDetails = {
                 id: event.id,
@@ -479,24 +551,33 @@ export default {
                 title: event.title,
                 start: formatDateForInput(event.start),
                 end: formatDateForInput(event.end),
-                office: event.office,
-                description: event.description,
-                venue: event.venue,
-                enp: event.enp,
-                postedBy: event.fname,
-                remarks: event.remarks,
-                personnalevent: event.personnalevent
+                office: event.office || '',
+                description: event.description || '',
+                venue: event.venue || '',
+                enp: event.enp || '',
+                postedBy: event.fname || '',
+                remarks: event.remarks || '',
+                personnalevent: event.personnalevent || ''
             };
-            this.$nextTick(() => {
-                this.openModal('edit');
-            });
+
+            this.$nextTick(() => this.openModal('edit'));
         },
         handleEventDrop(info) {
-
             const event = this.events.find(e => e.id === +info.event.id);
+            if (!event) return;
+
+            if (event.isHoliday) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Action Not Allowed',
+                    text: 'Public holidays cannot be moved.',
+                    confirmButtonText: 'OK'
+                });
+                info.revert();
+                return;
+            }
 
             const eventAuthor = event.postedBy || event.fname || event.createdBy;
-
             if (String(eventAuthor) !== String(this.posted_by)) {
                 Swal.fire({
                     title: 'Error',
@@ -504,19 +585,16 @@ export default {
                     icon: 'error',
                     confirmButtonColor: '#3085d6',
                 });
-
-                // Revert the event back to its original position
                 info.revert();
                 return;
             }
 
             const updatedEvent = {
                 id: info.event.id,
-                start: moment(info.event.start).format('YYYY-MM-DD HH:mm:ss'),
-                end: moment(info.event.end || info.event.start).format('YYYY-MM-DD HH:mm:ss')
+                start: moment(info.event.start).format('YYYY-MM-DD'),
+                end: moment(info.event.end || info.event.start).format('YYYY-MM-DD') // No +1 day
             };
 
-            // Send the updated event data to the server
             axios.post('/api/PostUpdateDragDrop', updatedEvent)
                 .then(() => {
                     toast.success('Event Updated!', { autoClose: 1000 });
@@ -528,60 +606,58 @@ export default {
                 });
         },
         saveEventData(formData) {
-            if (this.mode == 'add') {
+            if (this.mode === 'add') {
                 this.$fetchUserData(this.userId, '/api/fetchUser')
                     .then(emp_data => {
-                        this.eventDetails.postedBy = emp_data.name
-                        axios.post('/api/PostEventData',
-                            {
-                                postedby: this.userId,
-                                office: emp_data.id,
-                                title: this.eventDetails.title,
-                                color: this.eventDetails.personnalevent ? '#DAA520' : emp_data.DIVISION_COLOR,
-                                start: this.eventDetails.start,
-                                end: this.eventDetails.end,
-                                description: this.eventDetails.description,
-                                venue: this.eventDetails.venue,
-                                remarks: this.eventDetails.remarks.join(', '),
-                                enp: this.eventDetails.enp,
-                                personnalevent: this.eventDetails.personnalevent ? 1 : 0,
-                            }
-                        )
+                        this.eventDetails.postedBy = emp_data.name;
+                        axios.post('/api/PostEventData', {
+                            postedby: this.userId,
+                            office: emp_data.id,
+                            title: this.eventDetails.title,
+                            color: this.eventDetails.personnalevent ? '#DAA520' : emp_data.DIVISION_COLOR,
+                            start: this.eventDetails.start,
+                            end: this.eventDetails.end, // Exact end date, no +1 day
+                            description: this.eventDetails.description,
+                            venue: this.eventDetails.venue,
+                            remarks: this.eventDetails.remarks.join(', '),
+                            enp: this.eventDetails.enp,
+                            personnalevent: this.eventDetails.personnalevent ? 1 : 0,
+                        })
                             .then(() => {
-                                toast.success('Event Added!', {
-                                    autoClose: 1000
+                                toast.success('Event Added!', { autoClose: 1000 });
+                                this.$refs.calendar.getApi().refetchEvents();
+                                this.calendarOptions.events.push({
+                                    title: this.eventDetails.title,
+                                    start: this.eventDetails.start,
+                                    end: this.eventDetails.end, // Exact end date, no +1 day
                                 });
-                            });
-                        this.FetchData();
-                        this.closeModal();
+                                this.FetchData();
+                                this.closeModal();
+                            })
+                            .catch(error => console.error('error saving data', error));
                     })
-                    .catch(error => {
-                        console.error('error saving data', error);
-                    })
+                    .catch(error => console.error('error saving data', error));
             } else {
-                axios.post('/api/PostUpdateEvent',
-                    {
-                        id: formData.id,
-                        title: this.eventDetails.title,
-                        start: this.eventDetails.start,
-                        end: this.eventDetails.end,
-                        description: this.eventDetails.description,
-                        venue: this.eventDetails.venue,
-                        remarks: this.eventDetails.remarks.join(', '),
-                        enp: this.eventDetails.enp,
-                    }
-                )
+                console.log('Saving eventDetails:', this.eventDetails); // Debug log
+                axios.post('/api/PostUpdateEvent', {
+                    id: formData.id,
+                    title: this.eventDetails.title,
+                    start: this.eventDetails.start,
+                    end: this.eventDetails.end, // Exact end date, no +1 day
+                    description: this.eventDetails.description,
+                    venue: this.eventDetails.venue,
+                    remarks: this.eventDetails.remarks.join(', '),
+                    enp: this.eventDetails.enp,
+                })
                     .then(() => {
-                        toast.success('Event Updated!', {
-                            autoClose: 1000
-                        });
+                        toast.success('Event Updated!', { autoClose: 1000 });
                         this.modalVisible = false;
                         this.isDisabledFlag = true;
                         this.FetchData();
                     })
                     .catch(error => {
-                        console.error('error saving data', error)
-                    })
+                        console.error('error saving data', error);
+                    });
             }
         },
         deleteEvent(id) {
@@ -605,17 +681,13 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('/api/DeleteEvent', { id: id })
+                    axios.post('/api/DeleteEvent', { id })
                         .then(() => {
-                            toast.success('Event Deleted!', {
-                                autoClose: 1000
-                            });
-                            this.FetchData(); // Refresh the event list
-                            this.closeModal(); // Close the modal
+                            toast.success('Event Deleted!', { autoClose: 1000 });
+                            this.FetchData();
+                            this.closeModal();
                         })
-                        .catch(error => {
-                            console.error('Error deleting event:', error);
-                        });
+                        .catch(error => console.error('Error deleting event:', error));
                 }
             });
         },
@@ -634,7 +706,6 @@ export default {
 }
 
 .fc {
-    /* the calendar root */
     max-width: 1100px;
     margin: 0 auto;
 }
@@ -644,9 +715,7 @@ export default {
     padding: 2px 4px;
     overflow: visible;
     white-space: normal;
-    /* Allow text to wrap */
     word-break: break-word;
-    /* Prevent text overflow */
 }
 
 .fc-event-main-frame {
@@ -661,6 +730,7 @@ export default {
     font-size: 0.8em;
     font-weight: bold;
     margin-bottom: 2px;
+    color: #fff;
 }
 
 .fc-event-title {
@@ -673,7 +743,6 @@ export default {
 
 time.icon {
     font-size: 7px;
-    /* change icon size */
     display: block;
     position: relative;
     width: 7em;
@@ -682,9 +751,6 @@ time.icon {
     border-radius: 0.6em;
     box-shadow: 0 1px 0 #bdbdbd, 0 2px 0 #fff, 0 3px 0 #bdbdbd, 0 4px 0 #fff, 0 5px 0 #bdbdbd, 0 0 0 1px #bdbdbd;
     overflow: hidden;
-    backface-visibility: hidden;
-    transform: rotate(0deg) skewY(0deg);
-    transform-origin: 50% 10%;
 }
 
 time.icon * {
@@ -772,5 +838,23 @@ time.icon span {
 
 div::-webkit-scrollbar {
     display: none;
+}
+
+.card {
+    position: relative;
+}
+
+.fixed-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1000;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.scrollable-card-body {
+    max-height: 400px;
+    overflow-y: auto;
 }
 </style>

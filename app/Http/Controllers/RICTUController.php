@@ -3,11 +3,13 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use Carbon\Carbon;
 use Pusher\Pusher;
 use App\Models\UserModel;
 use App\Models\RICTUModel;
 use Illuminate\Http\Request;
+use Cossou\PhpJasper\PhpJasper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -15,7 +17,6 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use Cossou\PhpJasper\PhpJasper;
 
 
 class RICTUController extends Controller
@@ -56,6 +57,14 @@ class RICTUController extends Controller
             // Return an error response if the user is not logged in
             return response()->json(['error' => 'You are not logged in'], 401);
         }
+    }
+
+    public function getICTpersonnel()
+    {
+        $ict_personnel = DB::table('tbl_ict_personnel')
+            ->select('emp_id', 'ict_personnel')
+            ->get();
+        return response()->json($ict_personnel);
     }
 
     public function getICTData($id)
@@ -236,6 +245,7 @@ class RICTUController extends Controller
 
     public function post_create_ict_request(Request $request)
     {
+        // dd($request->all());
         $portal_system = $request->input('portal_sys') ?? null;
         $website_access = $request->input('web_access') ?? null;
 
@@ -245,66 +255,89 @@ class RICTUController extends Controller
 
         $userId = $request->input('requested_by');
         $user = UserModel::selectRaw('
-        users.id as id,
-        CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
-        users.username
-    ')
+            users.id as id,
+            CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name,
+            users.username
+        ')
             ->where('users.id', $userId)
             ->first();
 
         if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
+            return response()->json(['error' => 'User  not found'], 404);
         }
 
-        // Create the ICT request
-        $ict_opts = new RICTUModel([
-            'control_no' => $request->input('control_no'),
-            'request_by' => $userId,
-            'request_date' => $requestedDate,
-            'office_id' => $request->input('pmo'),
-            'unit_id' => $request->input('email'),
-            'equipment_type' => $request->input('equipment_type'),
-            'brand' => $request->input('brand'),
-            'property_no' => $request->input('property_no'),
-            'serial_no' => $request->input('equipment_sn'),
-            'others' => $req == 9 ? $request->input('subRequest') : null,
-            'portal_system' => $portal_system,
-            'website_access' => $website_access,
-            'request_type_category_id' => $req == 9 ? 37 : $request->input('subRequest'),
-            'request_type_id' => $req,
-            'assign_ict_officer' => 0,
-            'status_id' => self::STATUS_DRAFT,
-            'remarks' => $request->input('remarks'),
-            'css_link' => $month
-        ]);
+        // ✅ Define and process `$assignedOfficer` properly
+        $assignedOfficer = $request->input('assign_ict_officer', null); // Get the input value, default to null
+        // dd($assignedOfficer);
+        if (is_array($assignedOfficer)) { // If it's an array, convert to a string
+            $assignedOfficer = implode(',', $assignedOfficer);
+        }
 
-        $ict_opts->save();
+        DB::beginTransaction();
 
-        // Send notification via Pusher
-        $options = [
-            'cluster' => env('PUSHER_APP_CLUSTER'),
-            'useTLS' => true
-        ];
+        try {
+            // Create the ICT request
+            $ict_opts = new RICTUModel([
+                'control_no' => $request->input('control_no'),
+                'request_by' => $userId,
+                'request_date' => $requestedDate,
+                'received_date' => $assignedOfficer  ? $requestedDate : null,
+                'started_date' => $assignedOfficer ? $requestedDate : null,
+                'office_id' => $request->input('pmo'),
+                'unit_id' => $request->input('email'),
+                'equipment_type' => $request->input('equipment_type'),
+                'brand' => $request->input('brand'),
+                'property_no' => $request->input('property_no'),
+                'serial_no' => $request->input('equipment_sn'),
+                'others' => $req == 9 ? $request->input('subRequest') : null,
+                'portal_system' => $portal_system,
+                'website_access' => $website_access,
+                'request_type_category_id' => $req == 9 ? 37 : $request->input('subRequest'),
+                'request_type_id' => $req,
+                'assign_ict_officer' => $assignedOfficer,
+                'status_id' => $assignedOfficer ? self::STATUS_RECEIVED : self::STATUS_DRAFT,
+                'remarks' => $request->input('remarks'),
+                'css_link' => $month
+            ]);
 
-        $pusher = new Pusher(
-            env('PUSHER_APP_KEY'),
-            env('PUSHER_APP_SECRET'),
-            env('PUSHER_APP_ID'),
-            $options
-        );
+            $ict_opts->save();
 
-        // Prepare the data for the notification
-        $data = [
-            'id' => $ict_opts->id, // Unique ID of the request
-            'username' => $user->username, // Username of the requester
-            'name' => $user->name, // Full name of the requester
-        ];
+            // Send notification via Pusher
+            $options = [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'useTLS' => true
+            ];
 
-        // Trigger the event for admins
-        $pusher->trigger('ict-ta-channel', 'new-ict-ta', $data);
-        // Return a success response
-        return response()->json(['message' => 'ICT request created successfully.'], 201);
+            $pusher = new Pusher(
+                env('PUSHER_APP_KEY'),
+                env('PUSHER_APP_SECRET'),
+                env('PUSHER_APP_ID'),
+                $options
+            );
+
+            // Prepare the data for the notification
+            $data = [
+                'id' => $ict_opts->id, // Unique ID of the request
+                'username' => $user->username, // Username of the requester
+                'name' => $user->name, // Full name of the requester
+                'requester_id' => $userId, // Requester ID
+            ];
+
+            // Trigger the event for admins
+            $pusher->trigger('ict-ta-channel', 'new-ict-ta', $data);
+
+            DB::commit();
+
+            // Return a success response
+            return response()->json(['message' => 'ICT request created successfully.'], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Return an error response
+            return response()->json(['error' => 'Failed to create ICT request.'], 500);
+        }
     }
+
 
 
 
@@ -312,6 +345,7 @@ class RICTUController extends Controller
     public function fetch_ict_req_details(Request $request)
     {
         $id = $request->input('control_id');
+
         $ict_ta_opts = RICTUModel::select([
             'tbl_technicalassistance.id',
             'tbl_technicalassistance.control_no',
@@ -325,28 +359,28 @@ class RICTUController extends Controller
             'ip.ict_personnel as ict_personnel',
             'is.status'
         ])
-            ->join('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
-            ->join('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
-            ->join('pmo', 'pmo.id', '=', 'tbl_technicalassistance.office_id')
-            ->join('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
-            ->join('tbl_ict_request_category as c', 'c.REQUEST_ID', '=', 'itr.id')
-            ->join('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+            ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+            ->leftJoin('pmo', 'pmo.id', '=', 'tbl_technicalassistance.office_id')
+            ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
+            ->leftJoin('tbl_ict_request_category as c', 'c.REQUEST_ID', '=', 'itr.id')
+            ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
             ->where('tbl_technicalassistance.id', $id)
             ->first();
 
-        if ($ict_ta_opts) {
+        if ($ict_ta_opts && $ict_ta_opts->id) {
             return response()->json([
                 'id' => $ict_ta_opts->id,
-                'control_no' => $ict_ta_opts->control_no,
-                'requested_by' => $ict_ta_opts->requested_by,
+                'control_no' => $ict_ta_opts->control_no ?? 'N/A',
+                'requested_by' => $ict_ta_opts->requested_by ?? 'Unknown',
                 'request_date' => $ict_ta_opts->request_date,
                 'received_date' => $ict_ta_opts->received_date,
                 'remarks' => $ict_ta_opts->remarks,
-                'office' => $ict_ta_opts->office,
-                'request_type' => $ict_ta_opts->request_type,
-                'sub_request_type' => $ict_ta_opts->sub_request_type,
-                'ict_personnel' => $ict_ta_opts->ict_personnel,
-                'status' => $ict_ta_opts->status
+                'office' => $ict_ta_opts->office ?? 'Unknown',
+                'request_type' => $ict_ta_opts->request_type ?? 'Unknown',
+                'sub_request_type' => $ict_ta_opts->sub_request_type ?? 'Unknown',
+                'ict_personnel' => $ict_ta_opts->ict_personnel ?? 'Unassigned',
+                'status' => $ict_ta_opts->status ?? 'Unknown'
             ]);
         } else {
             return response()->json(['error' => 'Request not found'], 404);
@@ -584,6 +618,4 @@ class RICTUController extends Controller
 
         return response()->download($filePath)->deleteFileAfterSend(true);
     }
-
-
 }

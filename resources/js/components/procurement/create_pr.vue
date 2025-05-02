@@ -395,10 +395,11 @@ export default {
         fetchItems(year = new Date().getFullYear()) {
             axios.get(`/api/fetchItems/${year}`)
                 .then(response => {
-                    this.availableItems = response.data;
+                    this.availableItems = response.data || []; // Default to empty array
                 })
                 .catch(error => {
                     console.error('Error fetching items:', error);
+                    this.availableItems = []; // Ensure it's always an array
                 });
         },
 

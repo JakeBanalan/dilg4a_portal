@@ -56,7 +56,7 @@ class UserController extends Controller
     public function fetchUserData($userId)
     {
         $query = User::selectRaw('
-            users.id,
+            users.id as user_id,
             pmo.pmo_title,
             pmo.id,
             DIVISION_COLOR,
@@ -77,6 +77,24 @@ class UserController extends Controller
         // Execute the query and return the result
         $userData = $query->first(); // Use first() instead of get() to retrieve a single result
         return response()->json($userData);
+    }
+
+    public function fetchAllUsers()
+    {
+        $query = User::selectRaw('
+        users.id,
+        pmo.id as pmo_id,
+        DATE_FORMAT(users.birthdate, "%M %d %Y") as birthdate,
+        CONCAT(users.last_name," ", users.first_name," ",users.middle_name)  as name,
+        users.email as email
+        ')
+            ->leftJoin('pr', 'pr.action_officer', '=', 'users.id')
+            ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
+            ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id')
+            ->distinct('users.id'); // Use distinct to remove duplicates
+
+        $allUsers = $query->get(); // Use get() to retrieve all results
+        return response()->json($allUsers);
     }
 
     public function getUserDetails($id)
@@ -108,19 +126,28 @@ class UserController extends Controller
         $data = $query->first(); // Use first() instead of get() to retrieve a single result
         return response()->json($data);
     }
-    public function getAllUsers()
+    public function getGenderEmpStatus()
     {
-        $query = User::selectRaw('
-        users.last_name,
-        users.first_name,
-        users.middle_name,
-        DATE_FORMAT(users.birthdate, "%M %d %Y") as birthdate,
-        CONCAT(users.first_name," ", users.middle_name," ",users.last_name)  as name
+        $employmentMap = [
+            '1' => 'Permanent',
+            '2' => 'Contract of Service',
+            '3' => 'Job Order',
+            '4' => 'Consultant'
+        ];
 
-        ');
-        $data = $query->get(); // Use get() instead of first() to retrieve all results
-        return response()->json($data);
+        $users = User::select('gender', 'employment_status')->get();
+
+        // Map employment status and gender values
+        $users->transform(function ($user) use ($employmentMap) {
+            return [
+                'gender' => $user->gender === 'M' ? 'Male' : ($user->gender === 'F' ? 'Female' : 'Unknown'),
+                'employment_status' => $employmentMap[$user->employment_status] ?? 'Unknown'
+            ];
+        });
+
+        return response()->json($users);
     }
+
 
     public function updateUserDetails(Request $request)
     {
@@ -188,7 +215,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        $user = Auth::guard('api')->user();
+        $user = User::find(Auth::id());
         if ($user) {
             $user->tokens()->delete(); // Invalidate all user tokens
         }

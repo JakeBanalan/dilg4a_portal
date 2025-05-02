@@ -152,6 +152,10 @@ Route::middleware('api')->group(function () {
     Route::get('totalCountDraft', [RICTUController::class, 'totalCountDraft']);
 });
 
+Route::middleware('api')->group(function () {
+    Route::get('get-ict-personnel', [RICTUController::class, 'getICTpersonnel']);
+});
+
 
 Route::middleware('api')->group(function () {
     Route::get('/totalCountICTRequest', [RICTUController::class, 'totalCountICTrequest']);
@@ -216,15 +220,20 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetchAllUsers', [UserController::class, 'fetchAllUsers']);
+});
+
+
+Route::middleware('api')->group(function () {
     Route::get('getICTData/{id}', [RICTUController::class, 'getICTData']);
 });
 Route::middleware('api')->group(function () {
     Route::get('getUserDetails/{id}', [UserManagementController::class, 'getUserDetails']);
 });
-
 Route::middleware('api')->group(function () {
-    Route::get('getAllUsers', [UserController::class, 'getAllUsers']);
+    Route::get('getGenderEmpStat', [UserController::class, 'getGenderEmpStatus']);
 });
+
 
 
 

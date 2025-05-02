@@ -91,7 +91,8 @@ export default {
     data() {
         return {
             user_role: null,
-            userId: null
+            userId: null,
+            expandedItems: [],
         }
     },
     props: {
@@ -427,11 +428,6 @@ export default {
                 this.expandedItems.push(index);
             }
         },
-    },
-    data() {
-        return {
-            expandedItems: [],
-        };
     },
     components: {
         FontAwesomeIcon,

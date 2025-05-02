@@ -1239,10 +1239,10 @@ input.largerCheckbox {
                 <tbody>
                     <tr>
                         <td class="remarksInput" colspan="1" rowspan="1">
-                            <p style="text-transform: capitalize;">{{ data.remarks }}</p>
+                            <p >{{ data.remarks }}</p>
                         </td>
                         <td class="actionTakenInput" colspan="1" rowspan="1">
-                            <p style="text-transform: capitalize;">{{ data.ict_officer_remarks }}</p>
+                            <p >{{ data.ict_officer_remarks }}</p>
                         </td>
                     </tr>
                 </tbody>

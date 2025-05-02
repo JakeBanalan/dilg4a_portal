@@ -42,7 +42,9 @@ class CRUDController extends Controller
      users.username')
             ->where('users.id', $receiverId)
             ->first();
-
+        // ✅ Fetch CSS link dynamically based on the current month
+        $currentMonth = date('m');
+        $cssLink = DB::table('tbl_css_link')->where('month', $currentMonth)->value('link');
         // Send notification via Pusher
         $options = [
             'cluster' => env('PUSHER_APP_CLUSTER'),
@@ -59,6 +61,7 @@ class CRUDController extends Controller
         $data = [
             'requester_id' => $userId,
             'receiverName' => $receiver->receiverName,
+            'link' => $cssLink,
         ];
 
         // Trigger the event
