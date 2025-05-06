@@ -32,13 +32,13 @@
 <template>
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
         <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-            <a class="navbar-brand brand-logo mr-5" href="#"><img src="../../../../assets/images/logo.png" class="mr-2"
+            <a class="navbar-brand brand-logo mr-5" href="/dashboard"><img src="../../../../assets/images/logo.png" class="mr-2"
                     alt="logo" /></a>
-            <a class="navbar-brand brand-logo-mini" href="#"><img src="../../../../assets/images/logo.png"
+            <a class="navbar-brand brand-logo-mini" href="/dashboard"><img src="../../../../assets/images/logo.png"
                     alt="logo" /></a>
         </div>
         <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <button @click="toggleSidebar" class="navbar-toggler navbar-toggler align-self-center" type="button">
                 <span class="icon-menu"></span>
             </button>
             <ul class="navbar-nav mr-lg-2">
@@ -148,6 +148,10 @@ export default {
         this.initializeUserData();
     },
     methods: {
+        toggleSidebar() {
+            const body = document.querySelector('body');
+            body.classList.toggle('sidebar-icon-only');
+        },
         async initializeUserData() {
             if (!localStorage.getItem('api_token')) {
                 console.error('Unauthorized access');
