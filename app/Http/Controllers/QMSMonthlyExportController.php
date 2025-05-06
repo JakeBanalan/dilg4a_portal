@@ -76,29 +76,47 @@ class QMSMonthlyExportController extends Controller
         } else if ($fetchQOPR[0]['office'] === 'FAD') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-HRS'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-HRS') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - HUMAN RESOURCE SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-ACCOUNTING'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-ACCOUNTING') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - ACCOUNTING SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-RECORDS'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-RECORDS') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - RECORDS SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-GSS'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-GSS') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - GENERAL SERVICE SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'ORD'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD') {
             $office = 'Office of The Regional Director';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Legal'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD-Legal') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - LEGAL UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Planning'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD-Planning') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - PLANNING UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD - RICTU'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD - RICTU') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - REGIONAL INFORMATION AND COMMUNICATION TECHNOLOGY UNIT';
         }
 
-        // return response()->json($obj);
+        $processOwners =$fetchQOPR[0]['process_owner'];
+        if(strpos($processOwners, ',')) {
+            $processOwners = explode(', ', $processOwners);
+
+            $process_owner = '';
+            foreach ($processOwners as $name) {
+                $name= trim($name);
+                $process_owner .= "\n";
+                $process_owner .= $name;
+                $process_owner .= "\n";
+            }
+
+        }else {
+            $process_owner =$fetchQOPR[0]['process_owner'];
+        }
+
+
+        
+        // return response()->json($process_owner);
         $templatePath = public_path('templates/qms_qme_report_template.xlsx');
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
@@ -283,22 +301,22 @@ class QMSMonthlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 13; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['01'] : 'n/a');
-                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['02'] : 'n/a');
-                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['03'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['04'] : 'n/a');
-                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['05'] : 'n/a');
-                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['06'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['07'] : 'n/a');
-                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['08'] : 'n/a');
-                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['09'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['10'] : 'n/a');
-                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['11'] : 'n/a');
-                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['12'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['01'] : '');
+                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['02'] : '');
+                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['03'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['04'] : '');
+                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['05'] : '');
+                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['06'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['07'] : '');
+                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['08'] : '');
+                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['09'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['10'] : '');
+                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['11'] : '');
+                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['12'] : '');
                 }
                 // ====
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[0]['total'] > 0 ? $qmes[0]['total'] : '0') : '0');
+                $indATotal = $qmes[0]['rate']['01'] + $qmes[0]['rate']['02'] + $qmes[0]['rate']['03'] + $qmes[0]['rate']['04'] + $qmes[0]['rate']['05'] + $qmes[0]['rate']['06'] + $qmes[0]['rate']['07'] + $qmes[0]['rate']['08'] + $qmes[0]['rate']['09'] + $qmes[0]['rate']['10'] + $qmes[0]['rate']['11'] + $qmes[0]['rate']['12'];
+                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -333,22 +351,22 @@ class QMSMonthlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 13; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['01'] : 'n/a');
-                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['02'] : 'n/a');
-                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['03'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['04'] : 'n/a');
-                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['05'] : 'n/a');
-                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['06'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['07'] : 'n/a');
-                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['08'] : 'n/a');
-                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['09'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['10'] : 'n/a');
-                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['11'] : 'n/a');
-                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['12'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['01'] : '');
+                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['02'] : '');
+                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['03'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['04'] : '');
+                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['05'] : '');
+                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['06'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['07'] : '');
+                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['08'] : '');
+                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['09'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['10'] : '');
+                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['11'] : '');
+                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['12'] : '');
                 }
                 // ===
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[1]['total'] > 0 ? $qmes[1]['total'] : '0') : '0');
+                $indBTotal = $qmes[1]['rate']['01'] + $qmes[1]['rate']['02'] + $qmes[1]['rate']['03'] + $qmes[1]['rate']['04'] + $qmes[1]['rate']['05'] + $qmes[1]['rate']['06'] + $qmes[1]['rate']['07'] + $qmes[1]['rate']['08'] + $qmes[1]['rate']['09'] + $qmes[1]['rate']['10'] + $qmes[1]['rate']['11'] + $qmes[1]['rate']['12'];
+                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indBTotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -381,22 +399,22 @@ class QMSMonthlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 13; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['01'] : 'n/a');
-                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['02'] : 'n/a');
-                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['03'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['04'] : 'n/a');
-                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['05'] : 'n/a');
-                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['06'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['07'] : 'n/a');
-                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['08'] : 'n/a');
-                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['09'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['10'] : 'n/a');
-                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['11'] : 'n/a');
-                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['12'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['01'] : '');
+                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['02'] : '');
+                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['03'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['04'] : '');
+                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['05'] : '');
+                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['06'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['07'] : '');
+                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['08'] : '');
+                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['09'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['10'] : '');
+                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['11'] : '');
+                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['12'] : '');
                 }
                 // ===
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[2]['total'] > 0 ? $qmes[2]['total'] : '0') : '0');
+                $indCTotal = $qmes[2]['rate']['01'] + $qmes[2]['rate']['02'] + $qmes[2]['rate']['03'] + $qmes[2]['rate']['04'] + $qmes[2]['rate']['05'] + $qmes[2]['rate']['06'] + $qmes[2]['rate']['07'] + $qmes[2]['rate']['08'] + $qmes[2]['rate']['09'] + $qmes[2]['rate']['10'] + $qmes[2]['rate']['11'] + $qmes[2]['rate']['12'];
+                $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
 
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
@@ -431,22 +449,22 @@ class QMSMonthlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 13; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['01'] : 'n/a');
-                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['02'] : 'n/a');
-                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['03'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['04'] : 'n/a');
-                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['05'] : 'n/a');
-                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['06'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['07'] : 'n/a');
-                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['08'] : 'n/a');
-                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['09'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['10'] : 'n/a');
-                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['11'] : 'n/a');
-                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['12'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['01'] : '');
+                    $sheet->getCell('K' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['02'] : '');
+                    $sheet->getCell('L' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['03'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['04'] : '');
+                    $sheet->getCell('N' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['05'] : '');
+                    $sheet->getCell('O' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['06'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['07'] : '');
+                    $sheet->getCell('Q' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['08'] : '');
+                    $sheet->getCell('R' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['09'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['10'] : '');
+                    $sheet->getCell('T' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['11'] : '');
+                    $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['12'] : '');
                 }
                 // ===
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[3]['total'] > 0 ? $qmes[3]['total'] : '0') : '0');
+                $indDTotal = $qmes[3]['rate']['01'] + $qmes[3]['rate']['02'] + $qmes[3]['rate']['03'] + $qmes[3]['rate']['04'] + $qmes[3]['rate']['05'] + $qmes[3]['rate']['06'] + $qmes[3]['rate']['07'] + $qmes[3]['rate']['08'] + $qmes[3]['rate']['09'] + $qmes[3]['rate']['10'] + $qmes[3]['rate']['11'] + $qmes[3]['rate']['12'];
+                $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
 
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
@@ -497,10 +515,37 @@ class QMSMonthlyExportController extends Controller
                 $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[4]['rate']['12'] : 'n/a');
             }
 
-            $A = !empty($qmes[0]['total']) ? (int)$qmes[0]['total'] : 'n/a';
-            $B = !empty($qmes[1]['total']) ? (int)$qmes[1]['total'] : 'n/a';
-            $C = !empty($qmes[2]['total']) ? (int)$qmes[2]['total'] : 'n/a';
-            $D = !empty($qmes[3]['total']) ? (int)$qmes[3]['total'] : 'n/a';
+            $A = isset($indATotal) ? $indATotal : null;
+            $B = isset($indBTotal) ? $indBTotal : null;
+            $C = isset($indCTotal) ? $indCTotal : null;
+            $D = isset($indDTotal) ? $indDTotal : null;
+
+            if ($entry['formula'] == 'A/Bx100') {
+                if ($B != 0 && $B !== null) {
+                    $result = ($A / $B) * 100;
+                    $div = ($result == 100 || $result == 0) ? intval($result) . '%' : number_format($result, 2) . '%';
+                } else {
+                    $div = 'N/A';
+                }
+                $sheet->getCell('V' . $row)->setValue($div);
+            
+            } else if ($entry['formula'] == 'No. of Days Elapsed B-A') {
+                $sheet->getCell('V' . $row)->setValue('N/A');
+            
+            } else if ($entry['formula'] == 'Notice of Suspension/Disallowance') {
+                $sheet->getCell('V' . $row)->setValue('N/A');
+            
+            } else if ($entry['formula'] == 'A/(B+C)-Dx100') {
+                $denominator = ($B + $C - $D);
+                if ($denominator != 0 && $denominator !== null) {
+                    $result = ($A / $denominator) * 100;
+                    $div = ($result == 100 || $result == 0) ? intval($result) . '%' : number_format($result, 2) . '%';
+                } else {
+                    $div = 'N/A';
+                }
+                $sheet->getCell('V' . $row)->setValue($div);
+            }
+            
 
             // if($entry['formula'] == 'A/Bx100'){
             // 	if($A != 0 || $B !=0){
@@ -626,81 +671,81 @@ class QMSMonthlyExportController extends Controller
             ],
         ];
 
-        if($fetchQOPR[0]['office'] === 'ORD' || $fetchQOPR[0]['office'] === 'ORD-Legal' || $fetchQOPR[0]['office'] === 'ORD-Planning' || $fetchQOPR[0]['office'] === 'ORD-Rictu'){
-        $sheet->getCell('E' . $row)->setValue('Prepared by:');
-        // $sheet->getCell('L'.$row)->setValue('Reviewed by:');
-        $sheet->getCell('Q' . $row)->setValue('Reviewed and Approved by:');
-        $sheet->getStyle("E" . $row . ':K' . $row)->applyFromArray($style5);
-        $sheet->getStyle("Q" . $row . ':V' . $row)->applyFromArray($style5);
-        $sheet->mergeCells('E' . $row . ':K' . $row);
-        // $sheet->mergeCells('L'.$row.':P'.$row);
-        $sheet->mergeCells('Q' . $row . ':V' . $row);
+        if ($fetchQOPR[0]['office'] === 'ORD' || $fetchQOPR[0]['office'] === 'ORD-Legal' || $fetchQOPR[0]['office'] === 'ORD-Planning' || $fetchQOPR[0]['office'] === 'ORD-Rictu') {
+            $sheet->getCell('E' . $row)->setValue('Prepared by:');
+            // $sheet->getCell('L'.$row)->setValue('Reviewed by:');
+            $sheet->getCell('Q' . $row)->setValue('Reviewed and Approved by:');
+            $sheet->getStyle("E" . $row . ':K' . $row)->applyFromArray($style5);
+            $sheet->getStyle("Q" . $row . ':V' . $row)->applyFromArray($style5);
+            $sheet->mergeCells('E' . $row . ':K' . $row);
+            // $sheet->mergeCells('L'.$row.':P'.$row);
+            $sheet->mergeCells('Q' . $row . ':V' . $row);
 
 
-        $row = ++$row;
-        $a = $row + 5;
+            $row = ++$row;
+            $a = $row + 5;
 
-        $sheet->getCell('E' . $row)->setValue('');
-        $sheet->getStyle("E" . $row . ':K' . $a)->applyFromArray($style6);
-        $sheet->mergeCells('E' . $row . ':K' . $a);
+            $sheet->getCell('E' . $row)->setValue('');
+            $sheet->getStyle("E" . $row . ':K' . $a)->applyFromArray($style6);
+            $sheet->mergeCells('E' . $row . ':K' . $a);
 
-        $sheet->getCell('L'.$row)->setValue($approver);
-        $sheet->getStyle("L".$row.':P'.$a)->applyFromArray($style6);
-        $sheet->mergeCells('L'.$row.':P'.$a);
+            $sheet->getCell('L' . $row)->setValue($approver);
+            $sheet->getStyle("L" . $row . ':P' . $a)->applyFromArray($style6);
+            $sheet->mergeCells('L' . $row . ':P' . $a);
 
-        $sheet->getCell('Q' . $row)->setValue('DARRELL I. DIZON');
-        $sheet->getStyle("Q" . $row . ':V' . $a)->applyFromArray($style6);
-        $sheet->mergeCells('Q' . $row . ':V' . $a);
+            $sheet->getCell('Q' . $row)->setValue('DARRELL I. DIZON');
+            $sheet->getStyle("Q" . $row . ':V' . $a)->applyFromArray($style6);
+            $sheet->mergeCells('Q' . $row . ':V' . $a);
 
-        $row = $row + 6;
-        $sheet->getCell('E' . $row)->setValue('Process Owner');
-        $sheet->getStyle("E" . $row . ':K' . $row)->applyFromArray($style7);
-        $sheet->mergeCells('E' . $row . ':K' . $row);
+            $row = $row + 6;
+            $sheet->getCell('E' . $row)->setValue('Process Owner');
+            $sheet->getStyle("E" . $row . ':K' . $row)->applyFromArray($style7);
+            $sheet->mergeCells('E' . $row . ':K' . $row);
 
-        $sheet->getCell('L'.$row)->setValue('Regional QMR Deputy');
-        $sheet->getStyle("L".$row.':P'.$row)->applyFromArray($style7);
-        $sheet->mergeCells('L'.$row.':P'.$row);
+            $sheet->getCell('L' . $row)->setValue('Regional QMR Deputy');
+            $sheet->getStyle("L" . $row . ':P' . $row)->applyFromArray($style7);
+            $sheet->mergeCells('L' . $row . ':P' . $row);
 
-        $sheet->getCell('Q' . $row)->setValue('Regional QMR');
-        $sheet->getStyle("Q" . $row . ':V' . $row)->applyFromArray($style7);
-        $sheet->mergeCells('Q' . $row . ':V' . $row);
-        }else{
-        	$sheet->getCell('E'.$row)->setValue('Prepared by:');
-        	$sheet->getCell('L'.$row)->setValue('Reviewed by:');
-        	$sheet->getCell('Q'.$row)->setValue('Approved by:');
-        	$sheet->getStyle("E".$row.':V'.$row)->applyFromArray($style5);
-        	$sheet->mergeCells('E'.$row.':K'.$row);
-        	$sheet->mergeCells('L'.$row.':P'.$row);
-        	$sheet->mergeCells('Q'.$row.':V'.$row);
+            $sheet->getCell('Q' . $row)->setValue('Regional QMR');
+            $sheet->getStyle("Q" . $row . ':V' . $row)->applyFromArray($style7);
+            $sheet->mergeCells('Q' . $row . ':V' . $row);
+        } else {
+            $sheet->getCell('E' . $row)->setValue('Prepared by:');
+            $sheet->getCell('L' . $row)->setValue('Reviewed by:');
+            $sheet->getCell('Q' . $row)->setValue('Approved by:');
+            $sheet->getStyle("E" . $row . ':V' . $row)->applyFromArray($style5);
+            $sheet->mergeCells('E' . $row . ':K' . $row);
+            $sheet->mergeCells('L' . $row . ':P' . $row);
+            $sheet->mergeCells('Q' . $row . ':V' . $row);
 
 
-        	$row = ++$row;
-        	$a = $row+5;
+            $row = ++$row;
+            $a = $row + 5;
 
-        	$sheet->getCell('E'.$row)->setValue($fetchQOPR[0]['process_owner']);
-        	$sheet->getStyle("E".$row.':K'.$a)->applyFromArray($style6);
-        	$sheet->mergeCells('E'.$row.':K'.$a);
+            $sheet->getCell('E' . $row)->setValue($process_owner);
+            $sheet->getStyle("E" . $row . ':K' . $a)->applyFromArray($style6);
+            $sheet->mergeCells('E' . $row . ':K' . $a);
 
-        	$sheet->getCell('L'.$row)->setValue($approver);
-        	$sheet->getStyle("L".$row.':P'.$a)->applyFromArray($style6);
-        	$sheet->mergeCells('L'.$row.':P'.$a);
+            $sheet->getCell('L' . $row)->setValue($approver);
+            $sheet->getStyle("L" . $row . ':P' . $a)->applyFromArray($style6);
+            $sheet->mergeCells('L' . $row . ':P' . $a);
 
-        	$sheet->getCell('Q'.$row)->setValue('DARRELL I. DIZON');
-        	$sheet->getStyle("Q".$row.':V'.$a)->applyFromArray($style6);
-        	$sheet->mergeCells('Q'.$row.':V'.$a);
+            $sheet->getCell('Q' . $row)->setValue('DARRELL I. DIZON');
+            $sheet->getStyle("Q" . $row . ':V' . $a)->applyFromArray($style6);
+            $sheet->mergeCells('Q' . $row . ':V' . $a);
 
-        	$row = $row + 6;
-        	$sheet->getCell('E'.$row)->setValue('Process Owner');
-        	$sheet->getStyle("E".$row.':K'.$row)->applyFromArray($style7);
-        	$sheet->mergeCells('E'.$row.':K'.$row);
+            $row = $row + 6;
+            $sheet->getCell('E' . $row)->setValue('Process Owner');
+            $sheet->getStyle("E" . $row . ':K' . $row)->applyFromArray($style7);
+            $sheet->mergeCells('E' . $row . ':K' . $row);
 
-        	$sheet->getCell('L'.$row)->setValue('Regional Deputy QMR');
-        	$sheet->getStyle("L".$row.':P'.$row)->applyFromArray($style7);
-        	$sheet->mergeCells('L'.$row.':P'.$row);
+            $sheet->getCell('L' . $row)->setValue('Regional Deputy QMR');
+            $sheet->getStyle("L" . $row . ':P' . $row)->applyFromArray($style7);
+            $sheet->mergeCells('L' . $row . ':P' . $row);
 
-        	$sheet->getCell('Q'.$row)->setValue('Regional QMR');
-        	$sheet->getStyle("Q".$row.':V'.$row)->applyFromArray($style7);
-        	$sheet->mergeCells('Q'.$row.':V'.$row);
+            $sheet->getCell('Q' . $row)->setValue('Regional QMR');
+            $sheet->getStyle("Q" . $row . ':V' . $row)->applyFromArray($style7);
+            $sheet->mergeCells('Q' . $row . ':V' . $row);
         }
         // return response()->json($fetchQOPR);
 
@@ -710,7 +755,7 @@ class QMSMonthlyExportController extends Controller
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         //$fileName = 'abstract-no-' . $data[0]['abstract_no'] . '.xlsx';
-        $fileName = $fetchQOPR[0]['qp_code'].' - '. $fetchQOPR[0]['qp_covered']. '.xlsx';
+        $fileName = $fetchQOPR[0]['qp_code'] . ' - ' . $fetchQOPR[0]['qp_covered'] . '.xlsx';
         $writer->save($fileName);
         return response()->download($fileName)->deleteFileAfterSend(true);
     }

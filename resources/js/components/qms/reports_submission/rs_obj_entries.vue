@@ -21,7 +21,8 @@
                                             class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
                                             Return
                                         </button>
-                                        <button type="submit" class="btn btn-outline-success btn-fw btn-icon-text mx-2" :disabled="form.status != 0">
+                                        <button type="submit" class="btn btn-outline-success btn-fw btn-icon-text mx-2"
+                                            :disabled="status != 0">
                                             Submit
                                         </button>
                                     </div>
@@ -37,7 +38,7 @@
                                             <label>Objectives Met?:</label>
                                             <br>
                                             <label class="switch">
-                                                <input type="checkbox" v-model="form.is_gap_analysis" checked
+                                                <input type="checkbox" v-model="form.is_gap_analysis" :checked="form.is_gap_analysis==1"
                                                     @change="toggleGapAnalysis">
                                                 <span class="slider round">
                                                     <span class="slider-text off">No</span>
@@ -97,11 +98,11 @@
                                             </td>
                                             <td class="text-center" width="7.5%">
                                                 <input type="text" class="form-control" v-model="quarterData[0].Q3"
-                                                    :disabled="periodCover !== '3rd Quarter'">
+                                                    :disabled="qp_covered !== '3rd Quarter'">
                                             </td>
                                             <td class="text-center" width="7.5%">
                                                 <input type="text" class="form-control" v-model="quarterData[0].Q4"
-                                                    :disabled="periodCover !== '4th Quarter'">
+                                                    :disabled="qp_covered !== '4th Quarter'">
                                             </td>
                                             <!-- <td rowspan="2" class="text-center" width="7.5%"
                                                 style="vertical-align: middle;">0.00</td> -->
@@ -343,7 +344,7 @@ export default {
     data() {
         return {
             qp_covered: this.$route.query.pq,
-            status: this.$route.query.stat,
+            status: Number(this.$route.query.stat),
             quarterData: [
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
@@ -408,9 +409,10 @@ export default {
             // console.log("tbl_qop_report ID:", id)
             axios.get(`/api/fetchQOPRUserData/${id}/${qoe_id}`)
                 .then(response => {
-                    console.log(response.data)
+                    // console.log(response.data)
                     if (Array.isArray(response.data) && response.data.length > 0) {
                         this.form = response.data[0];
+                        console.log("fetchQOPRUserData:",this.form)
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }
@@ -470,7 +472,7 @@ export default {
             let id = this.$route.params.id;
             axios.get(`/api/fetchQuarterData/${id}/${qoe_id}`)
                 .then(response => {
-                    // console.log(response.data.quarters)
+                    console.log("fetchQuarterData:",response.data.quarters)
                     this.quarterData = response.data.quarters; // Update quarterData with fetched values
                 })
                 .catch(error => {

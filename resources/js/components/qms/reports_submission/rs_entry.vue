@@ -8,7 +8,7 @@
                     <BreadCrumbs />
                     <div class="card">
                         <div class="card-body">
-                            <form class="formQP" @submit.prevent="postRS">
+                            <form class="formQP" @submit.prevent="validateForm">
 
                                 <div class="card-title d-flex justify-content-between align-items-center">
                                     <h5 class="card-title">
@@ -16,7 +16,11 @@
                                         Procedures
                                     </h5>
                                     <div class="d-flex">
-                                        <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                        <button type="button" @click="Return()"
+                                            class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Return
+                                        </button>
+                                        <button type="submit" class="btn btn-outline-success btn-fw btn-icon-text mx-2">
                                             Save
                                         </button>
                                     </div>
@@ -24,25 +28,29 @@
                                 <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-3">
-                                            <label>Quality Procedure Code:</label>
+                                            <label>Quality Procedure Code: <small class="err-msg"
+                                                    v-if="errors.qp_code">{{ errors.qp_code }}</small></label>
                                             <Multiselect @update:modelValue="fetchQPdata" :options="qp_code"
                                                 track-by="value" v-model="form.qp_code" :multiple="false" label="label"
-                                                :searchable="false" id="qp_code" placeholder="Select QP Code">
+                                                :searchable="false" id="qp_code" placeholder="Select QP Code" :class="{'is-invalid': errors.qp_code}">
                                             </Multiselect>
                                         </div>
                                         <div class="col-md-3" style="padding:0%;">
                                             <div class="row">
                                                 <div class="col-md-8">
-                                                    <label>Period Covered:</label>
+                                                    <label>Period Covered: <small class="err-msg"
+                                                            v-if="errors.period_covered">{{ errors.period_covered
+                                                            }}</small></label>
                                                     <Multiselect :options="period_covered" v-model="form.period_covered"
                                                         :multiple="false" :searchable="false" id="period_covered"
-                                                        placeholder="Period Cover">
+                                                        placeholder="Period Cover" :class="{'is-invalid': errors.period_covered}">
                                                     </Multiselect>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <label>Year:</label>
+                                                    <label>Year: <small class="err-msg" v-if="errors.year">{{
+                                                            errors.year }}</small></label>
                                                     <Multiselect :options="year" v-model="form.year" :multiple="false"
-                                                        :searchable="false" id="year" placeholder="Year">
+                                                        :searchable="false" id="year" placeholder="Year" :class="{'is-invalid': errors.year}">
                                                     </Multiselect>
                                                 </div>
                                             </div>
@@ -144,9 +152,10 @@ export default {
                 coverage: '',
                 office: '',
             },
+            errors: {},
             qp_code: [],
             period_covered: [],
-            year: ['2022', '2023', '2024', '2025']
+            year: ['2024', '2025', '2026']
         }
     },
     props: {
@@ -162,6 +171,31 @@ export default {
 
     },
     methods: {
+        async validateForm() {
+            this.errors = {};
+            if (!this.form.qp_code) {
+                this.errors.qp_code = 'Required.';
+            }
+            if (!this.form.period_covered) {
+                this.errors.period_covered = 'Required.';
+            }
+            if (!this.form.year) {
+                this.errors.year = 'Required.';
+            }
+            if (Object.keys(this.errors).length === 0) {
+                try {
+                    await this.postRS()
+                    // this.$emit('save', this.eventDetails);
+                } catch (error) {
+                    if (error.response && error.response.data.errors) {
+                        this.errors = error.response.data.errors;
+                    }
+                }
+            }
+        },
+        Return() {
+            this.$router.push({ path: `/qms/reports_submission/index` });
+        },
         fetchQPdata(arg) {
             let qp_code_id = arg.value
             axios.get(`/api/fetchQPdata/${qp_code_id}`)
@@ -201,47 +235,44 @@ export default {
                     console.error('Error Fetching items:', error)
                 })
         },
-        postRS() {
-            Swal.fire({
+        async postRS() {
+            const result = await Swal.fire({
                 title: 'Do you want to continue?',
-                // text: "You won't be able to revert this!",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Continue',
-            }).then((result) => {
-                if (result.isConfirmed) {
-
-                    axios.post('/api/postReportEntry',
-                {
-                    qop_id: this.form.id,
-                    qoe_id: this.qoe_id,
-                    created_by: this.form.created_by,
-                    qp_covered: this.form.period_covered,
-                    frequency_monitoring: this.form.frequency_monitoring,
-                    year: this.form.year
-                }
-            )
-                .then(response => {
-
-                    Swal.fire({
-                                icon: 'success',
-                                title: 'Success!',
-                                showConfirmButton: false,
-                                timer: 1000
-                            });
-                            setTimeout(() => {
-                                const id = response.data.id
-                                this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
-                            }, 200);
-
-                })
-                .catch(error => {
-                    console.error('error saving data', error);
-                })
-
-                }
             });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await axios.post('/api/postReportEntry', {
+                        qop_id: this.form.id,
+                        qoe_id: this.qoe_id,
+                        created_by: this.userId,
+                        qp_covered: this.form.period_covered,
+                        frequency_monitoring: this.form.frequency_monitoring,
+                        year: this.form.year
+                    });
+
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+
+                    setTimeout(() => {
+                        const id = response.data.id;
+                        this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
+                    }, 200);
+
+                } catch (error) {
+                    console.error('error saving data', error);
+                    // Optionally, handle error.display or set this.errors if it's a 422
+                }
+            }
         }
+
     }
 
 };
@@ -283,5 +314,12 @@ th {
 .multiselect__tag-icon {
     margin-left: 4px;
     flex-shrink: 0;
+}
+/* Scoped or global */
+.is-invalid .multiselect__control,
+.is-invalid .multiselect__tags {
+  border: 1px solid red !important;
+  background-color: #fff !important;
+  border-radius: 4px;
 }
 </style>

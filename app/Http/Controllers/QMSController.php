@@ -140,7 +140,8 @@ class QMSController extends Controller
         return response()->json($postQP);
     }
 
-    public function UpdateQualityProcedure(Request $request){
+    public function UpdateQualityProcedure(Request $request)
+    {
         $id = $request->input('id');
         $EffDate = $request->input('EffDate');
         $frequency_monitoring = $request->input('frequency_monitoring');
@@ -150,7 +151,7 @@ class QMSController extends Controller
         $process_owner = $request->input('process_owner');
         $qp_code = $request->input('qp_code');
         $procedure_title = $request->input('procedure_title');
-        
+
         QPModel::where('id', $id)->update([
             'EffDate' => $EffDate,
             'frequency_monitoring' => $frequency_monitoring,
@@ -460,8 +461,11 @@ class QMSController extends Controller
             'gap_analysis' => $formData['gap_analysis'],
         ];
 
-        QGAModel::where('id', $formData['id'])->update($GA);
-
+        QGAModel::where('id', $formData['gap_id'])
+            ->where('qop_id', $formData['qop_id'])
+            ->where('qoe_id', $formData['gap_qoe_id'])
+            ->update($GA);
+            
         foreach ($monthlyData as $item) {
             $id = $item['id'] ?? null;
 
@@ -512,7 +516,10 @@ class QMSController extends Controller
             'gap_analysis' => $formData['gap_analysis'],
         ];
 
-        QGAModel::where('id', $formData['id'])->update($GA);
+        QGAModel::where('id', $formData['gap_id'])
+            ->where('qop_id', $formData['qop_id'])
+            ->where('qoe_id', $formData['gap_qoe_id'])
+            ->update($GA);
 
         foreach ($quarterData as $item) {
             $id = $item['id'] ?? null;
@@ -606,6 +613,7 @@ class QMSController extends Controller
         foreach ($qoe_ids as $qoe_id) {
             $post_gap_analysis = new QGAModel([
                 'qop_entry_id' => $createdId,
+                'qop_id' => $qop_id,
                 'qoe_id'   => $qoe_id,
             ]);
             // dd($post_gap_analysis);
@@ -804,13 +812,18 @@ class QMSController extends Controller
             'tbl_qoe.indicator_d',
             'tbl_qoe.indicator_e',
             'tbl_qoe.formula',
-            'gap.id',
+            'gap.id as gap_id',
             'gap.is_gap_analysis',
-            'gap.gap_analysis'
+            'gap.gap_analysis',
+            'gap.qoe_id as gap_qoe_id'
         )
-            ->leftjoin('tbl_qms_gap_analysis as gap', 'gap.qoe_id', '=', 'tbl_qoe.id')
+            ->leftJoin('tbl_qms_gap_analysis as gap', function ($join) use ($id) {
+                $join->on('gap.qoe_id', '=', 'tbl_qoe.id')
+                    ->where('gap.qop_entry_id', '=', $id);
+            })
             ->where('tbl_qoe.id', $qoe_id)
             ->get();
+
         return response()->json($fetchData);
     }
 
@@ -833,6 +846,9 @@ class QMSController extends Controller
             ->delete();
 
         QOPFrequencyModel::where('qop_entry_id', $request->id)
+            ->delete();
+
+        QGAModel::where('qop_entry_id', $request->id)
             ->delete();
 
         return response()->json(['message' => 'Item deleted successfully']);

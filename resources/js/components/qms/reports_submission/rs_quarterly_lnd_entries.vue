@@ -22,7 +22,7 @@
                                             Return
                                         </button>
                                         <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
-                                            :disabled="form.status != 0">
+                                            :disabled="status != 0">
                                             Submit
                                         </button>
                                     </div>
@@ -38,7 +38,7 @@
                                             <label>Objectives Met?:</label>
                                             <br>
                                             <label class="switch">
-                                                <input type="checkbox" v-model="form.is_gap_analysis" checked
+                                                <input type="checkbox" v-model="form.is_gap_analysis" :checked="form.is_gap_analysis==1"
                                                     @change="toggleGapAnalysis">
                                                 <span class="slider round">
                                                     <span class="slider-text off">No</span>
@@ -360,7 +360,7 @@ export default {
     data() {
         return {
             qp_covered: this.$route.query.pq,
-            status: this.$route.query.stat,
+            status: Number(this.$route.query.stat),
             quarterData: [
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, Q1: '', Q2: '', Q3: '', Q4: '' },

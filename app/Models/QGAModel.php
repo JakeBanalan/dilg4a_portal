@@ -15,6 +15,7 @@ class QGAModel extends Model
     protected $fillable = [
         'id',
         'qop_entry_id',
+        'qop_id',
         'qoe_id',
         'is_gap_analysis',
         'gap_analysis',

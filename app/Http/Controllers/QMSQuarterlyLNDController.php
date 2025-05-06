@@ -419,14 +419,14 @@ class QMSQuarterlyLNDController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 5; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q1']) ? $qmes[0]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q2']) ? $qmes[0]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q3']) ? $qmes[0]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q4']) ? $qmes[0]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q1']) ? $qmes[0]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q2']) ? $qmes[0]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q3']) ? $qmes[0]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q4']) ? $qmes[0]['rate']['Q4'] : '');
                 }
                 // ====
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[0]['total'] > 0 ? $qmes[0]['total'] : '0') : '0');
+                $indATotal = $qmes[0]['rate']['Q1'] + $qmes[0]['rate']['Q2'] + $qmes[0]['rate']['Q3'] + $qmes[0]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indATotal > 0 ? $indATotal : '0') : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -465,14 +465,14 @@ class QMSQuarterlyLNDController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 13; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q1']) ? $qmes[1]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q2']) ? $qmes[1]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q3']) ? $qmes[1]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q4']) ? $qmes[1]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q1']) ? $qmes[1]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q2']) ? $qmes[1]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q3']) ? $qmes[1]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q4']) ? $qmes[1]['rate']['Q4'] : '');
                 }
                 // ===
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[1]['total'] > 0 ? $qmes[1]['total'] : '0') : '0');
+                $indBTotal = $qmes[1]['rate']['Q1'] + $qmes[1]['rate']['Q2'] + $qmes[1]['rate']['Q3'] + $qmes[1]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indBTotal > 0 ? $indBTotal : '0') : '0');
 
                 $sheet->getRowDimension($row)->setRowHeight('45');
                 $char_len = strlen($entry['indicator_a']);
@@ -510,14 +510,14 @@ class QMSQuarterlyLNDController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 5; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q1']) ? $qmes[2]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q2']) ? $qmes[2]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q3']) ? $qmes[2]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q4']) ? $qmes[2]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q1']) ? $qmes[2]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q2']) ? $qmes[2]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q3']) ? $qmes[2]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q4']) ? $qmes[2]['rate']['Q4'] : '');
                 }
                 // ====
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[2]['total'] > 0 ? $qmes[2]['total'] : '0') : '0');
+                $indCTotal = $qmes[2]['rate']['Q1'] + $qmes[2]['rate']['Q2'] + $qmes[2]['rate']['Q3'] + $qmes[2]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indCTotal > 0 ? $indCTotal : '0') : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -556,14 +556,14 @@ class QMSQuarterlyLNDController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 5; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q1']) ? $qmes[3]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q2']) ? $qmes[3]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q3']) ? $qmes[3]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q4']) ? $qmes[3]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q1']) ? $qmes[3]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q2']) ? $qmes[3]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q3']) ? $qmes[3]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q4']) ? $qmes[3]['rate']['Q4'] : '');
                 }
                 // ====
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[3]['total'] > 0 ? $qmes[3]['total'] : '0') : '0');
+                $indDTotal = $qmes[3]['rate']['Q1'] + $qmes[3]['rate']['Q2'] + $qmes[3]['rate']['Q3'] + $qmes[3]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indDTotal > 0 ? $indDTotal : '0') : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -615,10 +615,36 @@ class QMSQuarterlyLNDController extends Controller
             // print_r($qmes[1]['total']);
             // $div = (int)((int)$qmes[0]['total'] + (int)$qmes[1]['total']);
 
-            $A = !empty($qmes[0]['total']) ? (int)$qmes[0]['total'] : 'n/a';
-            $B = !empty($qmes[1]['total']) ? (int)$qmes[1]['total'] : 'n/a';
-            $C = !empty($qmes[2]['total']) ? (int)$qmes[2]['total'] : 'n/a';
-            $D = !empty($qmes[3]['total']) ? (int)$qmes[3]['total'] : 'n/a';
+            $A = isset($indATotal) ? $indATotal : null;
+            $B = isset($indBTotal) ? $indBTotal : null;
+            $C = isset($indCTotal) ? $indCTotal : null;
+            $D = isset($indDTotal) ? $indDTotal : null;
+
+            if ($entry['formula'] == 'A/Bx100') {
+                if ($B != 0 && $B !== null) {
+                    $result = ($A / $B) * 100;
+                    $div = ($result == 100 || $result == 0) ? intval($result) . '%' : number_format($result, 2) . '%';
+                } else {
+                    $div = 'N/A';
+                }
+                $sheet->getCell('V' . $row)->setValue($div);
+            
+            } else if ($entry['formula'] == 'No. of Days Elapsed B-A') {
+                $sheet->getCell('V' . $row)->setValue('N/A');
+            
+            } else if ($entry['formula'] == 'Notice of Suspension/Disallowance') {
+                $sheet->getCell('V' . $row)->setValue('N/A');
+            
+            } else if ($entry['formula'] == 'A/(B+C)-Dx100') {
+                $denominator = ($B + $C - $D);
+                if ($denominator != 0 && $denominator !== null) {
+                    $result = ($A / $denominator) * 100;
+                    $div = ($result == 100 || $result == 0) ? intval($result) . '%' : number_format($result, 2) . '%';
+                } else {
+                    $div = 'N/A';
+                }
+                $sheet->getCell('V' . $row)->setValue($div);
+            }
 
             // if($entry['formula'] == 'A/Bx100'){
             //     $div = round($A / $B * 100) . '%';

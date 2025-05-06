@@ -76,25 +76,25 @@ class QMSQuarterlyExportController extends Controller
         } else if ($fetchQOPR[0]['office'] === 'FAD') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-HRS'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-HRS') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - HUMAN RESOURCE SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-ACCOUNTING'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-ACCOUNTING') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - ACCOUNTING SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-RECORDS'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-RECORDS') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - RECORDS SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'FAD-GSS'){
+        } else if ($fetchQOPR[0]['office'] === 'FAD-GSS') {
             $approver = 'CARINA S. CRUZ';
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - GENERAL SERVICE SECTION';
-        } else if ($fetchQOPR[0]['office'] === 'ORD'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD') {
             $office = 'Office of The Regional Director';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Legal'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD-Legal') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - LEGAL UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Planning'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD-Planning') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - PLANNING UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD - RICTU'){
+        } else if ($fetchQOPR[0]['office'] === 'ORD - RICTU') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - REGIONAL INFORMATION AND COMMUNICATION TECHNOLOGY UNIT';
         }
 
@@ -279,8 +279,8 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q4']) ? $qmes[0]['rate']['Q4'] : 'n/a');
                 }
                 // ====
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[0]['total'] > 0 ? $qmes[0]['total'] : '0') : '0');
+                $indATotal = $qmes[0]['rate']['Q1'] + $qmes[0]['rate']['Q2'] + $qmes[0]['rate']['Q3'] + $qmes[0]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -325,8 +325,8 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q4']) ? $qmes[1]['rate']['Q4'] : 'n/a');
                 }
                 // ===
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[1]['total'] > 0 ? $qmes[1]['total'] : '0') : '0');
+                $indBTotal = $qmes[1]['rate']['Q1'] + $qmes[1]['rate']['Q2'] + $qmes[1]['rate']['Q3'] + $qmes[1]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : '0');
 
                 $sheet->getRowDimension($row)->setRowHeight('45');
                 $char_len = strlen($entry['indicator_a']);
@@ -370,8 +370,8 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q4']) ? $qmes[2]['rate']['Q4'] : 'n/a');
                 }
                 // ====
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[2]['total'] > 0 ? $qmes[2]['total'] : '0') : '0');
+                $indCTotal = $qmes[2]['rate']['Q1'] + $qmes[2]['rate']['Q2'] + $qmes[2]['rate']['Q3'] + $qmes[2]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -416,8 +416,8 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q4']) ? $qmes[3]['rate']['Q4'] : 'n/a');
                 }
                 // ====
-
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($qmes[3]['total'] > 0 ? $qmes[3]['total'] : '0') : '0');
+                $indDTotal = $qmes[3]['rate']['Q1'] + $qmes[3]['rate']['Q2'] + $qmes[3]['rate']['Q3'] + $qmes[3]['rate']['Q4'];
+                $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -462,6 +462,37 @@ class QMSQuarterlyExportController extends Controller
                 $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q4']) ? $qmes[4]['rate']['Q4'] : 'n/a');
             }
             // ===
+            $A = isset($indATotal) ? $indATotal : null;
+            $B = isset($indBTotal) ? $indBTotal : null;
+            $C = isset($indCTotal) ? $indCTotal : null;
+            $D = isset($indDTotal) ? $indDTotal : null;
+
+            if ($entry['formula'] == 'A/Bx100') {
+                if ($B != 0 && $B !== null) {
+                    $result = ($A / $B) * 100;
+                    $div = ($result == 100 || $result == 0) ? intval($result) . '%' : number_format($result, 2) . '%';
+                } else {
+                    $div = 'N/A';
+                }
+                $sheet->getCell('V' . $row)->setValue($div);
+            
+            } else if ($entry['formula'] == 'No. of Days Elapsed B-A') {
+                $sheet->getCell('V' . $row)->setValue('N/A');
+            
+            } else if ($entry['formula'] == 'Notice of Suspension/Disallowance') {
+                $sheet->getCell('V' . $row)->setValue('N/A');
+            
+            } else if ($entry['formula'] == 'A/(B+C)-Dx100') {
+                $denominator = ($B + $C - $D);
+                if ($denominator != 0 && $denominator !== null) {
+                    $result = ($A / $denominator) * 100;
+                    $div = ($result == 100 || $result == 0) ? intval($result) . '%' : number_format($result, 2) . '%';
+                } else {
+                    $div = 'N/A';
+                }
+                $sheet->getCell('V' . $row)->setValue($div);
+            }
+
             // $divider = count($qmes[4]['rate']) / 2;
             // $divider = $qmes[4]['total'][0];
             // print_r($qmes[4]['total'][0]);
@@ -469,10 +500,10 @@ class QMSQuarterlyExportController extends Controller
             // print_r($qmes[1]['total']);
             // $div = (int)((int)$qmes[0]['total'] + (int)$qmes[1]['total']);
 
-            $A = !empty($qmes[0]['total']) ? (int)$qmes[0]['total'] : 'n/a';
-            $B = !empty($qmes[1]['total']) ? (int)$qmes[1]['total'] : 'n/a';
-            $C = !empty($qmes[2]['total']) ? (int)$qmes[2]['total'] : 'n/a';
-            $D = !empty($qmes[3]['total']) ? (int)$qmes[3]['total'] : 'n/a';
+            // $A = !empty($qmes[0]['total']) ? (int)$qmes[0]['total'] : 'n/a';
+            // $B = !empty($qmes[1]['total']) ? (int)$qmes[1]['total'] : 'n/a';
+            // $C = !empty($qmes[2]['total']) ? (int)$qmes[2]['total'] : 'n/a';
+            // $D = !empty($qmes[3]['total']) ? (int)$qmes[3]['total'] : 'n/a';
 
             // if($entry['formula'] == 'A/Bx100'){
             //     $div = round($A / $B * 100) . '%';
@@ -596,7 +627,7 @@ class QMSQuarterlyExportController extends Controller
         ];
 
 
-        if ($fetchQOPR[0]['office'] === 'ORD' || $fetchQOPR[0]['office'] === 'ORD-Legal' || $fetchQOPR[0]['office'] === 'ORD-Planning' || $fetchQOPR[0]['office'] === 'ORD-Rictu') {
+        if ($fetchQOPR[0]['office'] === 'ORD' || $fetchQOPR[0]['office'] === 'ORD-LEGAL' || $fetchQOPR[0]['office'] === 'ORD-PLANNING' || $fetchQOPR[0]['office'] === 'ORD-RICTU') {
             $sheet->getCell('E' . $row)->setValue('Prepared by:');
             // $sheet->getCell('L'.$row)->setValue('Reviewed by:');
             $sheet->getCell('Q' . $row)->setValue('Reviewed and Approved by:');
@@ -634,8 +665,6 @@ class QMSQuarterlyExportController extends Controller
             $sheet->getCell('Q' . $row)->setValue('Regional QMR');
             $sheet->getStyle("Q" . $row . ':V' . $row)->applyFromArray($style7);
             $sheet->mergeCells('Q' . $row . ':V' . $row);
-
-
         } else {
             $sheet->getCell('E' . $row)->setValue('Prepared by:');
             $sheet->getCell('L' . $row)->setValue('Reviewed by:');
@@ -681,7 +710,7 @@ class QMSQuarterlyExportController extends Controller
 
         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
         // $fileName = 'test.xlsx';
-        $fileName = $fetchQOPR[0]['qp_code'].' - '. $fetchQOPR[0]['qp_covered']. '.xlsx';
+        $fileName = $fetchQOPR[0]['qp_code'] . ' - ' . $fetchQOPR[0]['qp_covered'] . '.xlsx';
         $writer->save($fileName);
         return response()->download($fileName)->deleteFileAfterSend(true);
     }

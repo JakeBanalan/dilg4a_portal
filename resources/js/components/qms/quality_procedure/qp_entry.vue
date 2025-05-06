@@ -16,6 +16,9 @@
                                         Procedures
                                     </h5>
                                     <div class="d-flex">
+                                        <button type="button" @click="Return()" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Return
+                                        </button>
                                         <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
                                             Save
                                         </button>
@@ -239,6 +242,9 @@ export default {
         // console.log(this.OOptions);
     },
     methods: {
+        Return() {
+            this.$router.push({ path: `/qms/quality_procedure/index` });
+        },
         fetchAuthor() {
             const userId = localStorage.getItem('userId');
             this.$fetchUserData(userId, '../../../../api/fetchUser')

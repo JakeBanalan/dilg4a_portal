@@ -16,6 +16,9 @@
                                         Procedures
                                     </h5>
                                     <div class="d-flex">
+                                        <button type="button" @click="Return()" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Return
+                                        </button>
                                         <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
                                             Save
                                         </button>
@@ -203,7 +206,7 @@ export default {
             process_owner: [],
             FMOptions: ['Monthly', 'Quarterly'],
             COptions: ['Region', 'Region & Province', 'Region, Province & Field', 'Central Office, Region, Province & Field'],
-            OOptions: ['Office of The Regional Director (ORD)', 'Local Government Monitoring and Evaluation Division (LGMED)', 'Local Government Capability Development Division (LGCDD)', 'Finance and Administrative Division (FAD)'],
+            OOptions: ['ORD','ORD-RICTU','ORD-LEGAL','ORD-PLANNING','FAD','FAD-HRS','FAD-ACCOUNTING','FAD-RECORDS','FAD-GSS', 'LGMED', 'LGCDD'],
             POOptions: null,
             ProcessOwner: [],
         }
@@ -219,6 +222,9 @@ export default {
         // console.log(this.form);
     },
     methods: {
+        Return() {
+            this.$router.push({ path: `/qms/quality_procedure/index` });
+        },
         AddQOE() {
             let id = this.$route.params.id;
             this.$router.push({ path: `/qms/quality_procedure/qp_objectives_entry/${id}` });

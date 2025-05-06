@@ -22,7 +22,7 @@
                                             Return
                                         </button>
                                         <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2"
-                                            :disabled="form.status != 0">
+                                            :disabled="status != 0">
                                             Submit
                                         </button>
                                     </div>
@@ -38,7 +38,7 @@
                                             <label>Objectives Met?:</label>
                                             <br>
                                             <label class="switch">
-                                                <input type="checkbox" v-model="form.is_gap_analysis" checked
+                                                <input type="checkbox" v-model="form.is_gap_analysis" :checked="form.is_gap_analysis==1"
                                                     @change="toggleGapAnalysis">
                                                 <span class="slider round">
                                                     <span class="slider-text off">No</span>
@@ -531,7 +531,7 @@ export default {
     data() {
         return {
             qp_covered: this.$route.query.pq,
-            status: this.$route.query.stat,
+            status: Number(this.$route.query.stat),
             monthlyData: [
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, '01': '', '02': '', '03': '', '04': '', '05': '', '06': '', '07': '', '08': '', '09': '', '10': '', '11': '', '12': '' },
                 { id: '', indicator: '', qop_entry_id: this.$route.params.id, qoe_id: this.$route.params.qoe_id1, '01': '', '02': '', '03': '', '04': '', '05': '', '06': '', '07': '', '08': '', '09': '', '10': '', '11': '', '12': '' },
@@ -583,13 +583,14 @@ export default {
         fetchQOPRUserData() {
             let qoe_id = this.$route.params.qoe_id1;
             let id = this.$route.params.id;
-            console.log("tbl_qoe ID:", qoe_id)
-            console.log("tbl_qop_report ID:", id)
+            // console.log("tbl_qoe ID:", qoe_id)
+            // console.log("tbl_qop_report ID:", id)
             axios.get(`/api/fetchQOPRUserData/${id}/${qoe_id}`)
                 .then(response => {
                     // console.log(response.data)
                     if (Array.isArray(response.data) && response.data.length > 0) {
                         this.form = response.data[0];
+                        console.log(this.form)
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }
