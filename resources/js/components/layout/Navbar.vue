@@ -142,7 +142,7 @@ export default {
     },
     beforeUnmount() {
         // Clean up Pusher connections before component is destroyed
-        this.cleanupPusherConnections();
+        this.cleanPusher();
     },
     mounted() {
         this.initializeUserData();
@@ -219,7 +219,7 @@ export default {
         async logout() {
             try {
                 // Clean up Pusher connections before logout
-                this.cleanupPusherConnections();
+                this.cleanPusher();
 
                 const apiToken = localStorage.getItem('api_token');
                 await axios.post('/api/logout', null, {
@@ -358,17 +358,24 @@ export default {
             window.location.href = notification.redirectUrl;
         },
 
-        cleanupPusherConnections() {
-            // Properly unsubscribe from all channels before unmounting
+        cleanPusher() {
             if (this.pusher) {
                 this.channels.forEach(channel => {
-                    this.pusher.unsubscribe(channel.name);
+                    this.pusher.unsubscribe(channel);
                 });
-                this.pusher.disconnect();
+
+                // Only disconnect if not already disconnecting or closed
+                const state = this.pusher.connection.state;
+                if (state === 'connected' || state === 'connecting') {
+                    this.pusher.disconnect();
+                }
+
+                // Clean up references
                 this.pusher = null;
                 this.channels = [];
             }
         }
+
     }
 }
 </script>
