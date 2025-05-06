@@ -148,13 +148,17 @@ export default {
 
         cleanupPusherConnection() {
             if (this.pusher) {
-                // Unsubscribe from all channels
                 this.channels.forEach(channel => {
-                    this.pusher.unsubscribe(channel.name);
+                    this.pusher.unsubscribe(channel);
                 });
 
-                // Disconnect Pusher
-                this.pusher.disconnect();
+                // Only disconnect if not already disconnecting or closed
+                const state = this.pusher.connection.state;
+                if (state === 'connected' || state === 'connecting') {
+                    this.pusher.disconnect();
+                }
+
+                // Clean up references
                 this.pusher = null;
                 this.channels = [];
             }

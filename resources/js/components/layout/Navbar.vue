@@ -32,13 +32,13 @@
 <template>
     <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
         <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
-            <a class="navbar-brand brand-logo mr-5" href="#"><img src="../../../../assets/images/logo.png" class="mr-2"
-                    alt="logo" /></a>
-            <a class="navbar-brand brand-logo-mini" href="#"><img src="../../../../assets/images/logo.png"
+            <a class="navbar-brand brand-logo mr-5" href="/dashboard"><img src="../../../../assets/images/logo.png"
+                    class="mr-2" alt="logo" /></a>
+            <a class="navbar-brand brand-logo-mini" href="/dashboard"><img src="../../../../assets/images/logo.png"
                     alt="logo" /></a>
         </div>
         <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
-            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+            <button @click="toggleSidebar" class="navbar-toggler navbar-toggler align-self-center" type="button">
                 <span class="icon-menu"></span>
             </button>
             <ul class="navbar-nav mr-lg-2">
@@ -142,12 +142,16 @@ export default {
     },
     beforeUnmount() {
         // Clean up Pusher connections before component is destroyed
-        this.cleanupPusherConnections();
+        this.cleanPusher();
     },
     mounted() {
         this.initializeUserData();
     },
     methods: {
+        toggleSidebar() {
+            const body = document.querySelector('body');
+            body.classList.toggle('sidebar-icon-only');
+        },
         async initializeUserData() {
             if (!localStorage.getItem('api_token')) {
                 console.error('Unauthorized access');
@@ -219,7 +223,7 @@ export default {
         async logout() {
             try {
                 // Clean up Pusher connections before logout
-                this.cleanupPusherConnections();
+                this.cleanPusher();
 
                 const apiToken = localStorage.getItem('api_token');
                 await axios.post('/api/logout', null, {
@@ -275,7 +279,7 @@ export default {
                 const notification = {
                     id: data.id,
                     title: `${notificationTitle} from ${data.name}`,
-                    iconColor: iconColor,
+                    iconColor: `../../../../assets/images/logo.png`,
                     icon: iconClass,
                     time: new Date().toLocaleString(),
                     redirectUrl: "/rictu/ict_ta/index"
@@ -295,14 +299,14 @@ export default {
                 const notification = {
                     id: data.id,
                     title: `${notificationTitle} by ${data.receiverName}`,
-                    iconColor: iconColor,
+                    iconColor: `../../../../assets/images/logo.png`,
                     icon: iconClass,
-                    time: new Date().toLocaleString(),
-                    redirectUrl: "/rictu/ict_ta/index"
+                    time: new Date().toLocaleString()
                 };
 
                 this.notifications.push(notification);
                 this.showAlert(`${notificationTitle} by ${data.receiverName}`);
+
                 // Handle completed notifications specially
                 if (channelName === 'completed-ta-channel') {
                     this.showCompletedNotification(data, notificationTitle);
@@ -310,8 +314,8 @@ export default {
                     this.showReceivedNotification(data, notificationTitle);
                 }
 
-                // Show browser notification
-                this.showBrowserNotification(notification.title, iconClass, data.id);
+                // Show browser notification (pass link if exists)
+                this.showBrowserNotification(notification.title, iconClass, data.id, data.link || notification.redirectUrl);
             }
         },
 
@@ -339,11 +343,34 @@ export default {
             });
         },
 
-        showBrowserNotification(title, iconClass, id) {
-            if (Notification.permission === 'granted') {
-                new Notification(title, {
-                    icon: iconClass,
-                    tag: id
+        showBrowserNotification(title, iconClass, id, link) {
+            if (!("Notification" in window)) {
+                console.log("This browser does not support desktop notifications.");
+                return;
+            }
+
+            const show = () => {
+                const notification = new Notification(title, {
+                    icon: `../../../../assets/images/logo.png`,
+                    body: "Click to view details.",
+                    data: { url: link }
+                });
+
+                notification.onclick = function (event) {
+                    event.preventDefault();
+                    if (notification.data && notification.data.url) {
+                        window.open(notification.data.url, '_blank');
+                    }
+                };
+            };
+
+            if (Notification.permission === "granted") {
+                show();
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        show();
+                    }
                 });
             }
         },
@@ -358,17 +385,24 @@ export default {
             window.location.href = notification.redirectUrl;
         },
 
-        cleanupPusherConnections() {
-            // Properly unsubscribe from all channels before unmounting
+        cleanPusher() {
             if (this.pusher) {
                 this.channels.forEach(channel => {
-                    this.pusher.unsubscribe(channel.name);
+                    this.pusher.unsubscribe(channel);
                 });
-                this.pusher.disconnect();
+
+                // Only disconnect if not already disconnecting or closed
+                const state = this.pusher.connection.state;
+                if (state === 'connected' || state === 'connecting') {
+                    this.pusher.disconnect();
+                }
+
+                // Clean up references
                 this.pusher = null;
                 this.channels = [];
             }
         }
+
     }
 }
 </script>

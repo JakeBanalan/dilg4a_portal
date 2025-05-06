@@ -185,7 +185,6 @@
                                         <tr>
                                             <th style="text-align: left;">Name</th>
                                             <th  style="text-align: left;">Birthdate</th>
-                                            <th  style="text-align: left;">Age</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -194,7 +193,6 @@
                                                 <font-awesome-icon :icon="['fas', 'gift']" />&nbsp; {{ user.name }}
                                             </td>
                                             <td  style="text-align: left;">{{ user.birthdate }}</td>
-                                            <td  style="text-align: left;">{{ user.age }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
