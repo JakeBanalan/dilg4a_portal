@@ -13,6 +13,8 @@ use App\Models\PurchaseRequestItemModel;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\RichText\RichText;
+
 
 const SUBMITTED_TO_BUDGET = 2;
 const SUBMITTED_TO_GSS = 4;
@@ -495,9 +497,19 @@ class PurchaseRequestController extends Controller
         foreach ($query as $item) {
             $sheet->setCellValue('A' . $row, $item->serial_no);
             $sheet->setCellValue('B' . $row, $item->unit);
-            $sheet->setCellValue('C' . $row, $item->item_title . "\n\n" . $item->desc);
+
+            // Create a RichText object for the C column
+            $richText = new RichText();
+            $boldText = $richText->createTextRun(strtoupper($item->item_title)); // Make item_title uppercase
+            $boldText->getFont()->setBold(true); // Apply bold formatting
+
+            $normalText = $richText->createText("\n\n" . ucwords($item->desc)); // Add desc with normal formatting
+
+            // Set the rich text to the cell
+            $sheet->setCellValue('C' . $row, $richText);
             $sheet->getStyle('C' . $row)->getAlignment()->setWrapText(true);
             $sheet->getRowDimension($row)->setRowHeight(-1); // Auto height for wrapped text
+
             $sheet->setCellValue('D' . $row, $item->quantity);
             $sheet->setCellValue('E' . $row, '₱ ' . number_format($item->price, 2));
             $sheet->setCellValue('F' . $row, '₱ ' . number_format($item->quantity * $item->price, 2));
