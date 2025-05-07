@@ -285,8 +285,8 @@ class QMSQuarterlyLNDController extends Controller
             $sheet->getCell('C' . $row)->setValue($entry['indicator_a']);
             $sheet->getCell('J' . $row)->setValue('Target Result: ' . $entry['target_percentage']);
 
-            $sheet->getCell('N' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q1']) ? $qmes[0]['rate']['Q1'] : 'n/a');
-            $sheet->getCell('V' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q2']) ? $qmes[0]['rate']['Q2'] : 'n/a');
+            $sheet->getCell('N' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q1']) ? $qmes[0]['rate']['Q1'] : '');
+            $sheet->getCell('V' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q2']) ? $qmes[0]['rate']['Q2'] : '');
             $sheet->getRowDimension($row)->setRowHeight('30');
 
             $sheet->getRowDimension($row)->setRowHeight('30');

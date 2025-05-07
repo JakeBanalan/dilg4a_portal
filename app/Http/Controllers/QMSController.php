@@ -465,7 +465,7 @@ class QMSController extends Controller
             ->where('qop_id', $formData['qop_id'])
             ->where('qoe_id', $formData['gap_qoe_id'])
             ->update($GA);
-            
+
         foreach ($monthlyData as $item) {
             $id = $item['id'] ?? null;
 
@@ -749,6 +749,7 @@ class QMSController extends Controller
             'tbl_qop_report.id',
             'tbl_qop_report.qop_id',
             'tbl_qop_report.created_by',
+            'users.username as uname',
             'tbl_qop_report.date_created',
             'tbl_qop_report.status',
             'tbl_qop_report.qp_covered',
@@ -764,24 +765,28 @@ class QMSController extends Controller
             ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
             ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
             ->get();
+
         return response()->json($fetchQOPR);
     }
 
     public function fetchQOPRperUser($id)
     {
         $fetchUser = UserModel::select(
+            'users.username as username',
             DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
 
         )
             ->where('users.id', $id)
             ->get();
-
+        // $username = $fetchUser[0]->username;
         $userFullName = $fetchUser[0]->fname;
+        $currentUserId = $id;
 
         $fetchQOPR = QOPRModel::select(
             'tbl_qop_report.id',
             'tbl_qop_report.qop_id',
             'tbl_qop_report.created_by',
+            'users.username as uname',
             'tbl_qop_report.date_created',
             'tbl_qop_report.status',
             'tbl_qop_report.qp_covered',
@@ -794,8 +799,13 @@ class QMSController extends Controller
         )
 
             ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
-            ->where('qop.process_owner', 'LIKE', '%' . $userFullName . '%')
+            ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
+            ->where(function ($query) use ($userFullName, $currentUserId) {
+                $query->where('qop.process_owner', 'LIKE', '%' . $userFullName . '%')
+                      ->orWhere('tbl_qop_report.created_by', $currentUserId);
+            })
             ->get();
+
         return response()->json($fetchQOPR);
     }
 

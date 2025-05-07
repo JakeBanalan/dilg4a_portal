@@ -38,7 +38,7 @@
                                             <label>Objectives Met?:</label>
                                             <br>
                                             <label class="switch">
-                                                <input type="checkbox" v-model="form.is_gap_analysis" :checked="form.is_gap_analysis==1"
+                                                <input type="checkbox" v-model="form.is_gap_analysis"
                                                     @change="toggleGapAnalysis">
                                                 <span class="slider round">
                                                     <span class="slider-text off">No</span>
@@ -589,8 +589,13 @@ export default {
                 .then(response => {
                     // console.log(response.data)
                     if (Array.isArray(response.data) && response.data.length > 0) {
-                        this.form = response.data[0];
-                        console.log(this.form)
+
+                        const data = response.data[0];
+                        data.is_gap_analysis = data.is_gap_analysis == 1;
+                        this.form = data;
+
+                        // this.form = response.data[0];
+                        // console.log(this.form)
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }
@@ -603,27 +608,24 @@ export default {
                 })
         },
         updateMonthlyRating() {
-
             Swal.fire({
                 title: 'Do you want to Continue?',
-                // text: "You won't be able to revert this!",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Yes'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // ✅ Create a copy with converted value
+                    const payload = {
+                        ...this.form,
+                        is_gap_analysis: this.form.is_gap_analysis ? 1 : 0
+                    };
 
-                    if (this.form.is_gap_analysis === true) {
-                        this.form.is_gap_analysis = '1';
-                    } else {
-                        this.form.is_gap_analysis = '0';
-                    }
                     axios.post(`/api/saveMonthlyData`, {
-                        formData: this.form,
+                        formData: payload, // ✅ Use the safe copy
                         monthlyData: this.monthlyData
                     })
                         .then(response => {
-
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Report Successfully Submitted!',
@@ -637,9 +639,7 @@ export default {
                         })
                         .catch(error => {
                             console.error('Error updating:', error);
-                            // Optionally, handle error response
                         });
-
                 }
             });
         },
@@ -660,379 +660,3 @@ export default {
     }
 }
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- 
-<template>
-    <div class="card" style="margin-top:1%;">
-    <div class="card-body">
-        <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
-            <thead>
-				<tr style="background-color: #367fa9; color: white;">
-					<th class="text-center" colspan="13">Indicator A:
-					</th>
-				</tr>
-				<tr style="background-color: #ffa500a3;">
-					<th class="text-center" width="7.5%">JAN</th>
-					<th class="text-center" width="7.5%">FEB</th>
-					<th class="text-center" width="7.5%">MAR</th>
-					<th class="text-center" width="7.5%">APR</th>
-					<th class="text-center" width="7.5%">MAY</th>
-					<th class="text-center" width="7.5%">JUN</th>
-					<th class="text-center" width="7.5%">JUL</th>
-					<th class="text-center" width="7.5%">AUG</th>
-					<th class="text-center" width="7.5%">SEP</th>
-					<th class="text-center" width="7.5%">OCT</th>
-					<th class="text-center" width="7.5%">NOV</th>
-					<th class="text-center" width="7.5%">DEC</th>
-					<th rowspan="2" class="text-center" width="7.5%" style="vertical-align: middle;">TOTAL</th>
-				</tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center" width="7.5%">
-                     <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td rowspan="2" class="text-center" width="7.5%"
-                        style="vertical-align: middle;">00.0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="card" style="margin-top:1%;">
-    <div class="card-body">
-        <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
-            <thead>
-				<tr style="background-color: #367fa9; color: white;">
-					<th class="text-center" colspan="13">Indicator B:
-					</th>
-				</tr>
-				<tr style="background-color: #ffa500a3;">
-					<th class="text-center" width="7.5%">JAN</th>
-					<th class="text-center" width="7.5%">FEB</th>
-					<th class="text-center" width="7.5%">MAR</th>
-					<th class="text-center" width="7.5%">APR</th>
-					<th class="text-center" width="7.5%">MAY</th>
-					<th class="text-center" width="7.5%">JUN</th>
-					<th class="text-center" width="7.5%">JUL</th>
-					<th class="text-center" width="7.5%">AUG</th>
-					<th class="text-center" width="7.5%">SEP</th>
-					<th class="text-center" width="7.5%">OCT</th>
-					<th class="text-center" width="7.5%">NOV</th>
-					<th class="text-center" width="7.5%">DEC</th>
-					<th rowspan="2" class="text-center" width="7.5%" style="vertical-align: middle;">TOTAL</th>
-				</tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center" width="7.5%">
-                     <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td rowspan="2" class="text-center" width="7.5%"
-                        style="vertical-align: middle;">00.0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class="card" style="margin-top:1%;">
-    <div class="card-body">
-        <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
-            <thead>
-				<tr style="background-color: #367fa9; color: white;">
-					<th class="text-center" colspan="13">Indicator C:
-					</th>
-				</tr>
-				<tr style="background-color: #ffa500a3;">
-					<th class="text-center" width="7.5%">JAN</th>
-					<th class="text-center" width="7.5%">FEB</th>
-					<th class="text-center" width="7.5%">MAR</th>
-					<th class="text-center" width="7.5%">APR</th>
-					<th class="text-center" width="7.5%">MAY</th>
-					<th class="text-center" width="7.5%">JUN</th>
-					<th class="text-center" width="7.5%">JUL</th>
-					<th class="text-center" width="7.5%">AUG</th>
-					<th class="text-center" width="7.5%">SEP</th>
-					<th class="text-center" width="7.5%">OCT</th>
-					<th class="text-center" width="7.5%">NOV</th>
-					<th class="text-center" width="7.5%">DEC</th>
-					<th rowspan="2" class="text-center" width="7.5%" style="vertical-align: middle;">TOTAL</th>
-				</tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center" width="7.5%">
-                     <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td rowspan="2" class="text-center" width="7.5%"
-                        style="vertical-align: middle;">00.0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class="card" style="margin-top:1%;">
-    <div class="card-body">
-        <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
-            <thead>
-				<tr style="background-color: #367fa9; color: white;">
-					<th class="text-center" colspan="13">Indicator D:
-					</th>
-				</tr>
-				<tr style="background-color: #ffa500a3;">
-					<th class="text-center" width="7.5%">JAN</th>
-					<th class="text-center" width="7.5%">FEB</th>
-					<th class="text-center" width="7.5%">MAR</th>
-					<th class="text-center" width="7.5%">APR</th>
-					<th class="text-center" width="7.5%">MAY</th>
-					<th class="text-center" width="7.5%">JUN</th>
-					<th class="text-center" width="7.5%">JUL</th>
-					<th class="text-center" width="7.5%">AUG</th>
-					<th class="text-center" width="7.5%">SEP</th>
-					<th class="text-center" width="7.5%">OCT</th>
-					<th class="text-center" width="7.5%">NOV</th>
-					<th class="text-center" width="7.5%">DEC</th>
-					<th rowspan="2" class="text-center" width="7.5%" style="vertical-align: middle;">TOTAL</th>
-				</tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center" width="7.5%">
-                     <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td rowspan="2" class="text-center" width="7.5%"
-                        style="vertical-align: middle;">00.0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-<div class="card" style="margin-top:1%;">
-    <div class="card-body">
-        <table id="tb1" class="table table-striped table-responsive table-bordered dropbox">
-            <thead>
-				<tr style="background-color: #367fa9; color: white;">
-					<th class="text-center" colspan="13">Indicator E:
-					</th>
-				</tr>
-				<tr style="background-color: #ffa500a3;">
-					<th class="text-center" width="7.5%">JAN</th>
-					<th class="text-center" width="7.5%">FEB</th>
-					<th class="text-center" width="7.5%">MAR</th>
-					<th class="text-center" width="7.5%">APR</th>
-					<th class="text-center" width="7.5%">MAY</th>
-					<th class="text-center" width="7.5%">JUN</th>
-					<th class="text-center" width="7.5%">JUL</th>
-					<th class="text-center" width="7.5%">AUG</th>
-					<th class="text-center" width="7.5%">SEP</th>
-					<th class="text-center" width="7.5%">OCT</th>
-					<th class="text-center" width="7.5%">NOV</th>
-					<th class="text-center" width="7.5%">DEC</th>
-					<th rowspan="2" class="text-center" width="7.5%" style="vertical-align: middle;">TOTAL</th>
-				</tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="text-center" width="7.5%">
-                     <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td class="text-center" width="7.5%">
-                    <input type="text" class="form-control" id="rev_no" />
-                    </td>
-                    <td rowspan="2" class="text-center" width="7.5%"
-                        style="vertical-align: middle;">00.0</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-</template> -->

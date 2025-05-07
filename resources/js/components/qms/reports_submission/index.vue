@@ -46,9 +46,10 @@
                                             <td style="width: 5%;">{{ list.office }}</td>
                                             <td style="width: 5%;"><b>{{ list.qp_covered }}</b><br><i>~{{ list.year
                                                     }}~</i></td>
-                                            <td style="width: 5%;"><b v-if="list.status == 0">Draft</b> <b
-                                                    v-if="list.status == 1">Submitted</b>
-                                                <br><i>~{{ list.username }}~</i>
+                                            <td style="width: 5%;">
+                                                <b v-if="list.status == 0">Draft</b> 
+                                                <b v-if="list.status == 1">Submitted</b>
+                                                <br><i>~{{ list.uname }}~</i>
                                             </td>
 
 
@@ -215,9 +216,7 @@ export default {
         fetchQOPRperUser() {
             axios.get(`/api/fetchQOPRperUser/${this.userId}`)
                 .then(response => {
-
                     this.QOPRList = response.data
-                    // console.log(this.QOPRList)
                     this.initializeDataTable();
                 })
                 .catch(error => {
@@ -228,6 +227,14 @@ export default {
             axios.get('/api/fetchQOPR')
                 .then(response => {
                     this.QOPRList = response.data
+                    // const QOPRData = response.data.data
+                    // const username = response.data.username
+                    // this.QOPRList = QOPRData.map(item => {
+                    //     return {
+                    //         ...item,
+                    //         username: username
+                    //     };
+                    // });
                     this.initializeDataTable();
 
                     // console.log(this.QOPRList)

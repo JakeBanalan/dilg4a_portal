@@ -38,7 +38,7 @@
                                             <label>Objectives Met?:</label>
                                             <br>
                                             <label class="switch">
-                                                <input type="checkbox" v-model="form.is_gap_analysis" :checked="form.is_gap_analysis==1"
+                                                <input type="checkbox" v-model="form.is_gap_analysis"
                                                     @change="toggleGapAnalysis">
                                                 <span class="slider round">
                                                     <span class="slider-text off">No</span>
@@ -411,8 +411,13 @@ export default {
                 .then(response => {
                     // console.log(response.data)
                     if (Array.isArray(response.data) && response.data.length > 0) {
-                        this.form = response.data[0];
-                        console.log("fetchQOPRUserData:",this.form)
+
+                        const data = response.data[0];
+                        data.is_gap_analysis = data.is_gap_analysis == 1;
+                        this.form = data;
+
+                        // this.form = response.data[0];
+                        // console.log("fetchQOPRUserData:",this.form)
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }
@@ -433,18 +438,23 @@ export default {
                 confirmButtonText: 'Yes'
             }).then((result) => {
                 if (result.isConfirmed) {
-
-                    if (this.form.is_gap_analysis === true) {
-                        this.form.is_gap_analysis = '1';
-                    } else {
-                        this.form.is_gap_analysis = '0';
-                    }
+                    // ✅ Create a copy with converted value
+                    const payload = {
+                        ...this.form,
+                        is_gap_analysis: this.form.is_gap_analysis ? 1 : 0
+                    };
+                    // if (this.form.is_gap_analysis === true) {
+                    //     this.form.is_gap_analysis = '1';
+                    // } else {
+                    //     this.form.is_gap_analysis = '0';
+                    // }
                     // console.log(this.form);
                     // console.log(this.quarterData);
                     // Assuming you have Axios installed and imported
                     axios.post(`/api/saveQuarterData`, {
+                        formData: payload, // ✅ Use the safe copy
                         quarterData: this.quarterData,
-                        formData: this.form
+                        // formData: this.form
                     })
                         .then(response => {
                             Swal.fire({

@@ -273,14 +273,22 @@ class QMSQuarterlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 5; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q1']) ? $qmes[0]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q2']) ? $qmes[0]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q3']) ? $qmes[0]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q4']) ? $qmes[0]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q1']) ? $qmes[0]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q2']) ? $qmes[0]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q3']) ? $qmes[0]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q4']) ? $qmes[0]['rate']['Q4'] : '');
                 }
                 // ====
                 $indATotal = $qmes[0]['rate']['Q1'] + $qmes[0]['rate']['Q2'] + $qmes[0]['rate']['Q3'] + $qmes[0]['rate']['Q4'];
                 $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
+
+                // $indATotal = 0;
+                // for ($i = 1; $i <= 4; $i++) {
+                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                //     $value = $qmes[0]['rate'][$q] ?? 0;
+                //     $indATotal += is_numeric($value) ? $value : 0;
+                // }
+                // $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -319,14 +327,22 @@ class QMSQuarterlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 13; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q1']) ? $qmes[1]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q2']) ? $qmes[1]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q3']) ? $qmes[1]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q4']) ? $qmes[1]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q1']) ? $qmes[1]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q2']) ? $qmes[1]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q3']) ? $qmes[1]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q4']) ? $qmes[1]['rate']['Q4'] : '');
                 }
                 // ===
                 $indBTotal = $qmes[1]['rate']['Q1'] + $qmes[1]['rate']['Q2'] + $qmes[1]['rate']['Q3'] + $qmes[1]['rate']['Q4'];
                 $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : '0');
+
+                // $indBTotal = 0;
+                // for ($i = 1; $i <= 4; $i++) {
+                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                //     $value = $qmes[0]['rate'][$q] ?? 0;
+                //     $indBTotal += is_numeric($value) ? $value : 0;
+                // }
+                // $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : '0');
 
                 $sheet->getRowDimension($row)->setRowHeight('45');
                 $char_len = strlen($entry['indicator_a']);
@@ -364,14 +380,22 @@ class QMSQuarterlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 5; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q1']) ? $qmes[2]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q2']) ? $qmes[2]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q3']) ? $qmes[2]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q4']) ? $qmes[2]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q1']) ? $qmes[2]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q2']) ? $qmes[2]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q3']) ? $qmes[2]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q4']) ? $qmes[2]['rate']['Q4'] : '');
                 }
                 // ====
                 $indCTotal = $qmes[2]['rate']['Q1'] + $qmes[2]['rate']['Q2'] + $qmes[2]['rate']['Q3'] + $qmes[2]['rate']['Q4'];
                 $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
+
+                // $indCTotal = 0;
+                // for ($i = 1; $i <= 4; $i++) {
+                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                //     $value = $qmes[0]['rate'][$q] ?? 0;
+                //     $indCTotal += is_numeric($value) ? $value : 0;
+                // }
+                // $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -410,14 +434,22 @@ class QMSQuarterlyExportController extends Controller
                 // === CONVERT THIS TO DYNAMIC
                 // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
                 for ($i = 1; $i < 5; $i++) {
-                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q1']) ? $qmes[3]['rate']['Q1'] : 'n/a');
-                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q2']) ? $qmes[3]['rate']['Q2'] : 'n/a');
-                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q3']) ? $qmes[3]['rate']['Q3'] : 'n/a');
-                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q4']) ? $qmes[3]['rate']['Q4'] : 'n/a');
+                    $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q1']) ? $qmes[3]['rate']['Q1'] : '');
+                    $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q2']) ? $qmes[3]['rate']['Q2'] : '');
+                    $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q3']) ? $qmes[3]['rate']['Q3'] : '');
+                    $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q4']) ? $qmes[3]['rate']['Q4'] : '');
                 }
                 // ====
                 $indDTotal = $qmes[3]['rate']['Q1'] + $qmes[3]['rate']['Q2'] + $qmes[3]['rate']['Q3'] + $qmes[3]['rate']['Q4'];
                 $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
+
+                // $indDTotal = 0;
+                // for ($i = 1; $i <= 4; $i++) {
+                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                //     $value = $qmes[0]['rate'][$q] ?? 0;
+                //     $indDTotal += is_numeric($value) ? $value : 0;
+                // }
+                // $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -456,10 +488,10 @@ class QMSQuarterlyExportController extends Controller
             // === CONVERT THIS TO DYNAMIC
             // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
             for ($i = 1; $i < 5; $i++) {
-                $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q1']) ? $qmes[4]['rate']['Q1'] : 'n/a');
-                $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q2']) ? $qmes[4]['rate']['Q2'] : 'n/a');
-                $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q3']) ? $qmes[4]['rate']['Q3'] : 'n/a');
-                $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q4']) ? $qmes[4]['rate']['Q4'] : 'n/a');
+                $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q1']) ? $qmes[4]['rate']['Q1'] : '');
+                $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q2']) ? $qmes[4]['rate']['Q2'] : '');
+                $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q3']) ? $qmes[4]['rate']['Q3'] : '');
+                $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q4']) ? $qmes[4]['rate']['Q4'] : '');
             }
             // ===
             $A = isset($indATotal) ? $indATotal : null;
