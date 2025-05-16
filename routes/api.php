@@ -448,7 +448,7 @@ Route::post('ValidateReportEntry', [QMSController::class, 'ValidateReportEntry']
 
 //U S E R  M A N A G E M E N T
 Route::post('PostUser', [UserManagementController::class, 'PostUser']);
-
+Route::post('updateUserSidebar', [UserManagementController::class, 'updateUserSidebar']);
 
 
 

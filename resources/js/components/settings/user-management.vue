@@ -274,6 +274,73 @@
             <!-- partial-->
         </div>
     </div>
+
+    <div class="modal fade" id="assignSidebarModal" tabindex="-1" role="dialog"
+        aria-labelledby="assignSidebarModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+
+                <!-- Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title font-weight-bold" id="assignSidebarModalLabel" style="font-size: 1.5rem;">
+                        Assign Sidebar Items
+                    </h5>
+                    <!-- Fix close button -->
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close"
+                        style="font-size: 2rem;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body" style="background-color: #f8f9fa;">
+                    <form>
+                        <div class="row">
+                            <div v-for="menu in menuOptions" :key="menu.value" class="col-md-6 mb-4">
+
+                                <!-- Parent checkbox -->
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" :id="menu.value" :value="menu.value"
+                                        v-model="selectedSidebarItems" @change="toggleChildren(menu)"
+                                        style="transform: scale(1.3); margin-right: 0.6rem;" />
+                                    <label class="form-check-label font-weight-bold" :for="menu.value"
+                                        style="font-size: 1.2rem;">
+                                        {{ menu.label }}
+                                    </label>
+                                </div>
+
+                                <!-- Child checkboxes -->
+                                <div v-if="menu.children" class="ml-4 pl-3 border-left">
+                                    <div v-for="child in menu.children" :key="child.value" class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" :id="child.value"
+                                            :value="child.value" v-model="selectedSidebarItems"
+                                            :disabled="!selectedSidebarItems.includes(menu.value)"
+                                            style="transform: scale(1.2); margin-right: 0.5rem;" />
+                                        <label class="form-check-label" :for="child.value" style="font-size: 1.05rem;">
+                                            {{ child.label }}
+                                        </label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        Close
+                    </button>
+                    <button type="button" class="btn btn-primary" @click="saveSidebarItems">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </template>
 <style>
 @import "~vue-select/dist/vue-select.css";
@@ -303,10 +370,8 @@ import Sidebar from '../layout/Sidebar.vue';
 import FooterVue from '../layout/Footer.vue';
 import BreadCrumbs from '../dashboard_tiles/BreadCrumbs.vue';
 import user_table from './user_table.vue';
-
-
+import Swal from 'sweetalert2';
 import axios from 'axios'; // Import axios library to make HTTP requests
-// import employee_table from './app_table.vue';
 
 export default {
     name: 'User Management',
@@ -317,9 +382,7 @@ export default {
         FooterVue,
         BreadCrumbs,
         Multiselect,
-        // employee_table, //Table
     },
-
     data() {
         return {
             isCardVisible: false,
@@ -334,7 +397,6 @@ export default {
                 { label: 'Quezon', value: 'Quezon' },
                 { label: 'Lucena City', value: 'Lucena City' }
             ],
-
             options2: [
                 { label: 'All', value: 'option1' },
                 { label: 'Batangas', value: 'option2' },
@@ -353,49 +415,140 @@ export default {
                 { label: '45-54', value: 'option5' },
                 { label: '65 and Over', value: 'option6' }, // Options For Age Category
             ],
-
             options4: [
                 { label: 'All', value: 'option1' },
                 { label: 'Married', value: 'option2' },
                 { label: 'Single', value: 'option3' },
                 { label: 'Widow', value: 'option4' },
-                { label: 'Seperated', value: 'option5' },// Options For Civil Status
+                { label: 'Seperated', value: 'option5' }, // Options For Civil Status
             ],
-
             options5: [
                 { label: 'Yes', value: 'option1' },
-                { label: 'None', value: 'option2' },// Options For Health Issues
+                { label: 'None', value: 'option2' }, // Options For Health Issues
             ],
-
             options6: [
                 { label: 'Male', value: 'option1' },
-                { label: 'Female', value: 'option2' },// Options For Gender
+                { label: 'Female', value: 'option2' }, // Options For Gender
             ],
-
             options7: [
                 { label: 'Yes', value: 'option1' },
-                { label: 'No', value: 'option2' },// Options For PWD
+                { label: 'No', value: 'option2' }, // Options For PWD
             ],
-
             options8: [
                 { label: 'Yes', value: 'option1' },
-                { label: 'No', value: 'option2' },// Options For Solo Parent
+                { label: 'No', value: 'option2' }, // Options For Solo Parent
             ],
-
+            menuOptions: [
+                { label: 'Dashboard', value: '/dashboard' },
+                { label: 'Calendar', value: '/calendar/index' },
+                {
+                    label: 'Procurement',
+                    value: 'procurement',
+                    children: [
+                        { label: 'APP', value: '/procurement/AnnualProcurementPlan' },
+                        { label: 'Procurement Request', value: '/procurement/index' },
+                        { label: 'R.F.Q', value: '/procurement/rfq/index' },
+                        { label: 'Philgeps Awarding', value: '/procurement/abstract/index' },
+                        { label: 'Monitoring', value: '/procurement/pr_monitoring' },
+                    ],
+                },
+                {
+                    label: 'Budget Section',
+                    value: 'budget',
+                    children: [
+                        { label: 'Obligation', value: '/budget/obligation' },
+                    ],
+                },
+                {
+                    label: 'RICTU',
+                    value: 'rictu',
+                    children: [
+                        { label: 'ICT TA', value: '/rictu/ict_ta/index' },
+                    ],
+                },
+                {
+                    label: 'QMS',
+                    value: 'qms',
+                    children: [
+                        { label: 'Quality Procedures', value: '/qms/quality_procedure/index' },
+                        { label: 'Process Owners', value: '/qms/process_owner/index' },
+                        { label: 'Reports Submission', value: '/qms/reports_submission/index' },
+                    ],
+                },
+                { label: 'User Management', value: '/settings/user-management/' },
+            ],
+            selectedMenus: [], // To store selected menu items for the user
             searchText: '',
             users: [], // Initialize an empty array to store user data
+            selectedUserId: null, // To store the ID of the selected user
+            selectedSidebarItems: [], // To store the selected sidebar items
         };
     },
     mounted() {
         this.fetchEmployeeData();
-        // this.fetchUserOfficeCount();
     },
     methods: {
         createUser() {
-            this.$router.push({ path: `/settings/create` });
+            const userData = {
+                module_access: JSON.stringify(this.selectedMenus.map(menu => menu.value)), // Save selected menus as JSON
+            };
+            axios.post('../../api/PostUser', userData)
+                .then(response => {
+                    console.log('User created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error creating user:', error);
+                });
         },
         UpdateUser(id) {
             this.$router.push({ path: `/settings/update/${id}` });
+        },
+        addRole(id) {
+            this.selectedUserId = id; // Set the selected user ID
+            this.selectedSidebarItems = []; // Reset selected items
+            // Fetch the user's current module_access and pre-check the checkboxes
+            axios.get(`../../api/getUserDetails/${id}`)
+                .then(response => {
+                    const user = response.data;
+                    if (user.module_access) {
+                        this.selectedSidebarItems = JSON.parse(user.module_access); // Pre-check items
+                    }
+                    $('#assignSidebarModal').modal('show'); // Show the modal
+                })
+                .catch(error => {
+                    console.error('Error fetching user details:', error);
+                });
+        },
+        saveSidebarItems() {
+            const payload = {
+                userId: this.selectedUserId,
+                module_access: JSON.stringify(this.selectedSidebarItems), // Save as JSON string
+            };
+            axios.post('../../api/updateUserSidebar', payload)
+                .then(response => {
+                    console.log('Sidebar items updated successfully:', response.data);
+
+                    // Update localStorage with the new module_access if the current user is being updated
+                    if (this.selectedUserId === parseInt(localStorage.getItem('userId'))) {
+                        localStorage.setItem('module_access', JSON.stringify(this.selectedSidebarItems));
+                        console.log('Updated module_access in localStorage:', this.selectedSidebarItems); // Debugging log
+                    }
+
+                    $('#assignSidebarModal').modal('hide'); // Hide the modal
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Sidebar items updated successfully!',
+                    });
+                })
+                .catch(error => {
+                    console.error('Error updating sidebar items:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to update sidebar items.',
+                    });
+                });
         },
         toggleCard() {
             this.isCardVisible = !this.isCardVisible;
@@ -404,8 +557,6 @@ export default {
             const vm = this; // Save Vue instance context
             axios.get('../../api/fetchEmployeeData')
                 .then((response) => {
-                    // Update data table with fetched employee data
-                    console.log(response.data);
                     $('#employee_table').DataTable({
                         destroy: true, // Destroy existing DataTable instance
                         data: response.data,
@@ -423,24 +574,26 @@ export default {
                             { data: 'contact_details' },
                             {
                                 data: null, orderable: false, render: function (data) {
-                                    return '<button type="button" class="btn btn-info btn-update" data-id="' + data.id + '">View</button>';
+                                    return `
+                                        <button type="button" class="btn btn-info btn-update" data-id="${data.id}">View</button>
+                                        <button type="button" class="btn btn-primary btn-role" data-id="${data.id}">Add Role</button>
+                                    `;
                                 },
                             }
                         ]
                     });
-
-                    //   $(row).find('.btn-update').on('click', function () {
-                    //   const id = $(this).data('id');
-                    //   vm.UpdateUser(id); // Call the Vue method
-                    // });
-                    $('#employee_table tbody').on('click', 'button', function () {
+                    $('#employee_table tbody').on('click', 'button.btn-role', function () {
+                        const id = $(this).data('id');
+                        vm.addRole(id);
+                    });
+                    $('#employee_table tbody').on('click', 'button.btn-update', function () {
                         const id = $(this).data('id');
                         vm.UpdateUser(id);
                     });
 
                 })
                 .catch((error) => {
-                    console.error('Error fetching employee data:', error);
+
                 });
         },
         initializeDataTable() {
@@ -459,6 +612,16 @@ export default {
                     $('#employee_table').DataTable().clear().rows.add(this.EmpTableData).draw();
                 }
             });
+        },
+        toggleChildren(menu) {
+            if (!this.selectedSidebarItems.includes(menu.value)) {
+                menu.children?.forEach(child => {
+                    const index = this.selectedSidebarItems.indexOf(child.value);
+                    if (index !== -1) {
+                        this.selectedSidebarItems.splice(index, 1);
+                    }
+                });
+            }
         },
     },
 
