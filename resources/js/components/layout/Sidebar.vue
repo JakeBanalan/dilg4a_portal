@@ -201,7 +201,6 @@ export default {
         if (moduleAccess) {
             try {
                 this.allowedMenus = JSON.parse(moduleAccess);
-
             } catch (e) {
                 console.error('Error parsing module_access:', e);
                 this.allowedMenus = [];

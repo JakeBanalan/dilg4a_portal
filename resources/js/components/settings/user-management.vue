@@ -280,158 +280,36 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <!-- Header -->
-                <div class="modal-header text-white" style="background-color: #009688;">
-                    <h5 class="modal-title" id="assignSidebarModalLabel">
-                        Assign Sidebar Items
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title font-weight-bold" id="assignSidebarModalLabel">Assign Sidebar Items</h5>
+                    <button type="button" class="btn-close text-white" data-bs-dismiss="modal" aria-label="Close"
+                        style="font-size: 1.5rem; background: none; border: none;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
 
                 <!-- Body -->
-                <div class="modal-body">
+                <div class="modal-body" style="background-color: #f9f9f9; padding: 1.5rem;">
                     <form>
-                        <div class="row g-3">
-                            <!-- Left Column -->
-                            <div class="col-md-6">
-                                <!-- Dashboard -->
-                                <div class="sidebar-option mb-5">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="dashboard"
-                                            v-model="selectedSidebarItems" value="dashboard">
-                                        <label class="form-check-label fw-bold" for="dashboard">Dashboard</label>
-                                    </div>
+                        <div class="row">
+                            <div v-for="menu in menuOptions" :key="menu.value" class="col-md-6 mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" :id="menu.value" :value="menu.value"
+                                        v-model="selectedSidebarItems" @change="toggleChildren(menu)" />
+                                    <label class="form-check-label fw-bold" :for="menu.value" style="font-size: 1.1rem;">
+                                        {{ menu.label }}
+                                    </label>
                                 </div>
 
-                                <!-- Procurement Section -->
-                                <div class="sidebar-option mb-5">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="procurement"
-                                            v-model="selectedSidebarItems" value="procurement"
-                                            @change="toggleChildren('procurement')">
-                                        <label class="form-check-label fw-bold" for="procurement">Procurement</label>
-                                    </div>
-                                    <div class="ms-4 ps-2 border-start child-options">
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input" type="checkbox" id="app"
-                                                v-model="selectedSidebarItems" value="app"
-                                                :disabled="!selectedSidebarItems.includes('procurement')">
-                                            <label class="form-check-label" for="app">APP</label>
-                                        </div>
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input" type="checkbox" id="procurementRequest"
-                                                v-model="selectedSidebarItems" value="procurementRequest"
-                                                :disabled="!selectedSidebarItems.includes('procurement')">
-                                            <label class="form-check-label" for="procurementRequest">Procurement
-                                                Request</label>
-                                        </div>
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input" type="checkbox" id="rfq"
-                                                v-model="selectedSidebarItems" value="rfq"
-                                                :disabled="!selectedSidebarItems.includes('procurement')">
-                                            <label class="form-check-label" for="rfq">R.F.Q</label>
-                                        </div>
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input" type="checkbox" id="philgeps"
-                                                v-model="selectedSidebarItems" value="philgeps"
-                                                :disabled="!selectedSidebarItems.includes('procurement')">
-                                            <label class="form-check-label" for="philgeps">Philgeps Awarding</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="monitoring"
-                                                v-model="selectedSidebarItems" value="monitoring"
-                                                :disabled="!selectedSidebarItems.includes('procurement')">
-                                            <label class="form-check-label" for="monitoring">Monitoring</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- RICTU Section -->
-                                <div class="sidebar-option mb-5">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="rictu"
-                                            v-model="selectedSidebarItems" value="rictu"
-                                            @change="toggleChildren('rictu')">
-                                        <label class="form-check-label fw-bold" for="rictu">RICTU</label>
-                                    </div>
-                                    <div class="ms-4 ps-2 border-start child-options">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="ict-ta"
-                                                v-model="selectedSidebarItems" value="ict-ta"
-                                                :disabled="!selectedSidebarItems.includes('rictu')">
-                                            <label class="form-check-label" for="ict-ta">ICT TA</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Right Column -->
-                            <div class="col-md-6">
-                                <!-- Calendar -->
-                                <div class="sidebar-option mb-5">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="calendar"
-                                            v-model="selectedSidebarItems" value="calendar">
-                                        <label class="form-check-label fw-bold" for="calendar">Calendar</label>
-                                    </div>
-                                </div>
-
-                                <!-- Budget Section -->
-                                <div class="sidebar-option mb-5">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="budget"
-                                            v-model="selectedSidebarItems" value="budget"
-                                            @change="toggleChildren('budget')">
-                                        <label class="form-check-label fw-bold" for="budget">Budget Section</label>
-                                    </div>
-                                    <div class="ms-4 ps-2 border-start child-options">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="obligation"
-                                                v-model="selectedSidebarItems" value="obligation"
-                                                :disabled="!selectedSidebarItems.includes('budget')">
-                                            <label class="form-check-label" for="obligation">Obligation</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- QMS Section -->
-                                <div class="sidebar-option mb-5">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="qms"
-                                            v-model="selectedSidebarItems" value="qms" @change="toggleChildren('qms')">
-                                        <label class="form-check-label fw-bold" for="qms">QMS</label>
-                                    </div>
-                                    <div class="ms-4 ps-2 border-start child-options">
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input" type="checkbox" id="quality-procedures"
-                                                v-model="selectedSidebarItems" value="quality-procedures"
-                                                :disabled="!selectedSidebarItems.includes('qms')">
-                                            <label class="form-check-label" for="quality-procedures">Quality
-                                                Procedures</label>
-                                        </div>
-                                        <div class="form-check mb-1">
-                                            <input class="form-check-input" type="checkbox" id="process-owners"
-                                                v-model="selectedSidebarItems" value="process-owners"
-                                                :disabled="!selectedSidebarItems.includes('qms')">
-                                            <label class="form-check-label" for="process-owners">Process Owners</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="reports-submission"
-                                                v-model="selectedSidebarItems" value="reports-submission"
-                                                :disabled="!selectedSidebarItems.includes('qms')">
-                                            <label class="form-check-label" for="reports-submission">Reports
-                                                Submission</label>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- User Management -->
-                                <div class="sidebar-option mb-5">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="user-management"
-                                            v-model="selectedSidebarItems" value="user-management">
-                                        <label class="form-check-label fw-bold" for="user-management">User
-                                            Management</label>
+                                <!-- Child checkboxes -->
+                                <div v-if="menu.children" class="ms-4 ps-2 border-start mt-2">
+                                    <div v-for="child in menu.children" :key="child.value" class="form-check">
+                                        <input class="form-check-input" type="checkbox" :id="child.value"
+                                            :value="child.value" v-model="selectedSidebarItems"
+                                            :disabled="!selectedSidebarItems.includes(menu.value)" />
+                                        <label class="form-check-label" :for="child.value" style="font-size: 1rem;">
+                                            {{ child.label }}
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -440,43 +318,21 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn text-white" style="background-color: #009688;"
-                        @click="saveSidebarItems">Save Changes</button>
+                <div class="modal-footer" style="background-color: #f1f1f1;">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                        style="font-size: 1rem; font-weight: 500;">Close</button>
+                    <button type="button" class="btn btn-primary" @click="saveSidebarItems"
+                        style="font-size: 1rem; font-weight: 500;">Save Changes</button>
                 </div>
             </div>
         </div>
     </div>
 
+
 </template>
 <style>
 @import "~vue-select/dist/vue-select.css";
 
-#assignSidebarModal .sidebar-option .form-check-label.fw-bold {
-    font-size: 1.1rem;
-}
-
-#assignSidebarModal .child-options {
-    margin-top: 0.5rem;
-}
-
-#assignSidebarModal .form-check-input {
-    cursor: pointer;
-}
-
-#assignSidebarModal .form-check-label {
-    cursor: pointer;
-}
-
-#assignSidebarModal .modal-body {
-    background-color: #f9f9f9;
-    padding: 1.5rem;
-}
-
-#assignSidebarModal .border-start {
-    border-color: #ccd0d4 !important;
-}
 
 /* tbody {
     display: block;
@@ -659,7 +515,7 @@ export default {
             };
             axios.post('../../api/updateUserSidebar', payload)
                 .then(response => {
-                    console.log('Sidebar items updated successfully:', response.data);
+
 
                     // Update localStorage with the new module_access if the current user is being updated
                     if (this.selectedUserId === parseInt(localStorage.getItem('userId'))) {
