@@ -131,6 +131,8 @@ class UserManagementController extends Controller
             'password'         => $hashedPassword,
             'is_activated'         => 'Yes',
             'user_role'         => 'user',
+            'allowed_menus' => json_encode($request->allowedMenus), // Save allowed menus as JSON
+            'module_access' => $request->module_access, // Save module access JSON
         ]);
         // dd($PostUser);
         $PostUser->save();
@@ -160,18 +162,14 @@ class UserManagementController extends Controller
             users.section,
             users.division,
             users.position_id,
+            users.module_access, -- Include module_access
             pos.POSITION_TITLE as position,
-            CONCAT(users.first_name," ", users.middle_name," ",users.last_name)  as name
+            CONCAT(users.first_name," ", users.middle_name," ",users.last_name) as name
+        ')
+        ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+        ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
+        ->where('users.id', $id);
 
-            ')
-            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
-            // ->leftJoin('tbl_province as prov', 'prov.id', '=', 'users.province')
-            // ->leftJoin('tbl_office as ofc', 'ofc.id', '=', 'users.office')
-            // ->leftJoin('tbl_citymun as ctm', 'ctm.id', '=', 'users.citymun')
-            // ->leftJoin('tbl_section as sec', 'sec.id', '=', 'users.section')
-            // ->leftJoin('tbl_division as div', 'div.id', '=', 'users.division')
-            ->where('users.id', $id);
         $data = $query->first(); // Use first() instead of get() to retrieve a single result
         return response()->json($data);
     }
@@ -185,5 +183,16 @@ class UserManagementController extends Controller
             ->groupBy('o.id');
         $data = $query->get();
         return response()->json($data);
+    }
+
+    public function updateUserSidebar(Request $request)
+    {
+        $user = UserModel::find($request->userId);
+        if ($user) {
+            $user->module_access = $request->module_access; // Save module_access as JSON string
+            $user->save();
+            return response()->json(['message' => 'Sidebar items updated successfully.']);
+        }
+        return response()->json(['message' => 'User not found.'], 404);
     }
 }

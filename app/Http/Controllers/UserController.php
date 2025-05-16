@@ -37,12 +37,14 @@ class UserController extends Controller
                 ->update([
                     'api_token' => $token
                 ]);
+
             return response()->json([
                 'status' => true,
                 'message' => 'Success',
                 'api_token' => $token,
                 'user_role' => $user->user_role,
                 'userId' => $user->id,
+                'module_access' => $user->module_access, // Include module_access
                 'isUpdatedPassword' => $user->isUpdatedPassword
             ]);
         } else {
