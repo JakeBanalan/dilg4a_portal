@@ -90,11 +90,11 @@ class QMSMonthlyExportController extends Controller
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - GENERAL SERVICE SECTION';
         } else if ($fetchQOPR[0]['office'] === 'ORD') {
             $office = 'Office of The Regional Director';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Legal') {
+        } else if ($fetchQOPR[0]['office'] === 'ORD-LEGAL') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - LEGAL UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Planning') {
+        } else if ($fetchQOPR[0]['office'] === 'ORD-PLANNING') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - PLANNING UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD - RICTU') {
+        } else if ($fetchQOPR[0]['office'] === 'ORD-RICTU') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - REGIONAL INFORMATION AND COMMUNICATION TECHNOLOGY UNIT';
         }
 
@@ -315,8 +315,20 @@ class QMSMonthlyExportController extends Controller
                     $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[0]['rate']['12'] : '');
                 }
                 // ====
-                $indATotal = $qmes[0]['rate']['01'] + $qmes[0]['rate']['02'] + $qmes[0]['rate']['03'] + $qmes[0]['rate']['04'] + $qmes[0]['rate']['05'] + $qmes[0]['rate']['06'] + $qmes[0]['rate']['07'] + $qmes[0]['rate']['08'] + $qmes[0]['rate']['09'] + $qmes[0]['rate']['10'] + $qmes[0]['rate']['11'] + $qmes[0]['rate']['12'];
-                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
+                $indATotal = 0;
+                for ($i = 1; $i <= 12; $i++) {
+                    // $month = str_pad($i, 2, '0', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $month = '0' . $i;
+                    $value = $qmes[0]['rate'][$month] ?? '';
+
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indATotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : 0);
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -365,8 +377,23 @@ class QMSMonthlyExportController extends Controller
                     $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[1]['rate']['12'] : '');
                 }
                 // ===
-                $indBTotal = $qmes[1]['rate']['01'] + $qmes[1]['rate']['02'] + $qmes[1]['rate']['03'] + $qmes[1]['rate']['04'] + $qmes[1]['rate']['05'] + $qmes[1]['rate']['06'] + $qmes[1]['rate']['07'] + $qmes[1]['rate']['08'] + $qmes[1]['rate']['09'] + $qmes[1]['rate']['10'] + $qmes[1]['rate']['11'] + $qmes[1]['rate']['12'];
-                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indBTotal : '0');
+                // $indBTotal = $qmes[1]['rate']['01'] + $qmes[1]['rate']['02'] + $qmes[1]['rate']['03'] + $qmes[1]['rate']['04'] + $qmes[1]['rate']['05'] + $qmes[1]['rate']['06'] + $qmes[1]['rate']['07'] + $qmes[1]['rate']['08'] + $qmes[1]['rate']['09'] + $qmes[1]['rate']['10'] + $qmes[1]['rate']['11'] + $qmes[1]['rate']['12'];
+                // $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indBTotal : '0');
+
+                $indBTotal = 0;
+                for ($i = 1; $i <= 12; $i++) {
+                    // $month = str_pad($i, 2, '0', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $month = '0' . $i;
+                    $value = $qmes[1]['rate'][$month] ?? '';
+
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indBTotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : 0);
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -413,9 +440,23 @@ class QMSMonthlyExportController extends Controller
                     $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[2]['rate']['12'] : '');
                 }
                 // ===
-                $indCTotal = $qmes[2]['rate']['01'] + $qmes[2]['rate']['02'] + $qmes[2]['rate']['03'] + $qmes[2]['rate']['04'] + $qmes[2]['rate']['05'] + $qmes[2]['rate']['06'] + $qmes[2]['rate']['07'] + $qmes[2]['rate']['08'] + $qmes[2]['rate']['09'] + $qmes[2]['rate']['10'] + $qmes[2]['rate']['11'] + $qmes[2]['rate']['12'];
-                $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
+                // $indCTotal = $qmes[2]['rate']['01'] + $qmes[2]['rate']['02'] + $qmes[2]['rate']['03'] + $qmes[2]['rate']['04'] + $qmes[2]['rate']['05'] + $qmes[2]['rate']['06'] + $qmes[2]['rate']['07'] + $qmes[2]['rate']['08'] + $qmes[2]['rate']['09'] + $qmes[2]['rate']['10'] + $qmes[2]['rate']['11'] + $qmes[2]['rate']['12'];
+                // $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
 
+                $indCTotal = 0;
+                for ($i = 1; $i <= 12; $i++) {
+                    // $month = str_pad($i, 2, '0', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $month = '0' . $i;
+                    $value = $qmes[2]['rate'][$month] ?? '';
+
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indCTotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : 0);
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -463,9 +504,23 @@ class QMSMonthlyExportController extends Controller
                     $sheet->getCell('U' . $row)->setValue(!empty($qmes) ? $qmes[3]['rate']['12'] : '');
                 }
                 // ===
-                $indDTotal = $qmes[3]['rate']['01'] + $qmes[3]['rate']['02'] + $qmes[3]['rate']['03'] + $qmes[3]['rate']['04'] + $qmes[3]['rate']['05'] + $qmes[3]['rate']['06'] + $qmes[3]['rate']['07'] + $qmes[3]['rate']['08'] + $qmes[3]['rate']['09'] + $qmes[3]['rate']['10'] + $qmes[3]['rate']['11'] + $qmes[3]['rate']['12'];
-                $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
+                // $indDTotal = $qmes[3]['rate']['01'] + $qmes[3]['rate']['02'] + $qmes[3]['rate']['03'] + $qmes[3]['rate']['04'] + $qmes[3]['rate']['05'] + $qmes[3]['rate']['06'] + $qmes[3]['rate']['07'] + $qmes[3]['rate']['08'] + $qmes[3]['rate']['09'] + $qmes[3]['rate']['10'] + $qmes[3]['rate']['11'] + $qmes[3]['rate']['12'];
+                // $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
+                
+                $indDTotal = 0;
+                for ($i = 1; $i <= 12; $i++) {
+                    // $month = str_pad($i, 2, '0', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $month = '0' . $i;
+                    $value = $qmes[3]['rate'][$month] ?? '';
 
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indDTotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : 0);
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -528,13 +583,10 @@ class QMSMonthlyExportController extends Controller
                     $div = 'N/A';
                 }
                 $sheet->getCell('V' . $row)->setValue($div);
-            
             } else if ($entry['formula'] == 'No. of Days Elapsed B-A') {
                 $sheet->getCell('V' . $row)->setValue('N/A');
-            
             } else if ($entry['formula'] == 'Notice of Suspension/Disallowance') {
                 $sheet->getCell('V' . $row)->setValue('N/A');
-            
             } else if ($entry['formula'] == 'A/(B+C)-Dx100') {
                 $denominator = ($B + $C - $D);
                 if ($denominator != 0 && $denominator !== null) {
@@ -545,7 +597,7 @@ class QMSMonthlyExportController extends Controller
                 }
                 $sheet->getCell('V' . $row)->setValue($div);
             }
-            
+
 
             // if($entry['formula'] == 'A/Bx100'){
             // 	if($A != 0 || $B !=0){
@@ -671,7 +723,7 @@ class QMSMonthlyExportController extends Controller
             ],
         ];
 
-        if ($fetchQOPR[0]['office'] === 'ORD' || $fetchQOPR[0]['office'] === 'ORD-Legal' || $fetchQOPR[0]['office'] === 'ORD-Planning' || $fetchQOPR[0]['office'] === 'ORD-Rictu') {
+        if (in_array($fetchQOPR[0]['office'], ['ORD', 'ORD-LEGAL', 'ORD-PLANNING', 'ORD-RICTU'])) {
             $sheet->getCell('E' . $row)->setValue('Prepared by:');
             // $sheet->getCell('L'.$row)->setValue('Reviewed by:');
             $sheet->getCell('Q' . $row)->setValue('Reviewed and Approved by:');
@@ -685,13 +737,13 @@ class QMSMonthlyExportController extends Controller
             $row = ++$row;
             $a = $row + 5;
 
-            $sheet->getCell('E' . $row)->setValue('');
+            $sheet->getCell('E' . $row)->setValue($fetchQOPR[0]['process_owner']);
             $sheet->getStyle("E" . $row . ':K' . $a)->applyFromArray($style6);
             $sheet->mergeCells('E' . $row . ':K' . $a);
 
-            $sheet->getCell('L' . $row)->setValue($approver);
-            $sheet->getStyle("L" . $row . ':P' . $a)->applyFromArray($style6);
-            $sheet->mergeCells('L' . $row . ':P' . $a);
+            // $sheet->getCell('L' . $row)->setValue($approver);
+            // $sheet->getStyle("L" . $row . ':P' . $a)->applyFromArray($style6);
+            // $sheet->mergeCells('L' . $row . ':P' . $a);
 
             $sheet->getCell('Q' . $row)->setValue('DARRELL I. DIZON');
             $sheet->getStyle("Q" . $row . ':V' . $a)->applyFromArray($style6);
@@ -702,9 +754,9 @@ class QMSMonthlyExportController extends Controller
             $sheet->getStyle("E" . $row . ':K' . $row)->applyFromArray($style7);
             $sheet->mergeCells('E' . $row . ':K' . $row);
 
-            $sheet->getCell('L' . $row)->setValue('Regional QMR Deputy');
-            $sheet->getStyle("L" . $row . ':P' . $row)->applyFromArray($style7);
-            $sheet->mergeCells('L' . $row . ':P' . $row);
+            // $sheet->getCell('L' . $row)->setValue('Regional QMR Deputy');
+            // $sheet->getStyle("L" . $row . ':P' . $row)->applyFromArray($style7);
+            // $sheet->mergeCells('L' . $row . ':P' . $row);
 
             $sheet->getCell('Q' . $row)->setValue('Regional QMR');
             $sheet->getStyle("Q" . $row . ':V' . $row)->applyFromArray($style7);
@@ -722,7 +774,7 @@ class QMSMonthlyExportController extends Controller
             $row = ++$row;
             $a = $row + 5;
 
-            $sheet->getCell('E' . $row)->setValue($process_owner);
+            $sheet->getCell('E' . $row)->setValue($fetchQOPR[0]['process_owner']);
             $sheet->getStyle("E" . $row . ':K' . $a)->applyFromArray($style6);
             $sheet->mergeCells('E' . $row . ':K' . $a);
 

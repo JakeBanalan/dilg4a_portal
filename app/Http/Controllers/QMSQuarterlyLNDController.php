@@ -94,7 +94,7 @@ class QMSQuarterlyLNDController extends Controller
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - LEGAL UNIT';
         } else if ($fetchQOPR[0]['office'] === 'ORD-Planning') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - PLANNING UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD - RICTU') {
+        } else if ($fetchQOPR[0]['office'] === 'ORD-RICTU') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - REGIONAL INFORMATION AND COMMUNICATION TECHNOLOGY UNIT';
         }
 
@@ -425,8 +425,22 @@ class QMSQuarterlyLNDController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q4']) ? $qmes[0]['rate']['Q4'] : '');
                 }
                 // ====
-                $indATotal = $qmes[0]['rate']['Q1'] + $qmes[0]['rate']['Q2'] + $qmes[0]['rate']['Q3'] + $qmes[0]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indATotal > 0 ? $indATotal : '0') : '0');
+                // $indATotal = $qmes[0]['rate']['Q1'] + $qmes[0]['rate']['Q2'] + $qmes[0]['rate']['Q3'] + $qmes[0]['rate']['Q4'];
+                // $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indATotal > 0 ? $indATotal : '0') : '0');
+
+                $indATotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = 'Q' . $i; // 'Q1', 'Q2', etc.
+                    $value = $qmes[0]['rate'][$q] ?? '';
+
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indATotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : 0);
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -471,8 +485,22 @@ class QMSQuarterlyLNDController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q4']) ? $qmes[1]['rate']['Q4'] : '');
                 }
                 // ===
-                $indBTotal = $qmes[1]['rate']['Q1'] + $qmes[1]['rate']['Q2'] + $qmes[1]['rate']['Q3'] + $qmes[1]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indBTotal > 0 ? $indBTotal : '0') : '0');
+                // $indBTotal = $qmes[1]['rate']['Q1'] + $qmes[1]['rate']['Q2'] + $qmes[1]['rate']['Q3'] + $qmes[1]['rate']['Q4'];
+                // $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indBTotal > 0 ? $indBTotal : '0') : '0');
+
+                $indBTotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = 'Q' . $i; // 'Q1', 'Q2', etc.
+                    $value = $qmes[1]['rate'][$q] ?? '';
+                    
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indBTotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : 0);
 
                 $sheet->getRowDimension($row)->setRowHeight('45');
                 $char_len = strlen($entry['indicator_a']);
@@ -516,8 +544,22 @@ class QMSQuarterlyLNDController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q4']) ? $qmes[2]['rate']['Q4'] : '');
                 }
                 // ====
-                $indCTotal = $qmes[2]['rate']['Q1'] + $qmes[2]['rate']['Q2'] + $qmes[2]['rate']['Q3'] + $qmes[2]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indCTotal > 0 ? $indCTotal : '0') : '0');
+                // $indCTotal = $qmes[2]['rate']['Q1'] + $qmes[2]['rate']['Q2'] + $qmes[2]['rate']['Q3'] + $qmes[2]['rate']['Q4'];
+                // $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indCTotal > 0 ? $indCTotal : '0') : '0');
+
+                $indCTotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = 'Q' . $i; // 'Q1', 'Q2', etc.
+                    $value = $qmes[2]['rate'][$q] ?? '';
+                    
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indCTotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : 0);
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -562,8 +604,22 @@ class QMSQuarterlyLNDController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q4']) ? $qmes[3]['rate']['Q4'] : '');
                 }
                 // ====
-                $indDTotal = $qmes[3]['rate']['Q1'] + $qmes[3]['rate']['Q2'] + $qmes[3]['rate']['Q3'] + $qmes[3]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indDTotal > 0 ? $indDTotal : '0') : '0');
+                // $indDTotal = $qmes[3]['rate']['Q1'] + $qmes[3]['rate']['Q2'] + $qmes[3]['rate']['Q3'] + $qmes[3]['rate']['Q4'];
+                // $sheet->getCell('V' . $row)->setValue(!empty($qmes) ? ($indDTotal > 0 ? $indDTotal : '0') : '0');
+
+                $indDTotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = 'Q' . $i; // 'Q1', 'Q2', etc.
+                    $value = $qmes[3]['rate'][$q] ?? '';
+                    
+                    $sheet->getCell('V' . $row)->setValue($value);
+
+                    // Use numeric values for total
+                    if (is_numeric($value)) {
+                        $indDTotal += $value;
+                    }
+                }
+                $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : 0);
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -602,10 +658,10 @@ class QMSQuarterlyLNDController extends Controller
             // === CONVERT THIS TO DYNAMIC
             // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
             for ($i = 1; $i < 5; $i++) {
-                $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q1']) ? $qmes[4]['rate']['Q1'] : 'n/a');
-                $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q2']) ? $qmes[4]['rate']['Q2'] : 'n/a');
-                $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q3']) ? $qmes[4]['rate']['Q3'] : 'n/a');
-                $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q4']) ? $qmes[4]['rate']['Q4'] : 'n/a');
+                $sheet->getCell('J' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q1']) ? $qmes[4]['rate']['Q1'] : '');
+                $sheet->getCell('M' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q2']) ? $qmes[4]['rate']['Q2'] : '');
+                $sheet->getCell('P' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q3']) ? $qmes[4]['rate']['Q3'] : '');
+                $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[4]['rate']['Q4']) ? $qmes[4]['rate']['Q4'] : '');
             }
             // ===
             // $divider = count($qmes[4]['rate']) / 2;
@@ -768,7 +824,7 @@ class QMSQuarterlyLNDController extends Controller
         ];
 
 
-        if ($fetchQOPR[0]['office'] === 'ORD' || $fetchQOPR[0]['office'] === 'ORD-Legal' || $fetchQOPR[0]['office'] === 'ORD-Planning' || $fetchQOPR[0]['office'] === 'ORD-Rictu') {
+        if (in_array($fetchQOPR[0]['office'], ['ORD', 'ORD-LEGAL', 'ORD-PLANNING', 'ORD-RICTU'])) {
             $sheet->getCell('E' . $row)->setValue('Prepared by:');
             // $sheet->getCell('L'.$row)->setValue('Reviewed by:');
             $sheet->getCell('Q' . $row)->setValue('Reviewed and Approved by:');

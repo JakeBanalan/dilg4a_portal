@@ -268,7 +268,7 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('fetchQualityProcedure', [QMSController::class, 'fetchQualityProcedure']);
+    Route::get('fetchQualityProcedure/{userId}', [QMSController::class, 'fetchQualityProcedure']);
 });
 
 Route::middleware('api')->group(function () {
@@ -292,6 +292,10 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetchQopHistoryData/{id}', [QMSController::class, 'fetchQopHistoryData']);
+});
+
+Route::middleware('api')->group(function () {
     Route::get('fetchQoprEntryData/{id}', [QMSController::class, 'fetchQoprEntryData']);
 });
 
@@ -299,7 +303,7 @@ Route::middleware('api')->group(function () {
     Route::get('fetchQOPR', [QMSController::class, 'fetchQOPR']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('fetchQOPRperUser/{id}', [QMSController::class, 'fetchQOPRperUser']);
+    Route::get('fetchQOPRperDivision/{id}', [QMSController::class, 'fetchQOPRperDivision']);
 });
 
 Route::middleware('api')->group(function () {
@@ -441,6 +445,9 @@ Route::post('DeleteQualityObjective', [QMSController::class, 'DeleteQualityObjec
 Route::post('deleteQualityProcedure', [QMSController::class, 'deleteQualityProcedure']);
 Route::post('postReportEntry', [QMSController::class, 'postReportEntry']);
 Route::post('submitReport', [QMSController::class, 'submitReport']);
+Route::post('receiveReport', [QMSController::class, 'receiveReport']);
+Route::post('returnReport', [QMSController::class, 'returnReport']);
+Route::post('completeReport', [QMSController::class, 'completeReport']);
 Route::post('deleteRS', [QMSController::class, 'deleteRS']);
 Route::post('saveQuarterData', [QMSController::class, 'saveQuarterData']);
 Route::post('saveMonthlyData', [QMSController::class, 'saveMonthlyData']);

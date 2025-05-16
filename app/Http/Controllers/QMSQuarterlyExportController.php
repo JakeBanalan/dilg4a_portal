@@ -90,11 +90,11 @@ class QMSQuarterlyExportController extends Controller
             $office = 'FINANCE AND ADMINISTRATIVE DIVISION - GENERAL SERVICE SECTION';
         } else if ($fetchQOPR[0]['office'] === 'ORD') {
             $office = 'Office of The Regional Director';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Legal') {
+        } else if ($fetchQOPR[0]['office'] === 'ORD-LEGAL') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - LEGAL UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD-Planning') {
+        } else if ($fetchQOPR[0]['office'] === 'ORD-PLANNING') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - PLANNING UNIT';
-        } else if ($fetchQOPR[0]['office'] === 'ORD - RICTU') {
+        } else if ($fetchQOPR[0]['office'] === 'ORD-RICTU') {
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - REGIONAL INFORMATION AND COMMUNICATION TECHNOLOGY UNIT';
         }
 
@@ -279,16 +279,16 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[0]['rate']['Q4']) ? $qmes[0]['rate']['Q4'] : '');
                 }
                 // ====
-                $indATotal = $qmes[0]['rate']['Q1'] + $qmes[0]['rate']['Q2'] + $qmes[0]['rate']['Q3'] + $qmes[0]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
-
-                // $indATotal = 0;
-                // for ($i = 1; $i <= 4; $i++) {
-                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
-                //     $value = $qmes[0]['rate'][$q] ?? 0;
-                //     $indATotal += is_numeric($value) ? $value : 0;
-                // }
+                // $indATotal = $qmes[0]['rate']['Q1'] + $qmes[0]['rate']['Q2'] + $qmes[0]['rate']['Q3'] + $qmes[0]['rate']['Q4'];
                 // $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
+
+                $indATotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $value = $qmes[0]['rate'][$q] ?? 0;
+                    $indATotal += is_numeric($value) ? $value : 0;
+                }
+                $sheet->getCell('V' . $row)->setValue($indATotal > 0 ? $indATotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -333,16 +333,16 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[1]['rate']['Q4']) ? $qmes[1]['rate']['Q4'] : '');
                 }
                 // ===
-                $indBTotal = $qmes[1]['rate']['Q1'] + $qmes[1]['rate']['Q2'] + $qmes[1]['rate']['Q3'] + $qmes[1]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : '0');
-
-                // $indBTotal = 0;
-                // for ($i = 1; $i <= 4; $i++) {
-                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
-                //     $value = $qmes[0]['rate'][$q] ?? 0;
-                //     $indBTotal += is_numeric($value) ? $value : 0;
-                // }
+                // $indBTotal = $qmes[1]['rate']['Q1'] + $qmes[1]['rate']['Q2'] + $qmes[1]['rate']['Q3'] + $qmes[1]['rate']['Q4'];
                 // $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : '0');
+
+                $indBTotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $value = $qmes[1]['rate'][$q] ?? 0;
+                    $indBTotal += is_numeric($value) ? $value : 0;
+                }
+                $sheet->getCell('V' . $row)->setValue($indBTotal > 0 ? $indBTotal : '0');
 
                 $sheet->getRowDimension($row)->setRowHeight('45');
                 $char_len = strlen($entry['indicator_a']);
@@ -386,16 +386,16 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[2]['rate']['Q4']) ? $qmes[2]['rate']['Q4'] : '');
                 }
                 // ====
-                $indCTotal = $qmes[2]['rate']['Q1'] + $qmes[2]['rate']['Q2'] + $qmes[2]['rate']['Q3'] + $qmes[2]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
-
-                // $indCTotal = 0;
-                // for ($i = 1; $i <= 4; $i++) {
-                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
-                //     $value = $qmes[0]['rate'][$q] ?? 0;
-                //     $indCTotal += is_numeric($value) ? $value : 0;
-                // }
+                // $indCTotal = $qmes[2]['rate']['Q1'] + $qmes[2]['rate']['Q2'] + $qmes[2]['rate']['Q3'] + $qmes[2]['rate']['Q4'];
                 // $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
+
+                $indCTotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $value = $qmes[2]['rate'][$q] ?? 0;
+                    $indCTotal += is_numeric($value) ? $value : 0;
+                }
+                $sheet->getCell('V' . $row)->setValue($indCTotal > 0 ? $indCTotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -440,16 +440,16 @@ class QMSQuarterlyExportController extends Controller
                     $sheet->getCell('S' . $row)->setValue(!empty($qmes) && isset($qmes[3]['rate']['Q4']) ? $qmes[3]['rate']['Q4'] : '');
                 }
                 // ====
-                $indDTotal = $qmes[3]['rate']['Q1'] + $qmes[3]['rate']['Q2'] + $qmes[3]['rate']['Q3'] + $qmes[3]['rate']['Q4'];
-                $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
-
-                // $indDTotal = 0;
-                // for ($i = 1; $i <= 4; $i++) {
-                //     $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
-                //     $value = $qmes[0]['rate'][$q] ?? 0;
-                //     $indDTotal += is_numeric($value) ? $value : 0;
-                // }
+                // $indDTotal = $qmes[3]['rate']['Q1'] + $qmes[3]['rate']['Q2'] + $qmes[3]['rate']['Q3'] + $qmes[3]['rate']['Q4'];
                 // $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
+
+                $indDTotal = 0;
+                for ($i = 1; $i <= 4; $i++) {
+                    $q = str_pad($i, 2, 'Q', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
+                    $value = $qmes[3]['rate'][$q] ?? 0;
+                    $indDTotal += is_numeric($value) ? $value : 0;
+                }
+                $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
 
                 // AUTO ROW HEIGHT NOT WORKING DUE TO VERSION CONFLICT
                 $sheet->getRowDimension($row)->setRowHeight('45');
@@ -659,7 +659,7 @@ class QMSQuarterlyExportController extends Controller
         ];
 
 
-        if ($fetchQOPR[0]['office'] === 'ORD' || $fetchQOPR[0]['office'] === 'ORD-LEGAL' || $fetchQOPR[0]['office'] === 'ORD-PLANNING' || $fetchQOPR[0]['office'] === 'ORD-RICTU') {
+        if (in_array($fetchQOPR[0]['office'], ['ORD', 'ORD-LEGAL', 'ORD-PLANNING', 'ORD-RICTU'])) {
             $sheet->getCell('E' . $row)->setValue('Prepared by:');
             // $sheet->getCell('L'.$row)->setValue('Reviewed by:');
             $sheet->getCell('Q' . $row)->setValue('Reviewed and Approved by:');

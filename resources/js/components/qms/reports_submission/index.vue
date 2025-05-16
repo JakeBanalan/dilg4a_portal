@@ -47,16 +47,39 @@
                                             <td style="width: 5%;"><b>{{ list.qp_covered }}</b><br><i>~{{ list.year
                                                     }}~</i></td>
                                             <td style="width: 5%;">
-                                                <b v-if="list.status == 0">Draft</b> 
-                                                <b v-if="list.status == 1">Submitted</b>
+                                                <b>{{ statusMap[list.status] }}</b>
                                                 <br><i>~{{ list.uname }}~</i>
                                             </td>
 
+                                            <td v-if="this.role === 'admin'" style="width:5%;">
+                                                <div style="  display: flex;gap: 0.1em; justify-content: center;">
+                                                    <!-- <button @click="submitReport(list.id)" class="btn btn-icon mr-1"
+                                                        :disabled="list.status !== 0"
+                                                        style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                        <font-awesome-icon
+                                                            :icon="['fas', 'share-square']"></font-awesome-icon>
+                                                    </button> -->
+                                                    <button @click="viewReport(list.id)" class="btn btn-icon mr-1"
+                                                        style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                        <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
+                                                    </button>
+                                                    <!-- <button @click="receiveReport(list.id)" class="btn btn-icon mr-1"
+                                                        :hidden="list.status != 1"
+                                                        style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                        <font-awesome-icon :icon="['fas', 'check']"></font-awesome-icon>
+                                                    </button> -->
+                                                    <button @click="deleteReport(list.id)" class="btn btn-icon mr-1"
+                                                        :disabled="list.status !== 0"
+                                                        style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                        <font-awesome-icon :icon="['fas', 'trash']"></font-awesome-icon>
+                                                    </button>
+                                                </div>
+                                            </td>
 
-                                            <td style="width:5%;">
+                                            <td v-if="this.role != 'admin'" style="width:5%;">
                                                 <div style="  display: flex;gap: 0.1em; justify-content: center;">
                                                     <button @click="submitReport(list.id)" class="btn btn-icon mr-1"
-                                                        :disabled="list.status !== 0"
+                                                        :disabled="!(list.status === 0 || list.status === 3)"
                                                         style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                         <font-awesome-icon
                                                             :icon="['fas', 'share-square']"></font-awesome-icon>
@@ -81,6 +104,7 @@
                     </div>
 
                     <!-- <Pagination :total="ict_data.length" @pageChange="onPageChange" /> -->
+                     
 
                 </div>
                 <FooterVue />
@@ -100,8 +124,8 @@ import Pagination from '../../procurement/Pagination.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { toast } from "vue3-toastify";
 
-import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash } from '@fortawesome/free-solid-svg-icons';
-library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash);
+import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash, faCheck } from '@fortawesome/free-solid-svg-icons';
+library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash, faCheck);
 
 
 export default {
@@ -115,7 +139,13 @@ export default {
     },
     data() {
         return {
-
+            statusMap: {
+                0: 'Draft',
+                1: 'Submitted',
+                2: 'Received',
+                3: 'Returned',
+                4: 'Completed'
+            },
             QOPRList: [],
             dataTableInitialized: false
 
@@ -132,7 +162,7 @@ export default {
         if (this.role === 'admin') {
             this.fetchQOPR(); // Admin sees all requests
         } else {
-            this.fetchQOPRperUser(); // Non-admin sees only their own requests
+            this.fetchQOPRperDivision(); // Non-admin sees only their own requests
         }
     },
     methods: {
@@ -142,6 +172,43 @@ export default {
             this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
 
         },
+        // receiveReport(arg) {
+        //     Swal.fire({
+        //         title: 'Receive this Report?',
+        //         text: "You won't be able to revert this!",
+        //         icon: 'question',
+        //         showCancelButton: true,
+        //         confirmButtonText: 'Submit'
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+
+        //             let id = arg;
+        //             const userId = localStorage.getItem('userId');
+        //             axios.post(`/api/receiveReport`, {
+        //                 id: id,
+        //                 status: '2',
+        //                 userId: userId,
+        //             })
+        //                 .then(response => {
+
+        //                     Swal.fire({
+        //                         icon: 'success',
+        //                         title: 'Report Successfully Submitted!',
+        //                         showConfirmButton: false,
+        //                         timer: 1000
+        //                     });
+        //                     setTimeout(() => {
+        //                         this.fetchQOPR();
+        //                         // this.fetchQOPRperDivision();
+        //                     }, 200);
+        //                 })
+        //                 .catch(error => {
+        //                     console.error('Error Submitting report:', error)
+        //                 })
+
+        //         }
+        //     });
+        // },
         submitReport(arg) {
             Swal.fire({
                 title: 'Submit Report?',
@@ -153,9 +220,11 @@ export default {
                 if (result.isConfirmed) {
 
                     let id = arg;
+                    const userId = localStorage.getItem('userId');
                     axios.post(`/api/submitReport`, {
                         id: id,
-                        status: '1'
+                        status: '1',
+                        userId: userId,
                     })
                         .then(response => {
 
@@ -166,7 +235,8 @@ export default {
                                 timer: 1000
                             });
                             setTimeout(() => {
-                                this.fetchQOPR();
+                                // this.fetchQOPR();
+                                this.fetchQOPRperDivision();
                             }, 200);
                         })
                         .catch(error => {
@@ -202,6 +272,7 @@ export default {
                             });
                             setTimeout(() => {
                                 this.fetchQOPR();
+                                this.fetchQOPRperDivision();
                             }, 200);
                         })
                         .catch(error => {
@@ -213,10 +284,11 @@ export default {
 
 
         },
-        fetchQOPRperUser() {
-            axios.get(`/api/fetchQOPRperUser/${this.userId}`)
+        fetchQOPRperDivision() {
+            axios.get(`/api/fetchQOPRperDivision/${this.userId}`)
                 .then(response => {
                     this.QOPRList = response.data
+                    console.log(response)
                     this.initializeDataTable();
                 })
                 .catch(error => {

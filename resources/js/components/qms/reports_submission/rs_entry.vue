@@ -207,7 +207,7 @@ export default {
                     } else if (response.data[0].frequency_monitoring === 'Quarterly' || response.data[0].frequency_monitoring === 'Quarterly (Learning and Development)') {
                         this.period_covered = ['1st Quarter', '2nd Quarter', '3rd Quarter', '4th Quarter'];
                     }
-                    // console.log(qp_code_id)
+
                     this.form = {
                         ...response.data[0],
                         qp_code: this.form.qp_code,
@@ -221,9 +221,10 @@ export default {
                 })
         },
         fetchQualityProcedure() {
-            axios.get('/api/fetchQualityProcedure')
+            let userId = localStorage.getItem('userId');
+            axios.get(`/api/fetchQualityProcedure/${userId}`)
                 .then(response => {
-                    // console.log(response.data)
+                    console.log(response.data)
                     this.qp_code = response.data.map(qp_code => ({
                         label: qp_code.qp_code,
                         value: qp_code.id
@@ -253,7 +254,7 @@ export default {
                         frequency_monitoring: this.form.frequency_monitoring,
                         year: this.form.year
                     });
-
+                    
                     await Swal.fire({
                         icon: 'success',
                         title: 'Success!',
