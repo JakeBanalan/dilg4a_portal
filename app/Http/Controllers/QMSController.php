@@ -165,6 +165,28 @@ class QMSController extends Controller
         ]);
     }
 
+    public function fetchQualityProcedureAll()
+    {
+        $FetchQP = QPModel::select(
+            'tbl_qop.id',
+            'tbl_qop.frequency_monitoring',
+            'tbl_qop.coverage',
+            'tbl_qop.office',
+            'tbl_qop.rev_no',
+            'tbl_qop.EffDate',
+            'tbl_qop.process_owner',
+            'tbl_qop.qp_code',
+            'tbl_qop.procedure_title',
+            'tbl_qop.created_by',
+            'tbl_qop.date_created'
+        )
+
+            ->leftJoin('users', 'users.id', '=', 'tbl_qop.created_by')
+            // ->Where('tbl_qop.office', 'LIKE', '%' . $userOffice . '%')
+            ->get();
+        return response()->json($FetchQP);
+    }
+
     public function fetchQualityProcedure($userId)
     {
         $fetchUser = UserModel::select(

@@ -272,6 +272,10 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetchQualityProcedureAll', [QMSController::class, 'fetchQualityProcedureAll']);
+});
+
+Route::middleware('api')->group(function () {
     Route::get('fetchEntryData/{id}', [QMSController::class, 'fetchEntryData']);
 });
 
