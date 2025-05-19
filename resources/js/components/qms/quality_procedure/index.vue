@@ -135,7 +135,7 @@ export default {
                 });
         },
         fetchQualityProcedure() {
-            axios.get('/api/fetchQualityProcedure1')
+            axios.get('/api/fetchQualityProcedureAll')
                 .then(response => {
                     this.QualityProcedure = response.data;
                     this.initializeDataTable();

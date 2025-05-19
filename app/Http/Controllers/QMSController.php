@@ -164,9 +164,9 @@ class QMSController extends Controller
             'procedure_title' => $procedure_title,
         ]);
     }
-    public function fetchQualityProcedure1()
-    {
 
+    public function fetchQualityProcedureAll()
+    {
         $FetchQP = QPModel::select(
             'tbl_qop.id',
             'tbl_qop.frequency_monitoring',
