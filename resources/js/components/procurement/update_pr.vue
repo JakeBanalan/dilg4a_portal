@@ -151,7 +151,7 @@
                         </div>
                         <!--ADD ITEM MODAL-->
                         <div class="modal" v-if="addItemModalVisible" id="addEditModal"
-                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
                             <div class="modal-dialog"
                                 style=" margin: auto; position: relative; transform: translateY(15%); ">
                                 <div class="modal-content">
@@ -207,7 +207,7 @@
 
                         <!--EDIT ITEM MODAL-->
                         <div class="modal" v-if="editItemModalVisible" id="viewEditModal"
-                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
                             <div class="modal-dialog"
                                 style=" margin: auto; position: relative; transform: translateY(15%);">
                                 <div class="modal-content">
@@ -283,6 +283,7 @@ import StatBox from "../procurement/stat_board.vue";
 import vSelect from 'vue-select';
 import axios from "axios";
 import { toast } from "vue3-toastify";
+
 
 library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave);
 

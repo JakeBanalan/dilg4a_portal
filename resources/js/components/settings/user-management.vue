@@ -212,53 +212,52 @@
                                         Create User
                                     </button>
                                     <div class="table-responsive">
-                                        <!-- <user_table /> -->
                                         <table id="employee_table"
                                             class="table table-striped table-borderless display expandable-table dataTable no-footer"
                                             role="grid">
                                             <thead>
                                                 <tr role="row">
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        Employee ID</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        Province/HUC</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        Username</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        Full Name</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        Username</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        Email</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        Contact Number</th>
-                                                    <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1"
-                                                        aria-label="Quote#" style="width: 10px; text-align: center;">
-                                                        action</th>
+                                                    <th class="sorting_disabled" style="min-width: 90px;">Employee ID
+                                                    </th>
+                                                    <th class="sorting_disabled" style="min-width: 110px;">Province/HUC
+                                                    </th>
+                                                    <th class="sorting_disabled" style="min-width: 120px;">Username</th>
+                                                    <th class="sorting_disabled" style="min-width: 150px;">Full Name
+                                                    </th>
+                                                    <th class="sorting_disabled d-none d-md-table-cell"
+                                                        style="min-width: 120px;">Username</th>
+                                                    <th class="sorting_disabled d-none d-md-table-cell"
+                                                        style="min-width: 180px;">Email</th>
+                                                    <th class="sorting_disabled d-none d-lg-table-cell"
+                                                        style="min-width: 130px;">Contact Number</th>
+                                                    <th class="sorting_disabled" style="min-width: 100px;">Action</th>
                                                 </tr>
                                             </thead>
-
                                             <tbody>
                                                 <tr v-for="ed in EmpTableData" :key="ed.id">
                                                     <td>{{ ed.employee_no }}</td>
                                                     <td>{{ ed.province }}</td>
-                                                    <td>{{ ed.citymun }}</td>
-                                                    <td>{{ ed.name }}</td>
                                                     <td>{{ ed.username }}</td>
-                                                    <td>{{ ed.contact_details }}</td>
+                                                    <td>{{ ed.name }}</td>
+                                                    <td class="d-none d-md-table-cell">{{ ed.username }}</td>
+                                                    <td class="d-none d-md-table-cell">{{ ed.email }}</td>
+                                                    <td class="d-none d-lg-table-cell">{{ ed.contact_details }}</td>
                                                     <td>
-                                                        <button @click="UpdateUser(ed.id)" class="btn btn-icon mr-1"
-                                                            style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
-                                                            <font-awesome-icon
-                                                                :icon="['fas', 'eye']"></font-awesome-icon>
-                                                        </button>
+                                                        <div class="btn-group" role="group">
+                                                            <button @click="UpdateUser(ed.id)"
+                                                                class="btn btn-sm btn-info me-1" title="View User">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+                                                            <button @click="addRole(ed.id)"
+                                                                class="btn btn-sm btn-primary" title="Add Role">
+                                                                <i class="fas fa-user-tag"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <!-- Empty state if no data -->
+                                                <tr v-if="!EmpTableData || EmpTableData.length === 0">
+                                                    <td colspan="8" class="text-center py-4">No employee data available
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -291,25 +290,44 @@
                 <!-- Body -->
                 <div class="modal-body" style="background-color: #f9f9f9; padding: 1.5rem;">
                     <form>
+                        <!-- Select All Option -->
+                        <div class="mb-4 pb-2 border-bottom">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="selectAll"
+                                    v-model="selectAllChecked" @change="toggleSelectAll" />
+                                <label class="form-check-label fw-bold" for="selectAll"
+                                    style="font-size: 1.2rem; color: #059886;">
+                                    Select All Menu Items
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Menu Items -->
                         <div class="row">
                             <div v-for="menu in menuOptions" :key="menu.value" class="col-md-6 mb-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" :id="menu.value" :value="menu.value"
-                                        v-model="selectedSidebarItems" @change="toggleChildren(menu)" />
-                                    <label class="form-check-label fw-bold" :for="menu.value" style="font-size: 1.1rem;">
-                                        {{ menu.label }}
-                                    </label>
-                                </div>
+                                <div class="card shadow-sm">
+                                    <div class="card-header bg-light">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" :id="menu.value"
+                                                :value="menu.value" v-model="selectedSidebarItems"
+                                                @change="toggleChildren(menu)" />
+                                            <label class="form-check-label fw-bold" :for="menu.value"
+                                                style="font-size: 1.1rem;">
+                                                {{ menu.label }}
+                                            </label>
+                                        </div>
+                                    </div>
 
-                                <!-- Child checkboxes -->
-                                <div v-if="menu.children" class="ms-4 ps-2 border-start mt-2">
-                                    <div v-for="child in menu.children" :key="child.value" class="form-check">
-                                        <input class="form-check-input" type="checkbox" :id="child.value"
-                                            :value="child.value" v-model="selectedSidebarItems"
-                                            :disabled="!selectedSidebarItems.includes(menu.value)" />
-                                        <label class="form-check-label" :for="child.value" style="font-size: 1rem;">
-                                            {{ child.label }}
-                                        </label>
+                                    <!-- Child checkboxes -->
+                                    <div v-if="menu.children" class="card-body pt-2">
+                                        <div v-for="child in menu.children" :key="child.value" class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" :id="child.value"
+                                                :value="child.value" v-model="selectedSidebarItems"
+                                                :disabled="!selectedSidebarItems.includes(menu.value)" />
+                                            <label class="form-check-label" :for="child.value" style="font-size: 1rem;">
+                                                {{ child.label }}
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -328,30 +346,7 @@
         </div>
     </div>
 
-
 </template>
-<style>
-@import "~vue-select/dist/vue-select.css";
-
-
-/* tbody {
-    display: block;
-    height: 200px;
-    overflow: auto;
-}
-
-thead,
-tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-} */
-
-.sbnone::-webkit-scrollbar {
-    display: none;
-}
-</style>
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <script>
 import Multiselect from 'vue-multiselect';
 import Navbar from '../layout/Navbar.vue';
@@ -360,7 +355,7 @@ import FooterVue from '../layout/Footer.vue';
 import BreadCrumbs from '../dashboard_tiles/BreadCrumbs.vue';
 import user_table from './user_table.vue';
 import Swal from 'sweetalert2';
-import axios from 'axios'; // Import axios library to make HTTP requests
+import axios from 'axios';
 
 export default {
     name: 'User Management',
@@ -377,6 +372,7 @@ export default {
             isCardVisible: false,
             EmpTableData: [],
             dataTableInitialized: false,
+            selectAllChecked: false,
             options: [
                 { label: 'All', value: 'All' },
                 { label: 'Batangas', value: 'Batangas' },
@@ -393,39 +389,38 @@ export default {
                 { label: 'Laguna', value: 'option4' },
                 { label: 'Lucena City', value: 'option5' },
                 { label: 'Quezon', value: 'option6' },
-                { label: 'Rizal', value: 'option7' }, // Options For Office
+                { label: 'Rizal', value: 'option7' },
             ],
-
             options3: [
                 { label: 'All', value: 'option1' },
                 { label: '18-24', value: 'option2' },
                 { label: '25-34', value: 'option3' },
                 { label: '35-44', value: 'option4' },
                 { label: '45-54', value: 'option5' },
-                { label: '65 and Over', value: 'option6' }, // Options For Age Category
+                { label: '65 and Over', value: 'option6' },
             ],
             options4: [
                 { label: 'All', value: 'option1' },
                 { label: 'Married', value: 'option2' },
                 { label: 'Single', value: 'option3' },
                 { label: 'Widow', value: 'option4' },
-                { label: 'Seperated', value: 'option5' }, // Options For Civil Status
+                { label: 'Seperated', value: 'option5' },
             ],
             options5: [
                 { label: 'Yes', value: 'option1' },
-                { label: 'None', value: 'option2' }, // Options For Health Issues
+                { label: 'None', value: 'option2' },
             ],
             options6: [
                 { label: 'Male', value: 'option1' },
-                { label: 'Female', value: 'option2' }, // Options For Gender
+                { label: 'Female', value: 'option2' },
             ],
             options7: [
                 { label: 'Yes', value: 'option1' },
-                { label: 'No', value: 'option2' }, // Options For PWD
+                { label: 'No', value: 'option2' },
             ],
             options8: [
                 { label: 'Yes', value: 'option1' },
-                { label: 'No', value: 'option2' }, // Options For Solo Parent
+                { label: 'No', value: 'option2' },
             ],
             menuOptions: [
                 { label: 'Dashboard', value: '/dashboard' },
@@ -466,20 +461,61 @@ export default {
                 },
                 { label: 'User Management', value: '/settings/user-management/' },
             ],
-            selectedMenus: [], // To store selected menu items for the user
+            selectedMenus: [],
             searchText: '',
-            users: [], // Initialize an empty array to store user data
-            selectedUserId: null, // To store the ID of the selected user
-            selectedSidebarItems: [], // To store the selected sidebar items
+            users: [],
+            selectedUserId: null,
+            selectedSidebarItems: [],
+            // Keep track of all available menu items including children for select all functionality
+            allMenuItems: []
         };
+    },
+    computed: {
+        // Computed property to check if all items are selected
+        isAllSelected() {
+            return this.allMenuItems.length > 0 && this.selectedSidebarItems.length === this.allMenuItems.length;
+        }
+    },
+    watch: {
+        // Watch the selectedSidebarItems array to update selectAllChecked
+        selectedSidebarItems: {
+            handler() {
+                this.selectAllChecked = this.isAllSelected;
+            },
+            deep: true
+        }
     },
     mounted() {
         this.fetchEmployeeData();
+        this.generateAllMenuItems();
     },
     methods: {
+        // Generate a flat list of all menu items (including children) for select all functionality
+        generateAllMenuItems() {
+            const items = [];
+            this.menuOptions.forEach(menu => {
+                items.push(menu.value);
+                if (menu.children) {
+                    menu.children.forEach(child => {
+                        items.push(child.value);
+                    });
+                }
+            });
+            this.allMenuItems = items;
+        },
+        // Toggle select all functionality
+        toggleSelectAll() {
+            if (this.selectAllChecked) {
+                // Select all items
+                this.selectedSidebarItems = [...this.allMenuItems];
+            } else {
+                // Deselect all items
+                this.selectedSidebarItems = [];
+            }
+        },
         createUser() {
             const userData = {
-                module_access: JSON.stringify(this.selectedMenus.map(menu => menu.value)), // Save selected menus as JSON
+                module_access: JSON.stringify(this.selectedMenus.map(menu => menu.value)),
             };
             axios.post('../../api/PostUser', userData)
                 .then(response => {
@@ -493,42 +529,63 @@ export default {
             this.$router.push({ path: `/settings/update/${id}` });
         },
         addRole(id) {
-            this.selectedUserId = id; // Set the selected user ID
-            this.selectedSidebarItems = []; // Reset selected items
-            // Fetch the user's current module_access and pre-check the checkboxes
+            this.selectedUserId = id;
+            this.selectedSidebarItems = [];
             axios.get(`../../api/getUserDetails/${id}`)
                 .then(response => {
                     const user = response.data;
                     if (user.module_access) {
-                        this.selectedSidebarItems = JSON.parse(user.module_access); // Pre-check items
+                        try {
+                            this.selectedSidebarItems = JSON.parse(user.module_access);
+                            // Update the selectAllChecked status based on current selection
+                            this.selectAllChecked = this.isAllSelected;
+                        } catch (e) {
+                            console.error('Error parsing module_access JSON:', e);
+                            this.selectedSidebarItems = [];
+                        }
                     }
-                    $('#assignSidebarModal').modal('show'); // Show the modal
+                    $('#assignSidebarModal').modal('show');
                 })
                 .catch(error => {
                     console.error('Error fetching user details:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch user details.',
+                    });
                 });
         },
         saveSidebarItems() {
+            if (!this.selectedUserId) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No user selected.',
+                });
+                return;
+            }
+
             const payload = {
                 userId: this.selectedUserId,
-                module_access: JSON.stringify(this.selectedSidebarItems), // Save as JSON string
+                module_access: JSON.stringify(this.selectedSidebarItems),
             };
+
             axios.post('../../api/updateUserSidebar', payload)
                 .then(response => {
-
-
-                    // Update localStorage with the new module_access if the current user is being updated
+                    // Update localStorage if current user is being updated
                     if (this.selectedUserId === parseInt(localStorage.getItem('userId'))) {
                         localStorage.setItem('module_access', JSON.stringify(this.selectedSidebarItems));
-                        console.log('Updated module_access in localStorage:', this.selectedSidebarItems); // Debugging log
                     }
 
-                    $('#assignSidebarModal').modal('hide'); // Hide the modal
+                    $('#assignSidebarModal').modal('hide');
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
                         text: 'Sidebar items updated successfully!',
                     });
+
+                    // Refresh the employee data to show updated permissions
+                    this.fetchEmployeeData();
                 })
                 .catch(error => {
                     console.error('Error updating sidebar items:', error);
@@ -543,11 +600,11 @@ export default {
             this.isCardVisible = !this.isCardVisible;
         },
         fetchEmployeeData() {
-            const vm = this; // Save Vue instance context
+            const vm = this;
             axios.get('../../api/fetchEmployeeData')
                 .then((response) => {
                     $('#employee_table').DataTable({
-                        destroy: true, // Destroy existing DataTable instance
+                        destroy: true,
                         data: response.data,
                         pageLength: 20,
                         bLengthChange: false,
@@ -564,9 +621,9 @@ export default {
                             {
                                 data: null, orderable: false, render: function (data) {
                                     return `
-                                        <button type="button" class="btn btn-info btn-update" data-id="${data.id}">View</button>
-                                        <button type="button" class="btn btn-primary btn-role" data-id="${data.id}">Add Role</button>
-                                    `;
+                    <button type="button" class="btn btn-info btn-update" data-id="${data.id}">View</button>
+                    <button type="button" class="btn btn-primary btn-role" data-id="${data.id}">Add Role</button>
+                  `;
                                 },
                             }
                         ]
@@ -579,10 +636,14 @@ export default {
                         const id = $(this).data('id');
                         vm.UpdateUser(id);
                     });
-
                 })
                 .catch((error) => {
-
+                    console.error('Error fetching employee data:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch employee data.',
+                    });
                 });
         },
         initializeDataTable() {
@@ -603,16 +664,74 @@ export default {
             });
         },
         toggleChildren(menu) {
-            if (!this.selectedSidebarItems.includes(menu.value)) {
-                menu.children?.forEach(child => {
-                    const index = this.selectedSidebarItems.indexOf(child.value);
-                    if (index !== -1) {
-                        this.selectedSidebarItems.splice(index, 1);
-                    }
-                });
+            if (menu.children) {
+                // If the parent menu is checked, enable all child checkboxes
+                if (this.selectedSidebarItems.includes(menu.value)) {
+                    // Do nothing to children, they're now enabled for selection
+                } else {
+                    // If parent is unchecked, remove all children from selection
+                    menu.children.forEach(child => {
+                        const index = this.selectedSidebarItems.indexOf(child.value);
+                        if (index !== -1) {
+                            this.selectedSidebarItems.splice(index, 1);
+                        }
+                    });
+                }
             }
-        },
+        }
     },
-
 }
 </script>
+
+<style scoped>
+@import "~vue-select/dist/vue-select.css";
+
+/* Responsive table styles */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure all cells have padding and vertical alignment */
+.table td,
+.table th {
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+/* Make sure the action buttons are properly displayed */
+.btn-group {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+/* Hide scrollbar for cleaner look on some browsers */
+.table-responsive::-webkit-scrollbar {
+    height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+/* Special styles for mobile view */
+@media (max-width: 767.98px) {
+
+    .table th,
+    .table td {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+    }
+
+    /* Make sure action buttons are visible */
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+.sbnone::-webkit-scrollbar {
+    display: none;
+}
+</style>

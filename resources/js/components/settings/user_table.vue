@@ -19,7 +19,7 @@
                 <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
                     style="width: 10px; text-align: center;">Contact Number</th>
                 <th class="select-checkbox sorting_disabled" rowspan="1" colspan="1" aria-label="Quote#"
-                    style="width: 10px; text-align: center;">action</th>
+                    style="width: 10px; text-align: center;">Action</th>
             </tr>
         </thead>
 

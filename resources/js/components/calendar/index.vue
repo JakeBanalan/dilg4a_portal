@@ -254,7 +254,7 @@
             </div>
         </div>
         <EventModal :visible="modalVisible" :mode="mode" @close="closeModal" @save="saveEventData" @delete="deleteEvent"
-            :fetchAuthor="fetchAuthor" :eventDetails="eventDetails" />
+            :eventDetails="eventDetails" />
     </div>
 </template>
 
@@ -271,6 +271,7 @@ import axios from 'axios';
 import FullCalendar from '@fullcalendar/vue3';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+
 
 export default {
     components: {
@@ -316,6 +317,7 @@ export default {
                 editable: true,
                 events: [],
                 eventDisplay: 'block',
+                displayEventEnd: true,
                 dayMaxEvents: 3,
                 customButtons: {
                     AddEvent: {
