@@ -98,24 +98,23 @@ class QMSMonthlyExportController extends Controller
             $office = 'OFFICE OF THE REGIONAL DIRECTOR - REGIONAL INFORMATION AND COMMUNICATION TECHNOLOGY UNIT';
         }
 
-        $processOwners =$fetchQOPR[0]['process_owner'];
-        if(strpos($processOwners, ',')) {
+        $processOwners = $fetchQOPR[0]['process_owner'];
+        if (strpos($processOwners, ',')) {
             $processOwners = explode(', ', $processOwners);
 
             $process_owner = '';
             foreach ($processOwners as $name) {
-                $name= trim($name);
+                $name = trim($name);
                 $process_owner .= "\n";
                 $process_owner .= $name;
                 $process_owner .= "\n";
             }
-
-        }else {
-            $process_owner =$fetchQOPR[0]['process_owner'];
+        } else {
+            $process_owner = $fetchQOPR[0]['process_owner'];
         }
 
 
-        
+
         // return response()->json($process_owner);
         $templatePath = public_path('templates/qms_qme_report_template.xlsx');
         $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($templatePath);
@@ -506,7 +505,7 @@ class QMSMonthlyExportController extends Controller
                 // ===
                 // $indDTotal = $qmes[3]['rate']['01'] + $qmes[3]['rate']['02'] + $qmes[3]['rate']['03'] + $qmes[3]['rate']['04'] + $qmes[3]['rate']['05'] + $qmes[3]['rate']['06'] + $qmes[3]['rate']['07'] + $qmes[3]['rate']['08'] + $qmes[3]['rate']['09'] + $qmes[3]['rate']['10'] + $qmes[3]['rate']['11'] + $qmes[3]['rate']['12'];
                 // $sheet->getCell('V' . $row)->setValue($indDTotal > 0 ? $indDTotal : '0');
-                
+
                 $indDTotal = 0;
                 for ($i = 1; $i <= 12; $i++) {
                     // $month = str_pad($i, 2, '0', STR_PAD_LEFT); // ensures two-digit keys like '01', '02', etc.
@@ -550,8 +549,15 @@ class QMSMonthlyExportController extends Controller
             // $sheet->unmergeCells('D'.($row).':I'.($row));
 
             $sheet->getCell('A' . $row)->setValue($formula);
-            $sheet->getCell('D' . $row)->setValue('Formula: ' . $entry['formula']);
-            $sheet->getCell('H' . $row)->setValue('Target: ' . $entry['target_percentage']);
+            if ($entry['formula'] === null) {
+                $sheet->mergeCells('D' . $row . ':I' . $row);
+                $sheet->getCell('D' . $row)->setValue('Target: ' . $entry['target_percentage']);
+            } else {
+                $sheet->mergeCells('D' . $row . ':G' . $row);
+                $sheet->mergeCells('H' . $row . ':I' . $row);
+                $sheet->getCell('D' . $row)->setValue('Formula: ' . $entry['formula']);
+                $sheet->getCell('H' . $row)->setValue('Target: ' . $entry['target_percentage']);
+            }
 
             // === CONVERT THIS TO DYNAMIC
             // === DATA TO BE DISPLAY WILL DEPEND ON CURRENT PERIOD 
@@ -644,8 +650,8 @@ class QMSMonthlyExportController extends Controller
             $sheet->getStyle("D" . $row . ':I' . $row)->getAlignment()->setWrapText(true);
 
             $sheet->mergeCells('A' . $row . ':C' . $row);
-            $sheet->mergeCells('D' . $row . ':G' . $row);
-            $sheet->mergeCells('H' . $row . ':I' . $row);
+            // $sheet->mergeCells('D' . $row . ':G' . $row);
+            // $sheet->mergeCells('H' . $row . ':I' . $row);
             $sheet->mergeCells('V' . $row . ':X' . $row++);
             //FORMULA
 

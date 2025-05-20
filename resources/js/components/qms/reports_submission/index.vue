@@ -18,8 +18,95 @@
                                         @click="addsubmission()">
                                         Submit New Report
                                     </button>
+                                    <button type="button" class="btn btn-primary btn-fw btn-icon-text mx-2"
+                                        @click="toggleSearch">
+                                        <font-awesome-icon :icon="['fas', 'magnifying-glass']"></font-awesome-icon>
+                                        Advanced Search
+                                    </button>
                                 </div>
                             </div>
+
+                            <!-- Advanced Search Form -->
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                <!-- <div> -->
+                                <div v-if="searchVisible">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">QP Code:</label>
+                                            <input type="text" v-model="filteredParams.qp_code" class="form-control"
+                                                placeholder="QP Code" style="margin-bottom: 2%;">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">Procedure Title:</label>
+                                            <input type="text" v-model="filteredParams.procedure_title"
+                                                class="form-control" placeholder="Procedure Title"
+                                                style="margin-bottom: 2%;">
+
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">Process Owner:</label>
+                                            <input type="text" v-model="filteredParams.process_owner"
+                                                class="form-control" placeholder="Process Owner"
+                                                style="margin-bottom: 2%;">
+
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">Frequency:</label>
+                                            <Multiselect @update:modelValue="periodOptions" :options="FrequencyOption"
+                                                v-model="filteredParams.frequency_monitoring" track-by="value"
+                                                :multiple="false" label="label" :searchable="false"
+                                                id="frequency_monitoring" placeholder="Frequency"
+                                                style="margin-bottom: 2%;">
+                                            </Multiselect>
+
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">Office:</label>
+                                            <input type="text" v-model="filteredParams.office" class="form-control"
+                                                placeholder="Office">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">Status:</label>
+                                            <Multiselect :options="statusOptions" v-model="filteredParams.status"
+                                                track-by="value" :multiple="false" label="label" :searchable="false"
+                                                id="status" placeholder="Status" style="margin-bottom: 2%;">
+                                            </Multiselect>
+
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">Year:</label>
+                                            <input type="text" v-model="filteredParams.year" class="form-control"
+                                                placeholder="Year">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label style="font-size: 0.875rem;">Period Covered:</label>
+                                            <Multiselect :options="period_covered"
+                                                v-model="filteredParams.period_covered" track-by="value"
+                                                :multiple="false" label="label" :searchable="false" id="period_covered"
+                                                placeholder="Period" style="margin-bottom: 2%;">
+                                            </Multiselect>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12" style="text-align: right;">
+                                            <button type="button" class="btn btn-primary btn-icon-text"
+                                                @click="applySearch">
+                                                <font-awesome-icon
+                                                    :icon="['fas', 'magnifying-glass']"></font-awesome-icon>
+                                                Search</button>
+                                            <button type="button" class="btn btn-secondary btn-icon-text mx-2"
+                                                @click="resetSearch">
+                                                <font-awesome-icon :icon="['fas', 'rotate']"></font-awesome-icon>
+                                                Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div class="table1">
                                 <table id="rs_table" class="table table-striped table-bordered">
                                     <thead>
@@ -35,7 +122,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="list in QOPRList" :key="list.id">
+                                        <tr v-for="list in filteredQOPRList" :key="list.id">
                                             <td style="width: 5%;">{{ list.qp_code }}</td>
                                             <td style="width: 5%;" class="ellipsis"> {{ list.frequency_monitoring }}
                                             </td>
@@ -45,7 +132,7 @@
                                             <td style="width: 5%;" class="ellipsis">{{ list.process_owner }}</td>
                                             <td style="width: 5%;">{{ list.office }}</td>
                                             <td style="width: 5%;"><b>{{ list.qp_covered }}</b><br><i>~{{ list.year
-                                                    }}~</i></td>
+                                            }}~</i></td>
                                             <td style="width: 5%;">
                                                 <b>{{ statusMap[list.status] }}</b>
                                                 <br><i>~{{ list.uname }}~</i>
@@ -104,7 +191,7 @@
                     </div>
 
                     <!-- <Pagination :total="ict_data.length" @pageChange="onPageChange" /> -->
-                     
+
 
                 </div>
                 <FooterVue />
@@ -114,7 +201,7 @@
 </template>
 
 <script>
-
+import Multiselect from 'vue-multiselect';
 import Navbar from "../../layout/Navbar.vue";
 import Sidebar from "../../layout/Sidebar.vue";
 import FooterVue from "../../layout/Footer.vue";
@@ -125,11 +212,13 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { toast } from "vue3-toastify";
 
 import { faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { list } from 'postcss';
 library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash, faCheck);
 
 
 export default {
     components: {
+        Multiselect,
         Navbar,
         Sidebar,
         FooterVue,
@@ -147,68 +236,200 @@ export default {
                 4: 'Completed'
             },
             QOPRList: [],
-            dataTableInitialized: false
+            dataTableInitialized: false,
+            filteredParams: {
+                qp_code: '',
+                procedure_title: '',
+                process_owner: '',
+                frequency_monitoring: null,
+                office: '',
+                status: null,
+                year: '',
+                period_covered: null
+            },
+            searchVisible: false,
+            period_covered: [],
+            filteredQOPRList: [],
+            FrequencyOption: [
+                { label: 'Monthly', value: 'Monthly' },
+                { label: 'Quarterly', value: 'Quarterly' },
+            ],
+            MonthlyOptions: [
+                { label: 'January', value: 'January' },
+                { label: 'February', value: 'February' },
+                { label: 'March', value: 'March' },
+                { label: 'April', value: 'April' },
+                { label: 'May', value: 'May' },
+                { label: 'June', value: 'June' },
+                { label: 'July', value: 'July' },
+                { label: 'August', value: 'August' },
+                { label: 'September', value: 'September' },
+                { label: 'October', value: 'October' },
+                { label: 'November', value: 'November' },
+                { label: 'December', value: 'December' },
+            ],
+            QuarterOptions: [
+                { label: '1st Quarter', value: '1st Quarter' },
+                { label: '2nd Quarter', value: '2nd Quarter' },
+                { label: '3rd Quarter', value: '3rd Quarter' },
+                { label: '4th Quarter', value: '4th Quarter' },
+            ],
+            statusOptions: [
+                { label: 'Draft', value: 0 },
+                { label: 'Submitted', value: 1 },
+                { label: 'Received', value: 2 },
+                { label: 'Returned', value: 3 },
+                { label: 'Completed', value: 4 }
+            ],
 
         }
 
     },
+    // watch: {
+    //     filteredParams: {
+    //         handler: debounce(function () {
+    //             // Triggers re-computation if needed
+    //         }, 300),
+    //         deep: true
+    //     },
+    // 'filteredParams.frequency'(newVal) {
+    //     console.log('QP Code changed to:', newVal.value);
+    // }
+    //     // filteredQOPRList() {
+    //     //     this.$nextTick(() => {
+    //     //         $('#rs_table').DataTable().destroy();
+    //     //         $('#rs_table').DataTable({
+    //     //             retrieve: true,
+    //     //             ordering: false,
+    //     //             paging: true,
+    //     //             pageLength: 10,
+    //     //             searching: false,
+    //     //             lengthChange: false,
+    //     //         });
+    //     //     });
+    //     // }
+    // },
+    // computed: {
+    //     filteredQOPRList() {
+    //         return this.QOPRList.filter(item => {
+    //             const qpCodeMatch = this.filteredParams.qp_code === '' || item.qp_code?.toLowerCase().includes(this.filteredParams.qp_code.toLowerCase());
+    //             const titleMatch = this.filteredParams.procedure_title === '' || item.procedure_title?.toLowerCase().includes(this.filteredParams.procedure_title.toLowerCase());
+    //             const ownerMatch = this.filteredParams.process_owner === '' || item.process_owner?.toLowerCase().includes(this.filteredParams.process_owner.toLowerCase());
+    //             const freqMatch = (!this.filteredParams.frequency_monitoring || item.frequency_monitoring === this.filteredParams.frequency_monitoring?.value)
+    //             const officeMatch = this.filteredParams.office === '' || item.office?.toLowerCase().includes(this.filteredParams.office.toLowerCase());
+    //             const statusMatch = (!this.filteredParams.status || (this.filteredParams.status.value && item.status === this.filteredParams.status.value))
+    //             const yearMatch = this.filteredParams.year === '' || item.year?.toString() === this.filteredParams.year;
+    //             const periodMatch = (!this.filteredParams.period_covered || item.period_covered === this.filteredParams.period_covered?.value)
+
+    //             return qpCodeMatch && titleMatch && ownerMatch && freqMatch && officeMatch && statusMatch && yearMatch && periodMatch;
+    //         });
+    //     }
+    // },
     created() {
         this.userId = parseInt(localStorage.getItem('userId'));
         this.role = localStorage.getItem('user_role');
         // this.fetchQOPR();
     },
     mounted() {
-        // Load data for specific user or all users based on role
-        if (this.role === 'admin') {
-            this.fetchQOPR(); // Admin sees all requests
-        } else {
-            this.fetchQOPRperDivision(); // Non-admin sees only their own requests
-        }
+        this.refreshQOPRTable();
     },
     methods: {
+        toggleSearch() {
+            this.searchVisible = !this.searchVisible;
+        },
+        applySearch() {
+            if ($.fn.DataTable.isDataTable('#rs_table')) {
+                $('#rs_table').DataTable().destroy(); // Destroy before filtering
+            }
+
+            this.filteredQOPRList = this.QOPRList.filter(item => {
+                return (
+                    (!this.filteredParams.qp_code || item.qp_code?.toLowerCase().includes(this.filteredParams.qp_code.toLowerCase())) &&
+                    (!this.filteredParams.procedure_title || item.procedure_title?.toLowerCase().includes(this.filteredParams.procedure_title.toLowerCase())) &&
+                    (!this.filteredParams.process_owner || item.process_owner?.toLowerCase().includes(this.filteredParams.process_owner.toLowerCase())) &&
+                    (!this.filteredParams.frequency_monitoring ||
+                        (this.filteredParams.frequency_monitoring.value === 'Quarterly'
+                            ? item.frequency_monitoring.includes('Quarterly')
+                            : item.frequency_monitoring === this.filteredParams.frequency_monitoring.value)
+                    ) &&
+                    (!this.filteredParams.office || item.office?.toLowerCase().includes(this.filteredParams.office.toLowerCase())) &&
+                    (!this.filteredParams.status?.value || item.status === this.filteredParams.status.value) &&
+                    (!this.filteredParams.year || item.year?.toString().includes(this.filteredParams.year)) &&
+                    (!this.filteredParams.period_covered?.value || item.qp_covered === this.filteredParams.period_covered?.value)
+                );
+            });
+
+            this.$nextTick(() => {
+                $('#rs_table').DataTable({
+                    retrieve: true,
+                    ordering: false,
+                    paging: true,
+                    pageLength: 10,
+                    searching: false, // keep this false if you are not using built-in search
+                    lengthChange: false
+                });
+            });
+
+        },
+        resetSearch() {
+            if ($.fn.DataTable.isDataTable('#rs_table')) {
+                $('#rs_table').DataTable().destroy(); // Destroy before filtering
+            }
+
+            this.filteredParams = {
+                qp_code: '',
+                procedure_title: '',
+                process_owner: '',
+                frequency_monitoring: null,
+                office: '',
+                status: null,
+                year: '',
+                period_covered: null
+            };
+
+            this.periodOptions(null);  // make sure this clears period_covered options correctly
+
+            this.filteredQOPRList = [...this.QOPRList];  // assign a new array copy
+
+            this.$nextTick(() => {
+                $('#rs_table').DataTable({
+                    retrieve: true,
+                    ordering: false,
+                    paging: true,
+                    pageLength: 10,
+                    searching: false,
+                    lengthChange: false
+                });
+            });
+        },
+        periodOptions(f) {
+            this.filteredParams.period_covered = '';
+            if (!f || !f.value) {
+                this.period_covered = [];
+                return;
+            }
+
+            if (f.value === 'Monthly') {
+                this.period_covered = this.MonthlyOptions;
+            } else if (f.value === 'Quarterly') {
+                this.period_covered = this.QuarterOptions;
+            } else {
+                this.period_covered = [];
+            }
+        },
+        refreshQOPRTable() {
+            if (this.role === 'admin') {
+                this.fetchQOPR(); // Admin sees all requests
+            } else {
+                this.fetchQOPRperDivision(); // Non-admin sees only their own requests
+            }
+        },
         viewReport(arg) {
             let id = arg;
             console.log(arg)
             this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
 
         },
-        // receiveReport(arg) {
-        //     Swal.fire({
-        //         title: 'Receive this Report?',
-        //         text: "You won't be able to revert this!",
-        //         icon: 'question',
-        //         showCancelButton: true,
-        //         confirmButtonText: 'Submit'
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-
-        //             let id = arg;
-        //             const userId = localStorage.getItem('userId');
-        //             axios.post(`/api/receiveReport`, {
-        //                 id: id,
-        //                 status: '2',
-        //                 userId: userId,
-        //             })
-        //                 .then(response => {
-
-        //                     Swal.fire({
-        //                         icon: 'success',
-        //                         title: 'Report Successfully Submitted!',
-        //                         showConfirmButton: false,
-        //                         timer: 1000
-        //                     });
-        //                     setTimeout(() => {
-        //                         this.fetchQOPR();
-        //                         // this.fetchQOPRperDivision();
-        //                     }, 200);
-        //                 })
-        //                 .catch(error => {
-        //                     console.error('Error Submitting report:', error)
-        //                 })
-
-        //         }
-        //     });
-        // },
         submitReport(arg) {
             Swal.fire({
                 title: 'Submit Report?',
@@ -236,7 +457,9 @@ export default {
                             });
                             setTimeout(() => {
                                 // this.fetchQOPR();
-                                this.fetchQOPRperDivision();
+                                // this.fetchQOPRperDivision();
+                                this.refreshQOPRTable();
+
                             }, 200);
                         })
                         .catch(error => {
@@ -271,8 +494,9 @@ export default {
                                 timer: 1000
                             });
                             setTimeout(() => {
-                                this.fetchQOPR();
-                                this.fetchQOPRperDivision();
+                                this.refreshQOPRTable();
+                                // this.fetchQOPR();
+                                // this.fetchQOPRperDivision();
                             }, 200);
                         })
                         .catch(error => {
@@ -288,7 +512,8 @@ export default {
             axios.get(`/api/fetchQOPRperDivision/${this.userId}`)
                 .then(response => {
                     this.QOPRList = response.data
-                    console.log(response)
+                    this.filteredQOPRList = this.QOPRList;
+                    // console.log(response)
                     this.initializeDataTable();
                 })
                 .catch(error => {
@@ -299,6 +524,8 @@ export default {
             axios.get('/api/fetchQOPR')
                 .then(response => {
                     this.QOPRList = response.data
+                    this.filteredQOPRList = this.QOPRList;
+                    // console.log(response.data)
                     // const QOPRData = response.data.data
                     // const username = response.data.username
                     // this.QOPRList = QOPRData.map(item => {
@@ -324,6 +551,8 @@ export default {
                     ordering: false,
                     paging: true,
                     pageLength: 10,
+                    searching: false,
+                    lengthChange: false,
                 });
                 this.dataTableInitialized = true;
 

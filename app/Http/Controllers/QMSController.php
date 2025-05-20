@@ -186,7 +186,6 @@ class QMSController extends Controller
             ->get();
         return response()->json($FetchQP);
     }
-
     public function fetchQualityProcedure($userId)
     {
         $fetchUser = UserModel::select(
