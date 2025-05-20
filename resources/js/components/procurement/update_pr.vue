@@ -595,7 +595,18 @@ export default {
 </script>
 
 
-<style>
+<style scoped>
+select {
+    width: 100%;
+    height: 40px;
+    border: none;
+    outline: 0;
+    border-radius: 5px;
+    border: 1px solid #cbced4;
+    box-sizing: border-box;
+    padding: 0px 10px;
+}
+
 .custom-checkbox {
     display: inline-block;
     width: 20px;
