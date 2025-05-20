@@ -271,9 +271,6 @@ Route::middleware('api')->group(function () {
     Route::get('fetchQualityProcedure/{userId}', [QMSController::class, 'fetchQualityProcedure']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('fetchQualityProcedure1', [QMSController::class, 'fetchQualityProcedure1']);
-});
-Route::middleware('api')->group(function () {
     Route::get('fetchQualityProcedureAll', [QMSController::class, 'fetchQualityProcedureAll']);
 });
 

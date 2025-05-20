@@ -32,7 +32,8 @@
                                                     v-if="errors.qp_code">{{ errors.qp_code }}</small></label>
                                             <Multiselect @update:modelValue="fetchQPdata" :options="qp_code"
                                                 track-by="value" v-model="form.qp_code" :multiple="false" label="label"
-                                                :searchable="false" id="qp_code" placeholder="Select QP Code" :class="{'is-invalid': errors.qp_code}">
+                                                :searchable="false" id="qp_code" placeholder="Select QP Code"
+                                                :class="{ 'is-invalid': errors.qp_code }">
                                             </Multiselect>
                                         </div>
                                         <div class="col-md-3" style="padding:0%;">
@@ -43,14 +44,16 @@
                                                             }}</small></label>
                                                     <Multiselect :options="period_covered" v-model="form.period_covered"
                                                         :multiple="false" :searchable="false" id="period_covered"
-                                                        placeholder="Period Cover" :class="{'is-invalid': errors.period_covered}">
+                                                        placeholder="Period Cover"
+                                                        :class="{ 'is-invalid': errors.period_covered }">
                                                     </Multiselect>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <label>Year: <small class="err-msg" v-if="errors.year">{{
-                                                            errors.year }}</small></label>
+                                                        errors.year }}</small></label>
                                                     <Multiselect :options="year" v-model="form.year" :multiple="false"
-                                                        :searchable="false" id="year" placeholder="Year" :class="{'is-invalid': errors.year}">
+                                                        :searchable="false" id="year" placeholder="Year"
+                                                        :class="{ 'is-invalid': errors.year }">
                                                     </Multiselect>
                                                 </div>
                                             </div>
@@ -164,11 +167,20 @@ export default {
     },
     created() {
         this.userId = localStorage.getItem('userId');
+        this.role = localStorage.getItem('user_role');
         // this.fetchProcessOwner();
-        this.fetchQualityProcedure()
+        // this.fetchQualityProcedure()
         // this.fetchEntryData();
         // console.log(this.OOptions);
-
+        // console.log(this.role);
+    },
+    mounted() {
+        // Load data for specific user or all users based on role
+        if (this.role === 'admin') {
+            this.fetchQualityProcedureAll(); // Admin sees all requests
+        } else {
+            this.fetchQualityProcedure(); // Non-admin sees only their own requests
+        }
     },
     methods: {
         async validateForm() {
@@ -220,11 +232,24 @@ export default {
                     console.error('Error Fetching items:', error)
                 })
         },
+        fetchQualityProcedureAll() {
+            axios.get('/api/fetchQualityProcedureAll')
+                .then(response => {
+                    // console.log(response.data)
+                    this.qp_code = response.data.map(qp_code => ({
+                        label: qp_code.qp_code,
+                        value: qp_code.id
+                    }))
+                })
+                .catch(error => {
+                    console.error('Error Fetching items:', error);
+                });
+        },
         fetchQualityProcedure() {
             let userId = localStorage.getItem('userId');
             axios.get(`/api/fetchQualityProcedure/${userId}`)
                 .then(response => {
-                    console.log(response.data)
+                    // console.log(response.data)
                     this.qp_code = response.data.map(qp_code => ({
                         label: qp_code.qp_code,
                         value: qp_code.id
@@ -254,7 +279,7 @@ export default {
                         frequency_monitoring: this.form.frequency_monitoring,
                         year: this.form.year
                     });
-                    
+
                     await Swal.fire({
                         icon: 'success',
                         title: 'Success!',
@@ -316,11 +341,12 @@ th {
     margin-left: 4px;
     flex-shrink: 0;
 }
+
 /* Scoped or global */
 .is-invalid .multiselect__control,
 .is-invalid .multiselect__tags {
-  border: 1px solid red !important;
-  background-color: #fff !important;
-  border-radius: 4px;
+    border: 1px solid red !important;
+    background-color: #fff !important;
+    border-radius: 4px;
 }
 </style>
