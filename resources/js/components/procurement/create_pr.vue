@@ -12,7 +12,7 @@
 
                     <!-- Modal -->
                     <div class="modal demo-modal" v-if="modalVisible"
-                        style="position: fixed; top: 55%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; overflow-y: auto; width:900px;">
+                        style="position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; overflow-y: auto; width:900px;">
                         <div class="modal-dialog" style="margin: auto; position: relative; transform: translateY(60%);">
                             <div class="modal-content">
                                 <div class="modal-header">
