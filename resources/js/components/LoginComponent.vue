@@ -344,10 +344,7 @@ export default {
                         localStorage.setItem('user_role', response.data.user_role);
                         localStorage.setItem('api_token', response.data.api_token);
                         localStorage.setItem('isUpdatedPassword', response.data.isUpdatedPassword);
-                        localStorage.setItem('module_access', response.data.module_access || '[]'); // Store module_access
-
-                        console.log('Login successful. Module Access:', response.data.module_access);
-
+                        localStorage.setItem('module_access', response.data.module_access || '[]');
                         // Show success notification
                         this.showSuccessNotification('You are logged in');
 

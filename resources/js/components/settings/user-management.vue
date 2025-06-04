@@ -274,6 +274,7 @@
         </div>
     </div>
 
+    <!-- Modal -->
     <div class="modal fade" id="assignSidebarModal" tabindex="-1" role="dialog"
         aria-labelledby="assignSidebarModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -320,13 +321,44 @@
 
                                     <!-- Child checkboxes -->
                                     <div v-if="menu.children" class="card-body pt-2">
-                                        <div v-for="child in menu.children" :key="child.value" class="form-check mb-2">
-                                            <input class="form-check-input" type="checkbox" :id="child.value"
-                                                :value="child.value" v-model="selectedSidebarItems"
-                                                :disabled="!selectedSidebarItems.includes(menu.value)" />
-                                            <label class="form-check-label" :for="child.value" style="font-size: 1rem;">
-                                                {{ child.label }}
-                                            </label>
+                                        <div v-for="child in menu.children" :key="child.value" class="mb-2">
+                                            <!-- Handle nested children (2 levels deep) -->
+                                            <div v-if="child.children" class="border-start border-2 ps-3 mb-3">
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="checkbox" :id="child.value"
+                                                        :value="child.value" v-model="selectedSidebarItems"
+                                                        :disabled="!selectedSidebarItems.includes(menu.value)"
+                                                        @change="toggleGrandChildren(child)" />
+                                                    <label class="form-check-label fw-semibold" :for="child.value"
+                                                        style="font-size: 1rem;">
+                                                        {{ child.label }}
+                                                    </label>
+                                                </div>
+                                                <!-- Grandchildren -->
+                                                <div class="ps-4">
+                                                    <div v-for="grandchild in child.children" :key="grandchild.value"
+                                                        class="form-check mb-1">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            :id="grandchild.value" :value="grandchild.value"
+                                                            v-model="selectedSidebarItems"
+                                                            :disabled="!selectedSidebarItems.includes(child.value)" />
+                                                        <label class="form-check-label text-muted"
+                                                            :for="grandchild.value" style="font-size: 0.9rem;">
+                                                            {{ grandchild.label }}
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Regular children (no nested children) -->
+                                            <div v-else class="form-check mb-2">
+                                                <input class="form-check-input" type="checkbox" :id="child.value"
+                                                    :value="child.value" v-model="selectedSidebarItems"
+                                                    :disabled="!selectedSidebarItems.includes(menu.value)" />
+                                                <label class="form-check-label" :for="child.value"
+                                                    style="font-size: 1rem;">
+                                                    {{ child.label }}
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -454,9 +486,24 @@ export default {
                     label: 'QMS',
                     value: 'qms',
                     children: [
-                        { label: 'Quality Procedures', value: '/qms/quality_procedure/index' },
-                        { label: 'Process Owners', value: '/qms/process_owner/index' },
-                        { label: 'Reports Submission', value: '/qms/reports_submission/index' },
+                        {
+                            label: 'Quality Procedures',
+                            value: '/qms/quality_procedure/index'
+                        },
+                        {
+                            label: 'Process Owners',
+                            value: '/qms/process_owner/index'
+                        },
+                        {
+                            label: 'Reports Submission',
+                            value: '/qms/reports_submission/index',
+                            children: [
+                                {
+                                    label: 'New Report',
+                                    value: '/qms/reports_submission/new'
+                                },
+                            ]
+                        },
                     ],
                 },
                 { label: 'User Management', value: '/settings/user-management/' },
@@ -511,6 +558,26 @@ export default {
             } else {
                 // Deselect all items
                 this.selectedSidebarItems = [];
+            }
+        },
+        toggleGrandChildren(child) {
+            if (child.children) {
+                if (this.selectedSidebarItems.includes(child.value)) {
+                    // If the child is selected, add all grandchildren to the selection
+                    child.children.forEach(grandchild => {
+                        if (!this.selectedSidebarItems.includes(grandchild.value)) {
+                            this.selectedSidebarItems.push(grandchild.value);
+                        }
+                    });
+                } else {
+                    // If the child is deselected, remove all grandchildren from the selection
+                    child.children.forEach(grandchild => {
+                        const index = this.selectedSidebarItems.indexOf(grandchild.value);
+                        if (index > -1) {
+                            this.selectedSidebarItems.splice(index, 1);
+                        }
+                    });
+                }
             }
         },
         createUser() {
