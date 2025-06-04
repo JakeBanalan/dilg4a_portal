@@ -345,11 +345,22 @@ export default {
                         localStorage.setItem('api_token', response.data.api_token);
                         localStorage.setItem('isUpdatedPassword', response.data.isUpdatedPassword);
                         localStorage.setItem('module_access', response.data.module_access || '[]');
-                        // Show success notification
-                        this.showSuccessNotification('You are logged in');
 
                         // Request notification permission
                         this.requestNotificationPermission();
+
+                        // Check if it's the user's birthday
+                        const today = new Date().toISOString().slice(5, 10); // Format: MM-DD
+                        const userBirthday = response.data.birthdate?.slice(5, 10); // Assuming birthdate is in YYYY-MM-DD format
+                        if (today === userBirthday) {
+                            localStorage.setItem('isBirthday', 'true');
+                            localStorage.setItem('userName', response.data.name);
+                        } else {
+                            localStorage.setItem('isBirthday', 'false');
+                        }
+
+                        // Show success notification
+                        this.showSuccessNotification('You are logged in');
 
                         // Redirect to dashboard after 1 second
                         setTimeout(() => {

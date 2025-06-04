@@ -56,6 +56,8 @@ import StatisticDashboard from "./dashboard_tiles/StatisticDashboard.vue";
 import BirthdayTable from "./dashboard_tiles/BirthdayTable.vue";
 import NotifModal from "./NotifModal.vue";
 
+import Swal from 'sweetalert2';
+import confetti from 'canvas-confetti';
 
 export default {
     name: 'Dashboard',
@@ -104,10 +106,7 @@ export default {
     },
     mounted() {
         this.fetchUserData();
-
-
-
-
+        this.checkBirthday(); // Check for birthday on dashboard load
     },
     methods: {
         checkAndShowModal() {
@@ -140,6 +139,28 @@ export default {
                 .catch(error => {
                     console.error('Request failed:', error);
                 });
+        },
+        checkBirthday() {
+            const isBirthday = localStorage.getItem('isBirthday') === 'true';
+            const userName = localStorage.getItem('userName');
+            if (isBirthday && userName) {
+                Swal.fire({
+                    title: `Happy Birthday!, ${userName}! 🎉`,
+                    text: 'Wishing you a fantastic day!',
+                    icon: 'success',
+                    confirmButtonText: 'Thank you!'
+                }).then(() => {
+                    this.launchConfetti();
+                });
+                localStorage.setItem('isBirthday', 'false'); // Reset the flag
+            }
+        },
+        launchConfetti() {
+            confetti({
+                particleCount: 1000,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
         }
     }
 

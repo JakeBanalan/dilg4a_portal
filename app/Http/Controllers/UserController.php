@@ -45,7 +45,9 @@ class UserController extends Controller
                 'user_role' => $user->user_role,
                 'userId' => $user->id,
                 'module_access' => $user->module_access, // Include module_access
-                'isUpdatedPassword' => $user->isUpdatedPassword
+                'isUpdatedPassword' => $user->isUpdatedPassword,
+                'birthdate' => $user->birthdate, // Add birthdate to the response
+                'name' => $user->first_name . ' ' . $user->last_name // Add full name to the response
             ]);
         } else {
             return response()->json([
