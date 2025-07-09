@@ -461,7 +461,8 @@ export default {
                     children: [
                         { label: 'Quality Procedures', value: '/qms/quality_procedure/index' },
                         { label: 'Process Owners', value: '/qms/process_owner/index' },
-                        { label: 'Reports Submission', value: '/qms/reports_submission/index' },
+                        { label: 'Regional QME', value: '/qms/reports_submission/index' },
+                        { label: 'Provincial QME', value: '/qms/reports_submission/provincial_report' },
                     ],
                 },
                 { label: 'User Management', value: '/settings/user-management/' },

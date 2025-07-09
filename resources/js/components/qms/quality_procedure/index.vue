@@ -25,6 +25,7 @@
                                         <tr role="row">
                                             <th>FREQUENCY</th>
                                             <th>QP CODE</th>
+                                            <th>COVERAGE</th>
                                             <th>PROCEDURE TITLE</th>
                                             <th>PROCESS OWNER</th>
                                             <th>OFFICE</th>
@@ -36,6 +37,7 @@
                                             <td style=" width:5%; overflow-wrap: initial; white-space: normal;">
                                                 {{ qp.frequency_monitoring }}</td>
                                             <td style="width: 10%;">{{ qp.qp_code }}</td>
+                                            <td style="width: 10%;">{{ qp.coverage_name }}</td>
                                             <td
                                                 style=" word-break: break-word; overflow-wrap: break-word; white-space: normal;">
                                                 {{ qp.procedure_title }}</td>

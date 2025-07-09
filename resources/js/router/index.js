@@ -58,6 +58,7 @@ import calendar from "../components/calendar/index.vue";
 import qms_process_owner from "../components/qms/process_owner/index.vue";
 import qms_quality_procedure from "../components/qms/quality_procedure/index.vue";
 import qms_report_submission from "../components/qms/reports_submission/index.vue";
+import qms_provincial_report from "../components/qms/reports_submission/provincial_report.vue";
 import qms_report_submission_view from "../components/qms/reports_submission/rs_entry.vue";
 import qms_report_submission_update from "../components/qms/reports_submission/rs_update.vue";
 import qms_quality_procedure_view from "../components/qms/quality_procedure/qp_entry.vue";
@@ -1023,8 +1024,37 @@ const routes = [{
     },
     {
         path: '/qms/reports_submission/index',
-        name: 'Reports Submission',
+        name: 'Regional Reports',
         component: qms_report_submission,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+
+    },
+        {
+        path: '/qms/reports_submission/provincial_report',
+        name: 'Provincial Report',
+        component: qms_provincial_report,
         meta: {
             requiresAuth: true
         },

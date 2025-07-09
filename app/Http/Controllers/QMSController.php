@@ -12,6 +12,7 @@ use App\Models\QOPRModel;
 use App\Models\QOPFrequencyModel;
 use App\Models\QGAModel;
 use App\Models\QMSHistoryModel;
+use App\Models\POProcessOwnerModel;
 
 
 
@@ -48,6 +49,100 @@ class QMSController extends Controller
         return response()->json($ProcessOwner);
     }
 
+    public function fetchPProcessOwner($id)
+    {
+        $ProcessOwner = QMSModel::select(
+            'tbl_qms_process_owners.id',
+            'tbl_qms_process_owners.emp_id',
+            'users.first_name',
+            'users.last_name',
+            'tblposition.position_title',
+            'pmo.pmo_title',
+            'users.contact_details',
+            'users.email',
+            DB::raw("CONCAT(users.first_name, ' ', users.last_name) AS fname")
+        )
+            ->leftJoin('users', 'users.id', '=', 'tbl_qms_process_owners.emp_id')
+            ->leftJoin('tblposition', 'tblposition.position_C', '=', 'users.position_id')
+            ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
+            ->where('pmo.id', $id)
+            ->get();
+
+        // dd($ProcessOwner);
+        return response()->json($ProcessOwner);
+    }
+
+        public function fetchProvinceUser($id)
+    {
+        $ProcessOwner = UserModel::select(
+            'users.id',
+            DB::raw("CONCAT(users.first_name, ' ', users.last_name) AS fname"),
+            'pmo.pmo_title',
+        )
+            ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
+            ->where('pmo.id', $id)
+            ->get();
+
+        // dd($ProcessOwner);
+        return response()->json($ProcessOwner);
+    }
+
+    public function fetchPOProcessOwner($id)
+    {
+        $POprocessOwner = POProcessOwnerModel::select(
+            'tbl_qms_po_process_owner.id',
+            'tbl_qms_po_process_owner.qop_id',
+            'tbl_qms_po_process_owner.pmo_id',
+            'tbl_qms_po_process_owner.parent_p_owner',
+            'tbl_qms_po_process_owner.po_process_owner',
+            'pmo.pmo_title',
+            'tbl_qms_po_process_owner.program_manager',
+            'tbl_qms_po_process_owner.provincial_qmr',
+            DB::raw("CONCAT(users.first_name, ' ', users.last_name) AS ppo_name"),
+            DB::raw("CONCAT(user_qmr.first_name, ' ', user_qmr.last_name) AS qmr_name"),
+            DB::raw("CONCAT(user_pm.first_name, ' ', user_pm.last_name) AS pm_name")
+        )
+            ->leftJoin('pmo as pmo', 'pmo.id', '=', 'tbl_qms_po_process_owner.pmo_id')
+            ->leftJoin('users', 'users.id', '=', 'tbl_qms_po_process_owner.po_process_owner')
+            ->leftJoin('users as user_qmr', 'user_qmr.id', '=', 'tbl_qms_po_process_owner.provincial_qmr')
+            ->leftJoin('users as user_pm', 'user_pm.id', '=', 'tbl_qms_po_process_owner.program_manager')
+            ->where('tbl_qms_po_process_owner.qop_id', $id)
+            ->get();
+
+        return response()->json($POprocessOwner);
+
+        //to change db structure from single row per qop to 6 row per qop and bind the to tbl_province loop upon creating qop 
+        //and hide depending on the selected coverage
+
+        //still use user id as reference to the user
+        //retain the use of parent_p_owner as the main process owner for easier binding of the process owner upon submission in the future
+        //use the same process owner for the 6 province
+
+    }
+
+    public function AddPOProcessOwner(Request $request)
+    {
+        $ppoid = $request->input('ppoid');
+        $id = $request->input('po');
+        $ppo = $request->input('ppo');
+        $pm = $request->input('pm');
+        $qmr = $request->input('qmr');
+        POProcessOwnerModel::where('id', $ppoid)
+            ->update([
+                'po_process_owner' => $ppo,
+                'program_manager' => $pm,
+                'provincial_qmr' => $qmr,
+                'updated_at' => Carbon::now('Asia/Manila')->format('Y-m-d H:i:s'),
+            ]);
+    }
+    public function DeletePOProcessOwner(request $request)
+    {
+        POProcessOwnerModel::where('id', $request->id)
+            ->update([
+                'po_process_owner' => null,
+                'updated_at' => Carbon::now('Asia/Manila')->format('Y-m-d H:i:s'),
+            ]);
+    }
     public function fetchAllUser()
     {
 
@@ -133,11 +228,26 @@ class QMSController extends Controller
             'process_owner'        => $request->input('process_owner'),
             'qp_code'              => $request->input('qp_code'),
             'procedure_title'      => $request->input('procedure_title'),
-            // 'created_by'           => $request->input('created_by'),
+            'created_by'           => $request->input('created_by'),
             'date_created'         => $request->input('date_created'),
         ]);
         // dd($postQP);
         $postQP->save();
+
+        $createdId = $postQP->id;
+
+        $pmoIds = [10, 11, 9, 13, 12, 14];
+
+        foreach ($pmoIds as $pmoId) {
+            $po_process_owner = new POProcessOwnerModel([
+                'qop_id'           => $createdId,
+                'pmo_id'            => $pmoId,
+                'parent_p_owner'   => $request->input('process_owner'),
+                'po_process_owner' => null,
+            ]);
+            $po_process_owner->save();
+        }
+
         return response()->json($postQP);
     }
 
@@ -178,10 +288,12 @@ class QMSController extends Controller
             'tbl_qop.qp_code',
             'tbl_qop.procedure_title',
             'tbl_qop.created_by',
-            'tbl_qop.date_created'
+            'tbl_qop.date_created',
+            'qcoverage.coverage as coverage_name',
         )
 
             ->leftJoin('users', 'users.id', '=', 'tbl_qop.created_by')
+            ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'tbl_qop.coverage')
             // ->Where('tbl_qop.office', 'LIKE', '%' . $userOffice . '%')
             ->get();
         return response()->json($FetchQP);
@@ -193,25 +305,18 @@ class QMSController extends Controller
             'users.pmo_id',
             'p.pmo_title',
             DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
-
         )
             ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
             ->where('users.id', $userId)
-            ->get();
-        // $username = $fetchUser[0]->username;
-        $userOffice1 = $fetchUser[0]->pmo_title;
-        $currentUserId = $userId;
-        if (in_array($userOffice1, ['ORD', 'ORD-LEGAL', 'ORD-PLANNING', 'ORD-RICTU', 'ORD-Legal', 'ORD-Planning'])) {
-            $userOffice = 'ORD';
-        } elseif (in_array($userOffice1, ['LGMED', 'LGMED-MBRTG'])) {
-            $userOffice = 'LGMED';
-        } elseif (in_array($userOffice1, ['LGCDD', 'LGCDD-PDMU'])) {
-            $userOffice = 'LGCDD';
-        } else {
-            $userOffice = $userOffice1;
+            ->first(); // Use first() instead of get() since you're expecting one user
+
+        if (!$fetchUser) {
+            return response()->json(['error' => 'User not found'], 404);
         }
 
-        $FetchQP = QPModel::select(
+        $userOffice1 = $fetchUser->pmo_title;
+
+        $query = QPModel::select(
             'tbl_qop.id',
             'tbl_qop.frequency_monitoring',
             'tbl_qop.coverage',
@@ -222,15 +327,31 @@ class QMSController extends Controller
             'tbl_qop.qp_code',
             'tbl_qop.procedure_title',
             'tbl_qop.created_by',
-            'tbl_qop.date_created'
+            'tbl_qop.date_created',
+            'qcoverage.coverage as coverage_name'
         )
-
             ->leftJoin('users', 'users.id', '=', 'tbl_qop.created_by')
-            ->Where('tbl_qop.office', 'LIKE', '%' . $userOffice . '%')
-            ->get();
+            ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'tbl_qop.coverage');
+
+        $query->where(function ($q) use ($userOffice1, $userId) {
+            if (in_array($userOffice1, ['ORD', 'ORD-LEGAL', 'ORD-PLANNING', 'ORD-RICTU'])) {
+                $q->where('tbl_qop.office', 'LIKE', '%ORD%');
+            } elseif (in_array($userOffice1, ['LGMED', 'LGMED-MBRTG'])) {
+                $q->where('tbl_qop.office', 'LIKE', '%LGMED%');
+            } elseif (in_array($userOffice1, ['LGCDD', 'LGCDD-PDMU'])) {
+                $q->where('tbl_qop.office', 'LIKE', '%LGCDD%');
+            } elseif (in_array($userOffice1, ['CAVITE', 'LAGUNA', 'BATANGAS', 'RIZAL', 'QUEZON', 'LUCENA CITY'])) {
+                $q->where('qcoverage.coverage', 'LIKE', '%Province%');
+            }
+
+            // OR: if user is the process owner
+            $q->orWhere('tbl_qop.process_owner', $userId);
+        });
+
+        $FetchQP = $query->get();
+
         return response()->json($FetchQP);
     }
-
 
     public function fetchEntryData($id)
     {
@@ -246,10 +367,12 @@ class QMSController extends Controller
             'tbl_qop.procedure_title',
             'tbl_qop.created_by',
             'tbl_qop.date_created',
+            'qcoverage.coverage as coverage_name',
             DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS created_by")
 
         )
             ->leftJoin('users', 'users.id', '=', 'tbl_qop.created_by')
+            ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'tbl_qop.coverage')
             ->where('tbl_qop.id', $id)
             ->get();
 
@@ -368,6 +491,9 @@ class QMSController extends Controller
         QOPModel::where('qop_id', $request->id)
             ->delete();
 
+        POProcessOwnerModel::where('qop_id', $request->id)
+            ->delete();
+
         // return response()->json(['message' => 'Item deleted successfully']);
     }
 
@@ -388,11 +514,13 @@ class QMSController extends Controller
             'tbl_qop.procedure_title',
             'tbl_qop.created_by',
             'tbl_qop.date_created',
+            'qcoverage.coverage as coverage_name',
             DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
 
         )
             ->leftJoin('users', 'users.id', '=', 'tbl_qop.created_by')
             ->leftJoin('tbl_qoe', 'tbl_qoe.qop_id', '=', 'tbl_qop.id')
+            ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'tbl_qop.coverage')
             ->where('tbl_qop.id', $qp_code_id)
             ->get();
         return response()->json($FetchQP);
@@ -636,11 +764,18 @@ class QMSController extends Controller
             return response()->json(['error' => 'Invalid report type.'], 400);
         }
 
+        $userOffice = UserModel::select('id', 'office', 'province')->find($request->created_by);
+
+        if (!$userOffice) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
         // Create a new QOPRModel instance for the main record
         $postRS = new QOPRModel([
             'qop_id' => $request->qop_id,
             'date_created' => Carbon::now('Asia/Manila')->format('Y-m-d H:i:s'),
             'created_by' => $request->created_by,
+            'submitted_office' => $userOffice->province,
             'status' => '0',
             'qp_covered' => $request->qp_covered, // Assuming qp_covered is a JSON column
             'year' => $request->year
@@ -652,6 +787,7 @@ class QMSController extends Controller
         // gap_analysis
         // Fetch the created ID
         $createdId = $postRS->id;
+        $createdOffice = $postRS->submitted_office;
         $qoe_ids = $request->qoe_id; // Assuming $request->qoe_id is an array [14, 15]
         $qop_id = $request->qop_id;
 
@@ -683,6 +819,7 @@ class QMSController extends Controller
         // Check for existing frequency entries
         $existing = QOPFrequencyModel::whereIn('qoe_id', $qoe_ids)
             ->where('qop_id', $qop_id)
+            ->where('office_entry_id', $createdOffice)
             ->exists();
 
 
@@ -702,6 +839,7 @@ class QMSController extends Controller
                     foreach ($grouped->get($qoe_id, collect()) as $entry) {
                         QOPFrequencyModel::create([
                             'qop_entry_id' => $createdId,
+                            'office_entry_id' => $createdOffice,
                             'qop_id' => $qop_id,
                             'qoe_id' => $qoe_id,
                             'indicator' => $entry->indicator,
@@ -719,6 +857,7 @@ class QMSController extends Controller
                 for ($i = 1; $i <= 5; $i++) {
                     QOPFrequencyModel::create([
                         'qop_entry_id' => $createdId,
+                        'office_entry_id' => $createdOffice,
                         'qop_id' => $qop_id,
                         'qoe_id' => $qoe_id,
                         'indicator' => $i,
@@ -760,11 +899,14 @@ class QMSController extends Controller
     {
         $FetchQopr = QOPRModel::select(
             'tbl_qop_report.id',
+            'users.pmo_id',
             'tbl_qop_report.qop_id',
             'tbl_qop_report.date_created',
             'tbl_qop_report.created_by',
+            'tbl_qop_report.submitted_office',
             'tbl_qop_report.status',
             'tbl_qop_report.qp_covered',
+            'qcoverage.coverage as coverage_name',
             'qop.qp_code',
             'qop.coverage',
             'qop.office',
@@ -779,13 +921,15 @@ class QMSController extends Controller
             'qoe.indicator_d',
             'qoe.indicator_e',
             'qoe.formula',
-            DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
+            DB::raw("CONCAT(users.first_name, ' ', users.last_name) AS fname")
         )
-            ->leftjoin('tbl_qoe as qoe', 'qoe.qop_id', '=', 'tbl_qop_report.qop_id')
+            ->leftJoin('tbl_qoe as qoe', 'qoe.qop_id', '=', 'tbl_qop_report.qop_id')
             ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
-            ->leftjoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
+            ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
+            ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'qop.coverage')
             ->where('tbl_qop_report.id', $id)
             ->get();
+
 
         return response()->json($FetchQopr);
     }
@@ -842,6 +986,150 @@ class QMSController extends Controller
         return response()->json($fetchQOPR);
     }
 
+    public function fetchQOPR_processOwner_province()
+    {
+        $fetchQOPR = QOPRModel::select(
+            'tbl_qop_report.id',
+            'tbl_qop_report.qop_id',
+            'tbl_qop_report.created_by',
+            'users.pmo_id',
+            'p.pmo_title',
+            'tbl_qop_report.submitted_office',
+            'users.username as uname',
+            'tbl_qop_report.date_created',
+            'tbl_qop_report.status',
+            'tbl_qop_report.qp_covered',
+            'tbl_qop_report.year',
+            'qop.office',
+            'qop.qp_code',
+            'qop.frequency_monitoring',
+            'qop.procedure_title',
+            'qop.process_owner',
+            'qcoverage.coverage'
+        )
+            ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
+            ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
+            ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'qop.coverage')
+            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+            // ->where('p.pmo_title', $userOffice1)
+            ->orderBy('tbl_qop_report.id', 'desc');
+
+        $result = $fetchQOPR->get();
+
+
+        return response()->json($result);
+    }
+    public function fetchQOPRperProvince($id)
+    {
+        $fetchUser = UserModel::select(
+            'users.username as username',
+            'users.pmo_id',
+            'p.pmo_title',
+            DB::raw("CONCAT(users.first_name, ' ',users.last_name) AS fname")
+
+        )
+            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+            ->where('users.id', $id)
+            ->get();
+        // $username = $fetchUser[0]->username;
+        $userOffice1 = $fetchUser[0]->pmo_title;
+        $userId = $fetchUser[0]->pmo_id;
+        $userFName = $fetchUser[0]->fname;
+
+        $fetchProcessOwner = QPModel::select('id', 'process_owner')
+            ->whereRaw('FIND_IN_SET(?, REPLACE(process_owner, " ", ""))', [str_replace(' ', '', $userFName)])
+            ->get();
+            
+            $matchedUser = null;
+
+        if ($fetchProcessOwner->isEmpty()) {
+            
+            //For Provincial Process Owner
+            $fetchQOPR = QOPRModel::select(
+                'tbl_qop_report.id',
+                'tbl_qop_report.qop_id',
+                'tbl_qop_report.created_by',
+                'users.pmo_id',
+                'p.pmo_title',
+                'tbl_qop_report.submitted_office',
+                'users.username as uname',
+                'tbl_qop_report.date_created',
+                'tbl_qop_report.status',
+                'tbl_qop_report.qp_covered',
+                'tbl_qop_report.year',
+                'qop.office',
+                'qop.qp_code',
+                'qop.frequency_monitoring',
+                'qop.procedure_title',
+                'qop.process_owner',
+                'qcoverage.coverage'
+            )
+                ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
+                ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
+                ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'qop.coverage')
+                ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+                ->where('p.pmo_title', $userOffice1)
+                ->orderBy('tbl_qop_report.id', 'desc')
+                ->get();
+            // return response()->json($fetchQOPR);
+        } else {
+            // For Regional Process Owner
+
+            $processOwnersRaw = $fetchProcessOwner[0]->process_owner ?? '';
+
+
+            // Split the names and trim spaces
+            $processOwnerNames = array_map('trim', explode(',', $processOwnersRaw));
+
+            foreach ($processOwnerNames as $fullName) {
+                $strippedName = str_replace(' ', '', $fullName);
+
+                $user = UserModel::select('id', 'first_name', 'last_name')
+                    ->whereRaw('REPLACE(CONCAT(first_name, last_name), " ", "") = ?', [$strippedName])
+                    ->first();
+
+                if ($user) {
+                    $matchedUser[] = $user;
+                    // break; // or collect all if you want multiple matches
+                }
+            }
+
+            $provinceList = ['CAVITE', 'LAGUNA', 'BATANGAS', 'RIZAL', 'QUEZON', 'LUCENA CITY'];
+            $processIds = $fetchProcessOwner->pluck('id');
+
+            $fetchQOPR = QOPRModel::select(
+                'tbl_qop_report.id',
+                'tbl_qop_report.qop_id',
+                'tbl_qop_report.created_by',
+                'users.pmo_id',
+                'p.pmo_title',
+                'tbl_qop_report.submitted_office',
+                'users.username as uname',
+                'tbl_qop_report.date_created',
+                'tbl_qop_report.status',
+                'tbl_qop_report.qp_covered',
+                'tbl_qop_report.year',
+                'qop.office',
+                'qop.qp_code',
+                'qop.frequency_monitoring',
+                'qop.procedure_title',
+                'qop.process_owner',
+                'qcoverage.coverage'
+            )
+                ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
+                ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
+                ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'qop.coverage')
+                ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+                ->whereIn('p.pmo_title', $provinceList)
+                ->whereIn('tbl_qop_report.qop_id', $processIds)
+                ->orderBy('tbl_qop_report.id', 'desc')
+                ->get();
+        }
+        return response()->json([
+            'matched_users' => $matchedUser,
+            'qop_reports' => $fetchQOPR,
+        ]);
+    }
     public function fetchQOPRperDivision($id)
     {
         $fetchUser = UserModel::select(
@@ -856,21 +1144,27 @@ class QMSController extends Controller
             ->get();
         // $username = $fetchUser[0]->username;
         $userOffice1 = $fetchUser[0]->pmo_title;
-        $currentUserId = $id;
-        if (in_array($userOffice1, ['ORD', 'ORD-LEGAL', 'ORD-PLANNING', 'ORD-RICTU', 'ORD-Legal', 'ORD-Planning'])) {
-            $userOffice = 'ORD';
-        } elseif (in_array($userOffice1, ['LGMED', 'LGMED-MBRTG'])) {
-            $userOffice = 'LGMED';
-        } elseif (in_array($userOffice1, ['LGCDD', 'LGCDD-PDMU'])) {
-            $userOffice = 'LGCDD';
-        } else {
-            $userOffice = $userOffice1;
-        }
+        $userId = $fetchUser[0]->pmo_id;
+
+        $commonPMOTitles = [
+            'ORD',
+            'ORD-LEGAL',
+            'ORD-PLANNING',
+            'ORD-RICTU',
+            'ORD-Legal',
+            'ORD-Planning',
+            'LGMED',
+            'LGMED-MBRTG',
+            'FAD'
+        ];
 
         $fetchQOPR = QOPRModel::select(
             'tbl_qop_report.id',
             'tbl_qop_report.qop_id',
             'tbl_qop_report.created_by',
+            'users.pmo_id',
+            'p.pmo_title',
+            'tbl_qop_report.submitted_office',
             'users.username as uname',
             'tbl_qop_report.date_created',
             'tbl_qop_report.status',
@@ -881,16 +1175,43 @@ class QMSController extends Controller
             'qop.frequency_monitoring',
             'qop.procedure_title',
             'qop.process_owner',
-            'qop.office'
+            'qcoverage.coverage'
         )
-
             ->leftJoin('tbl_qop as qop', 'qop.id', '=', 'tbl_qop_report.qop_id')
             ->leftJoin('users', 'users.id', '=', 'tbl_qop_report.created_by')
-            ->Where('qop.office', 'LIKE', '%' . $userOffice . '%')
-            ->orderBy('tbl_qop_report.id', 'desc') // Added ordering here
-            ->get();
+            ->leftJoin('tbl_qop_coverage as qcoverage', 'qcoverage.id', '=', 'qop.coverage')
+            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id');
 
-        return response()->json($fetchQOPR);
+        // Grouped regional logic
+        $regionalOffices = [
+            'ORD' => '%ORD%',
+            'ORD-LEGAL' => '%ORD%',
+            'ORD-PLANNING' => '%ORD%',
+            'ORD-RICTU' => '%ORD%',
+            'ORD-Legal' => '%ORD%',
+            'ORD-Planning' => '%ORD%',
+            'LGMED' => '%LGMED%',
+            'LGMED-MBRTG' => '%LGMED%',
+            'LGCDD' => '%LGCDD%',
+            'LGCDD-PDMU' => '%LGCDD%',
+            'FAD' => '%FAD%',
+        ];
+
+        if (array_key_exists($userOffice1, $regionalOffices)) {
+            $fetchQOPR->where('qop.office', 'LIKE', $regionalOffices[$userOffice1])
+                ->whereIn('p.pmo_title', $commonPMOTitles);
+        } elseif (in_array($userOffice1, ['CAVITE', 'LAGUNA', 'BATANGAS', 'RIZAL', 'QUEZON', 'LUCENA CITY'])) {
+            $fetchQOPR->where('qcoverage.coverage', 'LIKE', '%Province%')
+                ->where('users.pmo_id', $userId);
+        }
+
+        $fetchQOPR->orderBy('tbl_qop_report.id', 'desc');
+
+        $result = $fetchQOPR->get();
+
+        return response()->json($result);
+
+        //add subheader for provincial submission for cleaner approach and preventing code duplication and rendering issues
     }
 
     public function fetchQOPRUserData($id, $qoe_id)

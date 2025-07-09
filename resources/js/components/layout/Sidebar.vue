@@ -156,7 +156,8 @@ export default {
                     children: [
                         { link: '/qms/quality_procedure/index', name: 'Quality Procedures', icon: 'clipboard-list' },
                         { link: '/qms/process_owner/index', name: 'Process Owners', icon: 'clipboard-list' },
-                        { link: '/qms/reports_submission/index', name: 'Reports Submission', icon: 'clipboard-list' },
+                        { link: '/qms/reports_submission/index', name: 'Regional QME', icon: 'clipboard-list' },
+                        { link: '/qms/reports_submission/provincial_report', name: 'Provincial QME', icon: 'clipboard-list' },
                     ],
                 },
                 {

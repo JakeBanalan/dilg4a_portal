@@ -62,7 +62,7 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <label>Coverage:</label>
-                                            <multiselect :options="COptions" v-model="form.coverage" :multiple="false"
+                                            <multiselect :options="COptions" v-model="form.coverage" track-by="value" label="label" :multiple="false"
                                                 :searchable="false" id="coverage">
                                             </multiselect>
                                             <label>Office:</label>
@@ -218,7 +218,12 @@ export default {
             CurrUser: null,
             process_owner: [],
             FMOptions: ['Monthly', 'Quarterly', 'Quarterly (Learning and Development)'],
-            COptions: ['Region', 'Region & Province', 'Region, Province & Field', 'Central Office, Region, Province & Field'],
+            COptions: [
+                {label:'Region', value: 1}, 
+                {label:'Region & Province', value: 2},
+                {label:'Region, Province & Field', value: 3},
+                {label:'Central Office, Region, Province & Field', value: 4}
+            ],
             OOptions: ['ORD','ORD-RICTU','ORD-LEGAL','ORD-PLANNING','FAD','FAD-HRS','FAD-ACCOUNTING','FAD-RECORDS','FAD-GSS', 'LGMED', 'LGCDD'],
             POOptions: null,
             ProcessOwner: [],
@@ -251,7 +256,7 @@ export default {
                 .then(emp_data => {
                     this.form.created_by_name = emp_data.name
                     this.form.created_by = userId
-                    console.log(userId)
+                    // console.log(userId)
                 });
         },
         fetchProcessOwner() {
@@ -274,7 +279,7 @@ export default {
                     qp_code: this.form.qp_code,
                     rev_no: this.form.rev_no,
 
-                    coverage: this.form.coverage,
+                    coverage: this.form.coverage.value,
                     frequency_monitoring: this.form.frequency_monitoring,
                     office: this.form.office,
                     process_owner: this.form.process_owner.join(', ')

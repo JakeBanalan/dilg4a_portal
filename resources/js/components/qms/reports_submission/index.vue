@@ -132,7 +132,7 @@
                                             <td style="width: 5%;" class="ellipsis">{{ list.process_owner }}</td>
                                             <td style="width: 5%;">{{ list.office }}</td>
                                             <td style="width: 5%;"><b>{{ list.qp_covered }}</b><br><i>~{{ list.year
-                                            }}~</i></td>
+                                                    }}~</i></td>
                                             <td style="width: 5%;">
                                                 <b>{{ statusMap[list.status] }}</b>
                                                 <br><i>~{{ list.uname }}~</i>
@@ -146,7 +146,8 @@
                                                         <font-awesome-icon
                                                             :icon="['fas', 'share-square']"></font-awesome-icon>
                                                     </button> -->
-                                                    <button @click="viewReport(list.id)" class="btn btn-icon mr-1"
+                                                    <button @click="viewReport(list.id, list.pmo_id)"
+                                                        class="btn btn-icon mr-1"
                                                         style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                         <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                                                     </button>
@@ -171,7 +172,8 @@
                                                         <font-awesome-icon
                                                             :icon="['fas', 'share-square']"></font-awesome-icon>
                                                     </button>
-                                                    <button @click="viewReport(list.id)" class="btn btn-icon mr-1"
+                                                    <button @click="viewReport(list.id, list.pmo_id)"
+                                                        class="btn btn-icon mr-1"
                                                         style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                         <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                                                     </button>
@@ -424,9 +426,9 @@ export default {
                 this.fetchQOPRperDivision(); // Non-admin sees only their own requests
             }
         },
-        viewReport(arg) {
-            let id = arg;
-            console.log(arg)
+        viewReport(id, pmo_id) {
+            // console.log('Report ID:', id);
+            // console.log('Submitted Office:', pmo_id);
             this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
 
         },
@@ -513,7 +515,7 @@ export default {
                 .then(response => {
                     this.QOPRList = response.data
                     this.filteredQOPRList = this.QOPRList;
-                    // console.log(response)
+                    // console.log(this.userId)
                     this.initializeDataTable();
                 })
                 .catch(error => {
