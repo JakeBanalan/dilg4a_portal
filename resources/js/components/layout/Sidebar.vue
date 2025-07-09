@@ -194,6 +194,19 @@ export default {
                 },
                 {
                     link: '',
+                    name: 'Finance Section',
+                    tooltip: 'Finance',
+                    icon: 'book',
+                    class: 'menu-icon-custom',
+                    children: [
+                        { link: '/finance/budget/index', name: 'Budget Section', icon: 'book' },
+                        { link: '', name: 'Accounting Section', icon: 'book' },
+                        { link: '', name: 'Cash Section', icon: 'book' },
+                        { link: '/procurement/abstract/index', name: 'Funds Downloaded', icon: 'book' },
+                    ],
+                },
+                {
+                    link: '',
                     name: 'Budget Section',
                     tooltip: 'Buttons',
                     icon: 'book',

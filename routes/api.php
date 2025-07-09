@@ -27,6 +27,9 @@ use App\Http\Controllers\QMSMonthlyExportController;
 use App\Http\Controllers\QMSQuarterlyExportController;
 use App\Http\Controllers\DailyTimeRecordController;
 
+use App\Http\Controllers\FundSourceController;
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -54,6 +57,9 @@ Route::middleware('auth:api')->group(function () {
 //     return response()->json(['authenticated' => auth()->check()]);
 // });
 
+Route::middleware('api')->group(function () {
+    Route::get('fetchFundSources', [FundSourceController::class, 'fetchFundSources']);
+});
 
 Route::middleware('api')->group(function () {
     Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']);
@@ -365,6 +371,8 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('fetch_supplier_quote/{id}', [AbstractController::class, 'fetch_supplier_quote']);
 });
+
+
 
 Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
 

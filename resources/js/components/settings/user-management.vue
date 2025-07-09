@@ -486,8 +486,15 @@ export default {
                     label: 'Human Resource',
                     value: 'human_resource',
                     children: [
-                    { label: 'Daily Time Record', value: '/human_resource/daily_time_record/index' },
-                    { label: 'Employee Directory', value: '/human_resource/employees_directory/index' },
+                        { label: 'Daily Time Record', value: '/human_resource/daily_time_record/index' },
+                        { label: 'Employee Directory', value: '/human_resource/employees_directory/index' },
+                    ],
+                },
+                {
+                    label: 'Finance',
+                    value: 'finance',
+                    children: [
+                        { label: 'Budget', value: '/finance/budget/index' },
                     ],
                 },
                 {

@@ -72,7 +72,8 @@ import qms_report_submission_quarterly_lnd_entry from "../components/qms/reports
 
 
 
-
+//FINANCE
+import finance_budget from "../components/finance/budget/index.vue";
 
 // settings
 import settingPanel from "../components/settings/user-management.vue";
@@ -179,6 +180,34 @@ const routes = [{
             });
         }
 
+    },
+    {
+        path: '/finance/budget/index',
+        name: 'Budget',
+        component: finance_budget,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
     },
     {
         path: '/procurement/index',
