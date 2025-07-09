@@ -15,7 +15,7 @@
                                         <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp;QMS Quality
                                         Procedures
                                     </h5>
-                                    <div v-if="this.role !== 'admin'" class="d-flex">
+                                    <div v-if="this.role !== 'admin' && this.Auth === false" class="d-flex">
                                         <button @click="Return()"
                                             class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
                                             Close
@@ -28,6 +28,28 @@
                                             :disabled="!(form.status === 0 || form.status === 3)"
                                             class="btn btn-outline-success btn-fw btn-icon-text mx-2">
                                             Submit
+                                        </button>
+                                    </div>
+                                    <div v-if="this.role !== 'admin' && this.Auth === true" class="d-flex">
+                                        <button @click="Return()"
+                                            class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                            Close
+                                        </button>
+                                        <button @click="generateReport()"
+                                            class="btn btn-outline-warning btn-fw btn-icon-text mx-2">
+                                            Export
+                                        </button>
+                                        <button @click="ModalReceive()" v-if="form.status === 1"
+                                            class="btn btn-outline-success btn-fw btn-icon-text mx-2">
+                                            Receive
+                                        </button>
+                                        <button @click="openModal()" v-if="form.status === 2"
+                                            class="btn btn-outline-danger btn-fw btn-icon-text mx-2">
+                                            Return
+                                        </button>
+                                        <button @click="ModalComplete()" v-if="form.status === 2"
+                                            class="btn btn-outline-success btn-fw btn-icon-text mx-2">
+                                            Complete
                                         </button>
                                     </div>
                                     <div v-if="this.role === 'admin'" class="d-flex">
@@ -80,7 +102,7 @@
                                         <div class="col-md-3">
                                             <label>Coverage:</label>
                                             <input type="text" class="form-control" id="coverage"
-                                                v-model="form.coverage" disabled />
+                                                v-model="form.coverage_name" disabled />
                                             <label>Office:</label>
                                             <input type="text" class="form-control" id="office" v-model="form.office"
                                                 disabled />
@@ -178,7 +200,8 @@
                                                 </small>
                                             </td>
                                             <td style="text-align: left;"><b>{{ statusMap[history.status] }}</b></td>
-                                            <td style="text-align: left; white-space: normal; word-wrap: break-word;">{{ history.remarks }}</td>
+                                            <td style="text-align: left; white-space: normal; word-wrap: break-word;">{{
+                                                history.remarks }}</td>
                                         </tr>
 
                                     </tbody>
@@ -257,6 +280,7 @@ export default {
                 procedure_title: '',
                 frequency_monitoring: '',
                 coverage: '',
+                coverage_name: '',
                 office: '',
                 qp_covered: '',
                 status: '',
@@ -278,6 +302,7 @@ export default {
                 indicator_e: '',
             },
             history: [],
+            po_id: null,
             modalVisible: false,
             SubmitVisible: false,
             ReceiveVisible: false,
@@ -299,6 +324,12 @@ export default {
         this.fetchQoprEntryData();
         this.fetchQopHistoryData();
         this.formData = { ...this.form };
+
+
+        this.Auth = this.$route.query.Auth === 'true';
+
+
+        // console.log("PO ID:", isUserProcessOwner);
 
     },
     methods: {
@@ -500,7 +531,7 @@ export default {
             axios.get(`/api/fetchQopHistoryData/${id}`)
                 .then(response => {
                     this.history = response.data
-                    console.log("HISTORY", this.history)
+                    // console.log("HISTORY", this.history)
                 })
                 .catch(error => {
                     console.error('Error Fetching items:', error)
@@ -508,11 +539,13 @@ export default {
         },
         fetchQoprData() {
             let id = this.$route.params.id;
+            let pmo_id = this.$route.params.pmo_id;
             // console.log("tbl_qop_report ID:", id)
             axios.get(`/api/fetchQoprData/${id}`)
                 .then(response => {
                     if (Array.isArray(response.data) && response.data.length > 0) {
                         this.form = response.data[0];
+                        // console.log("FORM", this.form)
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }

@@ -74,7 +74,7 @@
                                         <div class="col-md-3">
                                             <label>Coverage:</label>
                                             <input type="text" class="form-control" id="coverage"
-                                                v-model="form.coverage" disabled />
+                                                v-model="form.coverage_name" disabled />
                                             <label>Office:</label>
                                             <input type="text" class="form-control" id="office" v-model="form.office"
                                                 disabled />
@@ -153,6 +153,7 @@ export default {
                 procedure_title: '',
                 frequency_monitoring: '',
                 coverage: '',
+                coverage_name: '',
                 office: '',
             },
             errors: {},
@@ -226,7 +227,7 @@ export default {
 
                     }
                     this.qoe_id = response.data.map(item => item.qoe_id);
-                    // console.log(this.qoe_id)
+                    // console.log(this.form)
                 })
                 .catch(error => {
                     console.error('Error Fetching items:', error)
@@ -289,6 +290,7 @@ export default {
 
                     setTimeout(() => {
                         const id = response.data.id;
+                        const office = response.data.submitted_office;
                         this.$router.push({ path: `/qms/reports_submission/rs_update/${id}` });
                     }, 200);
 

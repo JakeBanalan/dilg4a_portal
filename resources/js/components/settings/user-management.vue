@@ -494,24 +494,10 @@ export default {
                     label: 'QMS',
                     value: 'qms',
                     children: [
-                        {
-                            label: 'Quality Procedures',
-                            value: '/qms/quality_procedure/index'
-                        },
-                        {
-                            label: 'Process Owners',
-                            value: '/qms/process_owner/index'
-                        },
-                        {
-                            label: 'Reports Submission',
-                            value: '/qms/reports_submission/index',
-                            children: [
-                                {
-                                    label: 'New Report',
-                                    value: '/qms/reports_submission/new'
-                                },
-                            ]
-                        },
+                        { label: 'Quality Procedures', value: '/qms/quality_procedure/index' },
+                        { label: 'Process Owners', value: '/qms/process_owner/index' },
+                        { label: 'Regional QME', value: '/qms/reports_submission/index' },
+                        { label: 'Provincial QME', value: '/qms/reports_submission/provincial_report' },
                     ],
                 },
                 { label: 'User Management', value: '/settings/user-management/' },
