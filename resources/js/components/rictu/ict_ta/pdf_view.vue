@@ -958,7 +958,7 @@ input.largerCheckbox {
                         <td class="documentCOdeC27" colspan="1" rowspan="1">
                             <p class="documentCodeC0"><span class="documentCodeC12 documentCodeC6">
                                     <center>{{ data.control_no
-                                        }}</center>
+                                    }}</center>
                                 </span></p>
                         </td>
                     </tr>
@@ -1239,10 +1239,10 @@ input.largerCheckbox {
                 <tbody>
                     <tr>
                         <td class="remarksInput" colspan="1" rowspan="1">
-                            <p >{{ data.remarks }}</p>
+                            <p>{{ data.remarks }}</p>
                         </td>
                         <td class="actionTakenInput" colspan="1" rowspan="1">
-                            <p >{{ data.ict_officer_remarks }}</p>
+                            <p>{{ data.ict_officer_remarks }}</p>
                         </td>
                     </tr>
                 </tbody>
@@ -1427,25 +1427,35 @@ export default {
                 day: 'numeric',
             });
         },
+        formatDateTime(date) {
+            if (!date || date === '0000-00-00') {
+                return null; // Return null if the date is null or '0000-00-00'
+            } else {
+                const formattedDate = new Date(date).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false // Changed to false for 24-hour format
+                });
+                return formattedDate;
+            }
+        },
         formatTime(date) {
             if (!date || date === '0000-00-00') return null;
-            return new Date(date).toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-        },
-        formatDateTime(date) {
-            if (!date || date === '0000-00-00') return null;
-            return new Date(date).toLocaleString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-        },
+
+            try {
+                return new Date(date).toLocaleString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                });
+            } catch (error) {
+                console.error('Date formatting error:', error);
+                return null;
+            }
+        }
     },
 }
 </script>

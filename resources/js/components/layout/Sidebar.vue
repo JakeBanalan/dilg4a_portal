@@ -32,18 +32,24 @@
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item" v-for="(childItem, childIndex) in menuItem.children" :key="childIndex">
                                 <template v-if="hasChildren(childItem)">
-                                    <router-link class="nav-link" :to="childItem.link" :data-target="'#ui-basic-child-' + childIndex"
-                                        :aria-controls="'ui-basic-child-' + childIndex" :aria-expanded="isExpanded(`${index}-${childIndex}`)"
+                                    <router-link class="nav-link" :to="childItem.link"
+                                        :data-target="'#ui-basic-child-' + childIndex"
+                                        :aria-controls="'ui-basic-child-' + childIndex"
+                                        :aria-expanded="isExpanded(`${index}-${childIndex}`)"
                                         @click.prevent="toggleCollapse(`${index}-${childIndex}`)">
                                         <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
                                         {{ childItem.name }}
                                         <i class="menu-arrow"></i>
                                     </router-link>
-                                    <div class="collapse" :id="'ui-basic-child-' + childIndex" :class="{ show: isExpanded(`${index}-${childIndex}`) }">
+                                    <div class="collapse" :id="'ui-basic-child-' + childIndex"
+                                        :class="{ show: isExpanded(`${index}-${childIndex}`) }">
                                         <ul class="nav flex-column sub-menu">
-                                            <li class="nav-item" v-for="(grandChildItem, grandChildIndex) in childItem.children" :key="grandChildIndex">
+                                            <li class="nav-item"
+                                                v-for="(grandChildItem, grandChildIndex) in childItem.children"
+                                                :key="grandChildIndex">
                                                 <router-link class="nav-link" :to="grandChildItem.link">
-                                                    <font-awesome-icon :icon="grandChildItem.icon" :class="menuItem.class" />
+                                                    <font-awesome-icon :icon="grandChildItem.icon"
+                                                        :class="menuItem.class" />
                                                     {{ grandChildItem.name }}
                                                 </router-link>
                                             </li>
@@ -82,18 +88,24 @@
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item" v-for="(childItem, childIndex) in menuItem.children" :key="childIndex">
                                 <template v-if="hasChildren(childItem)">
-                                    <router-link class="nav-link" :to="childItem.link" :data-target="'#ui-basic-child-' + childIndex"
-                                        :aria-controls="'ui-basic-child-' + childIndex" :aria-expanded="isExpanded(`${index}-${childIndex}`)"
+                                    <router-link class="nav-link" :to="childItem.link"
+                                        :data-target="'#ui-basic-child-' + childIndex"
+                                        :aria-controls="'ui-basic-child-' + childIndex"
+                                        :aria-expanded="isExpanded(`${index}-${childIndex}`)"
                                         @click.prevent="toggleCollapse(`${index}-${childIndex}`)">
                                         <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
                                         {{ childItem.name }}
                                         <i class="menu-arrow"></i>
                                     </router-link>
-                                    <div class="collapse" :id="'ui-basic-child-' + childIndex" :class="{ show: isExpanded(`${index}-${childIndex}`) }">
+                                    <div class="collapse" :id="'ui-basic-child-' + childIndex"
+                                        :class="{ show: isExpanded(`${index}-${childIndex}`) }">
                                         <ul class="nav flex-column sub-menu">
-                                            <li class="nav-item" v-for="(grandChildItem, grandChildIndex) in childItem.children" :key="grandChildIndex">
+                                            <li class="nav-item"
+                                                v-for="(grandChildItem, grandChildIndex) in childItem.children"
+                                                :key="grandChildIndex">
                                                 <router-link class="nav-link" :to="grandChildItem.link">
-                                                    <font-awesome-icon :icon="grandChildItem.icon" :class="menuItem.class" />
+                                                    <font-awesome-icon :icon="grandChildItem.icon"
+                                                        :class="menuItem.class" />
                                                     {{ grandChildItem.name }}
                                                 </router-link>
                                             </li>
@@ -157,6 +169,17 @@ export default {
                 },
                 {
                     link: '',
+                    name: 'Human Resource',
+                    tooltip: 'Human Resource',
+                    icon: 'users',
+                    class: 'menu-icon-custom',
+                    children: [
+                        { link: '/human_resource/daily_time_record/index', name: 'Daily Time Record', icon: 'clipboard-list' },
+                        { link: '/human_resource/employees_directory/index', name: 'Employee Directory', icon: 'address-book' },
+                    ],
+                },
+                {
+                    link: '',
                     name: 'Procurement',
                     tooltip: 'General Service Section',
                     icon: 'cart-shopping',
@@ -209,6 +232,7 @@ export default {
                         },
                     ],
                 },
+
                 {
                     link: '/settings/user-management/',
                     name: 'User Management',

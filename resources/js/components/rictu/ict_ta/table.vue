@@ -231,8 +231,9 @@ export default {
 
             try {
                 return new Date(date).toLocaleString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric'
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
                 });
             } catch (error) {
                 console.error('Date formatting error:', error);

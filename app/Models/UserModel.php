@@ -10,11 +10,11 @@ use Laravel\Sanctum\HasApiTokens;
 
 class UserModel extends Authenticatable
 {
-    use HasFactory;
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
+
     protected $table = 'users';
+
     protected $fillable = [
-        'id',
         'pmo_id',
         'position_id',
         'employee_no',
@@ -35,9 +35,14 @@ class UserModel extends Authenticatable
         'province',
         'citymun',
         'is_activated',
-        'code',
         'section',
         'division'
     ];
 
+    protected $hidden = ['password', 'remember_token', 'code'];
+
+    public function dailyTimeRecords()
+    {
+        return $this->hasMany(DailyTimeRecord::class, 'user_id');
+    }
 }

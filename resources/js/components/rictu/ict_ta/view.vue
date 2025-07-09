@@ -183,12 +183,12 @@
 
                                         <div class="col-lg-6">
                                             <TextAreaInput label="ADDITIONAL INFORMATION/REMARKS (if any): "
-                                                v-model="remarks" :value="data.remarks" disabled/>
+                                                v-model="remarks" :value="data.remarks" disabled />
                                         </div>
 
                                         <div class="col-lg-6">
                                             <TextAreaInput label="RECOMMENDATION" v-model="remarks"
-                                                :value="data.ict_officer_remarks"  disabled/>
+                                                :value="data.ict_officer_remarks" disabled />
                                         </div>
 
                                     </div>
@@ -317,23 +317,25 @@ export default {
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true // Change to false for 24-hour format
+                    hour12: false // Changed to false for 24-hour format
                 });
                 return formattedDate;
             }
         },
-        formatTime(time) {
-            if (!time || time === '0000-00-00') {
-                return null;
-            } else {
-                const formattedTime = new Date(time).toLocaleTimeString('en-US', {
+        formatTime(date) {
+            if (!date || date === '0000-00-00') return null;
+
+            try {
+                return new Date(date).toLocaleString('en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
-                    hour12: true
+                    hour12: false
                 });
-                return formattedTime;
+            } catch (error) {
+                console.error('Date formatting error:', error);
+                return null;
             }
-        },
+        }
     },
     components: {
         Navbar,

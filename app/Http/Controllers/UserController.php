@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\UserModel;
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseRequestModel;
-use App\Models\UserModel;
-use Laravel\Passport\HasApiTokens; // Import HasApiTokens trait
-
-
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+
+
+
+use Illuminate\Support\Facades\Cache;
+use Laravel\Passport\HasApiTokens; // Import HasApiTokens trait
 
 
 class UserController extends Controller
@@ -103,7 +104,8 @@ class UserController extends Controller
 
     public function getUserDetails($id)
     {
-        $query = User::selectRaw('
+        $user = Cache::remember("user:{$id}:details", 3600, function () use ($id) {
+            return User::selectRaw('
             users.id as id,
             users.last_name,
             users.middle_name,
@@ -121,15 +123,17 @@ class UserController extends Controller
             users.position_id,
             p.pmo_title as office,
             pos.POSITION_TITLE as position,
-            CONCAT(users.first_name," ", users.middle_name," ",users.last_name)  as name
+            CONCAT(users.first_name," ", users.middle_name," ",users.last_name) as name
+        ')
+                ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+                ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
+                ->where('users.id', $id)
+                ->first();
+        });
 
-            ')
-            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
-            ->where('users.id', $id);
-        $data = $query->first(); // Use first() instead of get() to retrieve a single result
-        return response()->json($data);
+        return response()->json($user);
     }
+
     public function getGenderEmpStatus()
     {
         $employmentMap = [

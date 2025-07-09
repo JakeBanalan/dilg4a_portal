@@ -13,7 +13,7 @@ use App\Models\PurchaseRequestModel;
 use App\Models\UserModel;
 use App\Models\ProvinceModel;
 use App\Models\OfficeModel;
-
+use Illuminate\Support\Facades\Cache;
 
 use Laravel\Passport\HasApiTokens; // Import HasApiTokens trait
 
@@ -25,7 +25,8 @@ class UserManagementController extends Controller
 {
     public function fetchEmployeeData()
     {
-        $query = UserModel::selectRaw('
+        $userData = Cache::remember('employees:all', 3600, function () {
+            return UserModel::selectRaw('
             users.id as id,
             users.employee_no as employee_no,
             users.first_name as first_name,
@@ -49,13 +50,13 @@ class UserManagementController extends Controller
             tbl_citymun.citymun as citymun,
             CONCAT(users.first_name, " ", users.middle_name, " ", users.last_name) as name
         ')
-            ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
-            ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id')
-            ->leftJoin('tbl_province', 'tbl_province.id', '=', 'users.province')
-            ->leftJoin('tbl_office', 'tbl_office.id', '=', 'users.office')
-            ->leftJoin('tbl_citymun', 'tbl_citymun.id', '=', 'users.citymun');
-
-        $userData = $query->get();
+                ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
+                ->leftJoin('tblposition', 'tblposition.POSITION_C', '=', 'users.position_id')
+                ->leftJoin('tbl_province', 'tbl_province.id', '=', 'users.province')
+                ->leftJoin('tbl_office', 'tbl_office.id', '=', 'users.office')
+                ->leftJoin('tbl_citymun', 'tbl_citymun.id', '=', 'users.citymun')
+                ->get();
+        });
 
         return response()->json($userData);
     }
@@ -136,6 +137,8 @@ class UserManagementController extends Controller
         ]);
         // dd($PostUser);
         $PostUser->save();
+
+        Cache::forget('employees:all');
         // return response()->json($PostUser);
     }
 
@@ -162,13 +165,13 @@ class UserManagementController extends Controller
             users.section,
             users.division,
             users.position_id,
-            users.module_access, -- Include module_access
+            users.module_access,
             pos.POSITION_TITLE as position,
             CONCAT(users.first_name," ", users.middle_name," ",users.last_name) as name
         ')
-        ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
-        ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
-        ->where('users.id', $id);
+            ->leftJoin('pmo as p', 'p.id', '=', 'users.pmo_id')
+            ->leftJoin('tblposition as pos', 'pos.POSITION_C', '=', 'users.position_id')
+            ->where('users.id', $id);
 
         $data = $query->first(); // Use first() instead of get() to retrieve a single result
         return response()->json($data);
