@@ -179,9 +179,12 @@ export default {
         addAppItem() {
             this.$router.push("/procurement/add_app_item");
         },
-        async fetchAppData(appYear = new Date().getFullYear()) {
+        async fetchAppData(appYear = null) {
             try {
-                const response = await axios.get(`../api/fetchAppData`, { params: { appYear } });
+                const params = {};
+                if (appYear) params.appYear = appYear;
+
+                const response = await axios.get(`../api/fetchAppData`, { params });
                 this.populateTable(response.data);
             } catch (error) {
                 console.error('Error fetching data:', error);

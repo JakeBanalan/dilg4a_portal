@@ -354,7 +354,7 @@ class RICTUController extends Controller
         $ict_ta_opts = RICTUModel::select([
             'tbl_technicalassistance.id',
             'tbl_technicalassistance.control_no',
-            'u.username as requested_by',
+            DB::raw('CONCAT(u.first_name, " ", u.last_name) AS requested_by'),
             'tbl_technicalassistance.request_date',
             'tbl_technicalassistance.received_date',
             'tbl_technicalassistance.remarks',
