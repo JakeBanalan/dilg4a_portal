@@ -67,7 +67,7 @@ return [
     |
     */
 
-    'timezone' => 'Asia/Manila',
+    'timezone' => 'Asia/Manila', // Set to your desired time zone
 
     /*
     |--------------------------------------------------------------------------
@@ -167,7 +167,7 @@ return [
         /*
          * Package Service Providers...
          */
-        
+
 
 
         /*

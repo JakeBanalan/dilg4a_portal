@@ -5,7 +5,7 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <div
-                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 44%;">
+                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -4px; background-color: white; color: #4cae4c; left: 44%;">
                             <img :src="logo" style="width:60px; height:60px;">
                         </div>
                     </div>
@@ -23,7 +23,7 @@
 
                                 <div class="col-sm-12">
                                     <label>Activity: <small class="err-msg" v-if="errors.title">{{ errors.title
-                                            }}</small> </label>
+                                    }}</small> </label>
                                     <div id="the-basics">
                                         <input class="form-control typeahead" type="text" id="title"
                                             v-model="eventDetails.title" :disabled="isDisabledFlag" />
@@ -46,7 +46,7 @@
                                     <div class="form-group row">
                                         <div class="col-sm-12">
                                             <label>Start: <small class="err-msg" v-if="errors.start">{{ errors.start
-                                                    }}</small></label>
+                                            }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="date" id="start"
                                                     v-model="eventDetails.start" :disabled="isDisabledFlag">
@@ -58,7 +58,7 @@
                                     <div class="form-group row">
                                         <div class="col-sm-12">
                                             <label>End: <small class="err-msg" v-if="errors.end">{{ errors.end
-                                                    }}</small></label>
+                                            }}</small></label>
                                             <div id="the-basics">
                                                 <input class="form-control typeahead" type="date" id="end"
                                                     v-model="eventDetails.end" :disabled="isDisabledFlag">
@@ -70,7 +70,7 @@
                             <div class="form-group row">
                                 <div class="col-sm-12">
                                     <label>Venue: <small class="err-msg" v-if="errors.venue">{{ errors.venue
-                                            }}</small></label>
+                                    }}</small></label>
                                     <div id="the-basics">
                                         <input class="form-control typeahead" type="text" id="venue"
                                             v-model="eventDetails.venue" :disabled="isDisabledFlag">
@@ -135,6 +135,145 @@
             </div>
         </div>
     </div>
+    <div v-if="visible" class="modal-background">
+        <div class="modal" tabindex="1" style="display: block;">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div
+                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 44%;">
+                            <img :src="logo" style="width:60px; height:60px;">
+                        </div>
+                    </div>
+                    <div class="modal-body">
+                        <form class="formEvent" @submit.prevent="validateForm">
+
+                            <div class="form-group row">
+                                <label style="font-size: 20pt; color: red; display: flex; align-items: center;">
+                                    <input type="checkbox" v-model="eventDetails.personnalevent"
+                                        style="visibility: hidden;">
+                                    <span class="custom-checkbox"
+                                        :style="{ backgroundColor: eventDetails.personnalevent ? '#4cae4c' : '#fff' }"></span>
+                                    Personal Event
+                                </label>
+
+                                <div class="col-sm-12">
+                                    <label>Activity: <small class="err-msg" v-if="errors.title">{{ errors.title
+                                    }}</small> </label>
+                                    <div id="the-basics">
+                                        <input class="form-control typeahead" type="text" id="title"
+                                            v-model="eventDetails.title" :disabled="isDisabledFlag" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label>Activity Description: <small class="err-msg" v-if="errors.description">{{
+                                        errors.description }}</small></label>
+                                    <div id="the-basics">
+                                        <textarea rows="3" col="100" style="height:100px !important;" id="description"
+                                            class="form-control" v-model="eventDetails.description"
+                                            :disabled="isDisabledFlag"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <div class="col-sm-12">
+                                            <label>Start: <small class="err-msg" v-if="errors.start">{{ errors.start
+                                            }}</small></label>
+                                            <div id="the-basics">
+                                                <input class="form-control typeahead" type="date" id="start"
+                                                    v-model="eventDetails.start" :disabled="isDisabledFlag">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <div class="col-sm-12">
+                                            <label>End: <small class="err-msg" v-if="errors.end">{{ errors.end
+                                            }}</small></label>
+                                            <div id="the-basics">
+                                                <input class="form-control typeahead" type="date" id="end"
+                                                    v-model="eventDetails.end" :disabled="isDisabledFlag">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label>Venue: <small class="err-msg" v-if="errors.venue">{{ errors.venue
+                                    }}</small></label>
+                                    <div id="the-basics">
+                                        <input class="form-control typeahead" type="text" id="venue"
+                                            v-model="eventDetails.venue" :disabled="isDisabledFlag">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group row">
+                                        <div class="col-sm-12">
+                                            <label>Target Participants: <small class="err-msg" v-if="errors.remarks">{{
+                                                errors.remarks }}</small></label>
+                                            <div id="the-basics">
+                                                <multiselect v-model="eventDetails.remarks"
+                                                    :options="TargetParticipantsOpt" :multiple="true"
+                                                    :disabled="isDisabledFlag" :searchable="false">
+                                                </multiselect>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <div class="col-sm-12">
+                                            <label>No. of Participants: <small class="err-msg" v-if="errors.enp">{{
+                                                errors.enp }}</small></label>
+                                            <div id="the-basics">
+                                                <input class="form-control typeahead" type="text"
+                                                    v-model="eventDetails.enp" id="enp" :disabled="isDisabledFlag">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <label>Posted By:</label>
+                                    <div id="the-basics">
+                                        <input class="form-control typeahead" type="text"
+                                            v-model="eventDetails.postedBy" readonly id="postedBy">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row button-row">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-primary float-end ms-2"
+                                        @click="closeModal">Close</button>
+                                    <button type="submit" id="confirmButton" class="btn btn-success float-end"
+                                        :disabled="isDisabledFlag">
+                                        {{ mode === 'add' ? 'Add Event' : 'Save Event' }}</button>
+
+                                    <button type="button" class="btn btn-secondary float-end ms-2"
+                                        @click="toggleEditMode" v-if="mode === 'edit'">
+                                        {{ isEditMode ? 'Cancel Edit' : 'Edit' }}
+                                    </button>
+                                    <button type="button" class="btn btn-danger float-end ms-2" v-if="mode === 'edit'"
+                                        @click="$emit('delete', eventDetails.id)">
+                                        Delete Event
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
@@ -167,9 +306,9 @@ export default {
         visible: Boolean,
         mode: String,
         eventDetails: Object,
-        posted_by: String
-        // Other props...
+        posted_by: String // Removed fetchAuthor from props
     },
+    emits: ['close', 'save', 'delete'], // Declare emitted events
     watch: {
         mode(newMode) {
             // Update isDisabledFlag when mode changes
@@ -182,8 +321,7 @@ export default {
     },
     created() {
         this.userId = localStorage.getItem('userId');
-        this.fetchAuthor();
-
+        this.fetchAuthor(); // Ensure fetchAuthor is called correctly
     },
     computed: {
         isDisabled() {
@@ -242,7 +380,10 @@ export default {
             const userId = localStorage.getItem('userId');
             this.$fetchUserData(userId, '../../../../api/fetchUser')
                 .then(emp_data => {
-                    this.Author = emp_data.name
+                    this.Author = emp_data.name;
+                })
+                .catch(error => {
+                    console.error('Error fetching author:', error);
                 });
         },
         closeModal() {
@@ -266,7 +407,7 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
 .custom-checkbox {
     display: inline-block;
     width: 20px;
@@ -300,31 +441,57 @@ export default {
     font-style: italic;
     color: red;
     font-size: 12px;
-    /* Make it more visible */
     margin-top: 5px;
-    /* Add margin for spacing */
 }
 
-/* Style for dimming the background */
+/* Style for the modal background */
 .modal-background {
     position: fixed;
-    left: 50%;
-    border-radius: 5px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 1050;
-    display: block;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
     background-color: rgba(0, 0, 0, 0.5);
     overflow-y: auto;
+    padding: 20px;
 }
 
-/* Style for centering the modal */
+/* Style for the modal dialog */
 .modal-dialog {
-    overflow: visible !important;
-    overflow-y: auto;
-    margin-top: 10%;
-    max-width: 80%;
-    /* Adjust as needed */
+    margin: 60px auto;
+    max-width: 60%;
+    width: 60%;
 }
 
+/* Style for the modal content */
+.modal-content {
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+/* Button styling */
+.button-row {
+    margin-top: 20px;
+}
+
+.float-end {
+    float: right;
+}
+
+.ms-2 {
+    margin-left: 0.5rem;
+}
+
+/* Ensure form looks good on mobile */
+@media (max-width: 768px) {
+    .modal-dialog {
+        max-width: 95%;
+    }
+}
 
 .selected img {
     border: 2px solid #007bff;

@@ -231,8 +231,9 @@ export default {
 
             try {
                 return new Date(date).toLocaleString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric'
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
                 });
             } catch (error) {
                 console.error('Date formatting error:', error);
@@ -255,11 +256,10 @@ export default {
             }
         },
 
-        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = null, quarter = null) {
+        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = new Date().getFullYear(), quarter = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
             this.currentPage = 1;
 
-            // Build params object from individual parameters
             const params = {
                 ...(controlNo && { control_no: controlNo }),
                 ...(requestedBy && { requested_by: requestedBy }),

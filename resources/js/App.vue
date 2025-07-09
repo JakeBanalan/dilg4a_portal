@@ -10,6 +10,7 @@ import Procurement from "./components/procurement/index.vue";
 import create_ict from "./components/rictu/ict_ta/create.vue";
 import AnnualProcurementPlan from "./components/procurement/AnnualProcurementPlan.vue";
 import Sidebar from "./components/layout/Sidebar.vue";
+import DailyTimeRecord from "./components/human_resource/daily_time_record/index.vue";
 
 export default {
     name: "App",
@@ -20,8 +21,8 @@ export default {
         Sidebar,
         Procurement,
         AnnualProcurementPlan,
-        create_ict
-
+        create_ict,
+        DailyTimeRecord
     }
 }
 

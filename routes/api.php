@@ -17,7 +17,6 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\AppItemController;
 use App\Http\Controllers\AbstractController;
 use App\Http\Controllers\CalendarController;
-
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -26,6 +25,8 @@ use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\QMSQuarterlyLNDController;
 use App\Http\Controllers\QMSMonthlyExportController;
 use App\Http\Controllers\QMSQuarterlyExportController;
+use App\Http\Controllers\DailyTimeRecordController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -54,7 +55,6 @@ Route::middleware('auth:api')->group(function () {
 // });
 
 
-
 Route::middleware('api')->group(function () {
     Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']);
 });
@@ -62,12 +62,12 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('get_purchase_request_details', [PurchaseRequestController::class, 'getPurchaseRequestDetails']);
 });
-    Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
+Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
 
-    Route::middleware('api')->group(function () {
-        Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);
-    });
-    Route::middleware('api')->group(function () {
+Route::middleware('api')->group(function () {
+    Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);
+});
+Route::middleware('api')->group(function () {
     Route::get('appitems', [AppItemController::class, 'getAppData']);
 });
 
@@ -97,7 +97,6 @@ Route::middleware('api')->group(function () {
     Route::get('generateRFQNo', [RFQController::class, 'generateRFQNo']);
 });
 
-
 Route::middleware('api')->group(function () {
     Route::get('generateAbstractNo', [AbstractController::class, 'generateAbstractNo']);
 });
@@ -105,7 +104,6 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('generatePurchaseOrderNo', [PurchaseOrderController::class, 'generatePurchaseOrderNo']);
 });
-
 
 Route::middleware('api')->group(function () {
     Route::get('fetch_created_abstract', [AbstractController::class, 'fetch_created_abstract']);
@@ -138,8 +136,6 @@ Route::middleware('api')->group(function () {
     Route::get('generate-stock-number', [AppItemController::class, 'generateStockNumber']);
 });
 
-
-
 Route::middleware('api')->group(function () {
     Route::get('countTotalItem/{cur_year}', [AppItemController::class, 'countTotalItem']);
 });
@@ -155,7 +151,6 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('get-ict-personnel', [RICTUController::class, 'getICTpersonnel']);
 });
-
 
 Route::middleware('api')->group(function () {
     Route::get('/totalCountICTRequest', [RICTUController::class, 'totalCountICTrequest']);
@@ -193,12 +188,9 @@ Route::middleware('api')->group(function () {
     Route::get('countUserTotalPR/{userId}', [PurchaseRequestController::class, 'countUserTotalPR']);
 });
 
-
-
 Route::middleware('api')->group(function () {
     Route::get('app_category', [AppItemController::class, 'app_category']);
 });
-
 
 Route::middleware('api')->group(function () {
     Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
@@ -223,7 +215,6 @@ Route::middleware('api')->group(function () {
     Route::get('fetchAllUsers', [UserController::class, 'fetchAllUsers']);
 });
 
-
 Route::middleware('api')->group(function () {
     Route::get('getICTData/{id}', [RICTUController::class, 'getICTData']);
 });
@@ -233,11 +224,6 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('getGenderEmpStat', [UserController::class, 'getGenderEmpStatus']);
 });
-
-
-
-
-
 
 Route::middleware('api')->group(function () {
     Route::get('getPosition', [PositionController::class, 'getPosition']);
@@ -252,11 +238,9 @@ Route::middleware('api')->group(function () {
     Route::get('dashboardEventData', [CalendarController::class, 'dashboardEventData']);
 });
 
-
 Route::middleware('api')->group(function () {
     Route::get('fetchEventDetails', [CalendarController::class, 'fetchEventDetails']);
 });
-
 
 //QMS GET
 Route::middleware('api')->group(function () {
@@ -328,12 +312,10 @@ Route::middleware('api')->group(function () {
     Route::get('fetchQOPRUserData/{id}/{qoe_id}', [QMSController::class, 'fetchQOPRUserData']);
 });
 Route::middleware('api')->group(function () {
-
     Route::get('fetchQuarterData/{id}/{qoe_id}', [QMSController::class, 'fetchQuarterData']);
 });
 
 Route::middleware('api')->group(function () {
-
     Route::get('fetchMonthlyData/{id}/{qoe_id}', [QMSController::class, 'fetchMonthlyData']);
 });
 
@@ -386,7 +368,6 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
 
-
 // Route::post('logout', function (Request $request) {
 //     $request->user()->token()->revoke(); // Revoke the user's access token
 //     // Clear any other cached data or session information if necessary
@@ -423,7 +404,6 @@ Route::post('post_update_status', [PurchaseRequestController::class, 'post_updat
 Route::post('post_addCode', [PurchaseRequestController::class, 'post_addCode']);
 Route::post('fetch_ict_req_details', [RICTUController::class, 'fetch_ict_req_details']);
 
-
 Route::post('post_complete', [CRUDController::class, 'post_complete']);
 Route::post('post_received_ict_request', [CRUDController::class, 'post_received_ict_request']);
 Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSmallestQuotationsForItems']);
@@ -434,7 +414,6 @@ Route::post('post_addCode', [BudgetController::class, 'insertCode']);
 Route::post('PostAbstract', [AbstractController::class, 'PostAbstract']);
 Route::post('PostSupplierQuotation', [AbstractController::class, 'PostSupplierQuotation']);
 
-
 // R F Q
 Route::post('post_create_rfq', [RFQController::class, 'post_create_rfq']);
 Route::post('PostUpdateRFQ', [RFQController::class, 'PostUpdateRFQ']);
@@ -444,8 +423,6 @@ Route::post('PostUpdateRFQ', [RFQController::class, 'PostUpdateRFQ']);
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
 Route::post('PostUpdateEvent', [CalendarController::class, 'PostUpdateEvent']);
 Route::post('post_create_event', [CalendarController::class, 'post_create_event']);
-
-
 
 //C A L E N D A R
 Route::post('PostEventData', [CalendarController::class, 'PostEventData']);
@@ -478,14 +455,11 @@ Route::post('DeletePOProcessOwner', [QMSController::class, 'DeletePOProcessOwner
 Route::post('PostUser', [UserManagementController::class, 'PostUser']);
 Route::post('updateUserSidebar', [UserManagementController::class, 'updateUserSidebar']);
 
-
-
 // E X P O R T
 // routes/web.php or routes/api.php
 Route::middleware('api')->group(function () {
     Route::get('export-purchase-request/{id}', [PurchaseRequestController::class, 'exportPurchaseRequest']);
 });
-
 
 Route::middleware('api')->group(function () {
     Route::get('export-rfq/{id}', [RFQController::class, 'viewRFQItems']);
@@ -495,11 +469,9 @@ Route::middleware('api')->group(function () {
     Route::get('export-abstract/{absID}', [AbstractController::class, 'ExportAbstract']);
 });
 
-
 Route::middleware('api')->group(function () {
     Route::get('generate-report/{sy}/{sq}/{rt}', [RICTUController::class, 'generate']);
 });
-
 
 Route::middleware('api')->group(function () {
     Route::get('generateReportQ/{id}', [QMSQuarterlyExportController::class, 'generateReport']);
@@ -511,4 +483,17 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('generateReportQLND/{id}', [QMSQuarterlyLNDController::class, 'generateReport']);
+});
+
+Route::prefix('daily-time-records')->group(function () {
+    Route::get('/', [DailyTimeRecordController::class, 'index']);
+    Route::get('/user/{userId}', [DailyTimeRecordController::class, 'getByUser']);
+    Route::put('/user/{userId}', [DailyTimeRecordController::class, 'updateByUser']);
+    Route::post('/import', [DailyTimeRecordController::class, 'import']);
+    Route::get('/export', [DailyTimeRecordController::class, 'export']);
+    Route::post('/bulk', [DailyTimeRecordController::class, 'storeBulk']);
+    Route::delete('/{id}', [DailyTimeRecordController::class, 'destroy']);
+    Route::get('/{id}', [DailyTimeRecordController::class, 'show']); // wildcard LAST!
+    Route::get('/export-user/{userId}', [DailyTimeRecordController::class, 'exportUser']);
+
 });

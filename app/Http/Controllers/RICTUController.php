@@ -114,7 +114,7 @@ class RICTUController extends Controller
 
     public function fetch_ict_request(Request $request, $status = null)
     {
-        $page = $request->query('page');
+        $page = $request->query('page', 1);
         $itemsPerPage = $request->query('itemsPerPage', 10000);
         $control_no = $request->query('control_no');
         $requested_by = $request->query('requested_by');
@@ -122,76 +122,81 @@ class RICTUController extends Controller
         $start_date = $request->query('start_date');
         $end_date = $request->query('end_date');
         $pmo = $request->query('pmo');
-        $year = $request->query('year', date('Y')); // Default to the current year
-        $quarter = $request->query('quarter'); // Retrieve the quarter from the request
+        $year = $request->query('year', date('Y'));
+        $quarter = $request->query('quarter');
 
-        $ictQuery = RICTUModel::select(RICTUModel::raw('
-            tbl_technicalassistance.id AS id,
-            tbl_technicalassistance.control_no AS control_no,
-            CONCAT(u.first_name, " ", u.last_name) AS requested_by,
-            u.user_role AS role,
-            tbl_technicalassistance.started_date AS started_date,
-            TIME(tbl_technicalassistance.started_date) AS started_time,
-            MONTH(tbl_technicalassistance.started_date) AS month,
-            YEAR(tbl_technicalassistance.started_date) AS year,
-            tbl_technicalassistance.request_date AS request_date,
-            tbl_technicalassistance.completed_date AS completed_date,
-            tbl_technicalassistance.remarks AS remarks,
-            cl.link AS css_link,
-            p.pmo_title AS office,
-            itr.request_type AS request_type,
-            c.TITLE AS sub_request_type,
-            ip.ict_personnel AS ict_personnel,
-            ip.emp_id AS ict_personnel_id,
-            is.status AS status,
-            is.id AS status_id
-        '))
-            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
+        $ictQuery = DB::table('tbl_technicalassistance')
+            ->select(DB::raw('
+                tbl_technicalassistance.id AS id,
+                tbl_technicalassistance.control_no,
+                CONCAT(u.first_name, " ", u.last_name) AS requested_by,
+                u.user_role AS role,
+                tbl_technicalassistance.started_date,
+                TIME(tbl_technicalassistance.started_date) AS started_time,
+                MONTH(tbl_technicalassistance.started_date) AS month,
+                YEAR(tbl_technicalassistance.started_date) AS year,
+                tbl_technicalassistance.request_date,
+                tbl_technicalassistance.completed_date,
+                tbl_technicalassistance.remarks,
+                cl.link AS css_link,
+                p.pmo_title AS office,
+                itr.request_type,
+                c.TITLE AS sub_request_type,
+                ip.ict_personnel,
+                ip.emp_id AS ict_personnel_id,
+                is.status,
+                is.id AS status_id
+            '))
             ->leftJoin('users as u', 'u.id', '=', 'tbl_technicalassistance.request_by')
+            ->leftJoin('tbl_ict_personnel as ip', 'ip.emp_id', '=', 'tbl_technicalassistance.assign_ict_officer')
             ->leftJoin('pmo as p', 'p.id', '=', 'tbl_technicalassistance.office_id')
             ->leftJoin('tbl_ict_type_of_request as itr', 'itr.id', '=', 'tbl_technicalassistance.request_type_id')
             ->leftJoin('tbl_ict_request_category as c', 'c.id', '=', 'tbl_technicalassistance.request_type_category_id')
             ->leftJoin('tbl_ict_status as is', 'is.id', '=', 'tbl_technicalassistance.status_id')
             ->leftJoin('tbl_css_link as cl', 'cl.id', '=', 'tbl_technicalassistance.css_link')
-            ->whereYear('tbl_technicalassistance.created_at', $year); // Filter by the provided year
+            ->whereYear('tbl_technicalassistance.created_at', $year)
+            ->when($status !== null && $status != 6, fn($q) => $q->where('tbl_technicalassistance.status_id', $status))
+            ->when($control_no, fn($q) => $q->where('tbl_technicalassistance.control_no', 'LIKE', "%$control_no%"))
+            ->when($requested_by, fn($q) =>
+                $q->where(DB::raw('CONCAT(u.first_name, " ", u.last_name)'), 'LIKE', "%$requested_by%")
+            )
+            ->when($ict_personnel, fn($q) =>
+                $q->where(DB::raw('ip.ict_personnel'), 'LIKE', "%$ict_personnel%")
+            )
+            ->when($start_date && $end_date, fn($q) =>
+                $q->whereBetween('tbl_technicalassistance.started_date', [
+                    $start_date,
+                    date('Y-m-d 23:59:59', strtotime($end_date))
+                ])
+            )
+            ->when($pmo, fn($q) =>
+                $q->where(DB::raw('p.pmo_title'), 'LIKE', "%$pmo%")
+            )
+            ->when($quarter, fn($q) =>
+                $q->whereBetween('tbl_technicalassistance.started_date', $this->getQuarterDateRange($quarter, $year))
+            )
+            ->orderByDesc('tbl_technicalassistance.control_no');
 
-        if ($status !== null && $status != 6) {
-            $ictQuery->where('tbl_technicalassistance.status_id', $status);
-        }
-
-        if ($control_no) {
-            $ictQuery->where('tbl_technicalassistance.control_no', 'LIKE', "%$control_no%");
-        }
-
-        if ($requested_by) {
-            $ictQuery->where(DB::raw('CONCAT(u.first_name, " ", u.last_name)'), 'LIKE', "%$requested_by%");
-        }
-
-        if ($ict_personnel) {
-            $ictQuery->where(DB::raw('ip.ict_personnel'), 'LIKE', "%$ict_personnel%");
-        }
-
-        if ($start_date && $end_date) {
-            // Set the end date to the end of the day
-            $end_date = date('Y-m-d 23:59:59', strtotime($end_date));
-            $ictQuery->whereBetween('tbl_technicalassistance.started_date', [$start_date, $end_date]);
-        }
-
-        if ($pmo) {
-            $ictQuery->where(DB::raw('p.pmo_title'), 'LIKE', "%$pmo%");
-        }
-
-        if ($quarter) {
-            $ictQuery->whereRaw('QUARTER(tbl_technicalassistance.started_date) = ?', [$quarter]);
-        }
-
-        // Order the results
-        $ictQuery->orderBy('control_no', 'DESC');
-
-        // Paginate the results
-        $ict = $ictQuery->paginate($itemsPerPage, ['*'], 'page', $page);
+        $ict = ($itemsPerPage == -1)
+            ? $ictQuery->get()
+            : $ictQuery->paginate($itemsPerPage, ['*'], 'page', $page);
 
         return response()->json($ict);
+    }
+
+    /**
+     * Return date range array for a given quarter and year
+     */
+    private function getQuarterDateRange($quarter, $year)
+    {
+        $ranges = [
+            1 => ["$year-01-01", "$year-03-31 23:59:59"],
+            2 => ["$year-04-01", "$year-06-30 23:59:59"],
+            3 => ["$year-07-01", "$year-09-30 23:59:59"],
+            4 => ["$year-10-01", "$year-12-31 23:59:59"],
+        ];
+
+        return $ranges[$quarter] ?? ["$year-01-01", "$year-12-31 23:59:59"];
     }
 
     public function fetch_ict_perUser(Request $request, $status, $userID)

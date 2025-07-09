@@ -21,7 +21,7 @@
         <ul class="nav" v-if="this.user_role == 'admin'">
             <li class="nav-item" v-for="(menuItem, index) in filteredMenuItems" :key="index">
                 <template v-if="hasChildren(menuItem)">
-                    <router-link class="nav-link " :to="menuItem.link" :data-target="'#ui-basic-' + index"
+                    <router-link class="nav-link" :to="menuItem.link" :data-target="'#ui-basic-' + index"
                         :aria-controls="'ui-basic-' + index" :aria-expanded="isExpanded(index)"
                         @click.prevent="toggleCollapse(index)">
                         <font-awesome-icon :icon="menuItem.icon" :class="menuItem.class" />
@@ -31,10 +31,37 @@
                     <div class="collapse" :id="'ui-basic-' + index" :class="{ show: isExpanded(index) }">
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item" v-for="(childItem, childIndex) in menuItem.children" :key="childIndex">
-                                <router-link class="nav-link" :to="childItem.link">
-                                    <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
-                                    {{ childItem.name }}
-                                </router-link>
+                                <template v-if="hasChildren(childItem)">
+                                    <router-link class="nav-link" :to="childItem.link"
+                                        :data-target="'#ui-basic-child-' + childIndex"
+                                        :aria-controls="'ui-basic-child-' + childIndex"
+                                        :aria-expanded="isExpanded(`${index}-${childIndex}`)"
+                                        @click.prevent="toggleCollapse(`${index}-${childIndex}`)">
+                                        <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
+                                        {{ childItem.name }}
+                                        <i class="menu-arrow"></i>
+                                    </router-link>
+                                    <div class="collapse" :id="'ui-basic-child-' + childIndex"
+                                        :class="{ show: isExpanded(`${index}-${childIndex}`) }">
+                                        <ul class="nav flex-column sub-menu">
+                                            <li class="nav-item"
+                                                v-for="(grandChildItem, grandChildIndex) in childItem.children"
+                                                :key="grandChildIndex">
+                                                <router-link class="nav-link" :to="grandChildItem.link">
+                                                    <font-awesome-icon :icon="grandChildItem.icon"
+                                                        :class="menuItem.class" />
+                                                    {{ grandChildItem.name }}
+                                                </router-link>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <router-link class="nav-link" :to="childItem.link">
+                                        <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
+                                        {{ childItem.name }}
+                                    </router-link>
+                                </template>
                             </li>
                         </ul>
                     </div>
@@ -50,7 +77,7 @@
         <ul class="nav" v-else>
             <li class="nav-item" v-for="(menuItem, index) in filteredMenuItems" :key="index">
                 <template v-if="hasChildren(menuItem)">
-                    <router-link class="nav-link " :to="menuItem.link" :data-target="'#ui-basic-' + index"
+                    <router-link class="nav-link" :to="menuItem.link" :data-target="'#ui-basic-' + index"
                         :aria-controls="'ui-basic-' + index" :aria-expanded="isExpanded(index)"
                         @click.prevent="toggleCollapse(index)">
                         <font-awesome-icon :icon="menuItem.icon" :class="menuItem.class" />
@@ -60,10 +87,37 @@
                     <div class="collapse" :id="'ui-basic-' + index" :class="{ show: isExpanded(index) }">
                         <ul class="nav flex-column sub-menu">
                             <li class="nav-item" v-for="(childItem, childIndex) in menuItem.children" :key="childIndex">
-                                <router-link class="nav-link" :to="childItem.link">
-                                    <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
-                                    {{ childItem.name }}
-                                </router-link>
+                                <template v-if="hasChildren(childItem)">
+                                    <router-link class="nav-link" :to="childItem.link"
+                                        :data-target="'#ui-basic-child-' + childIndex"
+                                        :aria-controls="'ui-basic-child-' + childIndex"
+                                        :aria-expanded="isExpanded(`${index}-${childIndex}`)"
+                                        @click.prevent="toggleCollapse(`${index}-${childIndex}`)">
+                                        <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
+                                        {{ childItem.name }}
+                                        <i class="menu-arrow"></i>
+                                    </router-link>
+                                    <div class="collapse" :id="'ui-basic-child-' + childIndex"
+                                        :class="{ show: isExpanded(`${index}-${childIndex}`) }">
+                                        <ul class="nav flex-column sub-menu">
+                                            <li class="nav-item"
+                                                v-for="(grandChildItem, grandChildIndex) in childItem.children"
+                                                :key="grandChildIndex">
+                                                <router-link class="nav-link" :to="grandChildItem.link">
+                                                    <font-awesome-icon :icon="grandChildItem.icon"
+                                                        :class="menuItem.class" />
+                                                    {{ grandChildItem.name }}
+                                                </router-link>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <router-link class="nav-link" :to="childItem.link">
+                                        <font-awesome-icon :icon="childItem.icon" :class="menuItem.class" />
+                                        {{ childItem.name }}
+                                    </router-link>
+                                </template>
                             </li>
                         </ul>
                     </div>
@@ -115,6 +169,17 @@ export default {
                 },
                 {
                     link: '',
+                    name: 'Human Resource',
+                    tooltip: 'Human Resource',
+                    icon: 'users',
+                    class: 'menu-icon-custom',
+                    children: [
+                        { link: '/human_resource/daily_time_record/index', name: 'Daily Time Record', icon: 'clipboard-list' },
+                        { link: '/human_resource/employees_directory/index', name: 'Employee Directory', icon: 'address-book' },
+                    ],
+                },
+                {
+                    link: '',
                     name: 'Procurement',
                     tooltip: 'General Service Section',
                     icon: 'cart-shopping',
@@ -147,6 +212,7 @@ export default {
                         { link: '/rictu/ict_ta/index', name: 'ICT TA', icon: 'group-arrows-rotate' },
                     ],
                 },
+
                 {
                     link: '',
                     name: 'QMS',
@@ -160,6 +226,7 @@ export default {
                         { link: '/qms/reports_submission/provincial_report', name: 'Provincial QME', icon: 'clipboard-list' },
                     ],
                 },
+
                 {
                     link: '/settings/user-management/',
                     name: 'User Management',
@@ -174,20 +241,36 @@ export default {
         filteredMenuItems() {
             // Filter menu items based on allowedMenus
             return this.menuItems.filter(menu => {
-                // Include parent menu if it has a matching link or any child matches
                 if (this.allowedMenus.includes(menu.link)) {
                     return true;
                 }
-                if (menu.children && menu.children.some(child => this.allowedMenus.includes(child.link))) {
+                if (menu.children && menu.children.some(child => {
+                    if (this.allowedMenus.includes(child.link)) {
+                        return true;
+                    }
+                    return child.children && child.children.some(grandChild => this.allowedMenus.includes(grandChild.link));
+                })) {
                     return true;
                 }
                 return false;
             }).map(menu => {
-                // If parent menu has children, filter children based on allowedMenus
                 if (menu.children) {
                     return {
                         ...menu,
-                        children: menu.children.filter(child => this.allowedMenus.includes(child.link)),
+                        children: menu.children.filter(child => {
+                            if (this.allowedMenus.includes(child.link)) {
+                                return true;
+                            }
+                            return child.children && child.children.some(grandChild => this.allowedMenus.includes(grandChild.link));
+                        }).map(child => {
+                            if (child.children) {
+                                return {
+                                    ...child,
+                                    children: child.children.filter(grandChild => this.allowedMenus.includes(grandChild.link)),
+                                };
+                            }
+                            return child;
+                        }),
                     };
                 }
                 return menu;
@@ -212,17 +295,19 @@ export default {
     },
     methods: {
         hasChildren(item) {
+            // Check if the item has children
             return item.children && item.children.length > 0;
         },
-        isExpanded(index) {
-            return this.expandedItems.includes(index);
+        isExpanded(key) {
+            // Check if the item is expanded
+            return this.expandedItems.includes(key);
         },
-        toggleCollapse(index) {
-            if (this.isExpanded(index)) {
-                const itemIndex = this.expandedItems.indexOf(index);
-                this.expandedItems.splice(itemIndex, 1);
+        toggleCollapse(key) {
+            // Toggle the collapse state of the item
+            if (this.isExpanded(key)) {
+                this.expandedItems = this.expandedItems.filter(item => item !== key);
             } else {
-                this.expandedItems.push(index);
+                this.expandedItems.push(key);
             }
         },
     },

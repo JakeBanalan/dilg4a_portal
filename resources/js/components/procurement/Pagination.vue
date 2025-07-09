@@ -61,10 +61,11 @@ export default {
       return visiblePages;
     },
   },
+
   methods: {
     changePage(page) {
       if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-        this.$emit('pageChange', page);
+        this.$emit('pageChange', page); // ✅ TAMA NA ITO!
       }
     }
   },

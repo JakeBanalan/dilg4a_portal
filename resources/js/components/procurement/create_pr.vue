@@ -5,21 +5,28 @@
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
+                    <!-- Blurred Background Overlay -->
+                    <div v-if="modalVisible" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                        background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 1040;">
+                    </div>
+
+                    <!-- Modal -->
                     <div class="modal demo-modal" v-if="modalVisible"
-                        style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent;overflow-y: auto; width: 600px;">
-                        <div class="modal-dialog"
-                            style=" margin: auto; position: relative; transform: translateY(60%);">
+                        style="position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; overflow-y: auto; width:900px;">
+                        <div class="modal-dialog" style="margin: auto; position: relative; transform: translateY(60%);">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <div
-                                        style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                                    <div style="width: 75px; height: 75px; border-radius: 50%;
+                            display: flex; align-items: center; justify-content: center;
+                            position: absolute; top: -18px; background-color: white;
+                            color: #4cae4c; left: 45%;">
                                         <img :src="logo" style="width:60px; height:60px;">
                                     </div>
                                 </div>
                                 <div class="modal-body">
                                     <div class="container">
                                         <h1>Do you wish to continue with Purchase Request No:</h1>
-                                        <h2> <span style="color: #007bff;">{{ purchase_no }}</span>?</h2>
+                                        <h2><span style="color: #007bff;">{{ purchase_no }}</span>?</h2>
                                         <div class="details">
                                             <div><span>END-USER:</span> {{ userData.name }}</div>
                                             <div><span>OFFICE :</span> {{ userData.pmo_title }}</div>
@@ -31,11 +38,13 @@
                                     <button type="button" class="btn btn-light"
                                         @click="cancelAndRedirect">Cancel</button>
                                     <button type="button" class="btn btn-primary" @click="proceedWithEncoding">
-                                        <i class="icon-arrow-right"></i>&nbsp;Proceed to Encoding</button>
+                                        <i class="icon-arrow-right"></i>&nbsp;Proceed to Encoding
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="row justify-content-end">
                         <button type="button" class="btn btn-primary btn-md" @click="post_create_pr"><font-awesome-icon
                                 :icon="['fas', 'save']" /> &nbsp;<b>Saved & Proceed</b></button>
@@ -168,7 +177,7 @@
                         </div>
                         <!--ADD ITEM MODAL-->
                         <div class="modal" v-if="addItemModalVisible" id="addItemModal"
-                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
                             <div class="modal-dialog"
                                 style=" margin: auto; position: relative; transform: translateY(15%);">
                                 <div class="modal-content">
@@ -222,7 +231,7 @@
 
                         <!--EDIT ITEM MODAL-->
                         <div class="modal" v-if="editItemModalVisible" id="editItemModal"
-                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 600px;">
+                            style=" position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
                             <div class="modal-dialog"
                                 style=" margin: auto; position: relative; transform: translateY(15%);">
                                 <div class="modal-content">
@@ -290,7 +299,7 @@ import Navbar from "../layout/Navbar.vue";
 import Sidebar from "../layout/Sidebar.vue";
 import FooterVue from "../layout/Footer.vue";
 import BreadCrumbs from "../dashboard_tiles/BreadCrumbs.vue";
-import Modal from "../modals/Modal.vue";
+import Modal from "../modals/modal.vue";
 import item_table from "./item_table.vue";
 import dtable from "./table.vue";
 import axios from "axios";
@@ -552,7 +561,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .custom-checkbox {
     display: inline-block;
     width: 20px;

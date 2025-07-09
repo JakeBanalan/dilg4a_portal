@@ -43,7 +43,8 @@ import budget_obligation from "../components/budget/obligation/index.vue";
 //HR Section
 import employees_directory from "../components/human_resource/employees_directory/index.vue";
 import daily_time_record from "../components/human_resource/daily_time_record/index.vue";
-
+import AddMonthlyRecords from "../components/human_resource/daily_time_record/monthly.vue";
+import ViewMonthlyRecords from "../components/human_resource/daily_time_record/viewRecord.vue";
 
 // ICT TA
 import dashboard_ict_ta from "../components/rictu/ict_ta/index.vue";
@@ -1270,14 +1271,10 @@ const routes = [{
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({
-                        name: 'Login'
-                    });
+                    next({ name: 'Login' });
                 }
             }).catch(() => {
-                next({
-                    name: 'Login'
-                });
+                next({ name: 'Login' });
             });
         }
     },
@@ -1308,6 +1305,74 @@ const routes = [{
                 });
             });
         }
+    },
+    {
+        path: '/human_resource/daily_time_record/index',
+        name: 'Daily Time Record',
+        component: daily_time_record,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({ name: 'Login' });
+                }
+            }).catch(() => {
+                next({ name: 'Login' });
+            });
+        }
+    },
+    {
+        path: '/human_resource/daily_time_record/monthly',
+        name: 'Add Monthly Records',
+        component: AddMonthlyRecords,
+        meta: {
+            requiresAuth: true,
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: { api_token: token },
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({ name: 'Login' });
+                }
+            }).catch(() => {
+                next({ name: 'Login' });
+            });
+        },
+    },
+    {
+        path: '/human_resource/daily_time_record/:userId',
+        name: 'View Monthly Records',
+        component: ViewMonthlyRecords,
+        meta: {
+            requiresAuth: true,
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: { api_token: token },
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({ name: 'Login' });
+                }
+            }).catch(() => {
+                next({ name: 'Login' });
+            });
+        },
     },
     {
         path: '/settings/user-management',
