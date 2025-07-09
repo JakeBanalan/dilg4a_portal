@@ -16,7 +16,8 @@
                                         Procedures
                                     </h5>
                                     <div class="d-flex">
-                                        <button type="button" @click="Return()" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
+                                        <button type="button" @click="Return()"
+                                            class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
                                             Return
                                         </button>
                                         <button type="submit" class="btn btn-outline-primary btn-fw btn-icon-text mx-2">
@@ -61,8 +62,8 @@
                                     <div class="row">
                                         <div class="col-md-3">
                                             <label>Coverage:</label>
-                                            <multiselect :options="COptions" v-model="form.coverage" :multiple="false"
-                                                :searchable="false" id="coverage">
+                                            <multiselect :options="COptions" v-model="form.coverage" track-by="value"
+                                                label="label" :multiple="false" :searchable="false" id="coverage">
                                             </multiselect>
                                             <label>Office:</label>
                                             <multiselect :options="OOptions" v-model="form.office" :multiple="false"
@@ -138,7 +139,96 @@
                         </div>
                     </div>
 
+                    <div class="card" style="margin-top:1%;" v-if="form.coverage.value == 1 || 2">
+                        <div class="card-body">
+                            <div class="card-title d-flex justify-content-between align-items-center">
+                                <!-- <h5 class="card-title">
+                                    Signatories
+                                </h5> -->
+                            </div>
+                            <!--table start quality objectives-->
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:20% !important">REGIONAL DEPUTY QMR</th>
+                                            <th style="width:20% !important">REGIONAL QMR</th>
+                                            <th style="width:5% !important">ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="ppo in PO_ProcessOwner" :key="ppo.id">
+                                            <td>{{ ppo.pmo_title }}</td>
+                                            <td>{{ ppo.ppo_name }}</td>
+                                            <td style="width:5% !important;">
+                                                <button class="btn btn-sm mr-1"
+                                                    style="background-color:#059886;color:#fff;"
+                                                    @click="updatePPO(ppo)">
+                                                    <font-awesome-icon
+                                                        :icon="['fas', 'pen-to-square']"></font-awesome-icon>
+                                                </button>
+                                                <button class="btn btn-sm mr-1"
+                                                    style="background-color:#059886;color:#fff;"
+                                                    @click="deletePPO(ppo.id)">
+                                                    <font-awesome-icon :icon="['fas', 'trash']"></font-awesome-icon>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:1%;" v-if="form.coverage.value == 2">
+                        <div class="card-body">
+                            <div class="card-title d-flex justify-content-between align-items-center">
+                                <h5 class="card-title">
+                                    Provincial Process Owners
+                                </h5>
+                            </div>
+                            <!--table start quality objectives-->
+                            <div class="table-responsive col-md-12">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:20% !important">PROVINCE/HUC</th>
+                                            <th style="width:20% !important">PROCESS OWNER</th>
+                                            <th style="width:20% !important">PROGRAM MANAGER</th>
+                                            <th style="width:20% !important">PROVINCIAL QMR</th>
+                                            <th style="width:5% !important">ACTION</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="ppo in PO_ProcessOwner" :key="ppo.id">
+                                            <td>{{ ppo.pmo_title }}</td>
+                                            <td>{{ ppo.ppo_name }}</td>
+                                            <td>{{ ppo.pm_name }}</td>
+                                            <td>{{ ppo.qmr_name }}</td>
+                                            <td style="width:5% !important;">
+                                                <button class="btn btn-sm mr-1"
+                                                    style="background-color:#059886;color:#fff;"
+                                                    @click="updatePPO(ppo)">
+                                                    <font-awesome-icon
+                                                        :icon="['fas', 'pen-to-square']"></font-awesome-icon>
+                                                </button>
+                                                <button class="btn btn-sm mr-1"
+                                                    style="background-color:#059886;color:#fff;"
+                                                    @click="deletePPO(ppo.id)">
+                                                    <font-awesome-icon :icon="['fas', 'trash']"></font-awesome-icon>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!-- <Pagination :total="ict_data.length" @pageChange="onPageChange" /> -->
+                    <PPOModal :visible="modalVisible" :selectedPOid="selectedPOid" :PO_ProcessOwner="PO_ProcessOwner"
+                        :selectedPPOId="selectedPPOId" @addpprocessowner="AddPProcessOwner" @close="CloseModal" />
 
                 </div>
                 <FooterVue />
@@ -158,6 +248,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Pagination from '../../procurement/Pagination.vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { toast } from "vue3-toastify";
+import PPOModal from '../quality_procedure/PPOModal.vue';
 
 
 
@@ -169,6 +260,7 @@ library.add(faEye, faLayerGroup, faCircleCheck, faSquarePollVertical, faTrash, f
 export default {
     name: "Update QP",
     components: {
+        PPOModal,
         Multiselect,
         Navbar,
         Sidebar,
@@ -189,6 +281,7 @@ export default {
                 ProcedureTitle: '',
                 frequency_monitoring: '',
                 coverage: '',
+                // coverage_name: '',
                 office: '',
             },
             QObjectives: {
@@ -205,10 +298,31 @@ export default {
             },
             process_owner: [],
             FMOptions: ['Monthly', 'Quarterly'],
-            COptions: ['Region', 'Region & Province', 'Region, Province & Field', 'Central Office, Region, Province & Field'],
-            OOptions: ['ORD','ORD-RICTU','ORD-LEGAL','ORD-PLANNING','FAD','FAD-HRS','FAD-ACCOUNTING','FAD-RECORDS','FAD-GSS', 'LGMED', 'LGCDD'],
+            COptions: [
+                { label: 'Region', value: 1 },
+                { label: 'Region & Province', value: 2 },
+                { label: 'Region, Province & Field', value: 3 },
+                { label: 'Central Office, Region, Province & Field', value: 4 }
+            ],
+            OOptions: ['ORD', 'ORD-RICTU', 'ORD-LEGAL', 'ORD-PLANNING', 'FAD', 'FAD-HRS', 'FAD-ACCOUNTING', 'FAD-RECORDS', 'FAD-GSS', 'LGMED', 'LGCDD'],
             POOptions: null,
             ProcessOwner: [],
+            PO_ProcessOwner: {
+                id: '',
+                qop_id: '',
+                parent_p_owner: '',
+                pmo_id: '',
+                po_process_owner: '',
+                pmo_title: '',
+                ppo_name: '',
+                qmr_name: '',
+                pm_name: '',
+                program_manager: '',
+                provincial_qmr: ''
+            },
+            modalVisible: false,
+            selectedPOid: null,
+            selectedPPOId: null,
         }
     },
     props: {
@@ -219,6 +333,7 @@ export default {
         this.fetchProcessOwner();
         this.fetchEntryData();
         this.fetchQualityObjective();
+        this.fetchPOProcessOwner();
         // console.log(this.form);
     },
     methods: {
@@ -235,7 +350,14 @@ export default {
                 .then(response => {
                     if (Array.isArray(response.data) && response.data.length > 0) {
                         this.form = response.data[0];
-                        console.log(this.form)
+
+                        const coverageValue = this.form.coverage;
+                        this.form.coverage = this.COptions.find(option => option.value === coverageValue);
+                        // console.log("Response Data", response.data[0])
+                        // console.log("coverage", response.data[0].coverage)
+                        // console.log("Coverage Name", response.data[0].coverage_name)
+                        // console.log("Coverage value from select", this.form.coverage_name)
+                        // console.log(this.form)
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }
@@ -255,6 +377,73 @@ export default {
                     console.error("There was an error fetching the data:", error);
                 });
         },
+        fetchPOProcessOwner() {
+            let id = this.$route.params.id;
+            axios.get(`/api/fetchPOProcessOwner/${id}`)
+                .then(response => {
+                    this.PO_ProcessOwner = response.data;
+                    // console.log(this.PO_ProcessOwner)
+                })
+                .catch(error => {
+                    console.error("There was an error fetching the data:", error);
+                });
+        },
+        updatePPO(ppo) {
+            this.selectedPPOId = ppo.id;
+            this.selectedPOid = ppo.pmo_id;
+            // console.log("Selected PPO ID:", this.selectedPPOId);
+            // console.log("Selected PO ID:", this.selectedPOid);
+            this.modalVisible = true;
+        },
+        CloseModal() {
+            this.modalVisible = false;
+        },
+        deletePPO(id) {
+            console.log("Delete PPO ID:", id)
+            axios.post('/api/DeletePOProcessOwner', {
+                id: id
+            })
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Process Owner Successfully Deleted!',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                    setTimeout(() => {
+                        this.fetchPOProcessOwner();
+                    }, 200);
+                })
+                .catch(error => {
+                    console.error('error saving data', error);
+                })
+        },
+        AddPProcessOwner({ ppoid, po, ppo, pm, qmr }) {
+
+            axios.post('/api/AddPOProcessOwner', {
+                ppoid: ppoid,
+                po: po,
+                ppo: ppo,
+                pm: pm,
+                qmr: qmr,
+            })
+                .then(() => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Process Owner Successfully Added!',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+                    setTimeout(() => {
+                        this.fetchPOProcessOwner();
+                        this.modalVisible = false;
+                    }, 200);
+                })
+                .catch(error => {
+                    console.error('error saving data', error);
+                })
+
+        },
         fetchProcessOwner() {
             axios.get('/api/fetchProcessOwner')
                 .then(response => {
@@ -266,6 +455,7 @@ export default {
                 });
         },
         postQualityProcedure() {
+            // console.log("Form Data:", this.form);
             axios.post('/api/UpdateQualityProcedure',
                 {
                     id: this.$route.params.id,
@@ -275,7 +465,7 @@ export default {
                     procedure_title: this.form.procedure_title,
                     qp_code: this.form.qp_code,
                     rev_no: this.form.rev_no,
-                    coverage: this.form.coverage,
+                    coverage: this.form.coverage.value,
                     frequency_monitoring: this.form.frequency_monitoring,
                     office: this.form.office,
                     process_owner: this.form.process_owner.join(', ')

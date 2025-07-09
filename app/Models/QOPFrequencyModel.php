@@ -15,6 +15,7 @@ class QOPFrequencyModel extends Model
     protected $fillable = [
          'id', 
          'qop_entry_id', 
+         'office_entry_id',
          'qop_id',
          'qoe_id', 
          'indicator', 

@@ -59,7 +59,7 @@ class AppItemController extends Controller
     public function fetchAppData(Request $request)
     {
         $searchValue = $request->input('searchValue', '');
-        $appYear = $request->input('appYear', date('Y')); // Get the requested year, default to current year
+        $appYear = $request->input('appYear', date('Y'));
 
         $app_item = AppItemModel::selectRaw('
                 tbl_app.id as app_id,
@@ -77,12 +77,17 @@ class AppItemController extends Controller
                 item_category.item_category_title as item_category_title,
                 mode_of_proc.mode_of_proc_title as mode_of_proc_title
             ')
-            ->join('source_of_funds', 'tbl_app.source_of_funds_id', '=', 'source_of_funds.id')
-            ->join('pmo', 'tbl_app.pmo_id', '=', 'pmo.id')
-            ->join('item_category', 'tbl_app.category_id', '=', 'item_category.id')
-            ->join('mode_of_proc', 'tbl_app.mode', '=', 'mode_of_proc.id')
-            ->join('item_unit', 'tbl_app.unit_id', '=', 'item_unit.id')
-            ->where('tbl_app.app_year', $appYear); // Make the year dynamic
+            ->from('tbl_app')
+            ->leftJoin('source_of_funds', 'tbl_app.source_of_funds_id', '=', 'source_of_funds.id')
+            ->leftJoin('pmo', 'tbl_app.pmo_id', '=', 'pmo.id')
+            ->leftJoin('item_category', 'tbl_app.category_id', '=', 'item_category.id')
+            ->leftJoin('mode_of_proc', 'tbl_app.mode', '=', 'mode_of_proc.id')
+            ->leftJoin('item_unit', 'tbl_app.unit_id', '=', 'item_unit.id')
+            ->where(function ($query) use ($appYear) {
+                if (!empty($appYear)) {
+                    $query->where('tbl_app.app_year', $appYear);
+                }
+            });
 
         if (!empty($searchValue)) {
             $app_item->where(function ($query) use ($searchValue) {
@@ -93,6 +98,7 @@ class AppItemController extends Controller
 
         return response()->json($app_item->get());
     }
+
 
     public function fetchAppDataById(Request $request)
     {

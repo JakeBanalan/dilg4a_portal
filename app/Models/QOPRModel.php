@@ -17,6 +17,7 @@ class QOPRModel extends Model
         'qop_id',
         'objective',
         'date_created',
+        'submitted_office',
         'created_by',
         'status',
         'qp_covered',

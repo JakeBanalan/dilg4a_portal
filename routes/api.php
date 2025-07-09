@@ -246,6 +246,17 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('fetchProcessOwner', [QMSController::class, 'fetchProcessOwner']);
 });
+Route::middleware('api')->group(function () {
+    Route::get('fetchPProcessOwner/{id}', [QMSController::class, 'fetchPProcessOwner']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchProvinceUser/{id}', [QMSController::class, 'fetchProvinceUser']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchPOProcessOwner/{id}', [QMSController::class, 'fetchPOProcessOwner']);
+});
 
 Route::middleware('api')->group(function () {
     Route::get('fetchAllUser', [QMSController::class, 'fetchAllUser']);
@@ -291,6 +302,10 @@ Route::middleware('api')->group(function () {
 });
 Route::middleware('api')->group(function () {
     Route::get('fetchQOPRperDivision/{id}', [QMSController::class, 'fetchQOPRperDivision']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchQOPRperProvince/{id}', [QMSController::class, 'fetchQOPRperProvince']);
 });
 
 Route::middleware('api')->group(function () {
@@ -432,6 +447,9 @@ Route::post('deleteRS', [QMSController::class, 'deleteRS']);
 Route::post('saveQuarterData', [QMSController::class, 'saveQuarterData']);
 Route::post('saveMonthlyData', [QMSController::class, 'saveMonthlyData']);
 Route::post('ValidateReportEntry', [QMSController::class, 'ValidateReportEntry']);
+Route::post('AddPOProcessOwner', [QMSController::class, 'AddPOProcessOwner']);
+Route::post('DeletePOProcessOwner', [QMSController::class, 'DeletePOProcessOwner']);
+
 
 //U S E R  M A N A G E M E N T
 Route::post('PostUser', [UserManagementController::class, 'PostUser']);
