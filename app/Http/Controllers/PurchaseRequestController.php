@@ -439,7 +439,6 @@ class PurchaseRequestController extends Controller
     // GENERATE REPORTS
     public function exportPurchaseRequest(Request $request, $id)
     {
-        // Fetch the purchase request data based on the ID, along with its items
         $query = DB::table('pr')
             ->select([
                 'pr.id AS id',
@@ -481,51 +480,70 @@ class PurchaseRequestController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Set static values
+        // Static cells
         $sheet->setCellValue('C7', 'PR No.: ' . $query[0]->pr_no);
-        $formattedDate = Carbon::parse($query[0]->pr_date)->format('F d, Y');
-        $sheet->setCellValue('E7', 'Date: ' . $formattedDate);
+        $sheet->setCellValue('E7', 'Date: ' . Carbon::parse($query[0]->pr_date)->format('F d, Y'));
         $sheet->setCellValue('B7', $query[0]->pmo_title);
         $sheet->setCellValue('B23', $query[0]->particulars);
         $sheet->setCellValue('B29', strtoupper($query[0]->pmo_contact_person));
         $sheet->setCellValue('B30', $query[0]->designation);
 
-        $row = 11;
+        $startRow = 11;
+        $maxRows = 12;
+        $itemCount = count($query);
+
+        if ($itemCount > $maxRows) {
+            $rowsToInsert = $itemCount - $maxRows;
+            $sheet->insertNewRowBefore($startRow + $maxRows, $rowsToInsert);
+        }
+
+        $row = $startRow;
         $totalAmount = 0;
 
-        // Populate item data dynamically
         foreach ($query as $item) {
             $sheet->setCellValue('A' . $row, $item->serial_no);
             $sheet->setCellValue('B' . $row, $item->unit);
 
-            // Create a RichText object for the C column
-            $richText = new RichText();
-            $boldText = $richText->createTextRun(strtoupper($item->item_title)); // Make item_title uppercase
-            $boldText->getFont()->setBold(true); // Apply bold formatting
+            // Rich text for item description: bold title + normal desc
+            $richText = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
+            $bold = $richText->createTextRun(strtoupper($item->item_title));
+            $bold->getFont()->setBold(true);
+            $richText->createText("\n\n" . ucwords($item->desc));
 
-            $normalText = $richText->createText("\n\n" . ucwords($item->desc)); // Add desc with normal formatting
-
-            // Set the rich text to the cell
             $sheet->setCellValue('C' . $row, $richText);
             $sheet->getStyle('C' . $row)->getAlignment()->setWrapText(true);
-            $sheet->getRowDimension($row)->setRowHeight(-1); // Auto height for wrapped text
+            $sheet->getStyle('C' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
+            // Quantity normal
             $sheet->setCellValue('D' . $row, $item->quantity);
-            $sheet->setCellValue('E' . $row, '₱ ' . number_format($item->price, 2));
-            $sheet->setCellValue('F' . $row, '₱ ' . number_format($item->quantity * $item->price, 2));
 
-            $totalAmount += $item->quantity * $item->price;
+            // Unit cost: right align, no bold
+            $sheet->setCellValue('E' . $row, '₱ ' . number_format($item->price, 2));
+            $sheet->getStyle('E' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('E' . $row)->getFont()->setBold(false);
+
+            // Amount: right align, no bold
+            $amount = $item->quantity * $item->price;
+            $sheet->setCellValue('F' . $row, '₱ ' . number_format($amount, 2));
+            $sheet->getStyle('F' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+            $sheet->getStyle('F' . $row)->getFont()->setBold(false);
+
+            // Auto height
+            $sheet->getRowDimension($row)->setRowHeight(-1);
+
+            $totalAmount += $amount;
             $row++;
         }
 
-        // Set total amount
+        // Fixed total cell
         $sheet->setCellValue('F22', '₱ ' . number_format($totalAmount, 2));
+        $sheet->getStyle('F22')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('F22')->getFont()->setBold(false);
 
-        // Protect sheet with password
+        // Protect sheet
         $sheet->getProtection()->setSheet(true);
         $sheet->getProtection()->setPassword('dilg4a@2024');
 
-        // Generate the file and return as a download
         $fileName = "PurchaseRequest_" . $query[0]->pr_no . ".xlsx";
         $writer = new Xlsx($spreadsheet);
         $tempFile = tempnam(sys_get_temp_dir(), 'PurchaseRequest');
@@ -535,7 +553,6 @@ class PurchaseRequestController extends Controller
             'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
         ])->deleteFileAfterSend(true);
     }
-
 
 
     public function getDepartmentOverview()
