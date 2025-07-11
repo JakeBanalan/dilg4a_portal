@@ -186,7 +186,7 @@ export default {
                     class: 'menu-icon-custom',
                     children: [
                         { link: '/procurement/AnnualProcurementPlan', name: 'APP', icon: 'list' },
-                        { link: '/procurement/index', name: 'Procurement Request', icon: 'store' },
+                        { link: '/procurement/index', name: 'Purchase Request', icon: 'store' },
                         { link: '/procurement/rfq/index', name: 'R.F.Q', icon: 'book' },
                         { link: '/procurement/abstract/index', name: 'Philgeps Awarding', icon: 'award' },
                         { link: '/procurement/pr_monitoring', name: 'Monitoring', icon: 'clipboard-list' },

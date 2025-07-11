@@ -462,7 +462,7 @@ export default {
                     value: 'procurement',
                     children: [
                         { label: 'APP', value: '/procurement/AnnualProcurementPlan' },
-                        { label: 'Procurement Request', value: '/procurement/index' },
+                        { label: 'Purchase Request', value: '/procurement/index' },
                         { label: 'R.F.Q', value: '/procurement/rfq/index' },
                         { label: 'Philgeps Awarding', value: '/procurement/abstract/index' },
                         { label: 'Monitoring', value: '/procurement/pr_monitoring' },
