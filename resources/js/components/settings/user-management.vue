@@ -494,7 +494,14 @@ export default {
                     label: 'Finance',
                     value: 'finance',
                     children: [
-                        { label: 'Budget', value: '/finance/budget/index' },
+                        { label: 'Budget', 
+                        value: 'Budget', 
+                        children: [
+                            { label: 'Fund Source', value: '/finance/budget/index' },
+                            { label: 'UACS', value: '/finance/budget/object_code' },
+                            { label: 'Obligation', value: '/finance/budget/obligation' },
+                        ]
+                        },
                         {
                             label: 'Accounting',
                             value: 'accounting',

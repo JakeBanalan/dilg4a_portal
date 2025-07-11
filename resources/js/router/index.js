@@ -44,9 +44,6 @@ import ntaCreate from "../components/finance/accounting/ntaCreate.vue";
 import Disbursement from "../components/finance/accounting/disbursement.vue";
 import disbursementCreate from "../components/finance/accounting/disbursementCreate.vue";
 
-//Budget
-import budget_fundsource from "../components/budget/fundsource/index.vue";
-import budget_obligation from "../components/budget/obligation/index.vue";
 
 //HR Section
 import employees_directory from "../components/human_resource/employees_directory/index.vue";
@@ -84,6 +81,7 @@ import qms_report_submission_quarterly_lnd_entry from "../components/qms/reports
 import finance_budget from "../components/finance/budget/index.vue";
 import update_fs from "../components/finance/budget/update_fs.vue";
 import object_code from "../components/finance/budget/object_code.vue";
+import budget_obligation from "../components/finance/budget/obligation.vue";
 
 // settings
 import settingPanel from "../components/settings/user-management.vue";
@@ -223,9 +221,6 @@ const routes = [{
         path: '/finance/budget/update_fs/:id',
         name: 'Fund Source',
         component: update_fs,
-        path: '/finance/accounting/nta',
-        name: 'NTA / NCA',
-        component: nta_nca,
         meta: {
             requiresAuth: true
         },
@@ -254,9 +249,90 @@ const routes = [{
         path: '/finance/budget/object_code',
         name: 'Object Code',
         component: object_code,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+        {
+        path: '/finance/budget/obligation',
+        name: 'Obligation',
+        component: budget_obligation,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
         path: '/finance/accounting/nta/:id',
-        name: 'NTA Details',
+        name: 'ntashow',
         component: ntaShow,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/accounting/nta',
+        name: 'nta_nca',
+        component: nta_nca,
         meta: {
             requiresAuth: true
         },
@@ -1410,63 +1486,6 @@ const routes = [{
             });
         }
 
-    },
-
-    {
-        path: '/budget/fundsource',
-        name: 'Fund Source 2',
-        component: budget_fundsource,
-        meta: {
-            requiresAuth: true
-        },
-        beforeEnter: (to, from, next) => {
-            const token = localStorage.getItem('api_token');
-            axios.get('/api/authenticated', {
-                params: {
-                    api_token: token
-                }
-            }).then(response => {
-                if (response.data.authenticated) {
-                    next();
-                } else {
-                    next({
-                        name: 'Login'
-                    });
-                }
-            }).catch(() => {
-                next({
-                    name: 'Login'
-                });
-            });
-        }
-    },
-    {
-        path: '/budget/obligation',
-        name: 'Obligation',
-        component: budget_obligation,
-        meta: {
-            requiresAuth: true
-        },
-        beforeEnter: (to, from, next) => {
-            const token = localStorage.getItem('api_token');
-            axios.get('/api/authenticated', {
-                params: {
-                    api_token: token
-                }
-            }).then(response => {
-                if (response.data.authenticated) {
-                    next();
-                } else {
-                    next({
-                        name: 'Login'
-                    });
-                }
-            }).catch(() => {
-                next({
-                    name: 'Login'
-                });
-            });
-        }
     },
     {
         path: '/human_resource/employees_directory/index',
