@@ -36,6 +36,14 @@ import quotation from "../components/procurement/abstract/panel/quotation.vue";
 // PURCHASE ORDER
 import create_po from "../components/procurement/purchase-order/panel/create.vue";
 
+//Finance
+import nta_nca from "../components/finance/accounting/nta.vue";
+import disdisbursement from "../components/budget/obligation/index.vue";
+import ntaShow from "../components/finance/accounting/ntaShow.vue";
+import ntaCreate from "../components/finance/accounting/ntaCreate.vue";
+import Disbursement from "../components/finance/accounting/disbursement.vue";
+import disbursementCreate from "../components/finance/accounting/disbursementCreate.vue";
+
 //Budget
 import budget_fundsource from "../components/budget/fundsource/index.vue";
 import budget_obligation from "../components/budget/obligation/index.vue";
@@ -215,6 +223,9 @@ const routes = [{
         path: '/finance/budget/update_fs/:id',
         name: 'Fund Source',
         component: update_fs,
+        path: '/finance/accounting/nta',
+        name: 'NTA / NCA',
+        component: nta_nca,
         meta: {
             requiresAuth: true
         },
@@ -243,6 +254,93 @@ const routes = [{
         path: '/finance/budget/object_code',
         name: 'Object Code',
         component: object_code,
+        path: '/finance/accounting/nta/:id',
+        name: 'NTA Details',
+        component: ntaShow,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/accounting/nta/create',
+        name: 'Create NTA/NCA',
+        component: ntaCreate,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/accounting/disbursement',
+        name: 'Disbursement',
+        component: Disbursement,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/accounting/disbursement/create',
+        name: 'Create Disbursement',
+        component: disbursementCreate,
         meta: {
             requiresAuth: true
         },
@@ -269,7 +367,7 @@ const routes = [{
     },
     {
         path: '/procurement/index',
-        name: 'Procurement',
+        name: 'Purchase Request',
         component: Procurement,
         meta: {
             requiresAuth: true
@@ -1313,6 +1411,7 @@ const routes = [{
         }
 
     },
+
     {
         path: '/budget/fundsource',
         name: 'Fund Source 2',

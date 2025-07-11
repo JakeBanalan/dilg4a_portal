@@ -495,6 +495,15 @@ export default {
                     value: 'finance',
                     children: [
                         { label: 'Budget', value: '/finance/budget/index' },
+                        {
+                            label: 'Accounting',
+                            value: 'accounting',
+                            children: [
+                                { label: 'NTA / NCA', value: '/finance/accounting/nta' },
+                                { label: 'Disbursement', value: '/finance/accounting/disbursement' },
+                                // Add more if needed
+                            ],
+                        },
                     ],
                 },
                 {

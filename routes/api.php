@@ -26,10 +26,11 @@ use App\Http\Controllers\QMSQuarterlyLNDController;
 use App\Http\Controllers\QMSMonthlyExportController;
 use App\Http\Controllers\QMSQuarterlyExportController;
 use App\Http\Controllers\DailyTimeRecordController;
-
 use App\Http\Controllers\FundSourceController;
 use App\Http\Controllers\SaroController;
 
+use App\Http\Controllers\NTAController;
+use App\Http\Controllers\DisbursementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -393,7 +394,12 @@ Route::middleware('api')->group(function () {
     Route::get('fetch_supplier_quote/{id}', [AbstractController::class, 'fetch_supplier_quote']);
 });
 
-
+Route::middleware('api')->group(function () {
+    Route::get('fetch-nta', [NTAController::class, 'fetchAll']);
+    Route::get('fetch-nta/{id}', [NTAController::class, 'fetchById']);
+    Route::get('/finance/accounting/nta/{id}', [NTAController::class, 'show']);
+    Route::post('create-nta', [NTAController::class, 'store']); // Use the 'store' method for creating NTA
+});
 
 Route::middleware('auth:api')->post('/logout', [UserController::class, 'logout']);
 
@@ -525,4 +531,13 @@ Route::prefix('daily-time-records')->group(function () {
     Route::get('/{id}', [DailyTimeRecordController::class, 'show']); // wildcard LAST!
     Route::get('/export-user/{userId}', [DailyTimeRecordController::class, 'exportUser']);
 
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('/finance/accounting/disbursements', [DisbursementController::class, 'index']);
+    Route::get('/finance/accounting/disbursement/{id}', [DisbursementController::class, 'show']);
+    Route::post('/finance/accounting/disbursement', [DisbursementController::class, 'store']);
+    Route::put('/finance/accounting/disbursement/{id}', [DisbursementController::class, 'update']);
+    Route::delete('/finance/accounting/disbursement/{id}', [DisbursementController::class, 'destroy']); // Delete route for disbursements
+    Route::post('/finance/accounting/disbursement/{id}/restore', [DisbursementController::class, 'restore']); // Restore route
 });

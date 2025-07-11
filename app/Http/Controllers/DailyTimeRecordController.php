@@ -267,6 +267,7 @@ class DailyTimeRecordController extends Controller
 
 
 
+
     public function export(Request $request)
     {
         $validated = $request->validate([
@@ -300,7 +301,6 @@ class DailyTimeRecordController extends Controller
         $templateSheet->setCellValue('A8', $richText);
         $templateSheet->getStyle('A8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
-
         foreach ($users as $user) {
             $newSheet = clone $templateSheet;
             $newSheet->setTitle(substr($user->first_name . '_' . $user->last_name, 0, 30));
@@ -323,18 +323,22 @@ class DailyTimeRecordController extends Controller
             $boldText->getFont()->setBold(true);
             $newSheet->setCellValue('A8', $richText);
             $newSheet->getStyle('A8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
-            foreach ($records as $record) {
-                $newSheet->setCellValue('A' . $row, date('F d, Y', strtotime($record->date)));
-                $newSheet->setCellValue('B' . $row, date('h:i A', strtotime($record->time_in_am)));
-                $newSheet->setCellValue('C' . $row, date('h:i A', strtotime($record->time_out_am)));
-                $newSheet->setCellValue('D' . $row, date('h:i A', strtotime($record->time_in_pm)));
-                $newSheet->setCellValue('E' . $row, date('h:i A', strtotime($record->time_out_pm)));
 
-                // Parse undertime
+            foreach ($records as $record) {
+                // Date - always show if record exists
+                $newSheet->setCellValue('A' . $row, date('F d, Y', strtotime($record->date)));
+
+                // Time fields - only show if not null
+                $newSheet->setCellValue('B' . $row, $record->time_in_am ? date('h:i A', strtotime($record->time_in_am)) : '');
+                $newSheet->setCellValue('C' . $row, $record->time_out_am ? date('h:i A', strtotime($record->time_out_am)) : '');
+                $newSheet->setCellValue('D' . $row, $record->time_in_pm ? date('h:i A', strtotime($record->time_in_pm)) : '');
+                $newSheet->setCellValue('E' . $row, $record->time_out_pm ? date('h:i A', strtotime($record->time_out_pm)) : '');
+
+                // Parse undertime - only if not null or empty
                 $hours = 0;
                 $minutes = 0;
 
-                if ($record->undertime) {
+                if ($record->undertime && trim($record->undertime) !== '') {
                     if (strpos($record->undertime, 'h') !== false || strpos($record->undertime, 'm') !== false) {
                         if (preg_match('/(\d+)h/', $record->undertime, $h)) {
                             $hours = (int) $h[1];
@@ -351,9 +355,9 @@ class DailyTimeRecordController extends Controller
                     }
                 }
 
-                // Write undertime hours and minutes in F and G
-                $newSheet->setCellValue('F' . $row, $hours);
-                $newSheet->setCellValue('G' . $row, $minutes);
+                // Write undertime hours and minutes in F and G - only if there's actual undertime
+                $newSheet->setCellValue('F' . $row, ($hours > 0) ? $hours : '');
+                $newSheet->setCellValue('G' . $row, ($minutes > 0) ? $minutes : '');
 
                 // Apply borders + center alignment for A–G
                 $cellRange = 'A' . $row . ':G' . $row;
@@ -417,7 +421,6 @@ class DailyTimeRecordController extends Controller
             $newSheet->getStyle("C{$row6}")->getFont()->setSize(11);
             $newSheet->getStyle("C{$row6}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
         }
-
 
         // Remove the original template sheet
         $spreadsheet->removeSheetByIndex(0);

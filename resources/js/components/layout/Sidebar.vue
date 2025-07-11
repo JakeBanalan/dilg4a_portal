@@ -135,9 +135,9 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faGroupArrowsRotate, faCoins } from '@fortawesome/free-solid-svg-icons';
+import { faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faGroupArrowsRotate, faCoins, faMoneyCheck, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
-library.add(faGroupArrowsRotate, faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faCoins);
+library.add(faGroupArrowsRotate, faCartShopping, faGauge, faList, faChartSimple, faClipboardList, faStore, faBook, faAward, faCalendar, faUsers, faAddressBook, faBoxArchive, faUserTie, faPlaneDeparture, faFileMedical, faComputer, faCoins, faMoneyCheck, faReceipt);
 
 export default {
     name: 'Sidebar',
@@ -200,7 +200,16 @@ export default {
                     class: 'menu-icon-custom',
                     children: [
                         { link: '/finance/budget/index', name: 'Budget Section', icon: 'book' },
-                        { link: '', name: 'Accounting Section', icon: 'book' },
+                        {
+                            link: '',
+                            name: 'Accounting Section',
+                            icon: 'receipt',
+                            children: [
+                                { link: '/finance/accounting/nta', name: 'NTA / NCA', icon: 'money-check' },
+                                { link: '/finance/accounting/disbursement', name: 'Disbursement', icon: 'file' },
+                                // Add more as needed
+                            ],
+                        },
                         { link: '', name: 'Cash Section', icon: 'book' },
                         { link: '/procurement/abstract/index', name: 'Funds Downloaded', icon: 'book' },
                     ],
