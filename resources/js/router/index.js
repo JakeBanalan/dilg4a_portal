@@ -223,9 +223,7 @@ const routes = [{
         path: '/finance/budget/update_fs/:id',
         name: 'Fund Source',
         component: update_fs,
-        path: '/finance/accounting/nta',
-        name: 'NTA / NCA',
-        component: nta_nca,
+
         meta: {
             requiresAuth: true
         },
@@ -254,6 +252,59 @@ const routes = [{
         path: '/finance/budget/object_code',
         name: 'Object Code',
         component: object_code,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/accounting/nta',
+        name: 'NTA / NCA',
+        component: nta_nca,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
         path: '/finance/accounting/nta/:id',
         name: 'NTA Details',
         component: ntaShow,
