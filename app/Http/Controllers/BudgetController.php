@@ -23,8 +23,8 @@ class BudgetController extends Controller
         $page = $request->query('page', 1);
         $itemsPerPage = $request->query('itemsPerPage', 1000);
 
-        $query = PurchaseRequestModel::select('id', 'pr_no', 'purpose', 'submitted_date_budget') // Fixed column name
-            ->where('stat', SUBMITTED_TO_BUDGET);
+        $query = PurchaseRequestModel::select('id', 'pr_no', 'purpose', 'is_budget_submitted','submitted_date_budget') // Fixed column name
+            ->where('is_budget_submitted', 1);
 
         try {
             $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);

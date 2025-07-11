@@ -47,6 +47,12 @@ class DailyTimeRecordImport implements ToCollection
             $date = $dateTime->format('Y-m-d');
             $time = $dateTime->format('H:i:s');
 
+            // ✅ Filter records based on selected date range
+            $recordDate = Carbon::parse($date);
+            if ($recordDate->lt($this->dateFrom) || $recordDate->gt($this->dateTo)) {
+                continue; // Skip records outside the selected date range
+            }
+
             $user = User::where('employee_no', $emp_no)->first();
 
             if (!$user) {
@@ -71,10 +77,8 @@ class DailyTimeRecordImport implements ToCollection
 
             $record->employee_no = $emp_no;
 
-            // ✅ Compute undertime only if IN/OUT present
-            if ($record->time_in_am && $record->time_out_pm) {
-                $this->calculateUndertime($record);
-            }
+            // ✅ Calculate undertime whenever we have any time data
+            $this->calculateUndertime($record);
 
             $record->save();
 
@@ -97,29 +101,63 @@ class DailyTimeRecordImport implements ToCollection
         };
 
         $schedInAM = 8 * 3600;   // 8:00 AM in seconds
+        $schedOutAM = 12 * 3600; // 12:00 PM in seconds (lunch break)
+        $schedInPM = 13 * 3600;  // 1:00 PM in seconds (back from lunch)
         $schedOutPM = 17 * 3600; // 5:00 PM in seconds
 
         $inAM = $timeToSeconds($record->time_in_am);
+        $outAM = $timeToSeconds($record->time_out_am);
+        $inPM = $timeToSeconds($record->time_in_pm);
         $outPM = $timeToSeconds($record->time_out_pm);
 
-        if (is_null($inAM) || is_null($outPM)) {
-            $record->undertime = '480m'; // whole day
-            return;
+        $totalUndertime = 0;
+
+        // Case 1: Only morning shift (like your example: 08:14:32 12:08:18 NULL NULL)
+        if ($inAM && $outAM && !$inPM && !$outPM) {
+            // Calculate morning work hours
+            $morningWorked = $outAM - $inAM;
+            $expectedMorningWork = $schedOutAM - $schedInAM; // 4 hours
+            
+            // Missing entire afternoon (4 hours)
+            $afternoonMissed = $schedOutPM - $schedInPM; // 4 hours
+            
+            // Calculate undertime
+            $morningUndertime = max(0, $expectedMorningWork - $morningWorked);
+            $totalUndertime = $morningUndertime + $afternoonMissed;
         }
-
-        // Flex offset → seconds
-        $flexOffset = $schedInAM - $inAM;
-        $expectedOutPM = $schedOutPM - $flexOffset;
-
-        $undertime = 0;
-        if ($outPM < $expectedOutPM) {
-            $undertime = $expectedOutPM - $outPM;
+        // Case 2: Full day with flexible time
+        elseif ($inAM && $outPM) {
+            // Calculate flex offset
+            $flexOffset = $schedInAM - $inAM;
+            $expectedOutPM = $schedOutPM - $flexOffset;
+            
+            if ($outPM < $expectedOutPM) {
+                $totalUndertime = $expectedOutPM - $outPM;
+            }
+        }
+        // Case 3: Incomplete records - calculate what's missing
+        else {
+            // Calculate total expected work time (8 hours)
+            $expectedTotal = 8 * 3600;
+            $actualWorked = 0;
+            
+            // Add morning work if present
+            if ($inAM && $outAM) {
+                $actualWorked += ($outAM - $inAM);
+            }
+            
+            // Add afternoon work if present
+            if ($inPM && $outPM) {
+                $actualWorked += ($outPM - $inPM);
+            }
+            
+            $totalUndertime = max(0, $expectedTotal - $actualWorked);
         }
 
         // Format undertime back to H M
-        $hrs = floor($undertime / 3600);
-        $mins = floor(($undertime % 3600) / 60);
+        $hrs = floor($totalUndertime / 3600);
+        $mins = floor(($totalUndertime % 3600) / 60);
 
-        $record->undertime = ($undertime <= 0) ? ' ' : trim(($hrs ? "{$hrs}h " : '') . "{$mins}m");
+        $record->undertime = ($totalUndertime <= 0) ? '' : trim(($hrs ? "{$hrs}h " : '') . ($mins ? "{$mins}m" : ''));
     }
 }
