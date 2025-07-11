@@ -28,6 +28,7 @@ use App\Http\Controllers\QMSQuarterlyExportController;
 use App\Http\Controllers\DailyTimeRecordController;
 
 use App\Http\Controllers\FundSourceController;
+use App\Http\Controllers\SaroController;
 
 
 /*
@@ -58,7 +59,27 @@ Route::middleware('auth:api')->group(function () {
 // });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetchSaro', [SaroController::class, 'fetchSaro']);
+});
+
+Route::middleware('api')->group(function () {
     Route::get('fetchFundSources', [FundSourceController::class, 'fetchFundSources']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchUACS', [FundSourceController::class, 'fetchUACS']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchFundSourcesData/{id}', [FundSourceController::class, 'fetchFundSourcesData']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchObjectCode', [FundSourceController::class, 'fetchObjectCode']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchFundSourceEntryData/{id}', [FundSourceController::class, 'fetchFundSourceEntryData']);
 });
 
 Route::middleware('api')->group(function () {

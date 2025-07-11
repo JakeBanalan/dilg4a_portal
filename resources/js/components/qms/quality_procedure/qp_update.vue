@@ -353,11 +353,6 @@ export default {
 
                         const coverageValue = this.form.coverage;
                         this.form.coverage = this.COptions.find(option => option.value === coverageValue);
-                        // console.log("Response Data", response.data[0])
-                        // console.log("coverage", response.data[0].coverage)
-                        // console.log("Coverage Name", response.data[0].coverage_name)
-                        // console.log("Coverage value from select", this.form.coverage_name)
-                        // console.log(this.form)
                     } else {
                         console.error("Unexpected response format:", response.data);
                     }

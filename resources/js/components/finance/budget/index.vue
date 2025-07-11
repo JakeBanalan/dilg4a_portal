@@ -116,24 +116,22 @@ td {
                                     </div>
 
                                     <!-- Advanced Search Form -->
-                                    <!-- <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
                                         <div v-if="searchVisible">
                                             <div class="row">
                                                 <div class="col-md-3">
-                                                    <input type="text" v-model="searchQuery.rfqNo" class="form-control"
+                                                    <input type="text" class="form-control"
                                                         placeholder="RFQ #">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <input type="date" v-model="searchQuery.rfqDate"
-                                                        class="form-control">
+                                                    <input type="date" class="form-control">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <input type="date" v-model="searchQuery.rfqDeadline"
-                                                        class="form-control">
+                                                    <input type="date" class="form-control">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <input type="text" v-model="searchQuery.createdBy"
-                                                        class="form-control" placeholder="Created By">
+                                                    <input type="text" class="form-control"
+                                                        placeholder="Created By">
                                                 </div>
                                             </div>
 
@@ -149,10 +147,10 @@ td {
                                                     Reset</button>
                                             </div>
                                         </div>
-                                    </div> -->
+                                    </div>
 
                                     <div class="table-responsive" style="padding-top:10px;">
-                                        <table class="table table-striped table-bordered">
+                                        <table class="table table-striped table-bordered" id="oblitable">
                                             <thead>
                                                 <tr>
                                                     <th style="width: 10%;">ALLOTMENT/SUB ALLOTMENT</th>
@@ -160,24 +158,36 @@ td {
                                                     <th style="width: 10%;">TOTAL ALLOTMENT</th>
                                                     <th style="width: 10%;">TOTAL OBLIGATED</th>
                                                     <th style="width: 10%;">TOTAL BALANCE</th>
-                                                    <th style="width: 10%;">STATUS</th>
+                                                    <!-- <th style="width: 10%;">STATUS</th> -->
                                                     <th style="width: 10%;">ACTION</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr v-for="fundSources in fundSources" :key="fundSources.id">
-                                                    <td>{{ fundSources.allotment }}</td>
-                                                    <td>{{ fundSources.fund }}</td>
-                                                    <td>{{ fundSources.total_allotment }}</td>
-                                                    <td>{{ fundSources.total_obligated }}</td>
+                                                    <td>{{ fundSources.code }}</td>
+                                                    <td>{{ fundSources.fund_name }}</td>
+                                                    <td>{{ fundSources.total_allotment_amount }}</td>
+                                                    <td>{{ fundSources.total_allotment_obligated }}</td>
                                                     <td>{{ fundSources.total_balance }}</td>
-                                                    <td>{{ fundSources.status }}</td>
+                                                    <td style="width:5%;">
+                                                        <div
+                                                            style="  display: flex;gap: 0.1em; justify-content: center;">
+                                                            <button @click="viewFs(fundSources.id)" class="btn btn-icon mr-1"
+                                                                style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                                <font-awesome-icon
+                                                                    :icon="['fas', 'eye']"></font-awesome-icon>
+                                                            </button>
+                                                            <button @click="" class="btn btn-icon mr-1"
+                                                                style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
+                                                                <font-awesome-icon
+                                                                    :icon="['fas', 'trash']"></font-awesome-icon>
+                                                            </button>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
-
-
                                 </div>
                             </div>
 
@@ -202,6 +212,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
 import { faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus } from '@fortawesome/free-solid-svg-icons';
+import router from '../../../router';
 library.add(faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus);
 export default {
     name: 'BudgetIndex',
@@ -210,7 +221,8 @@ export default {
     },
     data() {
         return {
-            fundSources:[]
+            fundSources: [],
+            searchVisible: false,
         };
     },
     components: {
@@ -228,15 +240,38 @@ export default {
         this.fetchFundSources();
     },
     methods: {
+
         fetchFundSources() {
             axios.get('/api/fetchFundSources')
                 .then(response => {
                     this.fundSources = response.data;
+                    this.initializeDataTable(); // Initialize DataTable after data is fetched
                     console.log('Fund sources fetched successfully:', this.fundSources);
                 })
                 .catch(error => {
                     console.error('Error fetching fund sources:', error);
                 });
+        },
+
+        toggleSearch() {
+            this.searchVisible = !this.searchVisible;
+        },
+
+        viewFs(id) {
+            // console.log(router.getRoutes())
+            this.$router.push({ path: `/finance/budget/update_fs/${id}` });
+
+        },
+        initializeDataTable() {
+            $('#oblitable').DataTable().destroy(); // clean up
+            this.$nextTick(() => {
+                $('#oblitable').DataTable({
+                    retrieve: true,
+                    ordering: false,
+                    paging: true,
+                    pageLength: 10,
+                });
+            });
         },
     },
 

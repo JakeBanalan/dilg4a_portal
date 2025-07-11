@@ -74,6 +74,8 @@ import qms_report_submission_quarterly_lnd_entry from "../components/qms/reports
 
 //FINANCE
 import finance_budget from "../components/finance/budget/index.vue";
+import update_fs from "../components/finance/budget/update_fs.vue";
+import object_code from "../components/finance/budget/object_code.vue";
 
 // settings
 import settingPanel from "../components/settings/user-management.vue";
@@ -185,6 +187,62 @@ const routes = [{
         path: '/finance/budget/index',
         name: 'Budget',
         component: finance_budget,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/budget/update_fs/:id',
+        name: 'Fund Source',
+        component: update_fs,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/budget/object_code',
+        name: 'Object Code',
+        component: object_code,
         meta: {
             requiresAuth: true
         },
@@ -1081,7 +1139,7 @@ const routes = [{
         }
 
     },
-        {
+    {
         path: '/qms/reports_submission/provincial_report',
         name: 'Provincial Report',
         component: qms_provincial_report,
@@ -1257,7 +1315,7 @@ const routes = [{
     },
     {
         path: '/budget/fundsource',
-        name: 'Fund Source',
+        name: 'Fund Source 2',
         component: budget_fundsource,
         meta: {
             requiresAuth: true
@@ -1300,10 +1358,14 @@ const routes = [{
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -1352,10 +1414,14 @@ const routes = [{
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         }
     },
@@ -1369,15 +1435,21 @@ const routes = [{
         beforeEnter: (to, from, next) => {
             const token = localStorage.getItem('api_token');
             axios.get('/api/authenticated', {
-                params: { api_token: token },
+                params: {
+                    api_token: token
+                },
             }).then(response => {
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         },
     },
@@ -1391,15 +1463,21 @@ const routes = [{
         beforeEnter: (to, from, next) => {
             const token = localStorage.getItem('api_token');
             axios.get('/api/authenticated', {
-                params: { api_token: token },
+                params: {
+                    api_token: token
+                },
             }).then(response => {
                 if (response.data.authenticated) {
                     next();
                 } else {
-                    next({ name: 'Login' });
+                    next({
+                        name: 'Login'
+                    });
                 }
             }).catch(() => {
-                next({ name: 'Login' });
+                next({
+                    name: 'Login'
+                });
             });
         },
     },
