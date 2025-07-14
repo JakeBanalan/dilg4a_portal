@@ -302,6 +302,34 @@ const routes = [{
         }
     },
     {
+        path: '/finance/accounting/nta',
+        name: 'NTA / NCA',
+        component: nta_nca,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
         path: '/finance/accounting/nta/:id',
         name: 'ntashow',
         component: ntaShow,

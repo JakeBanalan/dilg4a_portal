@@ -308,11 +308,16 @@ class DailyTimeRecordController extends Controller
             $newSheet->setCellValue('A6', "{$user->last_name}, {$user->first_name}");
             $newSheet->setCellValue('A8', 'For the Month of ' . date('F Y', strtotime("{$year}-{$month}-01")));
 
+            $startDate = Carbon::create($year, $month, 1);
+            $endDate = $startDate->copy()->endOfMonth();
+
             $records = DailyTimeRecord::where('user_id', $user->id)
                 ->whereMonth('date', $month)
                 ->whereYear('date', $year)
-                ->orderBy('date')
-                ->get();
+                ->get()
+                ->keyBy(function ($item) {
+                    return Carbon::parse($item->date)->format('Y-m-d');
+                });
 
             $row = 14;
 
@@ -324,21 +329,20 @@ class DailyTimeRecordController extends Controller
             $newSheet->setCellValue('A8', $richText);
             $newSheet->getStyle('A8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
-            foreach ($records as $record) {
-                // Date - always show if record exists
-                $newSheet->setCellValue('A' . $row, date('F d, Y', strtotime($record->date)));
+            while ($startDate->lte($endDate)) {
+                $date = $startDate->toDateString(); // 'YYYY-MM-DD'
+                $record = $records->get($date);
 
-                // Time fields - only show if not null
-                $newSheet->setCellValue('B' . $row, $record->time_in_am ? date('h:i A', strtotime($record->time_in_am)) : '');
-                $newSheet->setCellValue('C' . $row, $record->time_out_am ? date('h:i A', strtotime($record->time_out_am)) : '');
-                $newSheet->setCellValue('D' . $row, $record->time_in_pm ? date('h:i A', strtotime($record->time_in_pm)) : '');
-                $newSheet->setCellValue('E' . $row, $record->time_out_pm ? date('h:i A', strtotime($record->time_out_pm)) : '');
+                $newSheet->setCellValue('A' . $row, $startDate->format('F d, Y'));
+                $newSheet->setCellValue('B' . $row, $record && $record->time_in_am ? date('h:i A', strtotime($record->time_in_am)) : '');
+                $newSheet->setCellValue('C' . $row, $record && $record->time_out_am ? date('h:i A', strtotime($record->time_out_am)) : '');
+                $newSheet->setCellValue('D' . $row, $record && $record->time_in_pm ? date('h:i A', strtotime($record->time_in_pm)) : '');
+                $newSheet->setCellValue('E' . $row, $record && $record->time_out_pm ? date('h:i A', strtotime($record->time_out_pm)) : '');
 
-                // Parse undertime - only if not null or empty
                 $hours = 0;
                 $minutes = 0;
 
-                if ($record->undertime && trim($record->undertime) !== '') {
+                if ($record && $record->undertime && trim($record->undertime) !== '') {
                     if (strpos($record->undertime, 'h') !== false || strpos($record->undertime, 'm') !== false) {
                         if (preg_match('/(\d+)h/', $record->undertime, $h)) {
                             $hours = (int) $h[1];
@@ -355,11 +359,9 @@ class DailyTimeRecordController extends Controller
                     }
                 }
 
-                // Write undertime hours and minutes in F and G - only if there's actual undertime
                 $newSheet->setCellValue('F' . $row, ($hours > 0) ? $hours : '');
                 $newSheet->setCellValue('G' . $row, ($minutes > 0) ? $minutes : '');
 
-                // Apply borders + center alignment for A–G
                 $cellRange = 'A' . $row . ':G' . $row;
                 $newSheet->getStyle($cellRange)->applyFromArray([
                     'borders' => [
@@ -375,6 +377,7 @@ class DailyTimeRecordController extends Controller
                 ]);
                 $newSheet->getRowDimension($row)->setRowHeight(21);
 
+                $startDate->addDay();
                 $row++;
             }
 
@@ -462,32 +465,41 @@ class DailyTimeRecordController extends Controller
         $sheet->setCellValue('A8', $richText);
         $sheet->getStyle('A8')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
-        // Set column widths
+        // Get records and index by date string
         $records = DailyTimeRecord::where('user_id', $user->id)
             ->whereMonth('date', $validated['month'])
             ->whereYear('date', $validated['year'])
-            ->orderBy('date')
-            ->get();
+            ->get()
+            ->keyBy(function ($item) {
+                return Carbon::parse($item->date)->format('Y-m-d');
+            });
 
+        // Loop whole month
+        $startDate = Carbon::create($validated['year'], $validated['month'], 1);
+        $endDate = $startDate->copy()->endOfMonth();
         $row = 14;
-        foreach ($records as $record) {
-            $sheet->setCellValue('A' . $row, date('F d, Y', strtotime($record->date)));
 
-            // Format to 12-hour time with AM/PM if not null
-            $time_in_am = $record->time_in_am ? date('h:i A', strtotime($record->time_in_am)) : '';
-            $time_out_am = $record->time_out_am ? date('h:i A', strtotime($record->time_out_am)) : '';
-            $time_in_pm = $record->time_in_pm ? date('h:i A', strtotime($record->time_in_pm)) : '';
-            $time_out_pm = $record->time_out_pm ? date('h:i A', strtotime($record->time_out_pm)) : '';
+        while ($startDate->lte($endDate)) {
+            $date = $startDate->toDateString();
+            $record = $records->get($date);
+
+            $sheet->setCellValue('A' . $row, $startDate->format('F d, Y'));
+
+            $time_in_am = $record && $record->time_in_am ? date('h:i A', strtotime($record->time_in_am)) : '';
+            $time_out_am = $record && $record->time_out_am ? date('h:i A', strtotime($record->time_out_am)) : '';
+            $time_in_pm = $record && $record->time_in_pm ? date('h:i A', strtotime($record->time_in_pm)) : '';
+            $time_out_pm = $record && $record->time_out_pm ? date('h:i A', strtotime($record->time_out_pm)) : '';
 
             $sheet->setCellValue('B' . $row, $time_in_am);
             $sheet->setCellValue('C' . $row, $time_out_am);
             $sheet->setCellValue('D' . $row, $time_in_pm);
             $sheet->setCellValue('E' . $row, $time_out_pm);
 
+            // Parse undertime if record exists
             $hours = 0;
             $minutes = 0;
 
-            if ($record->undertime) {
+            if ($record && $record->undertime && trim($record->undertime) !== '') {
                 if (strpos($record->undertime, 'h') !== false || strpos($record->undertime, 'm') !== false) {
                     if (preg_match('/(\d+)h/', $record->undertime, $h)) {
                         $hours = (int) $h[1];
@@ -504,10 +516,9 @@ class DailyTimeRecordController extends Controller
                 }
             }
 
-            $sheet->setCellValue('F' . $row, $hours);
-            $sheet->setCellValue('G' . $row, $minutes);
+            $sheet->setCellValue('F' . $row, ($hours > 0) ? $hours : '');
+            $sheet->setCellValue('G' . $row, ($minutes > 0) ? $minutes : '');
 
-            // Apply border and center alignment for the row
             $sheet->getStyle("A{$row}:G{$row}")->applyFromArray([
                 'borders' => [
                     'allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
@@ -519,6 +530,7 @@ class DailyTimeRecordController extends Controller
             ]);
             $sheet->getRowDimension($row)->setRowHeight(21);
 
+            $startDate->addDay();
             $row++;
         }
 
@@ -529,7 +541,6 @@ class DailyTimeRecordController extends Controller
         $row5 = $row4 + 2;
         $row6 = $row5 + 1;
 
-        // Certification text
         $sheet->mergeCells("A{$row2}:G{$row2}");
         $sheet->setCellValue("A{$row2}", "I certify on my honor that the above is a true and correct report of the hours of work performed, record of which was made daily at the time of arrival and departure from office.");
         $sheet->getRowDimension($row2)->setRowHeight(30);
@@ -537,15 +548,11 @@ class DailyTimeRecordController extends Controller
         $sheet->getStyle("A{$row2}")->getAlignment()->setWrapText(true);
         $sheet->getStyle("A{$row2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        // VERIFIED line
         $sheet->setCellValue("A{$row4}", "VERIFIED as to the prescribed office hours:");
-
-        // Signatory box
         $sheet->mergeCells("C{$row3}:E{$row3}");
         $sheet->mergeCells("C{$row5}:E{$row5}");
         $sheet->mergeCells("C{$row6}:E{$row6}");
 
-        // Only bottom border for signatory lines
         $sheet->getStyle("C{$row3}:E{$row3}")->applyFromArray([
             'borders' => [
                 'bottom' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
@@ -557,7 +564,6 @@ class DailyTimeRecordController extends Controller
             ],
         ]);
 
-        // Signatory name left blank for manual fill
         $sheet->setCellValue("C{$row5}", '');
         $sheet->getStyle("C{$row5}")->getFont()->setBold(true);
 
@@ -565,7 +571,6 @@ class DailyTimeRecordController extends Controller
         $sheet->getStyle("C{$row6}")->getFont()->setSize(11);
         $sheet->getStyle("C{$row6}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        // Final filename with month and year
         $monthName = date('F', mktime(0, 0, 0, $validated['month'], 1));
         $fileName = "{$user->first_name}_{$user->last_name}_DTR_{$monthName}_{$validated['year']}.xlsx";
         $tempPath = storage_path("app/{$fileName}");
