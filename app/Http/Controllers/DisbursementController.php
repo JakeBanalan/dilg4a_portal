@@ -37,6 +37,7 @@ class DisbursementController extends Controller
 
     public function store(Request $request)
     {
+        // STEP 1: Add the missing fields to the validation rules.
         $validatedData = $request->validate([
             'dv_number' => 'required|string|max:255',
             'payee' => 'required|string|max:255',
@@ -45,36 +46,47 @@ class DisbursementController extends Controller
             'total_deductions' => 'required|numeric|min:0',
             'net_amount' => 'required|numeric|min:0',
             'remarks' => 'nullable|string|max:255',
+            'tax' => 'required|numeric|min:0',           // <-- Add this
+            'gsis' => 'required|numeric|min:0',          // <-- Add this
+            'pagibig' => 'required|numeric|min:0',       // <-- Add this
+            'philhealth' => 'required|numeric|min:0',    // <-- Add this
+            'other_payables' => 'required|numeric|min:0',// <-- Add this
             'lddap_entries' => 'array',
             'lddap_entries.*.lddap_number' => 'required|string|max:255',
             'lddap_entries.*.lddap_date' => 'required|date',
             'lddap_entries.*.lddap_balance' => 'required|numeric|min:0',
             'lddap_entries.*.disburse_amount' => 'required|numeric|min:0',
         ]);
-    
+
+        // STEP 2: Add the missing fields to the create() call.
+        // Make sure the key on the left matches your database column name.
         $disbursement = Disbursement::create([
             'dv' => $validatedData['dv_number'],
             'payee' => $validatedData['payee'],
             'particular' => $validatedData['particular'],
             'amount' => $validatedData['obligated_amount'],
+            'tax' => $validatedData['tax'],                 // <-- Add this
+            'gsis' => $validatedData['gsis'],               // <-- Add this
+            'pagibig' => $validatedData['pagibig'],         // <-- Add this
+            'philhealth' => $validatedData['philhealth'],   // <-- Add this
+            'other' => $validatedData['other_payables'], // <-- Add this (assuming db column is 'other')
             'total' => $validatedData['total_deductions'],
             'net' => $validatedData['net_amount'],
             'remarks' => $validatedData['remarks'] ?? null,
         ]);
-    
+
+        // This part for LDDAP entries is correct and doesn't need changes.
         if (isset($validatedData['lddap_entries'])) {
             foreach ($validatedData['lddap_entries'] as $entry) {
                 $disbursement->lddapEntries()->create($entry);
             }
         }
-    
+
         return response()->json([
             'message' => 'Disbursement created successfully',
             'disbursement' => $disbursement,
         ], 201);
     }
-    
-
 
     public function update(Request $request, $id)
     {
@@ -85,19 +97,19 @@ class DisbursementController extends Controller
         }
 
         $validatedData = $request->validate([
-            'dv' => 'string|max:255',
-            'ors' => 'string|max:255',
-            'payee' => 'string|max:255',
-            'particular' => 'string|max:255',
-            'amount' => 'numeric|min:0',
-            'tax' => 'numeric|min:0',
-            'gsis' => 'numeric|min:0',
-            'pagibig' => 'numeric|min:0',
-            'philhealth' => 'numeric|min:0',
-            'other' => 'numeric|min:0',
-            'total' => 'numeric|min:0',
-            'net' => 'numeric|min:0',
-            'datereleased' => 'date',
+            'dv' => 'nullable|string|max:255',
+            'ors' => 'nullable|string|max:255',
+            'payee' => 'nullable|string|max:255',
+            'particular' => 'nullable|string|max:255',
+            'amount' => 'nullable|numeric|min:0',
+            'tax' => 'nullable|numeric|min:0',
+            'gsis' => 'nullable|numeric|min:0',
+            'pagibig' => 'nullable|numeric|min:0',
+            'philhealth' => 'nullable|numeric|min:0',
+            'other' => 'nullable|numeric|min:0',
+            'total' => 'nullable|numeric|min:0',
+            'net' => 'nullable|numeric|min:0',
+            'datereleased' => 'nullable|date',
             'timereleased' => '',
             'remarks' => 'nullable|string|max:255',
             'status' => 'string|max:255',

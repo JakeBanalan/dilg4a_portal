@@ -9,6 +9,7 @@ CREATE TABLE `tbl_daily_time_records` (
     `time_out_pm` TIME NULL,
     `undertime` VARCHAR(50) NULL,
     `total_hours` DECIMAL(5,2) NULL,
+    `date_generated` DATE NULL,
     `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 

@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class AppItemController extends Controller
 {
-    public function index() {}
     public function countTotalItem($cur_year)
     {
         return response()->json(AppItemModel::select(AppItemModel::raw('count(*) as item'))->whereYear('created_at', $cur_year)

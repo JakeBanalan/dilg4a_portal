@@ -72,8 +72,12 @@
                                     <tbody>
                                         <tr v-for="record in filteredRecords" :key="record.id">
                                             <td style="font-size: 12pt;">{{ record.name }}</td>
-                                            <td style="font-size: 12pt;"></td>
-                                            <td style="font-size: 12pt;"></td>
+                                            <td style="font-size: 12pt;">
+                                                {{ formatDate(record.date_generated) }}
+                                            </td>
+                                            <td style="font-size: 12pt;">
+                                                {{ record.exporter_name || '-' }}
+                                            </td>
                                             <td>
                                                 <button class="btn btn-sm btn-primary"
                                                     @click="viewRecordDetails(record.id)">
@@ -592,7 +596,16 @@ export default {
                     this.exporting = false;
                     this.exportProgress = 0;
                 });
-        }
+        },
+        formatDate(date) {
+            if (!date) return '-';
+            const d = new Date(date);
+            return d.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        },
 
 
     },

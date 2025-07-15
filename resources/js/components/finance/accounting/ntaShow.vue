@@ -93,6 +93,8 @@
                                                 <td>
                                                     <button @click="deleteRow(index)"
                                                         class="btn btn-danger btn-sm">Delete</button>
+                                                    <button @click="updateRow(index)"
+                                                        class="btn btn-primary btn-sm">Update</button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -192,6 +194,12 @@ export default {
 
         deleteRow(index) {
             this.newRows.splice(index, 1);
+        },
+
+        updateRow(index) {
+            const row = this.newRows[index];
+            // Logic to handle row update, e.g., send data to the server
+            console.log('Updating row:', row);
         },
     },
 };

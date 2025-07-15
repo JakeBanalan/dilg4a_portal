@@ -41,8 +41,13 @@ class DailyTimeRecordController extends Controller
 
         $users->getCollection()->transform(function ($user) {
             $user->name = $user->first_name . ' ' . $user->last_name;
+            $user->date_generated = DailyTimeRecord::where('user_id', $user->id)
+                ->orderBy('date_generated', 'desc')
+                ->value('date_generated');
             return $user;
         });
+
+
 
         return response()->json($users);
     }
@@ -285,6 +290,15 @@ class DailyTimeRecordController extends Controller
 
         $users = User::where('pmo_id', $officeId)->get();
 
+        // ✅ NEW: Get user IDs
+        $userIds = $users->pluck('id');
+
+        // ✅ NEW: Update all matching DTRs to add date_generated = today
+        DailyTimeRecord::whereIn('user_id', $userIds)
+            ->whereMonth('date', $month)
+            ->whereYear('date', $year)
+            ->update(['date_generated' => now()]);
+
         $path = public_path('templates/export_dtr.xlsx');
 
         if (!file_exists($path)) {
@@ -381,14 +395,13 @@ class DailyTimeRecordController extends Controller
                 $row++;
             }
 
-            // Certification block
+            // Certification block (unchanged)
             $row2 = $row + 2;
             $row3 = $row2 + 2;
             $row4 = $row3 + 2;
             $row5 = $row4 + 2;
             $row6 = $row5 + 1;
 
-            // Certification text
             $newSheet->mergeCells("A{$row2}:G{$row2}");
             $newSheet->setCellValue("A{$row2}", "I certify on my honor that the above is a true and correct report of the hours of work performed, record of which was made daily at the time of arrival and departure from office.");
             $newSheet->getRowDimension($row2)->setRowHeight(30);
@@ -396,15 +409,12 @@ class DailyTimeRecordController extends Controller
             $newSheet->getStyle("A{$row2}")->getAlignment()->setWrapText(true);
             $newSheet->getStyle("A{$row2}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-            // VERIFIED line
             $newSheet->setCellValue("A{$row4}", "VERIFIED as to the prescribed office hours:");
 
-            // Signatory box
             $newSheet->mergeCells("C{$row3}:E{$row3}");
             $newSheet->mergeCells("C{$row5}:E{$row5}");
             $newSheet->mergeCells("C{$row6}:E{$row6}");
 
-            // Only bottom border for signatory lines
             $newSheet->getStyle("C{$row3}:E{$row3}")->applyFromArray([
                 'borders' => [
                     'bottom' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN],
@@ -416,7 +426,6 @@ class DailyTimeRecordController extends Controller
                 ],
             ]);
 
-            // Signatory name left blank for manual fill
             $newSheet->setCellValue("C{$row5}", '');
             $newSheet->getStyle("C{$row5}")->getFont()->setBold(true);
 
@@ -437,6 +446,7 @@ class DailyTimeRecordController extends Controller
 
         return response()->download($tempPath)->deleteFileAfterSend(true);
     }
+
 
     public function exportUser(Request $request, $userId)
     {
