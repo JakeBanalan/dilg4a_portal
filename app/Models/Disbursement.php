@@ -13,12 +13,9 @@ class Disbursement extends Model
 
     protected $table = 'tbl_disbursement';
     protected $primaryKey = 'ID';
-
-    // If your primary key is not auto-incrementing, set this to false
-    // public $incrementing = false;
-
-    // If your primary key is not an integer, specify the type
-    // protected $keyType = 'string';
+    public $incrementing = true;
+    public $timestamps = true;
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'burs_id',

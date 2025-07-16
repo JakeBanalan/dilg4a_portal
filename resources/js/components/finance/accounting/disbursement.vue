@@ -47,7 +47,8 @@
                                         <tr v-if="disbursements.length === 0">
                                             <td colspan="8" class="text-center">No records found.</td>
                                         </tr>
-                                        <tr v-else v-for="disbursement in disbursements" :key="disbursement.id">
+                                        <tr v-else v-for="disbursement in disbursements"
+                                            :key="disbursement.id || disbursement.ID">
                                             <td>{{ disbursement.dv }}</td>
                                             <td>{{ disbursement.ors }}</td>
                                             <td>{{ disbursement.payee }}</td>
@@ -218,15 +219,15 @@ export default {
         async fetchDisbursements() {
             this.loading = true;
             try {
-                const response = await axios.get(
-                    `/api/finance/accounting/disbursements?page=${this.currentPage}&per_page=${this.itemsPerPage}`
-                );
+                const response = await axios.get(`/api/finance/accounting/disbursements`, {
+                    params: { page: this.currentPage || 1, per_page: this.perPage || 10 }
+                });
                 const { data, from, to, total } = response.data;
                 this.disbursements = data || [];
                 this.totalRecords = total || 0;
                 this.showingEntriesMessage = `Showing ${from || 0} to ${to || 0} of ${total || 0} entries`;
             } catch (error) {
-                console.error('Error fetching disbursements:', error);
+                console.error('Error fetching disbursements:', error.response);
             } finally {
                 this.loading = false;
             }

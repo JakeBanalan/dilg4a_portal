@@ -199,8 +199,8 @@ export default {
                     icon: 'book',
                     class: 'menu-icon-custom',
                     children: [
-                        { link: '', 
-                        name: 'Budget Section', 
+                        { link: '',
+                        name: 'Budget Section',
                         icon: 'book',
                         children: [
                             { link: '/finance/budget/index', name: 'Fund Source', icon: 'book' },
@@ -220,7 +220,7 @@ export default {
                             ],
                         },
                         { link: '', name: 'Cash Section', icon: 'book' },
-                        { link: '/procurement/abstract/index', name: 'Funds Downloaded', icon: 'book' },
+                        { link: '/procurement/abstract/index', name: 'Cash Section', icon: 'book' },
                     ],
                 },
                 {

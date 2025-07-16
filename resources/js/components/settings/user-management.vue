@@ -497,8 +497,8 @@ export default {
                     label: 'Finance',
                     value: 'finance',
                     children: [
-                        { label: 'Budget', 
-                        value: 'Budget', 
+                        { label: 'Budget',
+                        value: 'Budget',
                         children: [
                             { label: 'Fund Source', value: '/finance/budget/index' },
                             { label: 'UACS', value: '/finance/budget/object_code' },
