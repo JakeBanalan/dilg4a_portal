@@ -500,6 +500,7 @@ export default {
                             { label: 'Fund Source', value: '/finance/budget/index' },
                             { label: 'UACS', value: '/finance/budget/object_code' },
                             { label: 'Obligation', value: '/finance/budget/obligation' },
+                            { label: 'Budget PR Monitoring', value: '/finance/budget/pr_monitoring' },
                         ]
                         },
                         {

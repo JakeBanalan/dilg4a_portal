@@ -102,7 +102,7 @@ td {
                                         </h5>
                                         <div class="d-flex">
                                             <button class="btn btn-primary btn-fw btn-icon-text mx-2"
-                                                @click="openModal()">
+                                                @click="create_fs()">
                                                 <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
                                                 Create
                                             </button>
@@ -272,6 +272,9 @@ export default {
                     pageLength: 10,
                 });
             });
+        },
+        create_fs() {
+            this.$router.push({ path: `/finance/budget/create_fs` });
         },
     },
 

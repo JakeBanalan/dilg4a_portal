@@ -206,6 +206,7 @@ export default {
                             { link: '/finance/budget/index', name: 'Fund Source', icon: 'book' },
                             { link: '/finance/budget/object_code', name: 'UACS', icon: 'book' },
                             { link: '/finance/budget/obligation', name: 'Obligation', icon: 'book' },
+                            { link: '/finance/budget/pr_monitoring', name: 'Procurement Budget Monitoring', icon: 'book' },
                         ]
                         },
                         {

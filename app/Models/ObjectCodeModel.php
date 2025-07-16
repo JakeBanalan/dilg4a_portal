@@ -16,6 +16,7 @@ class ObjectCodeModel extends Model
         'id',
         'code',
         'uacs',
-        'date_created'
+        'creadted_at',
+        'updated_at'
     ];
 }

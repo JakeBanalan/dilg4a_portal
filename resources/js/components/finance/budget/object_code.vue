@@ -120,8 +120,7 @@ td {
                                         <div v-if="searchVisible">
                                             <div class="row">
                                                 <div class="col-md-3">
-                                                    <input type="text" class="form-control"
-                                                        placeholder="RFQ #">
+                                                    <input type="text" class="form-control" placeholder="RFQ #">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <input type="date" class="form-control">
@@ -130,8 +129,7 @@ td {
                                                     <input type="date" class="form-control">
                                                 </div>
                                                 <div class="col-md-3">
-                                                    <input type="text" class="form-control"
-                                                        placeholder="Created By">
+                                                    <input type="text" class="form-control" placeholder="Created By">
                                                 </div>
                                             </div>
 
@@ -165,12 +163,13 @@ td {
                                                     <td style="width:5%;">
                                                         <div
                                                             style="  display: flex;gap: 0.1em; justify-content: center;">
-                                                            <button @click="viewFs(ObjectCode.id)" class="btn btn-icon mr-1"
+                                                            <!-- <button @click="viewFs(ObjectCode.id)" class="btn btn-icon mr-1"
                                                                 style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                                 <font-awesome-icon
                                                                     :icon="['fas', 'eye']"></font-awesome-icon>
-                                                            </button>
-                                                            <button @click="" class="btn btn-icon mr-1"
+                                                            </button> -->
+                                                            <button @click="deleteOC(ObjectCode.id)"
+                                                                class="btn btn-icon mr-1"
                                                                 style=" align-items: center; justify-content: center; padding: 0.5em; background-color: #059886; color: #fff;">
                                                                 <font-awesome-icon
                                                                     :icon="['fas', 'trash']"></font-awesome-icon>
@@ -184,7 +183,7 @@ td {
                                 </div>
                             </div>
 
-
+                            <ObjectCodeModal :visible="isModalVisible" @close="closeModal" @refresh="fetchObjectCode" />
                         </div>
                     </div>
                 </div>
@@ -200,7 +199,7 @@ import Navbar from '../../layout/Navbar.vue';
 import Sidebar from '../../layout/Sidebar.vue';
 import FooterVue from '../../layout/Footer.vue';
 import BreadCrumbs from '../../dashboard_tiles/BreadCrumbs.vue';
-
+import ObjectCodeModal from './oc_modal.vue';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
@@ -216,9 +215,11 @@ export default {
         return {
             ObjectCode: [],
             searchVisible: false,
+            isModalVisible: false,
         };
     },
     components: {
+        ObjectCodeModal,
         Navbar,
         Sidebar,
         FooterVue,
@@ -233,13 +234,19 @@ export default {
         this.fetchObjectCode();
     },
     methods: {
+        openModal() {
+            this.isModalVisible = true;
+        },
+        closeModal() {
+            this.fetchObjectCode();
+            this.isModalVisible = false;
+        },
 
         fetchObjectCode() {
             axios.get('/api/fetchObjectCode')
                 .then(response => {
                     this.ObjectCode = response.data;
                     this.initializeDataTable(); // Initialize DataTable after data is fetched
-                    console.log('Fund sources fetched successfully:', this.ObjectCode);
                 })
                 .catch(error => {
                     console.error('Error fetching fund sources:', error);
@@ -254,6 +261,37 @@ export default {
             // console.log(router.getRoutes())
             this.$router.push({ path: `/finance/budget/update_fs/${id}` });
 
+        },
+        async deleteOC(id) {
+            const result = await Swal.fire({
+                title: 'Do you want to continue?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Continue',
+            });
+            if (result.isConfirmed) {
+                try {
+                    const response = await axios.post('/api/deleteOC', {
+                        id: id
+                    });
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        showConfirmButton: false,
+                        timer: 1000
+                    });
+
+                    setTimeout(() => {
+                        this.fetchObjectCode();
+                        // const id = response.data.id;
+                        // this.$router.push({ path: `/finance/budget/update_fs/${id}` });
+                    }, 200);
+
+                } catch (error) {
+                    console.error('error saving data', error);
+                    // Optionally, handle error.display or set this.errors if it's a 422
+                }
+            }
         },
         initializeDataTable() {
             $('#oblitable').DataTable().destroy(); // clean up
