@@ -62,10 +62,6 @@
                                                 colspan="1" aria-label="Product: activate to sort column ascending"
                                                 aria-sort="descending">Date Generated
                                             </th>
-                                            <th class="sorting_desc" tabindex="0" aria-controls="example" rowspan="1"
-                                                colspan="1" aria-label="Product: activate to sort column ascending"
-                                                aria-sort="descending">Uploader/Exporter
-                                            </th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
@@ -74,9 +70,6 @@
                                             <td style="font-size: 12pt;">{{ record.name }}</td>
                                             <td style="font-size: 12pt;">
                                                 {{ formatDate(record.date_generated) }}
-                                            </td>
-                                            <td style="font-size: 12pt;">
-                                                {{ record.exporter_name || '-' }}
                                             </td>
                                             <td>
                                                 <button class="btn btn-sm btn-primary"

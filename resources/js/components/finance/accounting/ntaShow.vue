@@ -54,58 +54,62 @@
                                         </button>
 
                                     </div>
-                                    <table class="table table-striped table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>DV No.</th>
-                                                <th>ORS/BURS No.</th>
-                                                <th>ORS Date</th>
-                                                <th>Date Disbursed</th>
-                                                <th>Payee</th>
-                                                <th>Gross Amount</th>
-                                                <th>Total Deductions</th>
-                                                <th>Net Amount</th>
-                                                <th>Disbursed Amount</th>
-                                                <th>Remarks</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody v-if="newRows.length > 0">
-                                            <tr v-for="(row, index) in newRows" :key="'new-' + index">
-                                                <td><input v-model="row.dv_no" class="form-control" /></td>
-                                                <td><input v-model="row.ors_burs_no" class="form-control" /></td>
-                                                <td><input type="date" v-model="row.ors_date" class="form-control" />
-                                                </td>
-                                                <td><input type="date" v-model="row.date_disbursed"
-                                                        class="form-control" /></td>
-                                                <td><input v-model="row.payee" class="form-control" /></td>
-                                                <td><input type="number" v-model="row.gross_amount"
-                                                        class="form-control" /></td>
-                                                <td><input type="number" v-model="row.total_deductions"
-                                                        class="form-control" /></td>
-                                                <td><input type="number" v-model="row.net_amount"
-                                                        class="form-control" /></td>
-                                                <td><input type="number" v-model="row.disbursed_amount"
-                                                        class="form-control" /></td>
-                                                <td><input v-model="row.remarks" class="form-control" /></td>
-                                                <td><input v-model="row.status" class="form-control" /></td>
-                                                <td>
-                                                    <button @click="deleteRow(index)"
-                                                        class="btn btn-danger btn-sm">Delete</button>
-                                                    <button @click="updateRow(index)"
-                                                        class="btn btn-primary btn-sm">Update</button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered" style="width: 100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>DV No.</th>
+                                                    <th>ORS/BURS No.</th>
+                                                    <th>ORS Date</th>
+                                                    <th>Date Disbursed</th>
+                                                    <th>Payee</th>
+                                                    <th>Gross Amount</th>
+                                                    <th>Total Deductions</th>
+                                                    <th>Net Amount</th>
+                                                    <th>Disbursed Amount</th>
+                                                    <th>Remarks</th>
+                                                    <th>Status</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody v-if="newRows.length > 0">
+                                                <tr v-for="(row, index) in newRows" :key="'new-' + index">
+                                                    <td><input v-model="row.dv_no" class="form-control" /></td>
+                                                    <td><input v-model="row.ors_burs_no" class="form-control" /></td>
+                                                    <td><input type="date" v-model="row.ors_date"
+                                                            class="form-control" />
+                                                    </td>
+                                                    <td><input type="date" v-model="row.date_disbursed"
+                                                            class="form-control" /></td>
+                                                    <td><input v-model="row.payee" class="form-control" /></td>
+                                                    <td><input type="number" v-model="row.gross_amount"
+                                                            class="form-control" /></td>
+                                                    <td><input type="number" v-model="row.total_deductions"
+                                                            class="form-control" /></td>
+                                                    <td><input type="number" v-model="row.net_amount"
+                                                            class="form-control" /></td>
+                                                    <td><input type="number" v-model="row.disbursed_amount"
+                                                            class="form-control" /></td>
+                                                    <td><input v-model="row.remarks" class="form-control" /></td>
+                                                    <td><input v-model="row.status" class="form-control" /></td>
+                                                    <td>
+                                                        <button @click="deleteRow(index)"
+                                                            class="btn btn-danger btn-sm">Delete</button>
+                                                        <button @click="updateRow(index)"
+                                                            class="btn btn-primary btn-sm">Update</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
 
-                                        <tbody v-else>
-                                            <tr>
-                                                <td colspan="12" class="text-center">No rows added yet.</td>
-                                            </tr>
-                                        </tbody>
+                                            <tbody v-else>
+                                                <tr>
+                                                    <td colspan="12" class="text-center">No rows added yet.</td>
+                                                </tr>
+                                            </tbody>
 
-                                    </table>
+                                        </table>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>

@@ -325,8 +325,9 @@
                                             <!-- Handle nested children (2 levels deep) -->
                                             <div v-if="child.children" class="border-start border-2 ps-3 mb-3">
                                                 <div class="form-check mb-2">
-                                                    <input class="form-check-input" type="checkbox" :id="child.value"
-                                                        :value="child.value" v-model="selectedSidebarItems"
+                                                    <input class="form-check-input" style="margin-left: 0.75rem;"
+                                                        type="checkbox" :id="child.value" :value="child.value"
+                                                        v-model="selectedSidebarItems"
                                                         :disabled="!selectedSidebarItems.includes(menu.value)"
                                                         @change="toggleGrandChildren(child)" />
                                                     <label class="form-check-label fw-semibold" :for="child.value"
@@ -334,31 +335,33 @@
                                                         {{ child.label }}
                                                     </label>
                                                 </div>
-                                                <!-- Grandchildren -->
-                                                <div class="ps-4">
+                                                <!-- Grandchild -->
+                                                <div class="ps-5">
                                                     <div v-for="grandchild in child.children" :key="grandchild.value"
-                                                        class="form-check mb-1">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            :id="grandchild.value" :value="grandchild.value"
-                                                            v-model="selectedSidebarItems"
+                                                        class="form-check mb-1 ps-5">
+                                                        <input class="form-check-input" style="margin-left: 1.75rem;"
+                                                            type="checkbox" :id="grandchild.value"
+                                                            :value="grandchild.value" v-model="selectedSidebarItems"
                                                             :disabled="!selectedSidebarItems.includes(child.value)" />
                                                         <label class="form-check-label text-muted"
-                                                            :for="grandchild.value" style="font-size: 0.9rem;">
+                                                            :for="grandchild.value" style="font-size: 0.9rem; margin-left: 2.75rem;">
                                                             {{ grandchild.label }}
                                                         </label>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <!-- Regular children (no nested children) -->
-                                            <div v-else class="form-check mb-2">
-                                                <input class="form-check-input" type="checkbox" :id="child.value"
-                                                    :value="child.value" v-model="selectedSidebarItems"
+                                            <!-- Regular child -->
+                                            <div v-else class="form-check mb-2 ps-4">
+                                                <input class="form-check-input" style="margin-left: 0.5rem;"
+                                                    type="checkbox" :id="child.value" :value="child.value"
+                                                    v-model="selectedSidebarItems"
                                                     :disabled="!selectedSidebarItems.includes(menu.value)" />
                                                 <label class="form-check-label" :for="child.value"
                                                     style="font-size: 1rem;">
                                                     {{ child.label }}
                                                 </label>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
