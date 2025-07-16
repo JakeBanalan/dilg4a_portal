@@ -58,7 +58,7 @@
                                                     Edit
                                                 </button>
                                                 <button class="btn btn-sm btn-danger"
-                                                    @click="deleteDisbursement(disbursement.id)">
+                                                    @click="deleteDisbursement(disbursement.ID)">
                                                     Delete
                                                 </button>
                                             </td>
