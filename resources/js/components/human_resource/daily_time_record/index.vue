@@ -62,18 +62,15 @@
                                                 colspan="1" aria-label="Product: activate to sort column ascending"
                                                 aria-sort="descending">Date Generated
                                             </th>
-                                            <th class="sorting_desc" tabindex="0" aria-controls="example" rowspan="1"
-                                                colspan="1" aria-label="Product: activate to sort column ascending"
-                                                aria-sort="descending">Uploader/Exporter
-                                            </th>
                                             <th>Actions</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="record in filteredRecords" :key="record.id">
                                             <td style="font-size: 12pt;">{{ record.name }}</td>
-                                            <td style="font-size: 12pt;"></td>
-                                            <td style="font-size: 12pt;"></td>
+                                            <td style="font-size: 12pt;">
+                                                {{ formatDate(record.date_generated) }}
+                                            </td>
                                             <td>
                                                 <button class="btn btn-sm btn-primary"
                                                     @click="viewRecordDetails(record.id)">
@@ -592,7 +589,16 @@ export default {
                     this.exporting = false;
                     this.exportProgress = 0;
                 });
-        }
+        },
+        formatDate(date) {
+            if (!date) return '-';
+            const d = new Date(date);
+            return d.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        },
 
 
     },

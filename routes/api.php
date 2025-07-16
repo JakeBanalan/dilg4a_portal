@@ -545,7 +545,7 @@ Route::prefix('daily-time-records')->group(function () {
     Route::get('/export', [DailyTimeRecordController::class, 'export']);
     Route::post('/bulk', [DailyTimeRecordController::class, 'storeBulk']);
     Route::delete('/{id}', [DailyTimeRecordController::class, 'destroy']);
-    Route::get('/{id}', [DailyTimeRecordController::class, 'show']); // wildcard LAST!
+    Route::get('/{id}', [DailyTimeRecordController::class, 'show']);
     Route::get('/export-user/{userId}', [DailyTimeRecordController::class, 'exportUser']);
 
 });
@@ -555,6 +555,6 @@ Route::middleware('api')->group(function () {
     Route::get('/finance/accounting/disbursement/{id}', [DisbursementController::class, 'show']);
     Route::post('/finance/accounting/disbursement', [DisbursementController::class, 'store']);
     Route::put('/finance/accounting/disbursement/{id}', [DisbursementController::class, 'update']);
-    Route::delete('/finance/accounting/disbursement/{id}', [DisbursementController::class, 'destroy']); // Delete route for disbursements
-    Route::post('/finance/accounting/disbursement/{id}/restore', [DisbursementController::class, 'restore']); // Restore route
+    Route::delete('/finance/accounting/disbursement/{id}', [DisbursementController::class, 'destroy']);
+    Route::post('/finance/accounting/disbursement/{id}/restore', [DisbursementController::class, 'restore']);
 });

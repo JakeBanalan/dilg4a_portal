@@ -12,8 +12,6 @@ class Disbursement extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'tbl_disbursement';
-
-    // Specify the primary key if it's not 'id'
     protected $primaryKey = 'ID';
 
     // If your primary key is not auto-incrementing, set this to false
@@ -65,7 +63,7 @@ class Disbursement extends Model
         static::deleted(function ($disbursement) {
             Log::info("Disbursement with ID: {$disbursement->ID} has been deleted");
         });
-        
+
         static::restoring(function ($disbursement) {
             Log::info("Restoring disbursement with ID: {$disbursement->ID}");
         });

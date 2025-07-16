@@ -356,7 +356,7 @@ export default {
             isLoading: false,
             updatedItems: [],
             isExporting: false,
-            isTemporary:[]
+            isTemporary: []
         };
     },
     computed: {
@@ -580,10 +580,15 @@ export default {
 
                     // Revoke the object URL to release memory
                     URL.revokeObjectURL(url);
+
+                    // Show success toast
+                    toast.success('Purchase request exported successfully!', { autoClose: 1000 });
+
+                    // Show success toast
+                    this.$toast.success('Purchase request exported successfully!');
                 })
                 .catch((error) => {
                     console.error('Error exporting purchase request:', error);
-                    Swal.fire('Error', 'Failed to export the purchase request. Please try again.', 'error');
                 })
                 .finally(() => {
                     this.isExporting = false; // Reset loading state

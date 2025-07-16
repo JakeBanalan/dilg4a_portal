@@ -79,53 +79,53 @@
                                         </button>
                                     </div>
                                 </div>
-
-                                <table class="table table-striped table-bordered mb-3">
-                                    <thead>
-                                        <tr role="row">
-                                            <th style="width: 100px;">NTA NO</th>
-                                            <th style="width: 61px;">DATE RECEIVED</th>
-                                            <th style="width: 107px;">ACCOUNT NO</th>
-                                            <th style="width: 126px;">SARO</th>
-                                            <th style="width: 126px;">PARTICULAR</th>
-                                            <th style="width: 93px;">AMOUNT</th>
-                                            <th style="width: 4px;">DISBURSEMENT</th>
-                                            <th style="width: 4px;">BALANCE</th>
-                                            <th style="width: 4px;">ACTION</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody v-if="loading">
-                                        <tr>
-                                            <td colspan="9" class="text-center">
-                                                <span class="spinner-border spinner-border-sm" role="status"
-                                                    aria-hidden="true"></span>
-                                                Loading...
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else-if="ntas.length">
-                                        <tr v-for="nta in ntas" :key="nta.id">
-                                            <td>{{ nta.nta_number }}</td>
-                                            <td>{{ nta.received_date }}</td>
-                                            <td>{{ nta.account_number }}</td>
-                                            <td>{{ nta.saro_number }}</td>
-                                            <td>{{ nta.particular }}</td>
-                                            <td>{{ formatCurrency(nta.amount) }}</td>
-                                            <td>{{ formatCurrency(nta.obligated) }}</td>
-                                            <td>{{ formatCurrency(nta.balance) }}</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary"
-                                                    @click="viewNTA(nta.id)">View</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                    <tbody v-else>
-                                        <tr>
-                                            <td colspan="9" class="text-center">No records found.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-bordered mb-3" style="width: 100%;">
+                                        <thead>
+                                            <tr role="row">
+                                                <th style="width: 100px;">NTA NO</th>
+                                                <th style="width: 61px;">DATE RECEIVED</th>
+                                                <th style="width: 107px;">ACCOUNT NO</th>
+                                                <th style="width: 126px;">SARO</th>
+                                                <th style="width: 126px;">PARTICULAR</th>
+                                                <th style="width: 93px;">AMOUNT</th>
+                                                <th style="width: 4px;">DISBURSEMENT</th>
+                                                <th style="width: 4px;">BALANCE</th>
+                                                <th style="width: 4px;">ACTION</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody v-if="loading">
+                                            <tr>
+                                                <td colspan="9" class="text-center">
+                                                    <span class="spinner-border spinner-border-sm" role="status"
+                                                        aria-hidden="true"></span>
+                                                    Loading...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody v-else-if="ntas.length">
+                                            <tr v-for="nta in ntas" :key="nta.id">
+                                                <td>{{ nta.nta_number }}</td>
+                                                <td>{{ nta.received_date }}</td>
+                                                <td>{{ nta.account_number }}</td>
+                                                <td>{{ nta.saro_number }}</td>
+                                                <td>{{ nta.particular }}</td>
+                                                <td>{{ formatCurrency(nta.amount) }}</td>
+                                                <td>{{ formatCurrency(nta.obligated) }}</td>
+                                                <td>{{ formatCurrency(nta.balance) }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-primary"
+                                                        @click="viewNTA(nta.id)">View</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tbody v-else>
+                                            <tr>
+                                                <td colspan="9" class="text-center">No records found.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
                                 <Pagination :total="totalRecords" :currentPage="currentPage"
                                     :itemsPerPage="itemsPerPage" @pageChange="onPageChange" />

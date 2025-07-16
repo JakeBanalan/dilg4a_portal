@@ -194,6 +194,7 @@ export default {
                 total_deductions: 0,
                 net_amount: 0,
                 dv_number: '',
+                dv_date: '', // Add this line
                 remarks: '',
                 tax: 0,
                 gsis: 0,
@@ -201,9 +202,8 @@ export default {
                 philhealth: 0,
                 other_payables: 0,
             },
-
-
             lddapEntries: [],
+
         };
     },
     watch: {
@@ -244,7 +244,9 @@ export default {
                 }
             }
         },
-
+        updateNetAmount() {
+            this.form.net_amount = this.form.obligated_amount - this.form.total_deductions;
+        },
         addLDDAPEntry() {
             this.lddapEntries.push({
                 lddap_number: '',

@@ -23,6 +23,7 @@ class DailyTimeRecord extends Model
         'time_out_pm',
         'undertime',
         'total_hours',
+        'date_generated', // Add date_generated here
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class DailyTimeRecord extends Model
         'time_out_am' => 'string',
         'time_in_pm' => 'string',
         'time_out_pm' => 'string',
+        
     ];
 
     public function user()
