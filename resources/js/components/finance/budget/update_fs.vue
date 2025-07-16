@@ -13,10 +13,37 @@ td {
     /* Maximum width of cells */
 }
 
-#fstable,
-#fstable tr,
-#fstable td {
+#ufstable,
+#ufstable tr,
+#ufstable td {
     overflow: visible !important;
+    position: relative !important;
+}
+
+#ufstable {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    /* prevent vertical clipping */
+}
+
+.details-icon {
+    cursor: pointer;
+    color: #059988;
+    /* Bootstrap primary */
+    font-size: 1rem;
+    padding: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.details-icon:hover {
+    background-color: rgba(5, 153, 136, 0.1);
+    /* subtle hover effect */
+    color: #04756c;
+    /* darker primary on hover */
 }
 
 .profile_img {
@@ -106,17 +133,15 @@ td {
                                         Fund Source
                                     </h5>
                                     <div class="d-flex">
-                                        <button class="btn btn-primary btn-fw btn-icon-text mx-2"
-                                            @click="returnToObligation">
+                                        <button class="btn btn-primary btn-md mx-2" @click="returnToObligation">
                                             <font-awesome-icon :icon="['fas', 'arrow-left']"></font-awesome-icon>
                                             Return
                                         </button>
-                                        <button class="btn btn-success btn-fw btn-icon-text mx-2" @click="">
+                                        <button class="btn btn-success btn-md mx-2" @click="">
                                             <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
                                             Save
                                         </button>
-                                        <button type="button" class="btn btn-warning btn-fw btn-icon-text mx-2"
-                                            @click="">
+                                        <button type="button" class="btn btn-warning btn-md mx-2" @click="">
                                             <font-awesome-icon :icon="['fas', 'lock']"></font-awesome-icon>
                                             Lock
                                         </button>
@@ -187,22 +212,23 @@ td {
                                         Entries
                                     </h5>
                                     <div class="d-flex">
-                                        <button class="btn btn-primary btn-fw btn-icon-text mx-2" @click="addEntry">
+                                        <button class="btn btn-primary btn-md" @click="addEntry">
                                             <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
                                             Add Entry
                                         </button>
-                                        <button class="btn btn-success btn-fw btn-icon-text mx-2" @click="ToObjectCode">
+                                        <!--<button class="btn btn-success btn-fw btn-icon-text mx-2" @click="ToObjectCode">
                                             <font-awesome-icon :icon="['fas', 'plus']"></font-awesome-icon>
                                             Add UACS
-                                        </button>
+                                        </button>-->
                                     </div>
 
                                 </div>
 
                                 <div class="table-responsive">
-                                    <table class="table table-striped table-bordered" id="fstable">
+                                    <table class="table table-striped table-bordered" id="ufstable">
                                         <thead>
                                             <tr>
+                                                <th></th>
                                                 <th style="width: 25%;">EXPENSE CLASS</th>
                                                 <th style="width: 35%;">UACS</th>
                                                 <th style="width: 10%;">ALLOTMENT AMOUNT</th>
@@ -212,36 +238,57 @@ td {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr v-for="(fsed, index) in fundSourceEntryData" :key="index">
-                                                <td>
-                                                    <multiselect :options="ExpenseClass" v-model="fsed.expense_class"
-                                                        :multiple="false" :searchable="false"
-                                                        :custom-label="formatExpenseClass" id="expense_class">
-                                                    </multiselect>
-                                                </td>
-                                                <td>
-                                                    <multiselect @update:modelValue="testUpdate" :options="uacsData"
-                                                        v-model="fsed.uacs" track-by="id" label="code" :multiple="false"
-                                                        :searchable="false" id="uacs" />
+                                            <template v-for="(fsed, index) in fundSourceEntryData" :key="index">
+                                                <tr>
+                                                    <td>
+                                                        <span @click="toggleDetails(index)" class="details-icon">
+                                                            <font-awesome-icon
+                                                                :icon="['fas', fsed.showDetails ? 'minus' : 'plus']" />
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <multiselect :options="ExpenseClass"
+                                                            v-model="fsed.expense_class" :multiple="false"
+                                                            :searchable="false" :custom-label="formatExpenseClass"
+                                                            id="expense_class">
+                                                        </multiselect>
+                                                    </td>
+                                                    <td>
+                                                        <multiselect @update:modelValue="testUpdate" :options="uacsData"
+                                                            v-model="fsed.uacs" track-by="id" label="code"
+                                                            :multiple="false" :searchable="false" id="uacs" />
 
-                                                </td>
-                                                <!-- <td>{{ fsed.uacs }}</td> -->
-                                                <!-- <td>{{ fsed.allotment_amount }}</td> -->
-                                                <td>
-                                                    <input type="text" v-model="fsed.allotment_amount"
-                                                        class="form-control" placeholder="0.00">
-                                                </td>
-                                                <td>{{ fsed.obligated_amount }}</td>
-                                                <td>{{ fsed.balance }}</td>
-                                                <td>
-                                                    <button class="btn btn-danger btn-md" @click="removeEntry(index)">
-                                                        <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
-                                                        REMOVE
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                    <!-- <td>{{ fsed.uacs }}</td> -->
+                                                    <!-- <td>{{ fsed.allotment_amount }}</td> -->
+                                                    <td>
+                                                        <input type="text" v-model="fsed.allotment_amount"
+                                                            class="form-control" placeholder="0.00">
+                                                    </td>
+                                                    <td>{{ fsed.obligated_amount }}</td>
+                                                    <td>{{ fsed.balance }}</td>
+                                                    <td>
+                                                        <button class="btn btn-danger btn-md"
+                                                            @click="removeEntry(index)">
+                                                            <font-awesome-icon
+                                                                :icon="['fas', 'eye']"></font-awesome-icon>
+                                                            REMOVE
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                <tr v-if="fsed.showDetails">
+                                                    <td colspan="3"
+                                                        style="background-color: #f5f5f5; text-align:right;"> PO NUMBER:
+                                                    </td>
+                                                    <td> 0 </td>
+                                                    <td> 0 </td>
+                                                    <td> 0 </td>
+                                                    <td></td>
+                                                </tr>
+                                            </template>
                                             <tr>
                                                 <td colspan="2">TOTAL</td>
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -275,8 +322,8 @@ import BreadCrumbs from '../../dashboard_tiles/BreadCrumbs.vue';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
-import { faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus, faLock, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-library.add(faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus, faLock, faArrowLeft); // Add icons to the library
+import { faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus, faLock, faArrowLeft, faMinus } from '@fortawesome/free-solid-svg-icons';
+library.add(faEye, faPaperPlane, faRotate, faMagnifyingGlass, faPlus, faLock, faArrowLeft, faMinus); // Add icons to the library
 export default {
     name: 'Fund Source',
     props: {
@@ -357,7 +404,9 @@ export default {
                         const matchingUacs = this.uacsData.find(uacs => uacs.id === entry.uacs?.id || uacs.id === entry.uacs);
                         return {
                             ...entry,
-                            uacs: matchingUacs || null
+                            uacs: matchingUacs || null,
+                            showDetails: false,
+
                         };
                     });
                 })
@@ -383,10 +432,15 @@ export default {
                 allotment_amount: 0,
                 obligated_amount: 0,
                 balance: 0,
+                showDetails: false,
+
             });
         },
         removeEntry(index) {
             this.fundSourceEntryData.splice(index, 1);
+        },
+        toggleDetails(index) {
+            this.fundSourceEntryData[index].showDetails = !this.fundSourceEntryData[index].showDetails;
         },
         returnToObligation() {
             this.$router.push({ path: `/finance/budget/index` });

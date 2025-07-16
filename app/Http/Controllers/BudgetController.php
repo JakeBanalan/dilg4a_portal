@@ -6,6 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseRequestModel;
+use App\Models\ObligationModel;
+use App\Models\ObjectCodeModel;
+use App\Models\SupplierModel;
 
 
 const SUBMITTED_TO_BUDGET = 2;
@@ -18,20 +21,148 @@ const WITH_PO = 8;
 
 class BudgetController extends Controller
 {
+    public function fetchSUpplier(){
+        return response()->json(
+            SupplierModel::select(
+                'id',
+                'supplier_title',
+                'supplier_address'
+            )
+            ->get()
+        );
+    }
+    public function postObligation(Request $request)
+    {
+        $postObligation = new ObligationModel([
+            'type' => $request->type,
+            'serial_no' => $request->serial_no,
+            'po_id' => $request->po_code,
+            'address' => $request->address,
+            'purpose' => $request->purpose,
+            'amount' => $request->amount,
+            'supplier' => $request->supplier_title,
+        ]);
+        $postObligation->save();
+        return response()->json($postObligation);
+    }
+    
+    public function fetchObligationData($id)
+    {
+        $data = ObligationModel::select(
+            'tbl_obligation.id',
+            'tbl_obligation.type',
+            'tbl_obligation.serial_no',
+            'tbl_obligation.po_id',
+            'tbl_obligation.address',
+            'tbl_obligation.purpose',
+            'tbl_obligation.amount',
+            'tbl_obligation.remarks',
+            'tbl_obligation.status',
+            'tbl_obligation.is_dfunds',
+            'tbl_obligation.date_created',
+            'tbl_obligation.date_updated',
+            'tbl_obligation.date_submitted',
+            'tbl_obligation.date_received',
+            'tbl_obligation.date_obligated',
+            'tbl_obligation.date_returned',
+            'tbl_obligation.date_released',
+            's.supplier_title as supplier_title',
+            'po.po_no as po_code',
+            // 'e.employee_no as userid',
+            // 'e.username as created_by',
+            // 'sb.username as submitted_by',
+            // 'rb.username as received_by',
+            // 'obl.username as obligated_by',
+            // 'rtb.username as returned_by',
+            // 'rlb.username as released_by',
+            // 'ob.supplier as fallback_supplier',
+            // 'em.username as pr_creator',
+            // 'em.DIVISION_C as user_division',
+        )
+            ->leftJoin('po as po', 'po.id', '=', 'tbl_obligation.po_id')
+            ->leftJoin('supplier as s', 's.id', '=', 'tbl_obligation.supplier')
+            ->leftJoin('pr as pr', 'pr.id', '=', 'po.pr_id')
+            // ->leftJoin('users as e', 'e.employee_no', '=', 'tbl_obligation.created_by')
+            // ->leftJoin('users as sb', 'sb.employee_no', '=', 'tbl_obligation.submitted_by')
+            // ->leftJoin('users as rb', 'rb.employee_no', '=', 'tbl_obligation.received_by')
+            // ->leftJoin('users as obl', 'obl.employee_no', '=', 'tbl_obligation.obligated_by')
+            // ->leftJoin('users as rtb', 'rtb.employee_no', '=', 'tbl_obligation.returned_by')
+            // ->leftJoin('users as rlb', 'rlb.employee_no', '=', 'tbl_obligation.released_by')
+            // ->leftJoin('users as em', 'em.employee_no', '=', 'pr.username')
+            ->where('tbl_obligation.id', $id)
+            ->get();
+        return response()->json($data);
+    }
+    public function postObjectCode(Request $request)
+    {
+        $postOC = new ObjectCodeModel([
+            'code' => $request->code,
+            'uacs' => $request->uacs,
+        ]);
+        $postOC->save();
+        return response()->json($postOC);
+    }
     public function getPurchaseRequest(Request $request)
     {
-        $page = $request->query('page', 1);
-        $itemsPerPage = $request->query('itemsPerPage', 1000);
+        $query = PurchaseRequestModel::select(
+            'id',
+            'pr_no',
+            'purpose',
+            'is_budget_submitted',
+            'submitted_date_budget'
+        )
+            ->where('is_budget_submitted', 1)
+            ->orderBy('submitted_date_budget', 'desc');
 
-        $query = PurchaseRequestModel::select('id', 'pr_no', 'purpose', 'is_budget_submitted','submitted_date_budget') // Fixed column name
-            ->where('is_budget_submitted', 1);
+        return response()->json($query->get());
+    }
+    public function fetchObligation()
+    {
 
-        try {
-            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
-            return response()->json($prData);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while fetching data.'], 500);
-        }
+        $data = ObligationModel::select(
+            'tbl_obligation.id',
+            'tbl_obligation.type',
+            'tbl_obligation.serial_no',
+            'tbl_obligation.po_id',
+            'tbl_obligation.address',
+            'tbl_obligation.purpose',
+            'tbl_obligation.amount',
+            'tbl_obligation.remarks',
+            'tbl_obligation.status',
+            'tbl_obligation.is_dfunds',
+            'tbl_obligation.date_created',
+            'tbl_obligation.date_updated',
+            'tbl_obligation.date_submitted',
+            'tbl_obligation.date_received',
+            'tbl_obligation.date_obligated',
+            'tbl_obligation.date_returned',
+            'tbl_obligation.date_released',
+            's.supplier_title as supplier_title',
+            'po.po_no as po_code',
+            // 'e.employee_no as userid',
+            // 'e.username as created_by',
+            // 'sb.username as submitted_by',
+            // 'rb.username as received_by',
+            // 'obl.username as obligated_by',
+            // 'rtb.username as returned_by',
+            // 'rlb.username as released_by',
+            // 'ob.supplier as fallback_supplier',
+            // 'em.username as pr_creator',
+            // 'em.DIVISION_C as user_division',
+        )
+            ->leftJoin('po as po', 'po.id', '=', 'tbl_obligation.po_id')
+            ->leftJoin('supplier as s', 's.id', '=', 'tbl_obligation.supplier')
+            ->leftJoin('pr as pr', 'pr.id', '=', 'po.pr_id')
+            // ->leftJoin('users as e', 'e.employee_no', '=', 'tbl_obligation.created_by')
+            // ->leftJoin('users as sb', 'sb.employee_no', '=', 'tbl_obligation.submitted_by')
+            // ->leftJoin('users as rb', 'rb.employee_no', '=', 'tbl_obligation.received_by')
+            // ->leftJoin('users as obl', 'obl.employee_no', '=', 'tbl_obligation.obligated_by')
+            // ->leftJoin('users as rtb', 'rtb.employee_no', '=', 'tbl_obligation.returned_by')
+            // ->leftJoin('users as rlb', 'rlb.employee_no', '=', 'tbl_obligation.released_by')
+            // ->leftJoin('users as em', 'em.employee_no', '=', 'pr.username')
+            ->orderBy('tbl_obligation.id', 'desc')
+            ->get();
+        return response()->json($data);
     }
 
     public function getPurchaseOrder()

@@ -199,7 +199,16 @@ export default {
                     icon: 'book',
                     class: 'menu-icon-custom',
                     children: [
-                        { link: '/finance/budget/index', name: 'Budget Section', icon: 'book' },
+                        { link: '', 
+                        name: 'Budget Section', 
+                        icon: 'book',
+                        children: [
+                            { link: '/finance/budget/index', name: 'Fund Source', icon: 'book' },
+                            { link: '/finance/budget/object_code', name: 'UACS', icon: 'book' },
+                            { link: '/finance/budget/obligation', name: 'Obligation', icon: 'book' },
+                            { link: '/finance/budget/pr_monitoring', name: 'Procurement Budget Monitoring', icon: 'book' },
+                        ]
+                        },
                         {
                             link: '',
                             name: 'Accounting Section',
@@ -212,16 +221,6 @@ export default {
                         },
                         { link: '', name: 'Cash Section', icon: 'book' },
                         { link: '/procurement/abstract/index', name: 'Funds Downloaded', icon: 'book' },
-                    ],
-                },
-                {
-                    link: '',
-                    name: 'Budget Section',
-                    tooltip: 'Buttons',
-                    icon: 'book',
-                    class: 'menu-icon-custom',
-                    children: [
-                        { link: '/budget/obligation', name: 'Obligation', icon: 'book' },
                     ],
                 },
                 {

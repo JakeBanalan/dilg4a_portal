@@ -84,6 +84,14 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
+    Route::get('fetchObligation', [BudgetController::class, 'fetchObligation']);
+});
+
+Route::middleware('api')->group(function () {
+    Route::get('fetchObligationData/{id}', [BudgetController::class, 'fetchObligationData']);
+});
+
+Route::middleware('api')->group(function () {
     Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']);
 });
 
@@ -353,6 +361,9 @@ Route::middleware('api')->group(function () {
     Route::get('getPurchaseRequest', [BudgetController::class, 'getPurchaseRequest']);
     Route::get('getPurchaseOrder', [BudgetController::class, 'getPurchaseOrder']);
 });
+Route::middleware('api')->group(function () {
+    Route::get('fetchSupplier', [BudgetController::class, 'fetchSupplier']);
+});
 
 //USER MANAGEMENT GET
 Route::middleware('api')->group(function () {
@@ -442,6 +453,12 @@ Route::post('fetch_ict_req_details', [RICTUController::class, 'fetch_ict_req_det
 Route::post('post_complete', [CRUDController::class, 'post_complete']);
 Route::post('post_received_ict_request', [CRUDController::class, 'post_received_ict_request']);
 Route::post('getSmallestQuotationsForItems', [SupplierController::class, 'getSmallestQuotationsForItems']);
+
+//FINANCE POST
+Route::post('postFundSource', [FundSourceController::class, 'postFundSource']);
+Route::post('postObjectCode', [BudgetController::class, 'postObjectCode']);
+Route::post('deleteOC', [FundSourceController::class, 'deleteOC']);
+Route::post('postObligation', [BudgetController::class, 'postObligation']);
 
 //BUDGET POST
 Route::post('post_addCode', [BudgetController::class, 'insertCode']);

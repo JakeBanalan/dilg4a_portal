@@ -8,7 +8,7 @@ import ExampleComponent from "../components/ExampleComponent.vue";
 import DashboardComponent from "../components/DashboardComponent.vue";
 import LoginComponent from "../components/LoginComponent.vue";
 import Procurement from "../components/procurement/index.vue";
-import ProcurementMonitoring from "../components/procurement/pr_monitoring.vue";
+// import ProcurementMonitoring from "../components/procurement/pr_monitoring.vue";
 import AnnualProcurementPlan from "../components/procurement/AnnualProcurementPlan.vue";
 
 // FORMS
@@ -44,9 +44,6 @@ import ntaCreate from "../components/finance/accounting/ntaCreate.vue";
 import Disbursement from "../components/finance/accounting/disbursement.vue";
 import disbursementCreate from "../components/finance/accounting/disbursementCreate.vue";
 
-//Budget
-import budget_fundsource from "../components/budget/fundsource/index.vue";
-import budget_obligation from "../components/budget/obligation/index.vue";
 
 //HR Section
 import employees_directory from "../components/human_resource/employees_directory/index.vue";
@@ -83,7 +80,12 @@ import qms_report_submission_quarterly_lnd_entry from "../components/qms/reports
 //FINANCE
 import finance_budget from "../components/finance/budget/index.vue";
 import update_fs from "../components/finance/budget/update_fs.vue";
+import create_fs from "../components/finance/budget/create_fs.vue";
 import object_code from "../components/finance/budget/object_code.vue";
+import budget_obligation from "../components/finance/budget/obligation.vue";
+import pr_monitoring from "../components/finance/budget/pr_monitoring.vue";
+import create_obligation from "../components/finance/budget/create_obligation.vue";
+import update_obligation from "../components/finance/budget/update_obligation.vue";
 
 // settings
 import settingPanel from "../components/settings/user-management.vue";
@@ -220,10 +222,37 @@ const routes = [{
         }
     },
     {
+        path: '/finance/budget/create_fs',
+        name: 'Create Fund Source',
+        component: create_fs,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
         path: '/finance/budget/update_fs/:id',
         name: 'Fund Source',
         component: update_fs,
-
         meta: {
             requiresAuth: true
         },
@@ -252,6 +281,118 @@ const routes = [{
         path: '/finance/budget/object_code',
         name: 'Object Code',
         component: object_code,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/budget/obligation',
+        name: 'Obligation',
+        component: budget_obligation,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/budget/update_obligation/:id',
+        name: 'Update Obligation',
+        component: update_obligation,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/budget/create_obligation',
+        name: 'Create Obligation',
+        component: create_obligation,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/budget/pr_monitoring',
+        name: 'Procurement Monitoring',
+        component: pr_monitoring,
         meta: {
             requiresAuth: true
         },
@@ -306,8 +447,36 @@ const routes = [{
     },
     {
         path: '/finance/accounting/nta/:id',
-        name: 'NTA Details',
+        name: 'ntashow',
         component: ntaShow,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/finance/accounting/nta',
+        name: 'nta_nca',
+        component: nta_nca,
         meta: {
             requiresAuth: true
         },
@@ -444,34 +613,34 @@ const routes = [{
             });
         }
     },
-    {
-        path: '/procurement/pr_monitoring',
-        name: 'Procurement Monitoring',
-        component: ProcurementMonitoring,
-        meta: {
-            requiresAuth: true
-        },
-        beforeEnter: (to, from, next) => {
-            const token = localStorage.getItem('api_token');
-            axios.get('/api/authenticated', {
-                params: {
-                    api_token: token
-                }
-            }).then(response => {
-                if (response.data.authenticated) {
-                    next();
-                } else {
-                    next({
-                        name: 'Login'
-                    });
-                }
-            }).catch(() => {
-                next({
-                    name: 'Login'
-                });
-            });
-        }
-    },
+    // {
+    //     path: '/procurement/pr_monitoring',
+    //     name: 'Procurement Monitoring',
+    //     component: ProcurementMonitoring,
+    //     meta: {
+    //         requiresAuth: true
+    //     },
+    //     beforeEnter: (to, from, next) => {
+    //         const token = localStorage.getItem('api_token');
+    //         axios.get('/api/authenticated', {
+    //             params: {
+    //                 api_token: token
+    //             }
+    //         }).then(response => {
+    //             if (response.data.authenticated) {
+    //                 next();
+    //             } else {
+    //                 next({
+    //                     name: 'Login'
+    //                 });
+    //             }
+    //         }).catch(() => {
+    //             next({
+    //                 name: 'Login'
+    //             });
+    //         });
+    //     }
+    // },
     {
         path: '/procurement/AnnualProcurementPlan',
         name: 'Annual Procurement Plan',
@@ -1461,63 +1630,6 @@ const routes = [{
             });
         }
 
-    },
-
-    {
-        path: '/budget/fundsource',
-        name: 'Fund Source 2',
-        component: budget_fundsource,
-        meta: {
-            requiresAuth: true
-        },
-        beforeEnter: (to, from, next) => {
-            const token = localStorage.getItem('api_token');
-            axios.get('/api/authenticated', {
-                params: {
-                    api_token: token
-                }
-            }).then(response => {
-                if (response.data.authenticated) {
-                    next();
-                } else {
-                    next({
-                        name: 'Login'
-                    });
-                }
-            }).catch(() => {
-                next({
-                    name: 'Login'
-                });
-            });
-        }
-    },
-    {
-        path: '/budget/obligation',
-        name: 'Obligation',
-        component: budget_obligation,
-        meta: {
-            requiresAuth: true
-        },
-        beforeEnter: (to, from, next) => {
-            const token = localStorage.getItem('api_token');
-            axios.get('/api/authenticated', {
-                params: {
-                    api_token: token
-                }
-            }).then(response => {
-                if (response.data.authenticated) {
-                    next();
-                } else {
-                    next({
-                        name: 'Login'
-                    });
-                }
-            }).catch(() => {
-                next({
-                    name: 'Login'
-                });
-            });
-        }
     },
     {
         path: '/human_resource/employees_directory/index',
