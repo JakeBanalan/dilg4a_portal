@@ -44,7 +44,10 @@
                                         </tr>
                                     </tbody>
                                     <tbody v-else>
-                                        <tr v-for="disbursement in disbursements" :key="disbursement.id">
+                                        <tr v-if="disbursements.length === 0">
+                                            <td colspan="8" class="text-center">No records found.</td>
+                                        </tr>
+                                        <tr v-else v-for="disbursement in disbursements" :key="disbursement.id">
                                             <td>{{ disbursement.dv }}</td>
                                             <td>{{ disbursement.ors }}</td>
                                             <td>{{ disbursement.payee }}</td>
@@ -80,7 +83,7 @@
         <!-- Edit Modal -->
         <div v-if="showEditModal" class="modal fade show" tabindex="-1"
             style="display: block; background: rgba(0,0,0,0.5);">
-            <div class="modal-dialog modal-lg">
+            <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Disbursement</h5>
