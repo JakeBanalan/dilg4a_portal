@@ -83,6 +83,7 @@ export default {
         },
         proceed() {
             const rfq_id = this.id;
+            console.log(this.aoq_no);
             console.log(rfq_id);
             axios.post('/api/PostAbstract', {
                 abstract_no: this.aoq_no,
@@ -111,11 +112,6 @@ export default {
 </script>
 
 <style>
-.selected img {
-    border: 2px solid #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}
-
 /* Custom styles for text overflow with ellipsis */
 .multiselect__tags #modal_multi {
     display: flex;

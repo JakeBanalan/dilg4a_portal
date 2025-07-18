@@ -8,7 +8,7 @@ import ExampleComponent from "../components/ExampleComponent.vue";
 import DashboardComponent from "../components/DashboardComponent.vue";
 import LoginComponent from "../components/LoginComponent.vue";
 import Procurement from "../components/procurement/index.vue";
-// import ProcurementMonitoring from "../components/procurement/pr_monitoring.vue";
+import ProcurementMonitoring from "../components/procurement/pr_monitoring.vue";
 import AnnualProcurementPlan from "../components/procurement/AnnualProcurementPlan.vue";
 
 // FORMS
@@ -391,7 +391,7 @@ const routes = [{
     },
     {
         path: '/finance/budget/pr_monitoring',
-        name: 'Procurement Monitoring',
+        name: 'Procurement Monitoring1',
         component: pr_monitoring,
         meta: {
             requiresAuth: true
@@ -613,34 +613,34 @@ const routes = [{
             });
         }
     },
-    // {
-    //     path: '/procurement/pr_monitoring',
-    //     name: 'Procurement Monitoring',
-    //     component: ProcurementMonitoring,
-    //     meta: {
-    //         requiresAuth: true
-    //     },
-    //     beforeEnter: (to, from, next) => {
-    //         const token = localStorage.getItem('api_token');
-    //         axios.get('/api/authenticated', {
-    //             params: {
-    //                 api_token: token
-    //             }
-    //         }).then(response => {
-    //             if (response.data.authenticated) {
-    //                 next();
-    //             } else {
-    //                 next({
-    //                     name: 'Login'
-    //                 });
-    //             }
-    //         }).catch(() => {
-    //             next({
-    //                 name: 'Login'
-    //             });
-    //         });
-    //     }
-    // },
+    {
+        path: '/procurement/pr_monitoring',
+        name: 'Procurement Monitoring',
+        component: ProcurementMonitoring,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
     {
         path: '/procurement/AnnualProcurementPlan',
         name: 'Annual Procurement Plan',

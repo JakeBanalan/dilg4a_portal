@@ -74,7 +74,7 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label>Address:</label>
-                                                        <input type="text" v-model="ObligationData.address"
+                                                        <input type="text"
                                                             :value="ObligationData.supplier_title?.supplier_address || ''"
                                                             class="form-control" id="address" readonly />
                                                     </div>

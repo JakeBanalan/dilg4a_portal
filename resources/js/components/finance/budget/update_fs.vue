@@ -278,7 +278,7 @@ td {
                                                 </tr>
                                                 <tr v-if="fsed.showDetails">
                                                     <td colspan="3"
-                                                        style="background-color: #f5f5f5; text-align:right;"> PO NUMBER:
+                                                        style="background-color: #f5f5f5; text-align:right;"> TEST 1:
                                                     </td>
                                                     <td> 0 </td>
                                                     <td> 0 </td>
@@ -287,7 +287,7 @@ td {
                                                 </tr>
                                             </template>
                                             <tr>
-                                                <td colspan="2">TOTAL</td>
+                                                <td colspan="3">TOTAL</td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>

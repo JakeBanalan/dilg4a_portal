@@ -344,7 +344,8 @@
                                                             :value="grandchild.value" v-model="selectedSidebarItems"
                                                             :disabled="!selectedSidebarItems.includes(child.value)" />
                                                         <label class="form-check-label text-muted"
-                                                            :for="grandchild.value" style="font-size: 0.9rem; margin-left: 2.75rem;">
+                                                            :for="grandchild.value"
+                                                            style="font-size: 0.9rem; margin-left: 2.75rem;">
                                                             {{ grandchild.label }}
                                                         </label>
                                                     </div>
@@ -467,7 +468,8 @@ export default {
                         { label: 'APP', value: '/procurement/AnnualProcurementPlan' },
                         { label: 'Purchase Request', value: '/procurement/index' },
                         { label: 'R.F.Q', value: '/procurement/rfq/index' },
-                        { label: 'Philgeps Awarding', value: '/procurement/abstract/index' },
+                        { label: 'Abstract of Quotation', value: '/procurement/abstract/index' },
+                        // { label: 'Philgeps Awarding', value: '/procurement/abstract/index' },
                         { label: 'Monitoring', value: '/procurement/pr_monitoring' },
                     ],
                 },
@@ -497,14 +499,15 @@ export default {
                     label: 'Finance',
                     value: 'finance',
                     children: [
-                        { label: 'Budget', 
-                        value: 'Budget', 
-                        children: [
-                            { label: 'Fund Source', value: '/finance/budget/index' },
-                            { label: 'UACS', value: '/finance/budget/object_code' },
-                            { label: 'Obligation', value: '/finance/budget/obligation' },
-                            { label: 'Budget PR Monitoring', value: '/finance/budget/pr_monitoring' },
-                        ]
+                        {
+                            label: 'Budget',
+                            value: 'Budget',
+                            children: [
+                                { label: 'Fund Source', value: '/finance/budget/index' },
+                                { label: 'UACS', value: '/finance/budget/object_code' },
+                                { label: 'Obligation', value: '/finance/budget/obligation' },
+                                { label: 'Budget PR Monitoring', value: '/finance/budget/pr_monitoring' },
+                            ]
                         },
                         {
                             label: 'Accounting',
