@@ -19,7 +19,7 @@ class AbstractModel extends Model
         'abstract_no',
         'rfq_no',
         'supplier_id',
-        'date_created',
+        'abstract_date',
         'updated_at',
         'created_at'
     ];

@@ -12,7 +12,8 @@
     background-color: #059886;
     color: #fff;
 }
-td{
+
+td {
     text-align: center;
 }
 </style>x
@@ -30,7 +31,7 @@ td{
 
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div v-if="isCardVisible">
-                                <AbstractInfo />
+                                <!-- <AbstractInfo /> -->
                             </div>
                         </div>
 
@@ -60,12 +61,12 @@ td{
                                             <thead>
                                                 <tr>
                                                     <th style="max-width: 30px;">ACTIONS</th>
-                                                    <th>STATUS</th>
+                                                    <!-- <th>STATUS</th> -->
                                                     <th>PURCHASE REQUEST #</th>
                                                     <th>REQUEST FOR QUOTATION #</th>
                                                     <th>ABSTRACT #</th>
                                                     <th>PURCHASE ORDER</th>
-                                                    <th style="max-width: 100px;">P.O AMOUNT</th>
+                                                    <!-- <th style="max-width: 100px;">P.O AMOUNT</th> -->
                                                     <th>OFFICE</th>
 
                                                 </tr>
@@ -85,28 +86,36 @@ td{
                                                                 :icon="['fas', 'eye']"></font-awesome-icon>
 
                                                         </button>
-                                                        <button class="btn btn-icon mr-1" @click="exportAbstract(abstract_data.rfq_id)"
+                                                        <button class="btn btn-icon mr-1"
+                                                            @click="exportAbstract(abstract_data.rfq_id)"
                                                             style="background-color:#059886;color:#fff;">
                                                             <font-awesome-icon
                                                                 :icon="['fas', 'download']"></font-awesome-icon>
 
                                                         </button>
                                                     </td>
-                                                    <td >
+                                                    <!-- <td >
                                                         <div class="badge badge-success">{{ abstract_data.status }}
                                                         </div>
-                                                    </td>
+                                                    </td> -->
 
-                                                    <td >
-                                                        <b>{{ abstract_data.pr_no }}</b><br>~ PR Date: {{ abstract_data.pr_date }}~
+                                                    <td>
+                                                        <b>{{ abstract_data.pr_no }}</b><br>~ PR Date: {{
+                                                            abstract_data.pr_date }}~
 
                                                     </td>
-                                                    <td > <b>{{ abstract_data.rfq_no }}</b><br> ~ RFQ Date: {{abstract_data.rfq_date}} ~</td>
-                                                    <td > <b>{{ abstract_data.abstract_no }}</b><br> ~ Astract Date: {{abstract_data.abstract_date}} ~</td>
-                                                    <td v-if="abstract_data.po_no" > <b>{{ abstract_data.po_no }}</b><br> ~ Purchase Order Date: {{abstract_data.po_date}} ~ </td>
-                                                    <td v-else> <div class="badge badge-success" @click="create_po(abstract_data.rfq_id)">Create P.O</div> </td>
-                                                    <td style="width: 100px;">
-                                                        <font-awesome-icon :icon="['fas', 'peso-sign']" /> {{ this.$formatTotalAmount(abstract_data.po_amount) }}</td>
+                                                    <td> <b>{{ abstract_data.rfq_no }}</b><br> ~ RFQ Date:
+                                                        {{ abstract_data.rfq_date }} ~</td>
+                                                    <td> <b>{{ abstract_data.abstract_no }}</b><br> ~ Astract Date:
+                                                        {{ abstract_data.abstract_date }} ~</td>
+                                                    <td v-if="abstract_data.po_no"> <b>{{ abstract_data.po_no }}</b><br>
+                                                        ~ Purchase Order Date: {{ abstract_data.po_date }} ~ </td>
+                                                    <td v-else>
+                                                        <div class="badge badge-success"
+                                                            @click="create_po(abstract_data.rfq_id)">Create P.O</div>
+                                                    </td>
+                                                    <!-- <td style="width: 100px;">
+                                                        <font-awesome-icon :icon="['fas', 'peso-sign']" /> {{ this.$formatTotalAmount(abstract_data.po_amount) }}</td> -->
                                                     <td>{{ abstract_data.office }}</td>
                                                 </tr>
 
@@ -125,7 +134,7 @@ td{
                 </div>
             </div>
         </div>
-        <SelectSupplierModal :visible="modalVisible" @close="closeModal" />
+        <ModalAOQ :visible="modalVisible" :rfq_no="rfq_no" :id="id" @close="closeModal" />
 
     </div>
 </template>
@@ -140,14 +149,15 @@ import BreadCrumbs from '../../dashboard_tiles/BreadCrumbs.vue';
 import UserInfo from '../../procurement/user_info.vue';
 import Pagination from '../Pagination.vue';
 import SelectSupplierModal from "./modal/modal_select_supplier.vue";
-import AbstractInfo from "./panel/abstract_info.vue";
-
+// import AbstractInfo from "./panel/abstract_info.vue";
+import ModalAOQ from '../../procurement/abstract/modal/modal_confirm_abstract.vue';
+import Multiselect from 'vue-multiselect';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
 import { faCircleCheck, faCircleInfo, faDownload, faEye, faLayerGroup, faList, faPesoSign } from '@fortawesome/free-solid-svg-icons';
 
 
-library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign,faDownload);
+library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign, faDownload);
 
 export default {
     name: 'Abstract of Quotation',
@@ -163,6 +173,7 @@ export default {
         }
     },
     components: {
+        Multiselect,
         Navbar,
         Sidebar,
         FooterVue,
@@ -171,7 +182,8 @@ export default {
         Pagination,
         FontAwesomeIcon,
         SelectSupplierModal,
-        AbstractInfo,
+        // AbstractInfo,
+        ModalAOQ,
         // StatBox
     },
     computed: {
@@ -205,6 +217,7 @@ export default {
             axios.get(`../../api/load_abstract_data`)
                 .then(response => {
                     this.abstract_data = response.data.data;
+                    console.log(this.abstract_data);
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);

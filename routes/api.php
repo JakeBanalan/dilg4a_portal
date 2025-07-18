@@ -99,6 +99,10 @@ Route::middleware('api')->group(function () {
 Route::middleware('api')->group(function () {
     Route::get('get_purchase_request_details', [PurchaseRequestController::class, 'getPurchaseRequestDetails']);
 });
+Route::middleware('api')->group(function () {
+    Route::get('pr_monitoring_stats', [PurchaseRequestController::class, 'pr_monitoring_stats']);
+});
+Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
 
 Route::middleware('api')->group(function () {
     Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);

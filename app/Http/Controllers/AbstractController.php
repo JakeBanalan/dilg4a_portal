@@ -55,7 +55,8 @@ class AbstractController extends Controller
         return response()->json(
             AbstractModel::selectRaw('abstract_no,
                  DATE_FORMAT(abstract_date, "%M %d, %Y") as abstract_date,
-                 DATE_FORMAT(abstract_date, "%h:%i %p") AS abstract_time')
+                 DATE_FORMAT(abstract_date, "%h:%i %p") AS abstract_time'
+                 )
                 ->where('id', $id)
                 ->get()
         );
@@ -116,7 +117,7 @@ class AbstractController extends Controller
                 's.supplier_title'
             )
                 ->leftJoin('supplier as s', 's.id', '=', 'tbl_supplier_quotation.supplier_id')
-                ->where('abstract_id', $id)
+                ->where('tbl_supplier_quotation.abstract_id', $id)
                 ->get()
         );
     }
@@ -167,9 +168,10 @@ class AbstractController extends Controller
     {
         $page = $request->query('page');
         $itemsPerPage = $request->query('itemsPerPage', 500);
+
         $query = AbstractModel::select(
             'tbl_abstract.id AS id',
-            DB::raw('DATE_FORMAT(tbl_abstract.date_created, "%M %d, %Y") as abstract_date'),
+            DB::raw('DATE_FORMAT(tbl_abstract.abstract_date, "%M %d, %Y") as abstract_date'),
             DB::raw('r.id AS rfq_id'),
             DB::raw('tbl_abstract.abstract_no AS abstract_no'),
             DB::raw('r.rfq_no AS rfq_no'),
@@ -182,7 +184,7 @@ class AbstractController extends Controller
             DB::raw('pmo.pmo_title AS office'),
             DB::raw('s.title as status')
         )
-            ->leftJoin('tbl_rfq AS r', 'r.rfq_no', '=', 'tbl_abstract.rfq_no')
+            ->leftJoin('tbl_rfq AS r', 'r.id', '=', 'tbl_abstract.rfq_id')
             ->leftJoin('pr AS p', 'p.id', '=', 'r.pr_id')
             ->leftJoin('tbl_purchase_order as po', 'po.abstract_id', '=', 'tbl_abstract.id')
             ->leftJoin('pmo', 'pmo.id', '=', 'p.pmo')

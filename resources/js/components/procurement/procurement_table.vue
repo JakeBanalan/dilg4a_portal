@@ -242,6 +242,7 @@ export default {
                         isBudgetSubmitted: false,
                         isGSSSubmitted: false,
                     }));
+                    console.log('Data loaded for admin:', this.purchaseRequests);
                 })
                 .catch((error) => {
                     console.error('Error fetching data:', error);
@@ -271,7 +272,7 @@ export default {
             }
         },
         viewPr(pr_id, step_no) {
-            this.$router.push({ path: '/procurement/update_pr', query: { id: pr_id, step: step_no } });
+            this.$router.push({ path: '/procurement/update_pr', query: { id: pr_id } });
         },
         toBudget(id) {
             const userId = localStorage.getItem('userId');

@@ -188,7 +188,7 @@ export default {
                         { link: '/procurement/PPMP', name: 'PPMP', icon: 'list' },
                         { link: '/procurement/index', name: 'Purchase Request', icon: 'store' },
                         { link: '/procurement/rfq/index', name: 'R.F.Q', icon: 'book' },
-                        { link: '/procurement/abstract/index', name: 'Philgeps Awarding', icon: 'award' },
+                        // { link: '/procurement/abstract/index', name: 'Abstract of Quotation', icon: 'award' },
                         { link: '/procurement/pr_monitoring', name: 'Monitoring', icon: 'clipboard-list' },
                     ],
                 },

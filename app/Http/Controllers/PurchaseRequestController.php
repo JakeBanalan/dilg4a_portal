@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\PurchaseRequestItemModel;
+use App\Models\PurchaseRequestModel;
 use App\Models\AppItemModel;
 use App\Models\RFQModel;
+use App\Models\AbstractModel;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\PurchaseRequestModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use App\Models\PurchaseRequestItemModel;
+
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -25,6 +28,104 @@ const AWARDED = 7;
 const WITH_PO = 8;
 class PurchaseRequestController extends Controller
 {
+    public function pr_monitoring_stats()
+    {
+        return response()->json([
+            'total_pr' => PurchaseRequestModel::count(),
+            'total_rfq' => RFQModel::count(),
+            'total_aoq' => AbstractModel::count(),
+            'completed_pr' => PurchaseRequestModel::count(),
+        ]);
+    }
+    public function fetchPRMonitor()
+    {
+        // Step 1: Get all PRs and user info
+        $prs = DB::table('pr')
+            ->leftJoin('users', 'users.id', '=', 'pr.submitted_by')
+            ->select(
+                'pr.id as pr_id',
+                'pr.pr_no',
+                'pr.purpose',
+                'pr.target_date',
+                'pr.submitted_by',
+                DB::raw('DATE_FORMAT(pr.pr_date, "%b %d, %Y %h:%i %p") as pr_date'),
+                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as ferson"),
+            )
+            ->get()
+            ->keyBy('pr_id');
+
+        // Step 2: Get RFQs and expand comma-separated pr_ids
+        $rfqs = DB::table('tbl_rfq')->get();
+        $rfqExpanded = [];
+
+        foreach ($rfqs as $rfq) {
+            $prIds = array_filter(array_map('trim', explode(',', $rfq->pr_id)));
+            foreach ($prIds as $prId) {
+                $rfqExpanded[] = [
+                    'rfq_no' => $rfq->rfq_no,
+                    'rfq_id' => $rfq->id,
+                    'rfq_date' => \Carbon\Carbon::parse($rfq->rfq_date)->format('M d, Y h:i A'),
+                    'abstract_no' => DB::table('tbl_abstract')->where('rfq_id', $rfq->id)->value('abstract_no'),
+                    'aoq_id' => DB::table('tbl_abstract')->where('rfq_id', $rfq->id)->value('id'),
+                    'abstract_date' => DB::table('tbl_abstract')
+                        ->where('rfq_id', $rfq->id)
+                        ->selectRaw('DATE_FORMAT(abstract_date, "%b %d, %Y %h:%i %p") as abstract_date')
+                        ->value('abstract_date'),
+                    'pr_id' => (int)$prId,
+                ];
+            }
+        }
+
+        // Step 3: Track which PRs have RFQ entries
+        $final = [];
+        $seenPrIds = [];
+
+        foreach ($rfqExpanded as $row) {
+            if (isset($prs[$row['pr_id']])) {
+                $pr = $prs[$row['pr_id']];
+                $seenPrIds[] = $pr->pr_id;
+
+                $final[] = [
+                    'pr_id' => $pr->pr_id,
+                    'pr_no' => $pr->pr_no,
+                    'purpose' => $pr->purpose,
+                    'pr_date' => $pr->pr_date,
+                    'target_date' => $pr->target_date,
+                    'submitted_by' => $pr->submitted_by,
+                    'ferson' => $pr->ferson,
+                    'rfq_no' => $row['rfq_no'],
+                    'rfq_date' => $row['rfq_date'],
+                    'abstract_no' => $row['abstract_no'],
+                    'abstract_date' => $row['abstract_date'],
+                    'aoq_id' => $row['aoq_id'],
+                    'rfq_id' => $row['rfq_id'],
+                ];
+            }
+        }
+
+        // Step 4: Add PRs that do NOT have any RFQ
+        foreach ($prs as $prId => $pr) {
+            if (!in_array($prId, $seenPrIds)) {
+                $final[] = [
+                    'pr_id' => $pr->pr_id,
+                    'pr_no' => $pr->pr_no,
+                    'purpose' => $pr->purpose,
+                    'pr_date' => $pr->pr_date,
+                    'target_date' => $pr->target_date,
+                    'submitted_by' => $pr->submitted_by,
+                    'ferson' => $pr->ferson,
+                    'rfq_no' => null,
+                    'rfq_date' => null,
+                    'abstract_no' => null,
+                    'abstract_date' => null,
+                ];
+            }
+        }
+
+        return response()->json($final);
+    }
+
+
 
 
     public function generatePurchaseRequestNo($cur_year = null)
