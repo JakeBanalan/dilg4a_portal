@@ -19,21 +19,14 @@ class AppItemModel extends Model
     protected $fillable = [
         'id',
         'sn',
-        'code',
-        'new_entry',
-        'merge_code',
+        'pmo_id',
         'item_title',
         'unit_id',
-        'source_of_funds_id',
         'category_id',
-        'pmo_id',
-        'qty',
         'mode',
-        'price',
-        'app_price',
         'remarks',
         'app_year',
         'created_at',
-        'description'
+        'app_status'
     ];
 }

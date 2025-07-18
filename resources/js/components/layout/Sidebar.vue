@@ -185,7 +185,7 @@ export default {
                     icon: 'cart-shopping',
                     class: 'menu-icon-custom',
                     children: [
-                        { link: '/procurement/AnnualProcurementPlan', name: 'APP', icon: 'list' },
+                        { link: '/procurement/PPMP', name: 'PPMP', icon: 'list' },
                         { link: '/procurement/index', name: 'Purchase Request', icon: 'store' },
                         { link: '/procurement/rfq/index', name: 'R.F.Q', icon: 'book' },
                         { link: '/procurement/abstract/index', name: 'Philgeps Awarding', icon: 'award' },

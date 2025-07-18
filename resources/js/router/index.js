@@ -391,7 +391,7 @@ const routes = [{
     },
     {
         path: '/finance/budget/pr_monitoring',
-        name: 'Procurement Monitoring',
+        name: 'Purchase Request Monitoring',
         component: pr_monitoring,
         meta: {
             requiresAuth: true
@@ -642,8 +642,8 @@ const routes = [{
     //     }
     // },
     {
-        path: '/procurement/AnnualProcurementPlan',
-        name: 'Annual Procurement Plan',
+        path: '/procurement/PPMP',
+        name: 'Project Procurement Plan',
         component: AnnualProcurementPlan,
         meta: {
             requiresAuth: true
@@ -671,7 +671,7 @@ const routes = [{
     },
     {
         path: '/procurement/add_app_item',
-        name: 'Add Annual Procurement Plan Item',
+        name: 'Add PPMP',
         component: AddAppItem,
         meta: {
             requiresAuth: true

@@ -39,7 +39,7 @@
         </thead>
         <tbody>
             <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
-                <td v-if="role == 'admin'">
+                <td v-if="role == 'admin' || role == 'user'">
                     <div v-if="purchaseRequest.status_id == 1">
                         <button title="View" type="button" class="btn btn-icon mr-1"
                             style="background-color:#059886;color:#fff;"
@@ -228,7 +228,7 @@ export default {
             this.loadDataPerUser(); // Non-admin sees only their own requests
         }
     },
-    
+
     methods: {
         dateFormat(date) {
             return formatDate(date);

@@ -31,102 +31,48 @@
 </style>
 <template>
     <div class="container-scroller">
-        <!-- partial:partials/_navbar.html -->
-        <Navbar></Navbar>
-        <!-- partial -->
+        <Navbar />
         <div class="container-fluid page-body-wrapper">
-
-
-            <!-- partial -->
-            <!-- partial:partials/_sidebar.html -->
             <Sidebar />
-            <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <form class="form-sample" @submit.prevent="submitAppItem">
-
                         <div class="row">
-                            <div class="col-md-6 grid-margin stretch-card">
+                            <div class="col-md-12 grid-margin stretch-card">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h4 class="card-title"></h4>
-
-                                        <div class="form-group">
-                                            <label>Stock Number</label>
-                                            <input type="text" class="form-control" placeholder="Stock Number"
-                                                v-model="formData.sn" readonly>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Item Code</label>
-                                            <input type="text" class="form-control" placeholder="Item Code"
-                                                v-model="formData.code">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Item Name</label>
-                                            <input type="text" class="form-control" placeholder="Item Name"
-                                                v-model="formData.item_title">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Unit</label>
-                                            <select class="form-control form-control-lg" v-model="formData.unit_id">
-                                                <option v-for="option in unitOption" :key="option.value"
-                                                    :value="option.value">{{ option.label }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="exampleFormControlSelect1">Source of Funds</label>
-                                            <select class="form-control form-control-lg"
-                                                v-model="formData.source_of_funds_id">
-                                                <option v-for="option in fundsOption" :key="option.value"
-                                                    :value="option.value">{{ option.label }}</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 grid-margin stretch-card">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h4 class="card-title"></h4>
-
-                                        <div class="form-group">
-                                            <label for="exampleFormControlSelect1">Category</label>
-                                            <v-select v-model="formData.category_id" :options="categoriesOption"
-                                                label="label" :reduce="option => option.value" />
-                                            <div class="form-group">
-                                                <label>Office</label>
-
-                                                <select class="form-control form-control-lg" v-model="formData.pmo_id">
-                                                    <option v-for="option in officeData" :key="option.value"
-                                                        :value="option.value">{{ option.label }}</option>
-
-                                                </select>
+                                        <h4 class="card-title">Add New Item</h4>
+                                        <p class="card-description">Enter item details below</p>
+                                        <div class="form-group row">
+                                            <label for="item-name" class="col-sm-3 col-form-label">Item Name</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="item-name"
+                                                    placeholder="Item Name" v-model="sanitizedItemTitle" />
                                             </div>
-                                            <div class="form-group">
-                                                <label>Quantity</label>
-                                                <input type="number" class="form-control" v-model="formData.qty"
-                                                    min="0">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>APP Price</label>
-                                                <input type="number" class="form-control"
-                                                    id="exampleInputConfirmPassword1" min="0"
-                                                    v-model="formData.app_price">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Mode of Procurement</label>
-                                                <select class="form-control form-control-lg" v-model="formData.mode">
-                                                    <option v-for="option in modeOption" :key="option.value"
+
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="unit" class="col-sm-3 col-form-label">Unit</label>
+                                            <div class="col-sm-9">
+                                                <select class="form-control form-control-lg" id="unit"
+                                                    v-model="formData.unit_id">
+                                                    <option v-for="option in unitOption" :key="option.value"
                                                         :value="option.value">{{ option.label }}</option>
                                                 </select>
                                             </div>
-
-                                            <button type="submit"
-                                                class="btn btn-primary  pull-right-cancel">Submit</button>
-
-                                            <!-- Example button to trigger the toast -->
-
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="category" class="col-sm-3 col-form-label">Category</label>
+                                            <div class="col-sm-9">
+                                                <v-select v-model="formData.category_id" :options="categoriesOption"
+                                                    label="label" :reduce="option => option.value" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-12 text-right">
+                                                <button type="submit" class="btn btn-primary">Submit</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -134,16 +80,12 @@
                         </div>
                     </form>
                 </div>
-                <!-- content-wrapper ends -->
-                <!-- partial:partials/_footer.html -->
                 <FooterVue />
-                <!-- partial -->
             </div>
-            <!-- main-panel ends -->
         </div>
-        <!-- page-body-wrapper ends -->
     </div>
-</template>
+</template>>
+
 <script>
 
 import Navbar from '../layout/Navbar.vue';
@@ -157,7 +99,7 @@ import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
 export default {
-    name: 'Add Annual Procurement Plan Item',
+    name: 'Add PPMP',
     data() {
         return {
             unitOption: [
@@ -185,17 +127,6 @@ export default {
                 { value: '22', label: 'pax' },
                 { value: '23', label: 'liters' },
                 { value: '24', label: 'meters' },
-            ],
-            fundsOption: [
-                { value: '1', label: 'Regular, Local and Trust Fund' },
-                { value: '2', label: 'Local Fund' },
-                { value: '3', label: 'Regular Fund' }
-            ],
-            officeData: [
-                { value: '1', label: 'ORD' },
-                { value: '2', label: 'FAD' },
-                { value: '3', label: 'LGMED' },
-                { value: '4', label: 'LGCDD' }
             ],
             modeOption: [
                 { value: '1', label: 'Small Value Procurement' },
@@ -345,16 +276,11 @@ export default {
                 { value: '137', label: '6.1 Newspapers' },
             ],
             formData: {
-                stock_number: '',
-                item_code: '',
                 item_title: '',
-                unit: '',
-                source: '',
-                category: '',
-                office: '',
-                quantity: '',
-                app_price: '',
-                mode: '',
+                unit_id: '',
+                category_id: '',
+                userId: '',
+                app_year: new Date().getFullYear(),
             },
             cardTitle: "Please provide the needed information below. Fill out all the required fields (*)."
         }
@@ -368,19 +294,18 @@ export default {
         BreadCrumbs,
         vSelect
     },
-
-    mounted() {
-        this.getStockNumber();
+    computed: {
+        sanitizedItemTitle: {
+            get() {
+                return this.formData.item_title;
+            },
+            set(value) {
+                // Accept only letters, numbers, and spaces
+                this.formData.item_title = value.replace(/[^a-zA-Z0-9\s]/g, '');
+            }
+        }
     },
     methods: {
-        async getStockNumber() {
-            try {
-                const response = await axios.get('/api/generate-stock-number');
-                this.formData.sn = response.data.sn;
-            } catch (error) {
-                console.error('Error fetching stock number:', error);
-            }
-        },
         showToatWarning() {
             toast.warning('Wow warning!', {
                 autoClose: 1000,
@@ -396,27 +321,64 @@ export default {
                 autoClose: 1000,
             });
         },
+        mounted() {
+            this.formData.userId = localStorage.getItem('userId');
+        },
+        created() {
+            this.userId = localStorage.getItem('userId');
+        },
         async submitAppItem() {
             try {
-                const response = await axios.post('/api/app-items', this.formData);
 
-                // Show success message
-                toast.success(response.data.message, {
-                    autoClose: 1000,
-                });
+                this.formData.userId = localStorage.getItem('userId');
+                const response = await axios.post('/api/app-items', this.formData);
+                toast.success(response.data.message || 'Item added successfully!', { autoClose: 1000 });
+                // ✅ Notify the gss_admin role
+                this.notifyNewApproval();
 
                 setTimeout(() => {
-                    this.$router.push({ path: '/procurement/AnnualProcurementPlan' });
+                    this.$router.push({ path: '/procurement/PPMP' });
                 }, 1000);
-
             } catch (error) {
-                // Show error message
-                toast.error(error.response?.data?.message || "An error occurred");
+                const errorMsg = error.response?.data?.message || 'An error occurred while saving the item.';
+
+                if (error.response?.status === 422 && errorMsg.includes('Duplicated')) {
+                    toast.error('Duplicate item title. Please enter a unique title.', { autoClose: 1500 });
+                } else {
+                    toast.error(errorMsg, { autoClose: 1500 });
+                }
+
+                console.error('Submission error:', error);
             }
         },
+        notifyNewApproval() {
+            const iconPath = `${window.location.origin}/images/logo.png`;
+
+            if (Notification.permission === "granted") {
+                const notification = new Notification("New PPMP Added", {
+                    body: "A new item has been added and is awaiting approval.",
+                    icon: iconPath
+                });
+
+                notification.onclick = () => {
+                    window.open(`${window.location.origin}/procurement/PPMP`, '_blank');
+                };
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(permission => {
+                    if (permission === "granted") {
+                        const notification = new Notification("New PPMP Added", {
+                            body: "A new item has been added and is awaiting approval.",
+                            icon: iconPath
+                        });
+
+                        notification.onclick = () => {
+                            window.open(`${window.location.origin}/procurement/PPMP`, '_blank');
+                        };
+                    }
+                });
+            }
+        }
 
     },
-
-
 }
 </script>

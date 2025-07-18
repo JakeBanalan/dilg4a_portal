@@ -464,7 +464,7 @@ export default {
                     label: 'Procurement',
                     value: 'procurement',
                     children: [
-                        { label: 'APP', value: '/procurement/AnnualProcurementPlan' },
+                        { label: 'PPMP', value: '/procurement/PPMP' },
                         { label: 'Purchase Request', value: '/procurement/index' },
                         { label: 'R.F.Q', value: '/procurement/rfq/index' },
                         { label: 'Philgeps Awarding', value: '/procurement/abstract/index' },

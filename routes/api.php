@@ -92,17 +92,18 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']);
+    Route::get('fetchAppData', [AppItemController::class, 'fetchAppData']); // Fetch all app data
+    Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']); // Fetch app data by ID
 });
 
 Route::middleware('api')->group(function () {
     Route::get('get_purchase_request_details', [PurchaseRequestController::class, 'getPurchaseRequestDetails']);
 });
-Route::get('fetchAppDataById', [AppItemController::class, 'fetchAppDataById']);
 
 Route::middleware('api')->group(function () {
     Route::get('getPurchaseOrder', [SupplierController::class, 'getPurchaseOrder']);
 });
+
 Route::middleware('api')->group(function () {
     Route::get('appitems', [AppItemController::class, 'getAppData']);
 });
@@ -390,7 +391,8 @@ Route::middleware('api')->group(function () {
     Route::get('fetchUserOfficeCount', [UserManagementController::class, 'fetchUserOfficeCount']);
 });
 Route::middleware('api')->group(function () {
-    Route::get('fetchItems/{year?}', [PurchaseRequestController::class, 'fetchItems']);
+    Route::get('fetchItems', [PurchaseRequestController::class, 'fetchItems']);
+
 });
 
 Route::middleware('api')->group(function () {
@@ -426,6 +428,7 @@ Route::post('updateUserDetails', [UserController::class, 'updateUserDetails']);
 Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
 Route::post('app-items', [AppItemController::class, 'post_add_appItem']);
 Route::post('updateAppDataById/{id}',  [AppItemController::class, 'post_update_appItem']);
+Route::post('approveAppItem/{id}',  [AppItemController::class, 'approveAppItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
 Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);
