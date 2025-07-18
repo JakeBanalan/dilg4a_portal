@@ -117,17 +117,17 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="item in items" :key="item.id" id="hover">
+                                                <tr v-for="item in items" :key="item.id">
                                                     <td>{{ item.stockno }}</td>
                                                     <td>{{ item.unit }}</td>
                                                     <td>{{ item.name }}</td>
                                                     <td>{{ item.descrip }}</td>
                                                     <td>{{ item.qty }}</td>
-                                                    <td>₱{{ item.price?.toLocaleString('en-US', {
+                                                    <td>₱{{ item.unit_cost?.toLocaleString('en-US', {
                                                         minimumFractionDigits: 2,
                                                         maximumFractionDigits: 2
                                                     }) }}</td>
-                                                    <td>₱{{ (item.qty * item.price)?.toLocaleString('en-US', {
+                                                    <td>₱{{ item.abc?.toLocaleString('en-US', {
                                                         minimumFractionDigits: 2,
                                                         maximumFractionDigits: 2
                                                     }) }}</td>
@@ -153,7 +153,7 @@
                         <div class="modal" v-if="addItemModalVisible" id="addEditModal"
                             style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
                             <div class="modal-dialog"
-                                style=" margin: auto; position: relative; transform: translateY(15%); ">
+                                style="margin: auto; position: relative; transform: translateY(15%);">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <div
@@ -181,17 +181,18 @@
                                             <div class="form-group">
                                                 <label>Quantity</label>
                                                 <input type="number" class="form-control" id="itemQuantity"
-                                                    v-model.number="addMoreItem.qty" min="0">
+                                                    v-model.number="addMoreItem.qty" min="1"
+                                                    placeholder="Enter quantity">
                                             </div>
                                             <div class="form-group">
-                                                <label>ABC</label>
+                                                <label>Unit Cost</label> <!-- Renamed from "ABC" -->
                                                 <input type="number" class="form-control" v-model="addMoreItem.price"
-                                                    readonly>
+                                                    min="0.01" placeholder="Enter unit cost">
                                             </div>
                                             <div class="form-group">
                                                 <label>Description</label>
                                                 <textarea rows="1" v-model="addMoreItem.descrip"
-                                                    @keyup.enter="addItem"></textarea>
+                                                    placeholder="Enter description"></textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -241,7 +242,7 @@
                                             <div class="form-group">
                                                 <label for="editItemPrice">ABC</label>
                                                 <input type="number" class="form-control" id="editItemPrice"
-                                                    v-model="editItem.price" readonly>
+                                                    v-model="editItem.unit_cost">
                                             </div>
                                             <div class="form-group">
                                                 <label for="editItemDescription">Description</label>
@@ -361,8 +362,8 @@ export default {
     },
     computed: {
         grandTotal() {
-            return this.items.reduce((total, item) => {
-                return total + (item.qty * item.price);
+            return this.items.reduce((sum, item) => {
+                return sum + (item.qty * item.unit_cost);
             }, 0);
         },
         isUrgent() {
@@ -379,21 +380,14 @@ export default {
                 autoClose: 1000,
             });
         },
-        fetchItems(year = new Date().getFullYear()) {
-            this.isLoading = true;
-            axios.get(`/api/fetchItems/${year}`)
+        fetchItems() {
+            axios.get(`/api/fetchItems`)
                 .then(response => {
-                    if (Array.isArray(response.data)) {
-                        this.availableItems = response.data;
-                    } else {
-                        console.error('Invalid response format:', response.data);
-                    }
+                    this.availableItems = response.data || [];
                 })
                 .catch(error => {
                     console.error('Error fetching items:', error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
+                    this.availableItems = [];
                 });
         },
         formatNumberWithCommas(number) {
@@ -404,17 +398,19 @@ export default {
             axios.get(`../api/viewPurchaseRequest/${id}`)
                 .then(response => {
                     const { purchaseRequest, prItems } = response.data;
-                    // Handle your data here, update your modal and form
+                    // Update purchase request data
                     this.purchaseRequestData = purchaseRequest;
-                    this.items = [...prItems.map(item => ({
+                    // Map prItems to align with the backend structure
+                    this.items = prItems.map(item => ({
                         id: item.id,
                         stockno: item.serial_no,
                         unit: item.unit,
                         name: item.item_title,
                         descrip: item.description,
                         qty: item.qty,
-                        price: item.price
-                    }))];
+                        unit_cost: item.unit_cost, // Unit cost
+                        abc: item.abc // Total cost
+                    }));
                 })
                 .catch(error => {
                     console.error('Error fetching purchase request data:', error);
@@ -430,14 +426,14 @@ export default {
             const selectedItem = this.availableItems.find(item => item.id === this.addMoreItem.id);
             if (selectedItem && Number(this.addMoreItem.qty) > 0) {
                 this.items.push({
-                    id: selectedItem.id, // Retain the ID for lookup
+                    id: selectedItem.id,
                     stockno: selectedItem.stockno,
                     unit: selectedItem.unit,
                     name: selectedItem.name,
                     descrip: this.addMoreItem.descrip,
                     qty: this.addMoreItem.qty,
-                    price: selectedItem.price,
-                    isTemporary: true // Mark this item as temporary
+                    unit_cost: this.addMoreItem.price, // Set unit cost
+                    abc: this.addMoreItem.qty * this.addMoreItem.price // Calculate total cost
                 });
                 this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' }; // Reset the form
                 this.closeAddItemModal();
@@ -448,7 +444,7 @@ export default {
         addMoreItemList() {
             const selectedItem = this.availableItems.find(item => item.id === this.addMoreItem.id);
             if (selectedItem) {
-                this.addMoreItem.price = selectedItem.price;
+                this.addMoreItem.price = selectedItem.price || 0; // Set unit cost
                 this.addMoreItem.stockno = selectedItem.stockno;
                 this.addMoreItem.unit = selectedItem.unit;
             }
@@ -487,16 +483,15 @@ export default {
                 target_date: this.purchaseRequestData.target_date,
                 purpose: this.purchaseRequestData.particulars,
                 items: this.items.map(item => ({
-                    id: item.id, // Unique identifier for existing items
+                    id: item.id,
                     qty: item.qty,
-                    price: item.price,
+                    price: item.unit_cost, // Unit cost
                     descrip: item.descrip || null, // Optional description
                 })),
             })
                 .then(response => {
                     toast.success('Purchase request and items updated successfully!', { autoClose: 1000 });
                     this.fetchPurchaseRequestData();
-                    this.closeEdit();
                 })
                 .catch(error => {
                     toast.error('Failed to update purchase request and items. Please check the console for details.', { autoClose: 1000 });
@@ -511,8 +506,8 @@ export default {
 
             const item = this.items[itemIndex];
 
-            // If the item is temporary, remove it directly without making a backend call
-            if (item.isTemporary) {
+            // If the item is temporary (not saved in the database), remove it directly
+            if (!item.id || item.isTemporary) {
                 Swal.fire({
                     title: 'Are you sure?',
                     text: 'This temporary item will be removed.',

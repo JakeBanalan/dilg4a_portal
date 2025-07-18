@@ -169,7 +169,7 @@ export default {
             axios.get(`/api/fetchSupplier`)
                 .then(response => {
                     this.selectSupplier = response.data;
-                    console.log('Suppliers fetched successfully:', this.selectSupplier);
+
                 })
                 .catch(error => {
                     console.error('Error fetching suppliers:', error);

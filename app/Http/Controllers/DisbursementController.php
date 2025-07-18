@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Log;
 use App\Models\Disbursement;
 use Illuminate\Http\Request;
 
@@ -12,17 +13,19 @@ class DisbursementController extends Controller
         $perPage = (int) $request->query('per_page', 10);
         $perPage = ($perPage > 0 && $perPage <= 100) ? $perPage : 10;
 
-        // Use caching to optimize repeated queries
-        $cacheKey = "disbursements_page_{$request->query('page', 1)}_per_page_{$perPage}";
-        $disbursements = cache()->remember($cacheKey, now()->addMinutes(5), function () use ($perPage) {
-            return Disbursement::select('ID', 'dv', 'ors', 'payee', 'particular', 'amount', 'net', 'status')
-                ->withoutTrashed() // Exclude soft-deleted records
+        $page = $request->query('page', 1);
+
+        try {
+            $disbursements = Disbursement::select('ID', 'dv', 'ors', 'payee', 'particular', 'amount', 'net', 'status')
+                ->withoutTrashed()
                 ->orderBy('updated_at', 'desc')
                 ->paginate($perPage);
-        });
-
-        return response()->json($disbursements);
+            return response()->json($disbursements);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
     }
+
 
     public function show($id)
     {
@@ -50,7 +53,7 @@ class DisbursementController extends Controller
             'gsis' => 'required|numeric|min:0',          // <-- Add this
             'pagibig' => 'required|numeric|min:0',       // <-- Add this
             'philhealth' => 'required|numeric|min:0',    // <-- Add this
-            'other_payables' => 'required|numeric|min:0',// <-- Add this
+            'other_payables' => 'required|numeric|min:0', // <-- Add this
             'lddap_entries' => 'array',
             'lddap_entries.*.lddap_number' => 'required|string|max:255',
             'lddap_entries.*.lddap_date' => 'required|date',

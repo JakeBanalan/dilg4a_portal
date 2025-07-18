@@ -104,7 +104,7 @@
                                             </div>
                                         </div>
                                         <div class="form-group row">
-                                            <label class="col-sm-3 col-form-label">Particulars:</label>
+                                            <label class="col-sm-3 col-form-label">Purpose:</label>
                                             <div class="col-sm-9">
                                                 <textarea id="tinyMceExample" rows="1" v-model="prData.particulars"
                                                     placeholder="Enter Particulars"></textarea>
@@ -211,7 +211,7 @@
                                             <div class="form-group">
                                                 <label>ABC</label>
                                                 <input type="number" class="form-control" id="itemPrice"
-                                                    v-model="newItem.price" readonly>
+                                                    v-model="newItem.price">
                                             </div>
                                             <div class="form-group">
                                                 <label>Description</label>
@@ -265,7 +265,7 @@
                                             <div class="form-group">
                                                 <label for="editItemPrice">ABC</label>
                                                 <input type="number" class="form-control" id="editItemPrice"
-                                                    v-model="editItem.price" readonly>
+                                                    v-model="editItem.price">
                                             </div>
                                             <div class="form-group">
                                                 <label for="editItemDescription">Description</label>
@@ -401,14 +401,14 @@ export default {
         formatNumberWithCommas(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
-        fetchItems(year = new Date().getFullYear()) {
-            axios.get(`/api/fetchItems/${year}`)
+        fetchItems() {
+            axios.get(`/api/fetchItems`)
                 .then(response => {
-                    this.availableItems = response.data || []; // Default to empty array
+                    this.availableItems = response.data || [];
                 })
                 .catch(error => {
                     console.error('Error fetching items:', error);
-                    this.availableItems = []; // Ensure it's always an array
+                    this.availableItems = [];
                 });
         },
 
@@ -451,7 +451,7 @@ export default {
                 items: this.items.map(item => ({
                     id: item.id,
                     quantity: item.quantity,
-                    price: item.price,
+                    price: item.price, // Unit cost
                     description: item.descrip,
                     stockno: item.stockno,
                     unit: item.unit
@@ -514,7 +514,12 @@ export default {
         addItem() {
             const selectedItem = this.availableItems.find(item => item.id === this.newItem.id);
             if (selectedItem && this.newItem.quantity > 0) {
-                this.items.push({ ...selectedItem, quantity: this.newItem.quantity, descrip: this.newItem.descrip });
+                this.items.push({
+                    ...selectedItem,
+                    quantity: this.newItem.quantity,
+                    price: this.newItem.price, // Unit cost
+                    descrip: this.newItem.descrip
+                });
                 this.newItem = { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '', unit: '' };
                 this.closeAddItemModal();
             } else {

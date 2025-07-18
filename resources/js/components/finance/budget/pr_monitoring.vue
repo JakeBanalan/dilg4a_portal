@@ -14,7 +14,7 @@
                                     <div class="card-title d-flex justify-content-between align-items-center">
                                         <h5 class="card-title">
                                             <font-awesome-icon
-                                                :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Purchase Request
+                                                :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Purchase Request Monitoring
                                         </h5>
                                     </div>
                                     <div class="table-responsive">
@@ -79,7 +79,7 @@ import { formatTotalAmount } from '../../../globalMethods';
 library.add(faCircleInfo, faList, faCircleCheck, faEye, faLayerGroup, faPesoSign, faDownload, faSearch, faUndo);
 
 export default {
-    name: 'Obligation',
+    name: 'Purchase Request Monitoring',
     data() {
         return {
             currentView: 1,

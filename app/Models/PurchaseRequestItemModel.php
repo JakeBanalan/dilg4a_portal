@@ -17,18 +17,21 @@ class PurchaseRequestItemModel extends Model
     protected $fillable = [
         'id',
         'pr_id',
-        'pr_no',
         'pr_item_id',
         'description',
-        'unit',
         'qty',
-        'abc',
+        'abc', // Total cost
+        'unit_cost', // Unit cost
         'date_added',
-        'flag'
+        'flag',
     ];
 
     public function appItem()
     {
         return $this->belongsTo(AppItemModel::class, 'pr_item_id', 'id');
+    }
+    public function getGrandTotalAttribute()
+    {
+        return $this->qty * $this->unit_cost;
     }
 }

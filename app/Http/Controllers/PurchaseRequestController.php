@@ -163,29 +163,29 @@ class PurchaseRequestController extends Controller
 
             $items = $request->input('items');
             foreach ($items as $item) {
-                // Check if the PR ID and item ID combination already exists
+                $unitCost = isset($item['price']) ? floatval($item['price']) : 0;
+                $abc = $item['quantity'] * $unitCost;
+
                 $existingItem = PurchaseRequestItemModel::where('pr_id', $pr_id)
                     ->where('pr_item_id', $item['id'])
                     ->first();
 
                 if ($existingItem) {
-                    // If the combination exists, update the quantity
                     $existingItem->qty += $item['quantity'];
-                    $existingItem->abc = $existingItem->qty * $item['price'];
+                    $existingItem->unit_cost = $unitCost; // Ensure unit_cost is updated
+                    $existingItem->abc = $existingItem->qty * $unitCost; // Recalculate total cost
                     $existingItem->save();
                 } else {
-                    // If the combination doesn't exist, insert a new record
-                    $pr_opts = new PurchaseRequestItemModel([
-                        'id'            => null,
-                        'pr_id'         => $pr_id,
-                        'pr_item_id'    => $item['id'],
-                        'description'   => $item['description'],
-                        'qty'           => $item['quantity'],
-                        'abc'           => $item['quantity'] * $item['price'],
-                        'date_added'    => now(),
-                        'flag'          => 1,
+                    PurchaseRequestItemModel::create([
+                        'pr_id' => $pr_id,
+                        'pr_item_id' => $item['id'],
+                        'description' => $item['description'],
+                        'qty' => $item['quantity'],
+                        'unit_cost' => $unitCost, // Save unit cost
+                        'abc' => $abc, // Save total cost
+                        'date_added' => now(),
+                        'flag' => 1,
                     ]);
-                    $pr_opts->save();
                 }
             }
 
@@ -212,7 +212,7 @@ class PurchaseRequestController extends Controller
                 return response()->json(['message' => 'Purchase request not found'], 404);
             }
 
-            // Update the main fields of the purchase request
+            // Update main PR fields
             $purchaseRequest->update([
                 'pmo' => $request->input('pmo'),
                 'type' => $request->input('type'),
@@ -221,88 +221,95 @@ class PurchaseRequestController extends Controller
                 'purpose' => $request->input('purpose'),
             ]);
 
-            // Validate the items array
+            // Validate items array
             $validatedData = $request->validate([
                 'items' => 'required|array',
-                'items.*.id' => 'required|integer',
+                'items.*.id' => 'nullable|integer',
                 'items.*.qty' => 'required|numeric|min:1',
-                'items.*.price' => 'required|numeric|min:0',
+                'items.*.price' => 'required|numeric|min:0', // This is the unit cost
                 'items.*.descrip' => 'nullable|string',
             ]);
 
-            // Update or add items (if any)
             $items = $validatedData['items'];
+            $processedIds = [];
+
             foreach ($items as $item) {
-                $existingItem = PurchaseRequestItemModel::find($item['id']);
+                $unitCost = isset($item['price']) ? floatval($item['price']) : 0;
+                $abc = $item['qty'] * $unitCost;
+
+                $existingItem = PurchaseRequestItemModel::find($item['id'] ?? null);
 
                 if ($existingItem) {
-                    // Update the existing item
+                    // Update existing item
                     $existingItem->update([
-                        'qty' => $item['qty'],
-                        'abc' => $item['qty'] * $item['price'],
                         'description' => $item['descrip'],
+                        'qty' => $item['qty'],
+                        'unit_cost' => $unitCost,
+                        'abc' => $abc,
+                        'date_added' => now(),
+                        'flag' => 1,
                     ]);
+                    $processedIds[] = $existingItem->id;
                 } else {
-                    $isDuplicate = PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)
-                        ->where('pr_item_id', $item['id'])
-                        ->exists();
-
-                    if (!$isDuplicate) {
-                        PurchaseRequestItemModel::create([
-                            'pr_id' => $purchaseRequest->id,
-                            'pr_item_id' => $item['id'],
-                            'description' => $item['descrip'],
-                            'qty' => $item['qty'],
-                            'abc' => $item['qty'] * $item['price'],
-                            'date_added' => now(),
-                            'flag' => 1,
-                        ]);
-                    }
+                    // Create new item
+                    $newItem = PurchaseRequestItemModel::create([
+                        'pr_id' => $purchaseRequest->id,
+                        'pr_item_id' => $item['id'] ?? null,
+                        'description' => $item['descrip'],
+                        'qty' => $item['qty'],
+                        'unit_cost' => $unitCost,
+                        'abc' => $abc,
+                        'date_added' => now(),
+                        'flag' => 1,
+                    ]);
+                    $processedIds[] = $newItem->id;
                 }
             }
+
+            // Remove items that are no longer in the updated list
+            PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)
+                ->whereNotIn('id', $processedIds)
+                ->delete();
 
             DB::commit();
 
             return response()->json([
-                'message' => 'Purchase request and items updated successfully',
+                'message' => 'Purchase request and items updated successfully.',
                 'items' => PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)->get(),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Failed to update purchase request and items'], 500);
+            return response()->json([
+                'message' => 'Update failed.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
-
-
-
-    public function fetchItems($year = null)
+    public function fetchItems()
     {
         try {
-            $query = AppItemModel::select(
+            $items = AppItemModel::select(
                 'tbl_app.id',
                 'tbl_app.item_title as name',
-                'tbl_app.app_price as price',
                 'tbl_app.sn as stockno',
                 'unit.item_unit_title as unit',
                 'tbl_app.app_year as AppYear'
             )
-                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id');
+                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
+                ->where('tbl_app.app_status', 'approve')
+                ->get();
 
-            if (!$year) {
-                $year = date('Y'); // Use the current year by default
-            }
-
-            $query->where('tbl_app.app_year', $year);
-
-            $items = $query->get();
-
-            // ✅ Return an empty array instead of 404 when no items exist
             return response()->json($items, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'An error occurred while fetching items'], 500);
         }
     }
+
+
+
+
+
 
     public function fetchPurchaseReqData(Request $request)
     {
@@ -326,14 +333,14 @@ class PurchaseRequestController extends Controller
             MAX(pr.target_date) AS `target_date`,
             MAX(pr.is_urgent) AS `is_urgent`,
             MAX(pr_items.qty) AS `quantity`,
+            SUM(pr_items.abc) AS `app_price`,
             MAX(pr_items.description) AS `desc`,
             MAX(mode.mode_of_proc_title) AS `type`,
             MAX(app.sn) AS `serial_no`,
             MAX(app.item_title) AS `item_title`,
             MAX(unit.item_unit_title) AS `unit`,
             MAX(status.title) AS `status`,
-            MAX(status.id) AS `status_id`,
-            SUM(pr_items.qty * app.app_price) AS `app_price`
+            MAX(status.id) AS `status_id`
         '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
@@ -387,6 +394,7 @@ class PurchaseRequestController extends Controller
             MAX(pr.pr_date) AS `pr_date`,
             MAX(pr.target_date) AS `target_date`,
             MAX(pr.is_urgent) AS `is_urgent`,
+            SUM(pr_items.abc) AS `app_price`,
             MAX(pr_items.qty) AS `quantity`,
             MAX(pr_items.description) AS `desc`,
             MAX(mode.mode_of_proc_title) AS `type`,
@@ -394,8 +402,7 @@ class PurchaseRequestController extends Controller
             MAX(app.item_title) AS `item_title`,
             MAX(unit.item_unit_title) AS `unit`,
             MAX(status.title) AS `status`,
-            MAX(status.id) AS `status_id`,
-            SUM(pr_items.qty * app.app_price) AS `app_price`
+            MAX(status.id) AS `status_id`
         '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
@@ -432,20 +439,10 @@ class PurchaseRequestController extends Controller
                 pr.purpose AS `particulars`,
                 pr.pr_date AS `pr_date`,
                 pr.target_date AS `target_date`,
-                pr.is_urgent AS `is_urgent`,
-                pr_items.id,
-                pr_items.qty AS `quantity`,
-                pr_items.description AS `desc`,
-                app.sn AS `serial_no`,
-                app.item_title AS `item_title`,
-                unit.item_unit_title as  `unit`,
-                app.app_price AS `price`
+                pr.is_urgent AS `is_urgent`
             '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
-            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
-            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
             ->where('pr.id', $id)
             ->first();
 
@@ -454,11 +451,20 @@ class PurchaseRequestController extends Controller
             return response()->json(['message' => 'Purchase request not found'], 404);
         }
 
-        // Get related pr_items
+        // Get related pr_items using the PurchaseRequestItemModel
         $prItems = PurchaseRequestItemModel::where('pr_id', $id)
             ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
             ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
-            ->select('pr_items.*', 'app.app_price AS price', 'app.sn as serial_no', 'app.item_title as item_title', 'unit.item_unit_title as unit')
+            ->select(
+                'pr_items.id',
+                'pr_items.qty',
+                'pr_items.unit_cost', // Include unit cost
+                'pr_items.abc', // Total cost
+                'pr_items.description',
+                'app.sn as serial_no',
+                'app.item_title as item_title',
+                'unit.item_unit_title as unit'
+            )
             ->get();
 
         // Return the data in a structured format
@@ -563,7 +569,7 @@ class PurchaseRequestController extends Controller
                 'app.sn AS serial_no',
                 'app.item_title',
                 'unit.item_unit_title AS unit',
-                'app.app_price AS price'
+                'pr_items.unit_cost AS price'
             ])
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
@@ -706,7 +712,6 @@ class PurchaseRequestController extends Controller
 
         return response()->json($formattedData);
     }
-
 
 
 
