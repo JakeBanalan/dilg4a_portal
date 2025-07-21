@@ -3,16 +3,17 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
-use App\Models\PurchaseRequestItemModel;
-use App\Models\PurchaseRequestModel;
-use App\Models\AppItemModel;
 use App\Models\RFQModel;
+use App\Models\UserModel;
+use App\Models\AppItemModel;
+use Illuminate\Http\Request;
 use App\Models\AbstractModel;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\PurchaseRequestModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+use App\Models\PurchaseRequestItemModel;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -286,10 +287,18 @@ class PurchaseRequestController extends Controller
         }
     }
 
-    public function fetchItems()
+    public function fetchItems(Request $request)
     {
+        $userId = $request->input('userId');
+
+        $user = UserModel::find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
         try {
-            $items = AppItemModel::select(
+            $query = AppItemModel::select(
                 'tbl_app.id',
                 'tbl_app.item_title as name',
                 'tbl_app.sn as stockno',
@@ -297,8 +306,14 @@ class PurchaseRequestController extends Controller
                 'tbl_app.app_year as AppYear'
             )
                 ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
-                ->where('tbl_app.app_status', 'approve')
-                ->get();
+                ->where('tbl_app.app_status', 'approve');
+
+            // Filter by pmo_id if not gss_admin
+            if ($user->user_role !== 'gss_admin') {
+                $query->where('tbl_app.pmo_id', $user->pmo_id);
+            }
+
+            $items = $query->get();
 
             return response()->json($items, 200);
         } catch (\Exception $e) {
@@ -311,20 +326,30 @@ class PurchaseRequestController extends Controller
 
 
 
+
     public function fetchPurchaseReqData(Request $request)
     {
-        $page = $request->query('page', 1); // Default to page 1 if not provided
-        $itemsPerPage = $request->query('itemsPerPage', 10000); // Consider a lower default
+        $page = $request->query('page', 1);
+        $itemsPerPage = $request->query('itemsPerPage', 10000);
+
+        $userId = $request->input('user_id');
+        $user = UserModel::find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
         $prNo = $request->input('pr_no');
         $actionOfficer = $request->input('action_officer');
         $prDate = $request->input('pr_date');
         $pmo = $request->input('pmo');
         $status = $request->input('status');
+
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
             pr.id AS `id`,
             MAX(pr.pr_no) AS `pr_no`,
             MAX(pr.action_officer) AS `user_id`,
-            CONCAT(MAX(users.first_name), " " , MAX(users.last_name)) AS `created_by`,
+            CONCAT(MAX(users.first_name), " ", MAX(users.last_name)) AS `created_by`,
             MAX(pr.current_step) AS `step`,
             MAX(pmo.pmo_title) AS `office`,
             MAX(pr.submitted_by) AS `submitted_by`,
@@ -347,10 +372,12 @@ class PurchaseRequestController extends Controller
             ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
             ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
             ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id') // Adjusted join
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
             ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
             ->orderBy('pr.id', 'desc')
             ->groupBy('pr.id');
+
+        // Filters
         if ($prNo) {
             $query->where('pr.pr_no', 'like', '%' . $prNo . '%');
         }
@@ -367,6 +394,11 @@ class PurchaseRequestController extends Controller
             $query->where('status.title', 'like', '%' . $status . '%');
         }
 
+        // Apply user-specific filtering unless gss_admin
+        if (!in_array($user->user_role, ['gss_admin', 'budget_admin'])) {
+            $query->where('pr.action_officer', $user->id);
+        }
+
         try {
             $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
         } catch (\Exception $e) {
@@ -376,11 +408,18 @@ class PurchaseRequestController extends Controller
         return response()->json($prData);
     }
 
+
     public function perUserPurchaseReqData(Request $request)
     {
-        $page = $request->query('page', 1); // Default to page 1 if not provided
-        $itemsPerPage = $request->query('itemsPerPage', 10000); // Default to 10 items per page
-        $userId = $request->input('user_id', auth()->id()); // Use provided user_id or authenticated user
+        $page = $request->query('page', 1);
+        $itemsPerPage = $request->query('itemsPerPage', 10000);
+
+        $userId = $request->input('user_id');
+        $user = UserModel::find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
 
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
             pr.id AS `id`,
@@ -409,11 +448,14 @@ class PurchaseRequestController extends Controller
             ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
             ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
             ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id') // Adjusted join
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
             ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
-            ->where('pr.action_officer', $userId) // Filter by the user_id
             ->orderBy('pr.id', 'desc')
             ->groupBy('pr.id');
+
+        if (!in_array($user->user_role, ['gss_admin', 'budget_admin'])) {
+            $query->where('pr.action_officer', $user->id);
+        }
 
         try {
             $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
@@ -423,6 +465,7 @@ class PurchaseRequestController extends Controller
 
         return response()->json($prData);
     }
+
 
 
 
@@ -537,8 +580,6 @@ class PurchaseRequestController extends Controller
             return response()->json(['message' => 'Failed to delete item.'], 500);
         }
     }
-
-
 
 
 

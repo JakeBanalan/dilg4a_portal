@@ -24,6 +24,7 @@
 }
 </style>
 <template>
+
     <table id="pr_id" class="table table-striped table-bordered mb-3">
         <thead>
             <tr role="row">
@@ -39,7 +40,7 @@
         </thead>
         <tbody>
             <tr v-for="purchaseRequest in displayedItems" :key="purchaseRequest.id">
-                <td v-if="role == 'admin' || role == 'user'">
+                <td v-if="role == 'admin' || role == 'user' || role == 'gss_admin' || role == 'budget_admin'">
                     <div v-if="purchaseRequest.status_id == 1">
                         <button title="View" type="button" class="btn btn-icon mr-1"
                             style="background-color:#059886;color:#fff;"
@@ -61,6 +62,7 @@
                             <font-awesome-icon :icon="['fas', 'trash']" style="margin-left: -3px;" />
                         </button>
                     </div>
+
                     <div
                         v-else-if="purchaseRequest.status_id == 2 || purchaseRequest.status_id == 3 || purchaseRequest.status_id == 4 || purchaseRequest.status_id == 5">
                         <button title="View" type="button" class="btn btn-icon mr-1"
@@ -69,12 +71,20 @@
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
                         <button title="Send to GSS"
-                            v-if="purchaseRequest.status_id == 2 && !purchaseRequest.isGSSSubmitted" type="button"
-                            class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
+                            v-if="role === 'gss_admin' && purchaseRequest.status_id == 2 && !purchaseRequest.isGSSSubmitted"
+                            type="button" class="btn btn-icon mr-1" style="background-color:#059886;color:#fff;"
                             @click="toGSS(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'paper-plane']" style="margin-left: -3px;" />
                         </button>
+                        <!-- Custom button for budget_admin -->
+                        <button
+                            v-if="role === 'budget_admin' && purchaseRequest.status_id == 2 && !purchaseRequest.isGSSSubmitted"
+                            title="Mark Budget Approval" type="button" class="btn btn-icon mr-1"
+                            style="background-color:#ffc107;color:#000;" @click="approveBudget(purchaseRequest.id)">
+                            <font-awesome-icon :icon="['fas', 'thumbs-up']" style="margin-left: -3px;" />
+                        </button>
                     </div>
+
                     <div v-else-if="purchaseRequest.status_id == 6">
                         <button title="View" type="button" class="btn btn-icon mr-1"
                             style="background-color:#059886;color:#fff;"
@@ -124,9 +134,20 @@
                 <td>{{ dateFormat(purchaseRequest.target_date) }}</td>
                 <td>{{ purchaseRequest.created_by }}</td>
             </tr>
-        </tbody>
 
+        </tbody>
     </table>
+    <!-- Budget Approval Modal -->
+    <div v-if="showBudgetApprovalModal" class="modal-backdrop">
+        <div class="modal-content">
+            <h5>Approve Budget</h5>
+            <p>Are you sure you want to approve this purchase request?</p>
+            <div class="text-right">
+                <button class="btn btn-secondary mr-2" @click="showBudgetApprovalModal = false">Cancel</button>
+                <button class="btn btn-warning" @click="submitBudgetApproval">Confirm</button>
+            </div>
+        </div>
+    </div>
     <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
     <Pagination :total="totalRecords" :currentPage="currentPage" :itemsPerPage="itemsPerPage"
         @pageChange="onPageChange" />
@@ -137,11 +158,11 @@ import axios from 'axios';
 import Pagination from './Pagination.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faDownload, faEye, faPaperPlane, faShareSquare, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faEye, faPaperPlane, faShareSquare, faTrash, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { toast } from "vue3-toastify";
 import { formatDate } from '../../globalMethods';
 import { eventBus } from '../eventBus.js';
-library.add(faEye, faPaperPlane, faDownload, faTrash, faShareSquare);
+library.add(faEye, faPaperPlane, faDownload, faTrash, faShareSquare, faThumbsUp);
 
 export default {
     data() {
@@ -151,6 +172,8 @@ export default {
             purchaseRequests: [],
             currentPage: 1,
             itemsPerPage: 10,
+            selectedPrId: null,
+            showBudgetApprovalModal: false,
         };
     },
     props: {
@@ -168,7 +191,7 @@ export default {
         filterParams: {
             handler() {
                 this.currentPage = 1; // Reset currentPage to 1
-                if (this.role === 'admin') {
+                if (this.role === 'gss_admin' || this.role === 'budget_admin' || this.role === 'admin') {
                     this.loadData(this.filterParams);
                 } else {
                     this.loadDataPerUser(this.filterParams);
@@ -221,14 +244,9 @@ export default {
         this.role = localStorage.getItem('user_role');
     },
     mounted() {
-        // Load data for specific user or all users based on role
-        if (this.role === 'admin') {
-            this.loadData(); // Admin sees all requests
-        } else {
-            this.loadDataPerUser(); // Non-admin sees only their own requests
-        }
+        this.loadData();
+        this.loadDataPerUser();
     },
-
     methods: {
         dateFormat(date) {
             return formatDate(date);
@@ -273,6 +291,46 @@ export default {
         },
         viewPr(pr_id, step_no) {
             this.$router.push({ path: '/procurement/update_pr', query: { id: pr_id } });
+        },
+        approveBudget(id) {
+            this.selectedPrId = id;
+            this.showBudgetApprovalModal = true;
+        },
+        submitBudgetApproval() {
+            const userId = localStorage.getItem('userId');
+            axios.post(`../api/updatePurchaseRequestStatus`, {
+                id: this.selectedPrId,
+                status: 3,
+                submitted_by_budget: userId,
+                is_budget_submitted: true,
+            })
+                .then(() => {
+                    const updatedRequest = this.purchaseRequests.find((pr) => pr.id === this.selectedPrId);
+                    if (updatedRequest) {
+                        updatedRequest.isBudgetSubmitted = true;
+                    }
+                    toast.success('Successfully approved budget!', {
+                        autoClose: 2000,
+                        onClose: () => {
+                            if (this.role === 'admin') {
+                                this.loadData();
+                            } else {
+                                this.loadDataPerUser();
+                            }
+                        }
+                    });
+                    eventBus.emit('updateStats');
+                })
+                .catch((error) => {
+                    console.error('Error updating status:', error);
+                    toast.error('Failed to approve budget. Please try again.', {
+                        autoClose: 2000
+                    });
+                })
+                .finally(() => {
+                    this.showBudgetApprovalModal = false;
+                    this.selectedPrId = null;
+                });
         },
         toBudget(id) {
             const userId = localStorage.getItem('userId');

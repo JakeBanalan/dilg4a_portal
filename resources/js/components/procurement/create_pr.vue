@@ -387,6 +387,10 @@ export default {
             this.openModal();
         }, 1);
     },
+    created() {
+        this.role = localStorage.getItem('user_role');
+        this.userId = localStorage.getItem('userId');
+    },
     methods: {
         showToastSuccess(message) {
             toast.success(message, {
@@ -402,7 +406,11 @@ export default {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
         fetchItems() {
-            axios.get(`/api/fetchItems`)
+            axios.get('/api/fetchItems', {
+                params: {
+                    userId: this.userId
+                }
+            })
                 .then(response => {
                     this.availableItems = response.data || [];
                 })

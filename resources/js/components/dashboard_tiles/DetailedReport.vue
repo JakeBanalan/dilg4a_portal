@@ -19,7 +19,7 @@
                         </button>
 
                         <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="toggleCard()"
-                            v-if="this.role == 'admin'">
+                            v-if="this.role == 'admin' || this.role == 'user' || this.role == 'gss_admin' || this.role == 'budget_admin'">
                             Advanced Search
                         </button>
 
