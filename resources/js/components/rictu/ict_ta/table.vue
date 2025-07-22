@@ -22,7 +22,8 @@
                     <th scope="col">TIME</th>
                 </tr>
             </thead>
-            <tbody v-if="(role === 'admin' || role === 'user') && displayedItems.length > 0">
+            <tbody
+                v-if="(role === 'admin' || role === 'user' || role === 'gss_admin' || role === 'budget_admin' || role === 'ord_admin') && displayedItems.length > 0">
                 <tr v-for="ict_data in displayedItems" :key="ict_data.id">
                     <td>
                         <ActionButtons :role="role" :status="ict_data.status" :id="ict_data.id" :user-id="user_id"
@@ -209,7 +210,14 @@ export default {
         fetchRequests(role, status) {
             if (role === 'admin') {
                 this.load_ict_request(status);
-            } else if (role === 'user') {
+            } else if (role === 'gss_admin') {
+                this.load_ict_perUser_request(status);
+            } else if (role === 'budget_admin') {
+                this.load_ict_perUser_request(status);
+            }else if (role === 'ord_admin') {
+                this.load_ict_perUser_request(status); 
+            } 
+            else if (role === 'user') {
                 this.load_ict_perUser_request(status);
             } else {
                 console.error('Unknown role');

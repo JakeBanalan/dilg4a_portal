@@ -191,7 +191,7 @@
                                         <div class="container">
                                             <h1>Add New Item</h1>
                                             <div class="form-group">
-                                                <label>Item Name</label>
+                                                <label>Item Name <span style="color: red;">*</span></label>
                                                 <v-select :options="availableItems" v-model="newItem"
                                                     @change="updateItemPrice" label="name">
                                                     <template slot="option" slot-scope="option">
@@ -204,17 +204,17 @@
                                                 <input type="text" class="form-control" v-model="newItem.unit" readonly>
                                             </div>
                                             <div class="form-group">
-                                                <label>Quantity</label>
+                                                <label>Quantity <span style="color: red;">*</span></label>
                                                 <input type="number" class="form-control" id="itemQuantity"
                                                     v-model="newItem.quantity" min="0" @keyup.enter="addItem">
                                             </div>
                                             <div class="form-group">
-                                                <label>ABC</label>
+                                                <label>Unit Cost <span style="color: red;">*</span></label>
                                                 <input type="number" class="form-control" id="itemPrice"
                                                     v-model="newItem.price">
                                             </div>
                                             <div class="form-group">
-                                                <label>Description</label>
+                                                <label>Description <span style="color: red;">*</span></label>
                                                 <textarea rows="1" v-model="newItem.descrip"
                                                     @keyup.enter="addItem"></textarea>
                                             </div>
@@ -521,18 +521,27 @@ export default {
         },
         addItem() {
             const selectedItem = this.availableItems.find(item => item.id === this.newItem.id);
-            if (selectedItem && this.newItem.quantity > 0) {
-                this.items.push({
-                    ...selectedItem,
-                    quantity: this.newItem.quantity,
-                    price: this.newItem.price, // Unit cost
-                    descrip: this.newItem.descrip
-                });
-                this.newItem = { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '', unit: '' };
-                this.closeAddItemModal();
-            } else {
-                alert('Please select an item and enter a valid quantity.');
+            if (!selectedItem) {
+                this.showToastError('Please select an item.');
+                return;
             }
+            if (this.newItem.quantity <= 0) {
+                this.showToastError('Please enter a valid quantity.');
+                return;
+            }
+            if (!this.newItem.descrip || this.newItem.descrip.trim() === '') {
+                this.showToastError('Description is required!');
+                return;
+            }
+            this.items.push({
+                ...selectedItem,
+                quantity: this.newItem.quantity,
+                price: this.newItem.price,
+                descrip: this.newItem.descrip
+            });
+            this.newItem = { id: null, name: '', quantity: 0, price: 0, descrip: '', stockno: '', unit: '' };
+            this.closeAddItemModal();
+            this.showToastSuccess('Item added successfully!');
         },
         showEditItemModal(index) {
             this.editIndex = index;

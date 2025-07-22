@@ -6,6 +6,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import store from './store/store';
 import router from './router';
+import './bootstrap'; // Import Echo setup
 import * as globalMethods from './globalMethods'; // Import all global methods
 import * as VueMultiselect from 'vue-multiselect';
 import TextInput from "./components/micro/TextInput.vue";

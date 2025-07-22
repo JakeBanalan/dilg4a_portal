@@ -11,22 +11,30 @@ use App\Models\AbstractModel;
 
 use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseRequestModel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Events\PurchaseRequestUpdated;
 
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\PurchaseRequestItemModel;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
 
+const DRAFT = 1;
+const SUBMITTED_TO_GSS = 2;
+const RECEIVED_BY_GSS = 3;
+const APPROVED_BY_GSS = 4;
+const SUBMITTED_TO_BUDGET = 5;
+const RECEIVED_BY_BUDGET = 6;
+const APPROVED_BY_BUDGET = 7;
+const SUBMITTED_TO_ORD = 8;
+const RECEIVED_BY_ORD = 9;
+const APPROVED_BY_ORD = 10;
+const RETURNED_BY_GSS = 14;
+const RETURNED_BY_BUDGET = 15;
+const RETURNED_BY_ORD = 16;
+const CANCELLED = 17;
 
-const SUBMITTED_TO_BUDGET = 2;
-const SUBMITTED_TO_GSS = 4;
-const RECEIVED_BY_GSS = 5;
-const RECEIVED_BY_BUDGET = 3;
-const WITH_RFQ = 6;
-const AWARDED = 7;
-const WITH_PO = 8;
 class PurchaseRequestController extends Controller
 {
     public function pr_monitoring_stats()
@@ -38,6 +46,7 @@ class PurchaseRequestController extends Controller
             'completed_pr' => PurchaseRequestModel::count(),
         ]);
     }
+
     public function fetchPRMonitor()
     {
         // Step 1: Get all PRs and user info
@@ -126,24 +135,19 @@ class PurchaseRequestController extends Controller
         return response()->json($final);
     }
 
-
-
-
     public function generatePurchaseRequestNo($cur_year = null)
     {
         $cur_year = $cur_year ?? date('Y');
 
         return response()->json(
-            PurchaseRequestModel::select(PurchaseRequestModel::raw('COUNT(*)+1 as "pr_count" '))
+            PurchaseRequestModel::select(PurchaseRequestModel::raw('COUNT(*)+1 as "pr_count"'))
                 ->whereYear('date_added', $cur_year)
                 ->get()
         );
     }
 
-
     public function post_create_purchaseRequest(Request $request)
     {
-        // dd($request->all());
         try {
             DB::beginTransaction();
             $purchaseRequest = new PurchaseRequestModel();
@@ -173,8 +177,8 @@ class PurchaseRequestController extends Controller
 
                 if ($existingItem) {
                     $existingItem->qty += $item['quantity'];
-                    $existingItem->unit_cost = $unitCost; // Ensure unit_cost is updated
-                    $existingItem->abc = $existingItem->qty * $unitCost; // Recalculate total cost
+                    $existingItem->unit_cost = $unitCost;
+                    $existingItem->abc = $existingItem->qty * $unitCost;
                     $existingItem->save();
                 } else {
                     PurchaseRequestItemModel::create([
@@ -182,14 +186,13 @@ class PurchaseRequestController extends Controller
                         'pr_item_id' => $item['id'],
                         'description' => $item['description'],
                         'qty' => $item['quantity'],
-                        'unit_cost' => $unitCost, // Save unit cost
-                        'abc' => $abc, // Save total cost
+                        'unit_cost' => $unitCost,
+                        'abc' => $abc,
                         'date_added' => now(),
                         'flag' => 1,
                     ]);
                 }
             }
-
 
             $purchaseRequest->current_step = $request->input('step');
             $purchaseRequest->save();
@@ -213,7 +216,6 @@ class PurchaseRequestController extends Controller
                 return response()->json(['message' => 'Purchase request not found'], 404);
             }
 
-            // Update main PR fields
             $purchaseRequest->update([
                 'pmo' => $request->input('pmo'),
                 'type' => $request->input('type'),
@@ -222,12 +224,11 @@ class PurchaseRequestController extends Controller
                 'purpose' => $request->input('purpose'),
             ]);
 
-            // Validate items array
             $validatedData = $request->validate([
                 'items' => 'required|array',
                 'items.*.id' => 'nullable|integer',
                 'items.*.qty' => 'required|numeric|min:1',
-                'items.*.price' => 'required|numeric|min:0', // This is the unit cost
+                'items.*.price' => 'required|numeric|min:0',
                 'items.*.descrip' => 'nullable|string',
             ]);
 
@@ -241,7 +242,6 @@ class PurchaseRequestController extends Controller
                 $existingItem = PurchaseRequestItemModel::find($item['id'] ?? null);
 
                 if ($existingItem) {
-                    // Update existing item
                     $existingItem->update([
                         'description' => $item['descrip'],
                         'qty' => $item['qty'],
@@ -252,7 +252,6 @@ class PurchaseRequestController extends Controller
                     ]);
                     $processedIds[] = $existingItem->id;
                 } else {
-                    // Create new item
                     $newItem = PurchaseRequestItemModel::create([
                         'pr_id' => $purchaseRequest->id,
                         'pr_item_id' => $item['id'] ?? null,
@@ -267,7 +266,6 @@ class PurchaseRequestController extends Controller
                 }
             }
 
-            // Remove items that are no longer in the updated list
             PurchaseRequestItemModel::where('pr_id', $purchaseRequest->id)
                 ->whereNotIn('id', $processedIds)
                 ->delete();
@@ -308,7 +306,6 @@ class PurchaseRequestController extends Controller
                 ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
                 ->where('tbl_app.app_status', 'approve');
 
-            // Filter by pmo_id if not gss_admin
             if ($user->user_role !== 'gss_admin') {
                 $query->where('tbl_app.pmo_id', $user->pmo_id);
             }
@@ -320,12 +317,6 @@ class PurchaseRequestController extends Controller
             return response()->json(['message' => 'An error occurred while fetching items'], 500);
         }
     }
-
-
-
-
-
-
 
     public function fetchPurchaseReqData(Request $request)
     {
@@ -377,7 +368,6 @@ class PurchaseRequestController extends Controller
             ->orderBy('pr.id', 'desc')
             ->groupBy('pr.id');
 
-        // Filters
         if ($prNo) {
             $query->where('pr.pr_no', 'like', '%' . $prNo . '%');
         }
@@ -394,7 +384,6 @@ class PurchaseRequestController extends Controller
             $query->where('status.title', 'like', '%' . $status . '%');
         }
 
-        // Apply user-specific filtering unless gss_admin
         if (!in_array($user->user_role, ['gss_admin', 'budget_admin'])) {
             $query->where('pr.action_officer', $user->id);
         }
@@ -407,7 +396,6 @@ class PurchaseRequestController extends Controller
 
         return response()->json($prData);
     }
-
 
     public function perUserPurchaseReqData(Request $request)
     {
@@ -466,12 +454,8 @@ class PurchaseRequestController extends Controller
         return response()->json($prData);
     }
 
-
-
-
     public function viewPurchaseRequest($id)
     {
-        // Get the main purchase request details
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
                 pr.id AS `id`,
                 pr.type AS `type`,
@@ -489,20 +473,18 @@ class PurchaseRequestController extends Controller
             ->where('pr.id', $id)
             ->first();
 
-        // If no purchase request is found, return a 404 response
         if (!$query) {
             return response()->json(['message' => 'Purchase request not found'], 404);
         }
 
-        // Get related pr_items using the PurchaseRequestItemModel
         $prItems = PurchaseRequestItemModel::where('pr_id', $id)
             ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
             ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
             ->select(
                 'pr_items.id',
                 'pr_items.qty',
-                'pr_items.unit_cost', // Include unit cost
-                'pr_items.abc', // Total cost
+                'pr_items.unit_cost',
+                'pr_items.abc',
                 'pr_items.description',
                 'app.sn as serial_no',
                 'app.item_title as item_title',
@@ -510,7 +492,6 @@ class PurchaseRequestController extends Controller
             )
             ->get();
 
-        // Return the data in a structured format
         return response()->json([
             'purchaseRequest' => $query,
             'prItems' => $prItems
@@ -520,71 +501,135 @@ class PurchaseRequestController extends Controller
 
     public function updatePurchaseRequestStatus(Request $request)
     {
-        // Get the purchase request
         $purchaseRequest = PurchaseRequestModel::find($request->input('id'));
 
         if (!$purchaseRequest) {
             return response()->json(['message' => 'Purchase request not found'], 404);
         }
 
-        // Update the status if provided
-        if ($request->has('status')) {
-            $purchaseRequest->stat = $request->input('status');
-        }
+        $user = UserModel::find($request->input('submitted_by'));
+        $userRole = $user ? $user->user_role : null;
+        $currentStat = $purchaseRequest->stat;
 
-        // Update submission flags if provided
-        if ($request->has('is_budget_submitted')) {
-            $purchaseRequest->is_budget_submitted = $request->input('is_budget_submitted');
-            if ($purchaseRequest->is_budget_submitted) {
-                $purchaseRequest->submitted_by = $request->input('submitted_by');
-                $purchaseRequest->submitted_date_budget = Carbon::now();
+        $validTransitions = [
+            DRAFT => [SUBMITTED_TO_GSS, CANCELLED],
+            SUBMITTED_TO_GSS => [RECEIVED_BY_GSS, RETURNED_BY_GSS],
+            RECEIVED_BY_GSS => [APPROVED_BY_GSS, RETURNED_BY_GSS],
+            APPROVED_BY_GSS => [SUBMITTED_TO_BUDGET, RETURNED_BY_GSS],
+            SUBMITTED_TO_BUDGET => [RECEIVED_BY_BUDGET, RETURNED_BY_BUDGET],
+            RECEIVED_BY_BUDGET => [APPROVED_BY_BUDGET, RETURNED_BY_BUDGET],
+            APPROVED_BY_BUDGET => [SUBMITTED_TO_ORD, RETURNED_BY_BUDGET],
+            SUBMITTED_TO_ORD => [RECEIVED_BY_ORD, RETURNED_BY_ORD],
+            RECEIVED_BY_ORD => [APPROVED_BY_ORD, RETURNED_BY_ORD],
+            APPROVED_BY_ORD => [],
+            RETURNED_BY_GSS => [SUBMITTED_TO_GSS, CANCELLED],
+            RETURNED_BY_BUDGET => [SUBMITTED_TO_BUDGET, CANCELLED],
+            RETURNED_BY_ORD => [SUBMITTED_TO_ORD, CANCELLED],
+            CANCELLED => [],
+        ];
+
+        DB::beginTransaction();
+        try {
+            if ($request->has('status') && $request->input('status') === 'return') {
+                $newStat = $currentStat;
+
+                if ($userRole === 'gss_admin' && in_array($currentStat, [RECEIVED_BY_GSS, APPROVED_BY_GSS])) {
+                    $newStat = RETURNED_BY_GSS;
+                    $purchaseRequest->is_gss_submitted = false;
+                    $purchaseRequest->submitted_date_gss = null;
+                } elseif ($userRole === 'budget_admin' && in_array($currentStat, [SUBMITTED_TO_BUDGET, RECEIVED_BY_BUDGET, APPROVED_BY_BUDGET])) {
+                    $newStat = RETURNED_BY_BUDGET;
+                    $purchaseRequest->is_budget_submitted = false;
+                    $purchaseRequest->submitted_date_budget = null;
+                } elseif ($userRole === 'ord_admin' && in_array($currentStat, [SUBMITTED_TO_ORD, RECEIVED_BY_ORD, APPROVED_BY_ORD])) {
+                    $newStat = RETURNED_BY_ORD;
+                    $purchaseRequest->is_ord_submitted = false;
+                    $purchaseRequest->submitted_date_ord = null;
+                } else {
+                    return response()->json(['message' => 'Invalid return request for user role or status'], 400);
+                }
+
+                $purchaseRequest->stat = $newStat;
+            } else {
+                $newStatus = $request->has('status') ? (int)$request->input('status') : $currentStat;
+                if (!isset($validTransitions[$currentStat]) || !in_array($newStatus, $validTransitions[$currentStat])) {
+                    return response()->json(['message' => 'Invalid status transition'], 400);
+                }
+                $purchaseRequest->stat = $newStatus;
+
+                if ($newStatus === CANCELLED && !in_array($currentStat, [DRAFT, RETURNED_BY_GSS, RETURNED_BY_BUDGET, RETURNED_BY_ORD])) {
+                    return response()->json(['message' => 'Cannot cancel from this status'], 400);
+                }
+
+                if ($request->has('is_gss_submitted')) {
+                    $purchaseRequest->is_gss_submitted = (bool)$request->input('is_gss_submitted');
+                    if ($purchaseRequest->is_gss_submitted) {
+                        $purchaseRequest->submitted_by_gss = $request->input('submitted_by_gss');
+                        $purchaseRequest->submitted_date_gss = Carbon::now();
+                    }
+                }
+
+                if ($request->has('is_budget_submitted')) {
+                    $purchaseRequest->is_budget_submitted = (bool)$request->input('is_budget_submitted');
+                    if ($purchaseRequest->is_budget_submitted) {
+                        $purchaseRequest->submitted_by = $request->input('submitted_by');
+                        $purchaseRequest->submitted_date_budget = Carbon::now();
+                    }
+                }
+
+                if ($request->has('is_ord_submitted')) {
+                    $purchaseRequest->is_ord_submitted = (bool)$request->input('is_ord_submitted');
+                    if ($purchaseRequest->is_ord_submitted) {
+                        $purchaseRequest->submitted_by_ord = $request->input('submitted_by_ord');
+                        $purchaseRequest->submitted_date_ord = Carbon::now();
+                    }
+                }
             }
-        }
 
-        if ($request->has('is_gss_submitted')) {
-            $purchaseRequest->is_gss_submitted = $request->input('is_gss_submitted');
-            if ($purchaseRequest->is_gss_submitted) {
-                $purchaseRequest->submitted_by_gss = $request->input('submitted_by_gss');
-                $purchaseRequest->submitted_date_gss = Carbon::now();
+            $statusTitle = DB::table('tbl_status')->where('id', $purchaseRequest->stat)->value('title');
+            if ($statusTitle) {
+                $purchaseRequest->status = $statusTitle;
             }
+
+            $purchaseRequest->save();
+
+            event(new PurchaseRequestUpdated(
+                $purchaseRequest->id,
+                $purchaseRequest->stat,
+                $purchaseRequest->pr_no,
+                $request->input('submitted_by'),
+                $userRole,
+                $purchaseRequest->created_by, // Use created_by for createdById
+                $purchaseRequest->action_officer // Use action_officer for actionOfficerId
+            ));
+
+            DB::commit();
+
+            return response()->json(['message' => 'Purchase request updated successfully', 'data' => $purchaseRequest]);
+        } catch (\Exception $e) {
+            DB::rollBack();        
+            return response()->json(['message' => 'Failed to update purchase request', 'error' => $e->getMessage()], 500);
         }
-
-
-        $purchaseRequest->save();
-
-
-        return response()->json(['message' => 'Purchase request updated successfully']);
     }
 
-    //Removed Items
     public function deletePurchaseRequestItem(Request $request)
     {
         try {
-
             $item_id = $request->input('item_id');
 
             $item = PurchaseRequestItemModel::find($item_id);
 
             if ($item) {
-
                 $item->delete();
-
-
                 return response()->json(['message' => 'Item deleted successfully.']);
             } else {
-
                 return response()->json(['message' => 'Item not found'], 404);
             }
         } catch (\Exception $e) {
-
             return response()->json(['message' => 'Failed to delete item.'], 500);
         }
     }
 
-
-
-
-    // GENERATE REPORTS
     public function exportPurchaseRequest(Request $request, $id)
     {
         $query = DB::table('pr')
@@ -628,7 +673,6 @@ class PurchaseRequestController extends Controller
         $spreadsheet = IOFactory::load($templatePath);
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Static cells
         $sheet->setCellValue('C7', 'PR No.: ' . $query[0]->pr_no);
         $sheet->setCellValue('E7', 'Date: ' . Carbon::parse($query[0]->pr_date)->format('F d, Y'));
         $sheet->setCellValue('B7', $query[0]->pmo_title);
@@ -652,7 +696,6 @@ class PurchaseRequestController extends Controller
             $sheet->setCellValue('A' . $row, $item->serial_no);
             $sheet->setCellValue('B' . $row, $item->unit);
 
-            // Rich text for item description: bold title + normal desc
             $richText = new \PhpOffice\PhpSpreadsheet\RichText\RichText();
             $bold = $richText->createTextRun(strtoupper($item->item_title));
             $bold->getFont()->setBold(true);
@@ -662,33 +705,27 @@ class PurchaseRequestController extends Controller
             $sheet->getStyle('C' . $row)->getAlignment()->setWrapText(true);
             $sheet->getStyle('C' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
 
-            // Quantity normal
             $sheet->setCellValue('D' . $row, $item->quantity);
 
-            // Unit cost: right align, no bold
             $sheet->setCellValue('E' . $row, '₱ ' . number_format($item->price, 2));
             $sheet->getStyle('E' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             $sheet->getStyle('E' . $row)->getFont()->setBold(false);
 
-            // Amount: right align, no bold
             $amount = $item->quantity * $item->price;
             $sheet->setCellValue('F' . $row, '₱ ' . number_format($amount, 2));
             $sheet->getStyle('F' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             $sheet->getStyle('F' . $row)->getFont()->setBold(false);
 
-            // Auto height
             $sheet->getRowDimension($row)->setRowHeight(-1);
 
             $totalAmount += $amount;
             $row++;
         }
 
-        // Fixed total cell
         $sheet->setCellValue('F22', '₱ ' . number_format($totalAmount, 2));
         $sheet->getStyle('F22')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
         $sheet->getStyle('F22')->getFont()->setBold(false);
 
-        // Protect sheet
         $sheet->getProtection()->setSheet(true);
         $sheet->getProtection()->setPassword('dilg4a@2024');
 
@@ -702,7 +739,6 @@ class PurchaseRequestController extends Controller
         ])->deleteFileAfterSend(true);
     }
 
-
     public function getDepartmentOverview()
     {
         try {
@@ -711,8 +747,8 @@ class PurchaseRequestController extends Controller
                 'pmo.id as office',
                 'pmo.pmo_title'
             )
-                ->leftJoin('pr', 'pr_items.pr_id', '=', 'pr.id') // ✅ Join PR table first
-                ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo') // ✅ Ensure correct column name
+                ->leftJoin('pr', 'pr_items.pr_id', '=', 'pr.id')
+                ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
                 ->whereYear('pr_items.date_added', Carbon::now()->year)
                 ->whereNotIn('pr.stat', [1, 9])
                 ->groupBy('pmo.id', 'pmo.pmo_title')
@@ -725,24 +761,19 @@ class PurchaseRequestController extends Controller
         }
     }
 
-
-
-
-
     public function getMonthlyOverview()
     {
         $monthlyData = PurchaseRequestItemModel::select(
             DB::raw('SUM(pr_items.abc) as total_abc'),
             DB::raw('MONTH(pr_items.date_added) as month')
         )
-            ->join('pr', 'pr_items.pr_id', '=', 'pr.id') // Join with PR table
-            ->whereYear('pr_items.date_added', Carbon::now()->year) // Filter by current year
+            ->join('pr', 'pr_items.pr_id', '=', 'pr.id')
+            ->whereYear('pr_items.date_added', Carbon::now()->year)
             ->whereNotIn('pr.stat', [1, 9])
             ->groupBy(DB::raw('MONTH(pr_items.date_added)'))
             ->orderBy(DB::raw('MONTH(pr_items.date_added)'))
             ->get();
 
-        // Format data for frontend
         $formattedData = [];
         for ($i = 1; $i <= 12; $i++) {
             $formattedData[] = [
@@ -753,11 +784,6 @@ class PurchaseRequestController extends Controller
 
         return response()->json($formattedData);
     }
-
-
-
-
-
 
     public function total_amount(Request $request)
     {
@@ -777,20 +803,16 @@ class PurchaseRequestController extends Controller
             ->groupBy('pr.id')
             ->get();
 
-        // Dump and die to output the SQL and the result for debugging
-        // dd($query);
-
-        // If you want to return the result as JSON
         return response()->json($query);
     }
+
     public function countCancelledPR($userId)
     {
         return response()->json(PurchaseRequestModel::select(PurchaseRequestModel::raw('count(*) as cancelled_pr'))
-            ->where('stat', 7)
+            ->where('stat', CANCELLED)
             ->where('action_officer', $userId)
             ->get());
     }
-
     public function countUserTotalPR($userId)
     {
         return response()->json(PurchaseRequestModel::select(PurchaseRequestModel::raw('count(*) as total_pr'))

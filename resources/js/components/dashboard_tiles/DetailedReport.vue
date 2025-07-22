@@ -13,7 +13,7 @@
                         <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp; Purchase Request List
                     </p>
                     <div class="box-tools">
-                        <button @click="toCreatePR()" type="button"
+                        <button v-if="this.role == 'admin' || this.role == 'user'" @click="toCreatePR()" type="button"
                             class="btn btn-outline-primary btn-fw btn-icon-text">
                             Create PR
                         </button>

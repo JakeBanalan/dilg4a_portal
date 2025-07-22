@@ -4,18 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Sanctum\HasApiTokens;
-
-
-use Illuminate\Notifications\Notifiable;
 
 class PurchaseRequestModel extends Model
 {
     use HasFactory;
-    use HasApiTokens, Notifiable;
+
     protected $table = 'pr';
+
     protected $fillable = [
-        'id',
         'pr_no',
         'purpose',
         'pmo',
@@ -27,15 +23,31 @@ class PurchaseRequestModel extends Model
         'target_date',
         'submitted_date',
         'received_date',
-        'stat',
+        'stat', // Maps to status_id
+        'status', // Status text (e.g., "Return by Budget")
         'availability_code',
         'is_urgent',
         'requested_by',
-        'updated_at',
-        'created_at',
-        'current_step',
-        'name',
-        'email'
+        'is_budget_submitted',
+        'is_gss_submitted',
+        'is_ord_submitted',
+        'submitted_by', // User ID who submitted
+        'submitted_date_budget',
+        'submitted_date_gss',
+        'submitted_date_ord',
+    ];
+
+    protected $casts = [
+        'is_urgent' => 'boolean',
+        'is_budget_submitted' => 'boolean',
+        'is_gss_submitted' => 'boolean',
+        'is_ord_submitted' => 'boolean',
+        'pr_date' => 'date',
+        'target_date' => 'date',
+        'submitted_date' => 'datetime',
+        'submitted_date_budget' => 'datetime',
+        'submitted_date_gss' => 'datetime',
+        'submitted_date_ord' => 'datetime',
     ];
 
     public function items()
