@@ -62,15 +62,14 @@
                                         <div class="form-group row">
                                             <label class="col-sm-3 col-form-label">Purchase Request Date:</label>
                                             <div class="col-sm-9">
-                                                <input type="date" class="form-control"
-                                                    v-model="purchaseRequestData.pr_date" readonly>
+                                                <input type="date" class="form-control" v-model="formattedPrDate"
+                                                    readonly />
                                             </div>
                                         </div>
                                         <div class="form-group row">
                                             <label class="col-sm-3 col-form-label">Purchase Request Target Date:</label>
                                             <div class="col-sm-9">
-                                                <input type="date" class="form-control"
-                                                    v-model="purchaseRequestData.target_date">
+                                                <input type="date" class="form-control" v-model="formattedTargetDate" />
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -165,7 +164,7 @@
                                         <div class="container">
                                             <h1>Add More Item</h1>
                                             <div class="form-group">
-                                                <label>Item Name</label>
+                                                <label>Item Name <span style="color: red;">*</span></label>
                                                 <v-select :options="availableItems" v-model="addMoreItem"
                                                     @change="addMoreItemList" label="name">
                                                     <template slot="option" slot-scope="option">
@@ -179,18 +178,18 @@
                                                     readonly>
                                             </div>
                                             <div class="form-group">
-                                                <label>Quantity</label>
+                                                <label>Quantity <span style="color: red;">*</span></label>
                                                 <input type="number" class="form-control" id="itemQuantity"
                                                     v-model.number="addMoreItem.qty" min="1"
                                                     placeholder="Enter quantity">
                                             </div>
                                             <div class="form-group">
-                                                <label>Unit Cost</label> <!-- Renamed from "ABC" -->
+                                                <label>Unit Cost <span style="color: red;">*</span></label> <!-- Renamed from "ABC" -->
                                                 <input type="number" class="form-control" v-model="addMoreItem.price"
                                                     min="0.01" placeholder="Enter unit cost">
                                             </div>
                                             <div class="form-group">
-                                                <label>Description</label>
+                                                <label>Description <span style="color: red;">*</span></label>
                                                 <textarea rows="1" v-model="addMoreItem.descrip"
                                                     placeholder="Enter description"></textarea>
                                             </div>
@@ -271,7 +270,7 @@
 <script>
 import showAddItemModal from "./modal_addItem.vue";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core'; // Import the library object
+import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpinner, faCartShopping, faListCheck, faPesoSign, faSave } from '@fortawesome/free-solid-svg-icons';
 import dilg_logo from "../../../assets/logo.png";
 import Navbar from "../layout/Navbar.vue";
@@ -284,7 +283,6 @@ import StatBox from "../procurement/stat_board.vue";
 import vSelect from 'vue-select';
 import axios from "axios";
 import { toast } from "vue3-toastify";
-
 
 library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave);
 
@@ -301,7 +299,7 @@ export default {
         showAddItemModal,
         StatBox,
         dilg_logo,
-        vSelect
+        vSelect,
     },
     data() {
         return {
@@ -320,7 +318,6 @@ export default {
                 pr_no: null,
                 office: null,
                 is_urgent: 0,
-
             },
             procurementType: [
                 { value: '1', label: 'Catering Services' },
@@ -328,7 +325,7 @@ export default {
                 { value: '3', label: 'Repair and Maintenance' },
                 { value: '4', label: 'Supplies, Materials and Devices' },
                 { value: '5', label: 'Other Services' },
-                { value: '6', label: 'Reimbursement and Petty Cash' }
+                { value: '6', label: 'Reimbursement and Petty Cash' },
             ],
             pmoList: [
                 { value: '15', label: 'ORD' },
@@ -348,16 +345,16 @@ export default {
                 price: 0,
                 descrip: '',
                 stockno: '',
-                unit: ''
+                unit: '',
             },
-            availableItems: [], // Populated by fetchItems
+            availableItems: [],
             editItem: { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '' },
             editIndex: -1,
             items: [],
             isLoading: false,
             updatedItems: [],
             isExporting: false,
-            isTemporary: []
+            isTemporary: [],
         };
     },
     computed: {
@@ -368,11 +365,33 @@ export default {
         },
         isUrgent() {
             return this.purchaseRequestData ? this.purchaseRequestData.is_urgent : 0;
-        }
+        },
+        // Computed property for pr_date
+        formattedPrDate: {
+            get() {
+                return this.formatDate(this.purchaseRequestData.pr_date);
+            },
+            set(value) {
+                this.purchaseRequestData.pr_date = value;
+            },
+        },
+        // Computed property for target_date
+        formattedTargetDate: {
+            get() {
+                return this.formatDate(this.purchaseRequestData.target_date);
+            },
+            set(value) {
+                this.purchaseRequestData.target_date = value;
+            },
+        },
     },
     mounted() {
         this.fetchPurchaseRequestData();
         this.fetchItems();
+    },
+    created() {
+        this.role = localStorage.getItem('user_role');
+        this.userId = localStorage.getItem('userId');
     },
     methods: {
         showToastSuccess(message) {
@@ -380,8 +399,22 @@ export default {
                 autoClose: 1000,
             });
         },
+        formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return ''; // Handle invalid dates
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        },
         fetchItems() {
-            axios.get(`/api/fetchItems`)
+            axios
+                .get('/api/fetchItems', {
+                    params: {
+                        userId: this.userId,
+                    },
+                })
                 .then(response => {
                     this.availableItems = response.data || [];
                 })
@@ -395,12 +428,16 @@ export default {
         },
         fetchPurchaseRequestData() {
             const id = this.$route.query.id;
-            axios.get(`../api/viewPurchaseRequest/${id}`)
+            axios
+                .get(`../api/viewPurchaseRequest/${id}`)
                 .then(response => {
                     const { purchaseRequest, prItems } = response.data;
-                    // Update purchase request data
-                    this.purchaseRequestData = purchaseRequest;
-                    // Map prItems to align with the backend structure
+                    // Format dates before assigning
+                    this.purchaseRequestData = {
+                        ...purchaseRequest,
+                        pr_date: this.formatDate(purchaseRequest.pr_date),
+                        target_date: this.formatDate(purchaseRequest.target_date),
+                    };
                     this.items = prItems.map(item => ({
                         id: item.id,
                         stockno: item.serial_no,
@@ -408,12 +445,13 @@ export default {
                         name: item.item_title,
                         descrip: item.description,
                         qty: item.qty,
-                        unit_cost: item.unit_cost, // Unit cost
-                        abc: item.abc // Total cost
+                        unit_cost: item.unit_cost,
+                        abc: item.abc,
                     }));
                 })
                 .catch(error => {
                     console.error('Error fetching purchase request data:', error);
+                    toast.error('Failed to fetch purchase request data.', { autoClose: 1000 });
                 });
         },
         showAddItemModal() {
@@ -432,10 +470,10 @@ export default {
                     name: selectedItem.name,
                     descrip: this.addMoreItem.descrip,
                     qty: this.addMoreItem.qty,
-                    unit_cost: this.addMoreItem.price, // Set unit cost
-                    abc: this.addMoreItem.qty * this.addMoreItem.price // Calculate total cost
+                    unit_cost: this.addMoreItem.price,
+                    abc: this.addMoreItem.qty * this.addMoreItem.price,
                 });
-                this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' }; // Reset the form
+                this.addMoreItem = { id: null, name: '', qty: 0, price: 0, descrip: '', stockno: '', unit: '' };
                 this.closeAddItemModal();
             } else {
                 alert('Please select an item and enter a valid quantity.');
@@ -444,56 +482,61 @@ export default {
         addMoreItemList() {
             const selectedItem = this.availableItems.find(item => item.id === this.addMoreItem.id);
             if (selectedItem) {
-                this.addMoreItem.price = selectedItem.price || 0; // Set unit cost
+                this.addMoreItem.price = selectedItem.price || 0;
                 this.addMoreItem.stockno = selectedItem.stockno;
                 this.addMoreItem.unit = selectedItem.unit;
             }
         },
         EditItemModal(itemId) {
-            // Find the item by its ID
             const itemIndex = this.items.findIndex(item => item.id === itemId);
             if (itemIndex === -1) {
                 console.error("Item not found for editing:", itemId);
                 return;
             }
-            this.editIndex = itemIndex; // Save the index for later reference
-            this.editItem = JSON.parse(JSON.stringify(this.items[itemIndex])); // Copy the item for editing
-            this.editItemModalVisible = true; // Open the modal
+            this.editIndex = itemIndex;
+            this.editItem = JSON.parse(JSON.stringify(this.items[itemIndex]));
+            this.editItemModalVisible = true;
         },
-
         closeEdit() {
             this.editItemModalVisible = false;
             this.editItem = {};
         },
         editItemList() {
             const qty = Number(this.editItem.qty);
-            if (this.editItem.id && qty > 0) {  // Ensure `id` and `qty` are valid
-                this.items.splice(this.editIndex, 1, { ...this.editItem });  // Update the existing item
+            if (this.editItem.id && qty > 0) {
+                this.items.splice(this.editIndex, 1, { ...this.editItem });
                 this.editItemModalVisible = false;
             } else {
                 alert('Please select an item and enter a valid quantity.');
             }
         },
         updatePurchaseRequestDetails() {
-            axios.post('/api/post_update_purchaseRequest', {
-                pr_id: this.$route.query.id,
-                pmo: this.purchaseRequestData.office,
-                type: this.purchaseRequestData.type,
-                pr_date: this.purchaseRequestData.pr_date,
-                target_date: this.purchaseRequestData.target_date,
-                purpose: this.purchaseRequestData.particulars,
-                items: this.items.map(item => ({
-                    id: item.id,
-                    qty: item.qty,
-                    price: item.unit_cost, // Unit cost
-                    descrip: item.descrip || null, // Optional description
-                })),
-            })
+            if (!this.purchaseRequestData.pr_date || !this.purchaseRequestData.target_date) {
+                toast.error('Please provide valid dates for Purchase Request Date and Target Date.', { autoClose: 1000 });
+                return;
+            }
+
+            axios
+                .post('/api/post_update_purchaseRequest', {
+                    pr_id: this.$route.query.id,
+                    pmo: this.purchaseRequestData.office,
+                    type: this.purchaseRequestData.type,
+                    pr_date: this.purchaseRequestData.pr_date, // Already formatted
+                    target_date: this.purchaseRequestData.target_date, // Already formatted
+                    purpose: this.purchaseRequestData.particulars,
+                    items: this.items.map(item => ({
+                        id: item.id,
+                        qty: item.qty,
+                        price: item.unit_cost,
+                        descrip: item.descrip || null,
+                    })),
+                })
                 .then(response => {
                     toast.success('Purchase request and items updated successfully!', { autoClose: 1000 });
                     this.fetchPurchaseRequestData();
                 })
                 .catch(error => {
+                    console.error('Error updating purchase request:', error);
                     toast.error('Failed to update purchase request and items. Please check the console for details.', { autoClose: 1000 });
                 });
         },
@@ -506,7 +549,6 @@ export default {
 
             const item = this.items[itemIndex];
 
-            // If the item is temporary (not saved in the database), remove it directly
             if (!item.id || item.isTemporary) {
                 Swal.fire({
                     title: 'Are you sure?',
@@ -518,14 +560,13 @@ export default {
                     confirmButtonText: 'Yes, remove it!',
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        this.items.splice(itemIndex, 1); // Remove from the list
+                        this.items.splice(itemIndex, 1);
                         this.showToastSuccess('Temporary item removed.');
                     }
                 });
                 return;
             }
 
-            // For persisted items, send a request to the backend
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'This item will be permanently deleted.',
@@ -536,12 +577,13 @@ export default {
                 confirmButtonText: 'Yes, delete it!',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.post('../api/deletePurchaseRequestItem', {
-                        item_id: item.id // Send the ID to the backend
-                    })
+                    axios
+                        .post('../api/deletePurchaseRequestItem', {
+                            item_id: item.id,
+                        })
                         .then(response => {
                             this.showToastSuccess('Item successfully deleted.');
-                            this.items.splice(itemIndex, 1); // Remove from the list
+                            this.items.splice(itemIndex, 1);
                         })
                         .catch(error => {
                             Swal.fire('Error', 'Failed to delete the item. Please try again.', 'error');
@@ -555,41 +597,30 @@ export default {
 
             axios
                 .get(`../api/export-purchase-request/${purchaseRequestId}`, {
-                    responseType: 'blob', // Ensure we handle the response as a binary Blob
+                    responseType: 'blob',
                 })
                 .then((response) => {
                     const { data, headers } = response;
-
-                    // Extract filename from headers or use a default fallback
                     const fileName = headers['content-disposition']?.match(/filename="?(.+)"?/)?.[1] || 'PurchaseRequest.xlsx';
-
-                    // Create a Blob URL and trigger the file download
                     const blob = new Blob([data]);
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     link.href = url;
                     link.download = fileName;
-                    document.body.appendChild(link); // Append link for Firefox compatibility
+                    document.body.appendChild(link);
                     link.click();
-                    document.body.removeChild(link); // Remove the link after downloading
-
-                    // Revoke the object URL to release memory
+                    document.body.removeChild(link);
                     URL.revokeObjectURL(url);
-
-                    // Show success toast
                     toast.success('Purchase request exported successfully!', { autoClose: 1000 });
-
-                    // Show success toast
-                    this.$toast.success('Purchase request exported successfully!');
                 })
                 .catch((error) => {
                     console.error('Error exporting purchase request:', error);
+                    toast.error('Failed to export purchase request. Please try again.', { autoClose: 1000 });
                 })
                 .finally(() => {
-                    this.isExporting = false; // Reset loading state
+                    this.isExporting = false;
                 });
-        }
-
+        },
     },
 };
 </script>

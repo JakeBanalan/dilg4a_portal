@@ -605,16 +605,7 @@ export default {
             }
         },
         createUser() {
-            const userData = {
-                module_access: JSON.stringify(this.selectedMenus.map(menu => menu.value)),
-            };
-            axios.post('../../api/PostUser', userData)
-                .then(response => {
-                    console.log('User created successfully:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error creating user:', error);
-                });
+            this.$router.push("/settings/create");       
         },
         UpdateUser(id) {
             this.$router.push({ path: `/settings/update/${id}` });

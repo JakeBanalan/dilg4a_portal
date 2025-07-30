@@ -7,6 +7,7 @@
                 <th>Category</th>
                 <th>Item</th>
                 <th>Status</th>
+                <th>Mode of Procurement</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -46,9 +47,14 @@
 <script>
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faDownload, faEye, faPaperPlane, faShareSquare, faTrash, faEdit, faCheck } from '@fortawesome/free-solid-svg-icons';
+library.add(faEye, faPaperPlane, faDownload, faTrash, faShareSquare, faEdit, faCheck);
 export default {
     components: {
-        vSelect
+        vSelect,
+        FontAwesomeIcon,
     },
     name: 'app_table',
     props: {
@@ -57,11 +63,12 @@ export default {
             default: ''
         }
     },
-    emits: ['approve-item', 'edit-item'], 
+
+    emits: ['approve-item', 'edit-item'],
     data() {
         return {
-            selectedAppId: null, 
-            snInput: '', 
+            selectedAppId: null,
+            snInput: '',
             isModalVisible: false,
             modeOfProcTitle: '',
             pr_typeOption: [
@@ -92,10 +99,15 @@ export default {
                             data: 'app_status',
                             render: function (data) {
                                 if (data === 'for approval') {
-                                    return `<span class="text-danger">●</span> ${data}`;
+                                    return `<span class="badge badge-danger"><span class="text-danger">●</span> ${data.toUpperCase()}</span>`;
+                                } else if (data === 'approve') {
+                                    return `<span class="badge badge-success">${data.toUpperCase()}</span>`;
                                 }
-                                return data;
+                                return data.toUpperCase();
                             },
+                        },
+                        {
+                            data: 'mode_of_proc_title',
                         },
                         {
                             data: null,
@@ -103,13 +115,11 @@ export default {
                             render: (data) => {
                                 let buttons = '';
                                 if (this.role !== 'gss_admin') {
-                                   
-                                    buttons += `<button class="btn btn-info edit-btn" data-id="${data.app_id}">Edit</button>`;
+                                    buttons += `<button class="btn btn-info edit-btn" data-id="${data.app_id}"><i class="fas fa-edit"></i> Edit</button>`;
                                 }
                                 if (this.role === 'gss_admin') {
-                                  
                                     const disabled = data.app_status === 'approve' ? 'disabled' : '';
-                                    buttons += ` <button class="btn btn-success approve-btn" data-id="${data.app_id}" ${disabled}>Approve</button>`;
+                                    buttons += ` <button class="btn btn-success approve-btn" data-id="${data.app_id}" ${disabled}><i class="fas fa-check"></i> Approve</button>`;
                                 }
                                 return buttons;
                             }
@@ -125,27 +135,27 @@ export default {
         handleApproveButton() {
             $('#app_table').off('click', '.approve-btn:not([disabled])').on('click', '.approve-btn:not([disabled])', (event) => {
                 this.selectedAppId = $(event.target).data('id');
-                this.snInput = ''; 
-                this.isModalVisible = true; 
-                $('#approveModal').modal('show'); 
+                this.snInput = '';
+                this.isModalVisible = true;
+                $('#approveModal').modal('show');
             });
         },
         handleEditButton() {
             $('#app_table').off('click', '.edit-btn').on('click', '.edit-btn', (event) => {
                 const appId = $(event.target).data('id');
-                this.$emit('edit-item', appId); 
+                this.$emit('edit-item', appId);
             });
         },
         closeModal() {
-            this.isModalVisible = false; 
+            this.isModalVisible = false;
             $('#approveModal').modal('hide');
         },
         saveApproval() {
             if (!this.snInput) {
                 alert('Please enter a Stock Number (SN).');
                 return;
-            }        
-            this.$emit('approve-item', { appId: this.selectedAppId, sn: this.snInput , mode: this.modeOfProcTitle });
+            }
+            this.$emit('approve-item', { appId: this.selectedAppId, sn: this.snInput, mode: this.modeOfProcTitle });
             this.closeModal();
         }
     }

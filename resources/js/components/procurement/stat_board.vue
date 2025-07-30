@@ -1,6 +1,6 @@
 <template>
 
-    <div class="col-lg-6 grid-margin stretch-card" v-if="this.role == 'admin'|| this.role == 'user'">
+    <div class="col-lg-6 grid-margin stretch-card" v-if="this.role == 'admin'">
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Monthly Overview - {{ currentMonth }} {{ currentYear }}</h4>
@@ -10,12 +10,12 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-6 grid-margin stretch-card" v-if="this.role == 'admin' || this.role == 'user'">
+    <div class="col-lg-6 grid-margin stretch-card" v-if="this.role == 'admin'">
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Department Overview - {{ currentYear }}</h4>
                 <div class="doughnutjs-wrapper" style="height: 400px; width: 100%;">
-                    <canvas ref="doughnutChart"></canvas> <!-- ✅ Corrected -->
+                    <canvas ref="doughnutChart"></canvas>
                 </div>
 
             </div>

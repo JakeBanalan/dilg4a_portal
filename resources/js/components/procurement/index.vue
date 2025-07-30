@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .profile_img {
     width: 100px;
     height: 100px;
@@ -78,7 +78,7 @@
                 <div class="content-wrapper">
                     <BreadCrumbs />
                     <div class="row">
-                        <StatBox/>
+                        <!-- <StatBox/> -->
                         <!-- <div class="col-lg-3">
                             <UserInfo/>
                         </div> -->

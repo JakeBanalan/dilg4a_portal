@@ -58,7 +58,7 @@
         </div>
       </template>
 
-      <template v-else-if="role === 'user'">
+      <template v-else-if="role === 'user' || role === 'gss_admin' || role === 'budget_admin'">
         <button
           class="btn btn-icon mr-1"
           style="background-color:#059886;color:#fff;"
