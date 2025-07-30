@@ -13,11 +13,11 @@
                     <div class="modal-body">
                         <div class="container">
                             <h1>Do you wish to proceed with the abstract for RFQ No. <span style="color: #007bff;">{{
-                                    rfq_no }}</span>?</h1>
+                                prData.rfq_no }}</span>?</h1>
                             <div class="details">
-                                <div><span>RFQ NO:</span>{{ rfq_no }}</div>
+                                <!-- <div><span>RFQ NO:</span>{{ prData.rfq_no }}</div> -->
                                 <div><span>ABSTRACT NO :</span>{{ aoq_no }}</div>
-                                <div><span>RFQ ID :</span>{{ id }}</div>
+                                <!-- <div><span>RFQ ID :</span>{{ prData.rfq_id }}</div> -->
                             </div>
                         </div>
                     </div>
@@ -44,7 +44,8 @@ export default {
     props: {
         visible: Boolean,
         rfq_no: String,
-        id: String
+        id: String,
+        prData: Object
 
     },
     components: {
@@ -82,16 +83,15 @@ export default {
             }
         },
         proceed() {
-            const rfq_id = this.id;
-            console.log(this.aoq_no);
-            console.log(rfq_id);
+            const rfq_id = this.prData.rfq_id;
             axios.post('/api/PostAbstract', {
                 abstract_no: this.aoq_no,
-                rfq_id: parseInt(rfq_id)
+                rfq_id: this.prData.rfq_id,
             })
                 .then(response => {
                     // Assuming the abstract ID is returned in response.data.abstract_id
                     const abstract_id = response.data.abstract_id;
+                    const rfq_id = response.data.rfq_id;
 
                     this.$router.push({
                         path: '/procurement/abstract',

@@ -152,6 +152,8 @@
                                                                             style="width: 5%;">PURCHASE REQUEST
                                                                             #</th>
                                                                         <th class="select-checkbox sorting_disabled"
+                                                                            style="width: 2%;">STATUS</th>
+                                                                        <th class="select-checkbox sorting_disabled"
                                                                             style="width: 5%;">RFQ #</th>
                                                                         <th class="select-checkbox sorting_disabled"
                                                                             style="width: 5%;">AOQ #</th>
@@ -177,16 +179,26 @@
                                                                             <br> ~PR Date:{{ pr.pr_date }}~
                                                                         </td>
                                                                         <td class="prm-cell">
+                                                                            <span v-if="pr.stat === 17"
+                                                                                class="badge badge-danger">{{ pr.status
+                                                                                }}</span>
+                                                                            <span v-else class="badge badge-success">{{
+                                                                                pr.status }}</span>
+
+                                                                        </td>
+                                                                        <td class="prm-cell">
                                                                             <template v-if="pr.rfq_id">
                                                                                 <b @click.prevent="viewRFQ(pr.rfq_id)">{{
                                                                                     pr.rfq_no }}</b>
                                                                                 <br> ~RFQ Date:{{ pr.rfq_date }}~
                                                                             </template>
-                                                                            <template v-else>
+                                                                            <template
+                                                                                v-else-if="pr.stat !== 17 && pr.stat == 10">
                                                                                 <div class="prm-hover-area">
-                                                                                    <div
+                                                                                    <div @click.prevent="createRFQ(pr)"
                                                                                         class="badge badge-success hover-badge">
-                                                                                        Create RFQ</div>
+                                                                                        Create RFQ
+                                                                                    </div>
                                                                                 </div>
                                                                             </template>
                                                                         </td>
@@ -197,18 +209,70 @@
                                                                                         pr.abstract_no }}</b>
                                                                                 <br> ~AOQ Date: {{ pr.abstract_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.rfq_id">
+                                                                            <template v-else-if="pr.rfq_id || pr.stat == 17">
                                                                                 <div class="prm-hover-area">
-                                                                                    <div
+                                                                                    <div @click.prevent="createAbstract(pr)"
                                                                                         class="badge badge-success hover-badge">
                                                                                         Create AOQ</div>
                                                                                 </div>
                                                                             </template>
                                                                         </td>
-                                                                        <td class="prm-cell"></td>
-                                                                        <td class="prm-cell"></td>
-                                                                        <td class="prm-cell"></td>
-                                                                        <td class="prm-cell"></td>
+                                                                        <td class="prm-cell">
+                                                                            <template v-if="pr.reso_no">
+                                                                                <b>{{ pr.reso_no }}</b>
+                                                                                <br> ~Reso Date: {{ pr.reso_date }}~
+                                                                            </template>
+                                                                            <template v-else-if="pr.abstract_no || pr.stat == 17">
+                                                                                <div class="prm-hover-area">
+                                                                                    <div
+                                                                                        class="badge badge-success hover-badge">
+                                                                                        Create Reso
+                                                                                    </div>
+                                                                                </div>
+                                                                            </template>
+                                                                        </td>
+                                                                        <td class="prm-cell">
+                                                                            <template v-if="pr.po_no">
+                                                                                <b>{{ pr.po_no }}</b>
+                                                                                <br> ~PO Date: {{ pr.po_date }}~
+                                                                            </template>
+                                                                            <template v-else-if="pr.reso_no || pr.stat == 17">
+                                                                                <div class="prm-hover-area">
+                                                                                    <div
+                                                                                        class="badge badge-success hover-badge">
+                                                                                        Create PO
+                                                                                    </div>
+                                                                                </div>
+                                                                            </template>
+                                                                        </td>
+                                                                        <td class="prm-cell">
+                                                                            <template v-if="pr.noa_no">
+                                                                                <b>{{ pr.noa_no }}</b>
+                                                                                <br> ~NOA Date: {{ pr.noa_date }}~
+                                                                            </template>
+                                                                            <template v-else-if="pr.po_no || pr.stat == 17">
+                                                                                <div class="prm-hover-area">
+                                                                                    <div
+                                                                                        class="badge badge-success hover-badge">
+                                                                                        Create NOA
+                                                                                    </div>
+                                                                                </div>
+                                                                            </template>
+                                                                        </td>
+                                                                        <td class="prm-cell">
+                                                                            <template v-if="pr.ntp_no">
+                                                                                <b>{{ pr.ntp_no }}</b>
+                                                                                <br> ~NTP Date: {{ pr.ntp_date }}~
+                                                                            </template>
+                                                                            <template v-else-if="pr.noa_no || pr.stat == 17">
+                                                                                <div class="prm-hover-area">
+                                                                                    <div
+                                                                                        class="badge badge-success hover-badge">
+                                                                                        Create NTP
+                                                                                    </div>
+                                                                                </div>
+                                                                            </template>
+                                                                        </td>
                                                                         <td class="prm-cell"
                                                                             style="text-align:left; white-space: normal; word-break: break-word;">
                                                                             {{ pr.purpose }}</td>
@@ -235,6 +299,9 @@
                 <FooterVue />
             </div>
         </div>
+        <ModalAOQ :visible="aoqvisible" :prData="selectedPR" @close="closeModal" />
+        <ModalRFQ :visible="rfqvisible" @close="closeModal" @post="handlePostRFQ" />
+
     </div>
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
@@ -251,6 +318,10 @@ import axios from 'axios';
 import Multiselect from 'vue-multiselect';
 import { Transition } from 'vue';
 import { formatDate } from '../../globalMethods';
+import ModalAOQ from '../procurement/abstract/modal/modal_confirm_abstract.vue';
+import ModalRFQ from '../procurement/rfq/modal/modal_create_rfq.vue';
+
+
 
 
 export default {
@@ -269,18 +340,24 @@ export default {
         UserInfo,
         Transition,
         Pagination,
+        ModalAOQ,
+        ModalRFQ
+
     },
     data() {
         return {
             isCardVisible: false,
             purchaseRequests: [],
+            aoqvisible: false,
+            rfqvisible: false,
             stats: [],
             division: [
                 { id: 'FAD', name: 'Finance and Administrative Division' },
                 { id: 'ORD', name: 'Office of the Regional Director' },
                 { id: 'LGMED', name: 'Local Government Monitoring and Evaluation Division' },
                 { id: 'LGCDD', name: 'Local Government Capacity Development Division' },
-            ]
+            ],
+            selectedPR: null,
         }
     },
     mounted() {
@@ -292,6 +369,22 @@ export default {
     computed: {
     },
     methods: {
+        createAbstract(pr) {
+            this.selectedPR = pr;
+            this.aoqvisible = true;
+        },
+        handlePostRFQ() {
+            this.rfqvisible = false;
+            this.loadData();
+        },
+        createRFQ(pr) {
+            this.selectedPR = pr;
+            this.rfqvisible = true;
+        },
+        closeModal() {
+            this.aoqvisible = false;
+            this.rfqvisible = false;
+        },
         statbox() {
             axios.get(`../api/pr_monitoring_stats`)
                 .then((response) => {
@@ -325,12 +418,13 @@ export default {
                 .then((response) => {
                     this.purchaseRequests = response.data;
                     this.initializeDataTable();
-                    // console.log(this.purchaseRequests);
+                    console.log(this.purchaseRequests);
                 })
                 .catch((error) => {
                     console.error('Error fetching data:', error);
                 });
         },
+
         initializeDataTable() {
 
             $('#prmtable').DataTable().destroy(); // clean up
@@ -359,23 +453,35 @@ export default {
 
 .prm-cell {
     transition: background-color 0.3s ease;
+    position: relative;
 }
 
+/* Highlight row */
 .prm-cell:hover {
     background-color: rgba(5, 152, 135, 0.258);
 }
 
+/* Reserve space for the badge */
 .prm-hover-area {
     position: relative;
-    height: 100%;
+    height: 24px;
+    /* Make sure it's tall enough for the badge */
 }
 
+/* Always render badge but hide it visually */
 .hover-badge {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease;
     cursor: pointer;
+    display: inline-block;
+    min-width: 80px;
+    /* Optional: set consistent width */
 }
 
+/* On hover, fade it in without triggering reflow */
 .prm-cell:hover .hover-badge {
-    display: inline-block;
+    visibility: visible;
+    opacity: 1;
 }
 </style>

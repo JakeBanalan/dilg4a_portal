@@ -30,8 +30,8 @@ class RFQController extends Controller
     public function fetchSubmittedPurchaseRequest()
     {
         return response()->json(
-            PurchaseRequestModel::selectRaw('id, pr_no,purpose')
-                ->whereIn('stat', [4, 5])
+            PurchaseRequestModel::select('id', 'pr_no', 'purpose')
+                ->where('stat', 10)
                 ->orderBy('id', 'desc')
                 ->get()
         );
@@ -52,7 +52,7 @@ class RFQController extends Controller
             'tbl_rfq.particulars',
             'updater.last_name as updated_by',
             'creator.last_name as created_by',
-            
+
         )
             ->leftJoin('users as creator', 'creator.id', '=', 'tbl_rfq.created_by')
             ->leftJoin('users as updater', 'updater.id', '=', 'tbl_rfq.updated_by');
@@ -207,7 +207,7 @@ class RFQController extends Controller
 
         foreach ($pr_id_check as $id_check) {
             PurchaseRequestModel::where('id', $id_check)
-                ->update(['stat' => 6]);
+                ->update(['stat' => 11]);
         }
 
         return response()->json(['message' => 'RFQ created successfully', 'sql_query' => $rfq], 201);
@@ -542,15 +542,15 @@ class RFQController extends Controller
             // Apply styles to the row
             $sheet->getStyle('B' . $row . ':E' . $row)->applyFromArray($rfqItemsStyle);
             $sheet->getStyle('F' . $row . ':P' . $row)->applyFromArray($rfqItemsStyle1);
-            $sheet->getStyle('A' . $row )->applyFromArray($rfqItemsStyle1);
+            $sheet->getStyle('A' . $row)->applyFromArray($rfqItemsStyle1);
 
             // Set cell values
             $sheet->setCellValueByColumnAndRow(1, $row, $itemIndex++);
             $sheet->setCellValueByColumnAndRow(2, $row, $prItems['description']);
             $sheet->setCellValueByColumnAndRow(6, $row, $prItems['qty']);
             $sheet->setCellValueByColumnAndRow(7, $row, $prItems['unit']);
-            $sheet->setCellValueByColumnAndRow(8, $row, '₱ '. number_format($prItems['abc']));
-            $sheet->setCellValueByColumnAndRow(9, $row, '₱ '.number_format($prItems['total_abc']));
+            $sheet->setCellValueByColumnAndRow(8, $row, '₱ ' . number_format($prItems['abc']));
+            $sheet->setCellValueByColumnAndRow(9, $row, '₱ ' . number_format($prItems['total_abc']));
 
 
             // Adjust row height to auto-size based on the description length

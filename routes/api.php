@@ -28,6 +28,7 @@ use App\Http\Controllers\QMSQuarterlyExportController;
 use App\Http\Controllers\DailyTimeRecordController;
 use App\Http\Controllers\FundSourceController;
 use App\Http\Controllers\SaroController;
+use App\Http\Controllers\ResolutionController;
 
 use App\Http\Controllers\NTAController;
 use App\Http\Controllers\DisbursementController;
@@ -412,6 +413,8 @@ Route::middleware('api')->group(function () {
     Route::get('fetch_supplier_quote/{id}', [AbstractController::class, 'fetch_supplier_quote']);
 });
 
+Route::get('/fetchResolution/{id}', [ResolutionController::class, 'fetchResolution']);
+
 Route::middleware('api')->group(function () {
     Route::get('fetch-nta', [NTAController::class, 'fetchAll']);
     Route::get('fetch-nta/{id}', [NTAController::class, 'fetchById']);
@@ -478,6 +481,9 @@ Route::post('PostSupplierQuotation', [AbstractController::class, 'PostSupplierQu
 // R F Q
 Route::post('post_create_rfq', [RFQController::class, 'post_create_rfq']);
 Route::post('PostUpdateRFQ', [RFQController::class, 'PostUpdateRFQ']);
+
+// R E S O L U T I O N
+Route::post('PostResolution', [ResolutionController::class, 'PostResolution']);
 
 //CALENDAR
 //C A L E N D A R

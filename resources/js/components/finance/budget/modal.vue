@@ -78,7 +78,7 @@ export default {
                         });
                     } else {
                         toast.error('Failed to add Availability Code', {
-                            autoClose: 1500
+                            autoClose: 1500 
                         });
                     }
                 })

@@ -47,7 +47,8 @@ class AbstractController extends Controller
         // Return response with the newly generated ID
         return response()->json([
             'message'      => 'Data saved successfully',
-            'abstract_id'  => $abstract->id // Return the generated ID
+            'abstract_id'  => $abstract->id, // Return the generated ID
+            'rfq_id'  => $abstract->rfq_id // Return the generated ID
         ]);
     }
     public function viewAOQ($id)

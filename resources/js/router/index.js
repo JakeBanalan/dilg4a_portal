@@ -33,6 +33,10 @@ import dashboard_abstract from "../components/procurement/abstract/index.vue";
 import awarding from "../components/procurement/abstract/panel/awarding.vue";
 import quotation from "../components/procurement/abstract/panel/quotation.vue";
 
+//RESOLUTION
+import create_reso from "../components/procurement/resolution/create_reso.vue";
+import update_reso from "../components/procurement/resolution/update_reso.vue";
+
 // PURCHASE ORDER
 import create_po from "../components/procurement/purchase-order/panel/create.vue";
 
@@ -1090,6 +1094,62 @@ const routes = [{
         path: '/procurement/abstract/:id',
         name: 'Quotation',
         component: quotation,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/procurement/resolution',
+        name: 'Create Resolution',
+        component: create_reso,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+            {
+        path: '/procurement/resolution/update/:id',
+        name: 'Update Resolution',
+        component: update_reso,
         meta: {
             requiresAuth: true
         },
