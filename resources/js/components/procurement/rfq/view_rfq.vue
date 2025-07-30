@@ -15,10 +15,10 @@
                                         Information
                                     </h5>
                                     <div class="d-flex" style="float:right;margin-top:-50px;">
-                                        <button type="button" class="btn btn-primary btn-icon-text mx-2"
+                                        <!-- <button type="button" class="btn btn-primary btn-icon-text mx-2"
                                             @click="RouteAbstract()">
                                             <font-awesome-icon :icon="['fas', 'share']"></font-awesome-icon>
-                                            Create Abstract</button>
+                                            Create Abstract</button> -->
 
                                         <button type="button" class="btn btn-warning btn-icon-text mx-2"
                                             @click="openModal()">

@@ -42,12 +42,15 @@ class PurchaseRequestController extends Controller
         // Step 1: Get all PRs and user info
         $prs = DB::table('pr')
             ->leftJoin('users', 'users.id', '=', 'pr.submitted_by')
+            ->leftJoin('tbl_status', 'tbl_status.id', '=', 'pr.stat')
             ->select(
                 'pr.id as pr_id',
                 'pr.pr_no',
                 'pr.purpose',
                 'pr.target_date',
                 'pr.submitted_by',
+                'pr.stat',
+                'tbl_status.title as status',
                 DB::raw('DATE_FORMAT(pr.pr_date, "%b %d, %Y %h:%i %p") as pr_date'),
                 DB::raw("CONCAT(users.first_name, ' ', users.last_name) as ferson"),
             )
@@ -99,6 +102,8 @@ class PurchaseRequestController extends Controller
                     'abstract_date' => $row['abstract_date'],
                     'aoq_id' => $row['aoq_id'],
                     'rfq_id' => $row['rfq_id'],
+                    'status' => $pr->status,
+                    'stat' => $pr->stat,
                 ];
             }
         }
@@ -118,6 +123,8 @@ class PurchaseRequestController extends Controller
                     'rfq_date' => null,
                     'abstract_no' => null,
                     'abstract_date' => null,
+                    'status' => $pr->status,
+                    'stat' => $pr->stat,
                 ];
             }
         }
