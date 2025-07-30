@@ -145,6 +145,240 @@ class PurchaseRequestController extends Controller
                 ->get()
         );
     }
+    public function fetchItems(Request $request)
+    {
+        $userId = $request->input('userId');
+
+        $user = UserModel::find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        try {
+            $query = AppItemModel::select(
+                'tbl_app.id',
+                'tbl_app.item_title as name',
+                'tbl_app.sn as stockno',
+                'unit.item_unit_title as unit',
+                'tbl_app.app_year as AppYear'
+            )
+                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
+                ->where('tbl_app.app_status', 'approve');
+
+            if ($user->user_role !== 'gss_admin') {
+                $query->where('tbl_app.pmo_id', $user->pmo_id);
+            }
+
+            $items = $query->get();
+
+            return response()->json($items, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while fetching items'], 500);
+        }
+    }
+
+    public function fetchPurchaseReqData(Request $request)
+    {
+        $page = $request->query('page', 1);
+        $itemsPerPage = $request->query('itemsPerPage', 50); // Reduced default for performance
+
+        $userId = $request->input('user_id');
+        $user = UserModel::find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $prNo = $request->input('pr_no');
+        $prDate = $request->input('pr_date');
+        $pmo = $request->input('pmo');
+        $status = $request->input('status');
+
+        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
+            pr.id AS `id`,
+            MAX(pr.pr_no) AS `pr_no`,
+            MAX(pr.action_officer) AS `user_id`,
+            CONCAT(MAX(users.first_name), " ", MAX(users.last_name)) AS `created_by`,
+            MAX(pr.current_step) AS `step`,
+            MAX(pmo.pmo_title) AS `office`,
+            MAX(pr.submitted_by) AS `submitted_by`,
+            MAX(pr.purpose) AS `particulars`,
+            MAX(pr.pr_date) AS `pr_date`,
+            MAX(pr.target_date) AS `target_date`,
+            MAX(pr.is_urgent) AS `is_urgent`,
+            MAX(pr_items.qty) AS `quantity`,
+            SUM(pr_items.abc) AS `app_price`,
+            MAX(pr_items.description) AS `desc`,
+            MAX(mode.mode_of_proc_title) AS `type`,
+            MAX(app.sn) AS `serial_no`,
+            MAX(app.item_title) AS `item_title`,
+            MAX(unit.item_unit_title) AS `unit`,
+            MAX(status.title) AS `status`,
+            MAX(status.id) AS `status_id`,
+            MAX(pr.is_gss_submitted) AS `is_gss_submitted`,
+            MAX(pr.is_budget_submitted) AS `is_budget_submitted`,
+            MAX(pr.is_ord_submitted) AS `is_ord_submitted`
+        '))
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
+            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
+            ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
+            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
+            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
+            ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
+            ->orderBy('pr.id', 'desc')
+            ->groupBy('pr.id');
+
+        if ($user->user_role === 'gss_admin') {
+            $query->whereIn('pr.stat', [
+                SUBMITTED_TO_GSS, // 2
+                RECEIVED_BY_GSS,  // 3
+                APPROVED_BY_GSS,  // 4
+                RETURNED_BY_GSS   // 14
+            ]);
+        } elseif ($user->user_role === 'budget_admin') {
+            $query->whereIn('pr.stat', [
+                SUBMITTED_TO_BUDGET,
+                RECEIVED_BY_BUDGET,
+                APPROVED_BY_BUDGET,
+                RETURNED_BY_BUDGET
+            ]);
+        } elseif ($user->user_role === 'ord_admin') {
+            $query->whereIn('pr.stat', [
+                SUBMITTED_TO_ORD,
+                RECEIVED_BY_ORD,
+                APPROVED_BY_ORD,
+                RETURNED_BY_ORD
+            ]);
+        }
+
+        if ($prNo) {
+            $query->where('pr.pr_no', 'like', '%' . $prNo . '%');
+        }
+        if ($prDate) {
+            $query->whereDate('pr.pr_date', $prDate);
+        }
+        if ($pmo) {
+            $query->where('pmo.pmo_title', 'like', '%' . $pmo . '%');
+        }
+        if ($status) {
+            $query->where('status.title', 'like', '%' . $status . '%');
+        }
+
+        if (!in_array($user->user_role, ['gss_admin', 'budget_admin', 'ord_admin'])) {
+            $query->where('pr.action_officer', $user->id);
+        }
+
+        try {
+            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
+
+            return response()->json($prData);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching data.', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    public function perUserPurchaseReqData(Request $request)
+    {
+        $page = $request->query('page', 1);
+        $itemsPerPage = $request->query('itemsPerPage', 10000);
+
+        $userId = $request->input('user_id');
+        $user = UserModel::find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
+            pr.id AS `id`,
+            MAX(pr.pr_no) AS `pr_no`,
+            MAX(pr.action_officer) AS `user_id`,
+            CONCAT(MAX(users.first_name), " ", MAX(users.last_name)) AS `created_by`,
+            MAX(pr.current_step) AS `step`,
+            MAX(pmo.pmo_title) AS `office`,
+            MAX(pr.submitted_by) AS `submitted_by`,
+            MAX(pr.purpose) AS `particulars`,
+            MAX(pr.pr_date) AS `pr_date`,
+            MAX(pr.target_date) AS `target_date`,
+            MAX(pr.is_urgent) AS `is_urgent`,
+            SUM(pr_items.abc) AS `app_price`,
+            MAX(pr_items.qty) AS `quantity`,
+            MAX(pr_items.description) AS `desc`,
+            MAX(mode.mode_of_proc_title) AS `type`,
+            MAX(app.sn) AS `serial_no`,
+            MAX(app.item_title) AS `item_title`,
+            MAX(unit.item_unit_title) AS `unit`,
+            MAX(status.title) AS `status`,
+            MAX(status.id) AS `status_id`
+        '))
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
+            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
+            ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
+            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
+            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
+            ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
+            ->orderBy('pr.id', 'desc')
+            ->groupBy('pr.id');
+
+        if (!in_array($user->user_role, ['gss_admin', 'budget_admin','ord_admin'])) {
+            $query->where('pr.action_officer', $user->id);
+        }
+
+        try {
+            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'An error occurred while fetching data.'], 500);
+        }
+
+        return response()->json($prData);
+    }
+
+    public function viewPurchaseRequest($id)
+    {
+        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
+                pr.id AS `id`,
+                pr.type AS `type`,
+                pr.pr_no AS `pr_no`,
+                pr.action_officer AS `user_id`,
+                users.last_name AS `created_by`,
+                pmo.id AS `office`,
+                pr.purpose AS `particulars`,
+                pr.pr_date AS `pr_date`,
+                pr.target_date AS `target_date`,
+                pr.is_urgent AS `is_urgent`
+            '))
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
+            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
+            ->where('pr.id', $id)
+            ->first();
+
+        if (!$query) {
+            return response()->json(['message' => 'Purchase request not found'], 404);
+        }
+
+        $prItems = PurchaseRequestItemModel::where('pr_id', $id)
+            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
+            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
+            ->select(
+                'pr_items.id',
+                'pr_items.qty',
+                'pr_items.unit_cost',
+                'pr_items.abc',
+                'pr_items.description',
+                'app.sn as serial_no',
+                'app.item_title as item_title',
+                'unit.item_unit_title as unit'
+            )
+            ->get();
+
+        return response()->json([
+            'purchaseRequest' => $query,
+            'prItems' => $prItems
+        ]);
+    }
 
     public function post_create_purchaseRequest(Request $request)
     {
@@ -285,220 +519,6 @@ class PurchaseRequestController extends Controller
         }
     }
 
-    public function fetchItems(Request $request)
-    {
-        $userId = $request->input('userId');
-
-        $user = UserModel::find($userId);
-
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-        try {
-            $query = AppItemModel::select(
-                'tbl_app.id',
-                'tbl_app.item_title as name',
-                'tbl_app.sn as stockno',
-                'unit.item_unit_title as unit',
-                'tbl_app.app_year as AppYear'
-            )
-                ->leftJoin('item_unit as unit', 'unit.id', '=', 'tbl_app.unit_id')
-                ->where('tbl_app.app_status', 'approve');
-
-            if ($user->user_role !== 'gss_admin') {
-                $query->where('tbl_app.pmo_id', $user->pmo_id);
-            }
-
-            $items = $query->get();
-
-            return response()->json($items, 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while fetching items'], 500);
-        }
-    }
-
-    public function fetchPurchaseReqData(Request $request)
-    {
-        $page = $request->query('page', 1);
-        $itemsPerPage = $request->query('itemsPerPage', 10000);
-
-        $userId = $request->input('user_id');
-        $user = UserModel::find($userId);
-
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-        $prNo = $request->input('pr_no');
-        $actionOfficer = $request->input('action_officer');
-        $prDate = $request->input('pr_date');
-        $pmo = $request->input('pmo');
-        $status = $request->input('status');
-
-        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-            pr.id AS `id`,
-            MAX(pr.pr_no) AS `pr_no`,
-            MAX(pr.action_officer) AS `user_id`,
-            CONCAT(MAX(users.first_name), " ", MAX(users.last_name)) AS `created_by`,
-            MAX(pr.current_step) AS `step`,
-            MAX(pmo.pmo_title) AS `office`,
-            MAX(pr.submitted_by) AS `submitted_by`,
-            MAX(pr.purpose) AS `particulars`,
-            MAX(pr.pr_date) AS `pr_date`,
-            MAX(pr.target_date) AS `target_date`,
-            MAX(pr.is_urgent) AS `is_urgent`,
-            MAX(pr_items.qty) AS `quantity`,
-            SUM(pr_items.abc) AS `app_price`,
-            MAX(pr_items.description) AS `desc`,
-            MAX(mode.mode_of_proc_title) AS `type`,
-            MAX(app.sn) AS `serial_no`,
-            MAX(app.item_title) AS `item_title`,
-            MAX(unit.item_unit_title) AS `unit`,
-            MAX(status.title) AS `status`,
-            MAX(status.id) AS `status_id`
-        '))
-            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
-            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
-            ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
-            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
-            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
-            ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
-            ->orderBy('pr.id', 'desc')
-            ->groupBy('pr.id');
-
-        if ($prNo) {
-            $query->where('pr.pr_no', 'like', '%' . $prNo . '%');
-        }
-
-        if ($prDate) {
-            $query->whereDate('pr.pr_date', $prDate);
-        }
-
-        if ($pmo) {
-            $query->where('pmo.pmo_title', 'like', '%' . $pmo . '%');
-        }
-
-        if ($status) {
-            $query->where('status.title', 'like', '%' . $status . '%');
-        }
-
-        if (!in_array($user->user_role, ['gss_admin', 'budget_admin'])) {
-            $query->where('pr.action_officer', $user->id);
-        }
-
-        try {
-            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while fetching data.'], 500);
-        }
-
-        return response()->json($prData);
-    }
-
-    public function perUserPurchaseReqData(Request $request)
-    {
-        $page = $request->query('page', 1);
-        $itemsPerPage = $request->query('itemsPerPage', 10000);
-
-        $userId = $request->input('user_id');
-        $user = UserModel::find($userId);
-
-        if (!$user) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-            pr.id AS `id`,
-            MAX(pr.pr_no) AS `pr_no`,
-            MAX(pr.action_officer) AS `user_id`,
-            CONCAT(MAX(users.first_name), " ", MAX(users.last_name)) AS `created_by`,
-            MAX(pr.current_step) AS `step`,
-            MAX(pmo.pmo_title) AS `office`,
-            MAX(pr.submitted_by) AS `submitted_by`,
-            MAX(pr.purpose) AS `particulars`,
-            MAX(pr.pr_date) AS `pr_date`,
-            MAX(pr.target_date) AS `target_date`,
-            MAX(pr.is_urgent) AS `is_urgent`,
-            SUM(pr_items.abc) AS `app_price`,
-            MAX(pr_items.qty) AS `quantity`,
-            MAX(pr_items.description) AS `desc`,
-            MAX(mode.mode_of_proc_title) AS `type`,
-            MAX(app.sn) AS `serial_no`,
-            MAX(app.item_title) AS `item_title`,
-            MAX(unit.item_unit_title) AS `unit`,
-            MAX(status.title) AS `status`,
-            MAX(status.id) AS `status_id`
-        '))
-            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
-            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
-            ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
-            ->leftJoin('pr_items', 'pr_items.pr_id', '=', 'pr.id')
-            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
-            ->leftJoin('tbl_status as status', 'status.id', '=', 'pr.stat')
-            ->orderBy('pr.id', 'desc')
-            ->groupBy('pr.id');
-
-        if (!in_array($user->user_role, ['gss_admin', 'budget_admin'])) {
-            $query->where('pr.action_officer', $user->id);
-        }
-
-        try {
-            $prData = $query->paginate($itemsPerPage, ['*'], 'page', $page);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'An error occurred while fetching data.'], 500);
-        }
-
-        return response()->json($prData);
-    }
-
-    public function viewPurchaseRequest($id)
-    {
-        $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-                pr.id AS `id`,
-                pr.type AS `type`,
-                pr.pr_no AS `pr_no`,
-                pr.action_officer AS `user_id`,
-                users.last_name AS `created_by`,
-                pmo.id AS `office`,
-                pr.purpose AS `particulars`,
-                pr.pr_date AS `pr_date`,
-                pr.target_date AS `target_date`,
-                pr.is_urgent AS `is_urgent`
-            '))
-            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
-            ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
-            ->where('pr.id', $id)
-            ->first();
-
-        if (!$query) {
-            return response()->json(['message' => 'Purchase request not found'], 404);
-        }
-
-        $prItems = PurchaseRequestItemModel::where('pr_id', $id)
-            ->leftJoin('tbl_app as app', 'app.id', '=', 'pr_items.pr_item_id')
-            ->leftJoin('item_unit as unit', 'unit.id', '=', 'app.unit_id')
-            ->select(
-                'pr_items.id',
-                'pr_items.qty',
-                'pr_items.unit_cost',
-                'pr_items.abc',
-                'pr_items.description',
-                'app.sn as serial_no',
-                'app.item_title as item_title',
-                'unit.item_unit_title as unit'
-            )
-            ->get();
-
-        return response()->json([
-            'purchaseRequest' => $query,
-            'prItems' => $prItems
-        ]);
-    }
-
-
     public function updatePurchaseRequestStatus(Request $request)
     {
         $purchaseRequest = PurchaseRequestModel::find($request->input('id'));
@@ -580,7 +600,7 @@ class PurchaseRequestController extends Controller
                 if ($request->has('is_ord_submitted')) {
                     $purchaseRequest->is_ord_submitted = (bool)$request->input('is_ord_submitted');
                     if ($purchaseRequest->is_ord_submitted) {
-                        $purchaseRequest->submitted_by_ord = $request->input('submitted_by_ord');
+                        $purchaseRequest->submitted_by = $request->input('submitted_by');
                         $purchaseRequest->submitted_date_ord = Carbon::now();
                     }
                 }
@@ -607,7 +627,7 @@ class PurchaseRequestController extends Controller
 
             return response()->json(['message' => 'Purchase request updated successfully', 'data' => $purchaseRequest]);
         } catch (\Exception $e) {
-            DB::rollBack();        
+            DB::rollBack();
             return response()->json(['message' => 'Failed to update purchase request', 'error' => $e->getMessage()], 500);
         }
     }

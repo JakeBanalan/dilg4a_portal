@@ -17,7 +17,6 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    /* Adjusted opacity for better visibility */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,12 +26,9 @@
 .modal-dialog {
     background: #fff;
     border-radius: 8px;
-    /* Slightly increased border radius */
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-    /* Enhanced shadow for better focus */
     width: 100%;
-    /* Adjusted width for medium modal */
     max-width: 1080px;
 }
 
@@ -85,8 +81,9 @@
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="table-responsive">
-                                                <app_table ref="appTable" :role="role" @approve-item="approveItem"
-                                                    @edit-item="editItem" />
+                                                <app_table ref="appTable" :role="role" :userId="userId"
+                                                    @approve-item="approveItem" @edit-item="editItem"
+                                                    @refresh="fetchAppData" />
                                             </div>
                                         </div>
                                     </div>
@@ -150,8 +147,8 @@ export default {
     data() {
         return {
             currentYear: new Date().getFullYear(),
-            role: '', // Initialize role
-            isModalVisible: false, // Track modal visibility
+            role: '',
+            isModalVisible: false,
             selectedAppId: null,
             userId: null,
             modalData: {
@@ -159,7 +156,7 @@ export default {
                 unitTile: '',
                 itemCategory: '',
                 modeOfProcTitle: ''
-            }, // Data for the modal
+            },
             unitOption: [
                 { value: 1, label: 'piece' },
                 { value: 2, label: 'box' },
@@ -324,7 +321,7 @@ export default {
                 { value: 137, label: '6.1 Newspapers' },
             ],
             pr_typeOption: [
-                { value: '1', label: 'Small Value Procuremen' },
+                { value: '1', label: 'Small Value Procurement' },
                 { value: '2', label: 'Shopping' },
                 { value: '3', label: 'NP Lease of Venue' },
                 { value: '4', label: 'Direct Contracting' },
@@ -348,7 +345,6 @@ export default {
         vSelect
     },
     mounted() {
-        // Request notification permission on component mount
         if (Notification.permission !== "granted") {
             Notification.requestPermission();
         }
@@ -356,24 +352,34 @@ export default {
     },
     methods: {
         addAppItem() {
-            this.$router.push("/procurement/add_app_item");           
+            this.$router.push("/procurement/add_app_item");
         },
         async fetchAppData(appYear = null) {
             try {
+                if (!this.userId) {
+                    toast.error('User ID is missing.', { autoClose: 1500 });
+                    return;
+                }
                 const params = {
                     userId: this.userId,
                 };
                 if (appYear) params.appYear = appYear;
 
-                const response = await axios.get(`../api/fetchAppData`, { params });
+                const response = await axios.get('/api/fetchAppData', { params });
+                if (!response.data || !Array.isArray(response.data)) {
+                    console.error('Invalid data format:', response.data);
+                    toast.error('Invalid data received from server.', { autoClose: 1500 });
+                    return;
+                }
                 this.$refs.appTable.initializeTable(response.data);
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching data:', error.response || error);
+                toast.error(error.response?.data?.error || 'Failed to fetch data.', { autoClose: 1500 });
             }
         },
         async approveItem({ appId, sn, mode }) {
             try {
-                const response = await axios.post(`../api/approveAppItem/${appId}`, { sn , mode });
+                const response = await axios.post(`../api/approveAppItem/${appId}`, { sn, mode });
                 toast.success(response.data.message || 'Item approved successfully!', { autoClose: 1000 });
                 this.fetchAppData();
             } catch (error) {
@@ -392,9 +398,9 @@ export default {
                         return;
                     }
                     this.modalData.itemTitle = data.item_title || '';
-                    this.modalData.unitTile = data.unit_id || ''; 
-                    this.modalData.itemCategory = data.category_id || ''; 
-                    this.modalData.modeOfProcTitle = data.mode_id || ''; 
+                    this.modalData.unitTile = data.unit_id || '';
+                    this.modalData.itemCategory = data.category_id || '';
+                    this.modalData.modeOfProcTitle = data.mode_id || '';
 
                     this.isModalVisible = true;
                 })
@@ -405,7 +411,7 @@ export default {
         },
         closeModal() {
             this.isModalVisible = false;
-            this.selectedAppId = null; 
+            this.selectedAppId = null;
         },
         handleSaveButton() {
             const data = {
@@ -424,7 +430,7 @@ export default {
             axios.post(`../api/updateAppDataById/${data.id}`, data)
                 .then((response) => {
                     toast.success(response.data.message || 'Item updated successfully!', { autoClose: 1000 });
-                    this.closeModal(); 
+                    this.closeModal();
                     this.fetchAppData();
                 })
                 .catch((error) => {

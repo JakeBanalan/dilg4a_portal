@@ -282,7 +282,8 @@ export default {
                 userId: '',
                 app_year: new Date().getFullYear(),
             },
-            cardTitle: "Please provide the needed information below. Fill out all the required fields (*)."
+            cardTitle: "Please provide the needed information below. Fill out all the required fields (*).",
+            created_by: null
         }
 
 
@@ -329,11 +330,16 @@ export default {
         },
         async submitAppItem() {
             try {
+                this.formData.created_by = localStorage.getItem('userId');
+                if (!this.formData.created_by) {
+                    toast.error('User ID is missing. Please log in again.', { autoClose: 1500 });
+                    return;
+                }
 
-                this.formData.userId = localStorage.getItem('userId');
                 const response = await axios.post('/api/app-items', this.formData);
                 toast.success(response.data.message || 'Item added successfully!', { autoClose: 1000 });
-                // ✅ Notify the gss_admin role
+
+                // Notify gss_admin role
                 this.notifyNewApproval();
 
                 setTimeout(() => {

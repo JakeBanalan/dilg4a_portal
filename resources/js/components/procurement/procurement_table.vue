@@ -449,7 +449,7 @@ export default {
     },
     watch: {
         filterParams: {
-            handler(newVal) {              
+            handler(newVal) {
                 this.currentPage = 1;
                 this.refreshData();
             },
@@ -479,11 +479,11 @@ export default {
                     (!this.filterParams.pr_date || item.pr_date === this.filterParams.pr_date) &&
                     (!this.filterParams.pmo || item.office === this.filterParams.pmo) &&
                     (!this.filterParams.status || item.status === this.filterParams.status)
-                );    
+                );
                 return matches;
             });
             const start = (this.currentPage - 1) * this.itemsPerPage;
-            const end = start + this.itemsPerPage;           
+            const end = start + this.itemsPerPage;
             return filteredRequests.slice(start, end);
         },
         showingEntriesMessage() {
@@ -495,7 +495,7 @@ export default {
     created() {
         const userId = localStorage.getItem('userId');
         this.userId = userId ? parseInt(userId) : null;
-        this.role = localStorage.getItem('user_role');       
+        this.role = localStorage.getItem('user_role');
         if (!this.userId || !this.role) {
             toast.error('User not authenticated. Please log in.', { autoClose: 2000 });
             this.$router.push('/login');
@@ -507,8 +507,15 @@ export default {
             this.refreshData();
         }
     },
-    beforeUnmount() {      
+    beforeUnmount() {
         window.Echo.leave(`notifications.${this.userId}`);
+        if (this.role === 'gss_admin') {
+            window.Echo.leave('notifications.gss_admin');
+        } else if (this.role === 'budget_admin') {
+            window.Echo.leave('notifications.budget_admin');
+        } else if (this.role === 'ord_admin') {
+            window.Echo.leave('notifications.ord_admin');
+        }
     },
     methods: {
         dateFormat(date) {
@@ -533,35 +540,58 @@ export default {
             };
             return ['badge', badgeClasses[statusId] || 'badge-default'];
         },
+        // Map statusId to status name, similar to PHP event
+        getStatusName(statusId) {
+            const statusMessages = {
+                2: 'SUBMITTED TO GSS',
+                3: 'RECEIVED BY GSS',
+                4: 'APPROVED BY GSS',
+                5: 'SUBMITTED TO BUDGET',
+                6: 'RECEIVED BY BUDGET',
+                7: 'APPROVED BY BUDGET',
+                8: 'SUBMITTED TO ORD',
+                9: 'RECEIVED BY ORD',
+                10: 'APPROVED BY ORD',
+                14: 'RETURNED BY GSS',
+                15: 'RETURNED BY BUDGET',
+                16: 'RETURNED BY ORD',
+                17: 'CANCELLED',
+            };
+            return statusMessages[statusId] || 'Unknown';
+        },
         setupWebSocket() {
-            if (!this.userId) {              
+            if (!this.userId) {
                 toast.error('User not authenticated. Please log in.', { autoClose: 2000 });
                 return;
             }
-    
-            if (!window.Echo) {               
+
+            if (!window.Echo) {
                 toast.error('Real-time updates are unavailable. Please refresh the page.', { autoClose: 2000 });
                 return;
             }
 
+            // Subscribe to user-specific channel
             window.Echo.channel(`notifications.${this.userId}`)
-                .listen('PurchaseRequestUpdated', (e) => {                  
+                .listen('PurchaseRequestUpdated', (e) => {
                     const { title, body, prId, statusId } = e;
                     const iconPath = '/images/logo.png';
 
-                    // Update purchaseRequests directly
+                    // Update purchase request in the list
                     const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
                     if (prIndex !== -1) {
-                        this.purchaseRequests[prIndex].status_id = statusId;                     
-                        this.purchaseRequests[prIndex].status = this.purchaseRequests[prIndex].status;
+                        // Use Vue.set for reactivity
+                        Vue.set(this.purchaseRequests, prIndex, {
+                            ...this.purchaseRequests[prIndex],
+                            status_id: statusId,
+                            status: this.getStatusName(statusId),
+                        });
+                    } else {
+                        // If PR is not in the list, fetch it to add (optional, depending on requirements)
                         this.refreshData();
-                    } 
-                    // Reset status filter to ensure updated PR is visible
-                    if (this.filterParams.status) {                      
-                        this.$emit('update:filterParams', { ...this.filterParams, status: null });
                     }
 
-                    if (!("Notification" in window)) {                      
+                    // Show notification
+                    if (!("Notification" in window)) {
                         window.alert(`${title}: ${body}`);
                         return;
                     }
@@ -585,78 +615,124 @@ export default {
                                     window.open(`/procurement/index`, '_blank');
                                 };
                             } else {
-                               
                                 window.alert(`${title}: ${body}`);
                             }
-                        }).catch(error => {                            
+                        }).catch(error => {
                             window.alert(`${title}: ${body}`);
                         });
-                    } else {                     
+                    } else {
                         window.alert(`${title}: ${body}`);
                     }
-                })              
-                .error((error) => {                   
+                })
+                .error((error) => {
                     toast.error('Failed to connect to real-time updates.', { autoClose: 2000 });
                 });
+
+            // Subscribe to role-based channels
+            if (this.role === 'gss_admin') {
+                window.Echo.channel('notifications.gss_admin')
+                    .listen('PurchaseRequestUpdated', (e) => {
+                        const { title, body, prId, statusId } = e;
+                        const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
+                        if (prIndex !== -1) {
+                            Vue.set(this.purchaseRequests, prIndex, {
+                                ...this.purchaseRequests[prIndex],
+                                status_id: statusId,
+                                status: this.getStatusName(statusId),
+                            });
+                        } else {
+                            this.refreshData();
+                        }
+                    });
+            } else if (this.role === 'budget_admin') {
+                window.Echo.channel('notifications.budget_admin')
+                    .listen('PurchaseRequestUpdated', (e) => {
+                        const { title, body, prId, statusId } = e;
+                        const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
+                        if (prIndex !== -1) {
+                            Vue.set(this.purchaseRequests, prIndex, {
+                                ...this.purchaseRequests[prIndex],
+                                status_id: statusId,
+                                status: this.getStatusName(statusId),
+                            });
+                        } else {
+                            this.refreshData();
+                        }
+                    });
+            } else if (this.role === 'ord_admin') {
+                window.Echo.channel('notifications.ord_admin')
+                    .listen('PurchaseRequestUpdated', (e) => {
+                        const { title, body, prId, statusId } = e;
+                        const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
+                        if (prIndex !== -1) {
+                            Vue.set(this.purchaseRequests, prIndex, {
+                                ...this.purchaseRequests[prIndex],
+                                status_id: statusId,
+                                status: this.getStatusName(statusId),
+                            });
+                        } else {
+                            this.refreshData();
+                        }
+                    });
+            }
         },
-        loadData(filterParams = {}) {           
+        loadData(filterParams = {}) {
             return axios.post('/api/fetchPurchaseReqData', {
                 user_id: this.userId,
                 page: this.currentPage,
                 itemsPerPage: this.itemsPerPage,
                 ...filterParams
             })
-                .then((response) => {                   
+                .then((response) => {
                     this.purchaseRequests = response.data.data.map((pr) => ({
                         ...pr,
                         isBudgetSubmitted: pr.is_budget_submitted || false,
                         isGSSSubmitted: pr.is_gss_submitted || false,
                         isORDSubmitted: pr.is_ord_submitted || false,
-                    }));                   
+                        status: this.getStatusName(pr.status_id), // Ensure status is set
+                    }));
                 })
-                .catch((error) => {                  
+                .catch((error) => {
                     toast.error('Failed to load data.', { autoClose: 2000 });
                     throw error;
                 });
         },
-        loadDataPerUser(filterParams = {}) {          
+        loadDataPerUser(filterParams = {}) {
             return axios.post('/api/perUserPurchaseReqData', {
                 user_id: this.userId,
                 page: this.currentPage,
                 itemsPerPage: this.itemsPerPage,
                 ...filterParams
             })
-                .then((response) => {                  
+                .then((response) => {
                     this.purchaseRequests = response.data.data.map((pr) => ({
                         ...pr,
                         isBudgetSubmitted: pr.is_budget_submitted || false,
                         isGSSSubmitted: pr.is_gss_submitted || false,
                         isORDSubmitted: pr.is_ord_submitted || false,
-                    }));                   
+                        status: this.getStatusName(pr.status_id), // Ensure status is set
+                    }));
                 })
-                .catch((error) => {                 
+                .catch((error) => {
                     toast.error('Failed to load user data.', { autoClose: 2000 });
                     throw error;
                 });
         },
         refreshData() {
-            if (!this.userId || !this.role) {              
+            if (!this.userId || !this.role) {
                 toast.error('User not authenticated. Please log in.', { autoClose: 2000 });
                 return;
-            }           
+            }
             const loadMethod = ['admin', 'gss_admin', 'budget_admin', 'ord_admin'].includes(this.role)
                 ? this.loadData
                 : this.loadDataPerUser;
-            setTimeout(() => {
-                loadMethod(this.filterParams).then(() => {
-                   
-                    eventBus.emit('updateStats');
-                }).catch((error) => {
-                    console.error('Error refreshing data:', error);
-                });
-            }, 500);
+            loadMethod(this.filterParams).then(() => {
+                eventBus.emit('updateStats');
+            }).catch((error) => {
+                console.error('Error refreshing data:', error);
+            });
         },
-        onPageChange(page) {          
+        onPageChange(page) {
             this.currentPage = page;
             this.refreshData();
         },
@@ -719,7 +795,7 @@ export default {
                 submitted_by_gss: this.userId,
                 is_gss_submitted: false,
             })
-                .then((response) => {                   
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === this.selectedPrId);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -750,7 +826,7 @@ export default {
                 submitted_by: this.userId,
                 is_budget_submitted: false,
             })
-                .then((response) => {                   
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === this.selectedPrId);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -781,7 +857,7 @@ export default {
                 submitted_by_ord: this.userId,
                 is_ord_submitted: false,
             })
-                .then((response) => {                  
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === this.selectedPrId);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -812,7 +888,7 @@ export default {
                 submitted_by_gss: this.userId,
                 is_gss_submitted: true,
             })
-                .then((response) => {                   
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === this.selectedPrId);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -843,7 +919,7 @@ export default {
                 submitted_by: this.userId,
                 is_budget_submitted: true,
             })
-                .then((response) => {                    
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === this.selectedPrId);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -874,7 +950,7 @@ export default {
                 submitted_by_ord: this.userId,
                 is_ord_submitted: true,
             })
-                .then((response) => {                   
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === this.selectedPrId);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -905,7 +981,7 @@ export default {
                 submitted_by_gss: this.userId,
                 is_gss_submitted: false,
             })
-                .then((response) => {                    
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -932,7 +1008,7 @@ export default {
                 submitted_by: this.userId,
                 is_budget_submitted: false,
             })
-                .then((response) => {                 
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -959,7 +1035,7 @@ export default {
                 submitted_by_ord: this.userId,
                 is_ord_submitted: false,
             })
-                .then((response) => {                  
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -969,7 +1045,7 @@ export default {
                     toast.success('Successfully submitted to ORD!', { autoClose: 2000 });
                     this.refreshData();
                 })
-                .catch((error) => {                  
+                .catch((error) => {
                     toast.error(error.response?.data?.message || 'Failed to submit to ORD.', { autoClose: 2000 });
                     this.refreshData();
                 });
@@ -984,7 +1060,7 @@ export default {
                 status: 17,
                 submitted_by: this.userId,
             })
-                .then((response) => {                 
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
@@ -1009,7 +1085,7 @@ export default {
                 status: 'return',
                 submitted_by: this.userId
             })
-                .then((response) => {                  
+                .then((response) => {
                     const updatedRequest = this.purchaseRequests.find((pr) => pr.id === id);
                     if (updatedRequest) {
                         updatedRequest.status_id = response.data.data.stat;
