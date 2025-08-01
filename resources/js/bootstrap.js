@@ -24,9 +24,10 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
 window.Pusher = Pusher;
+// window.Pusher.logToConsole = true;
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: '29d53f8816252d29de52', // Your PUSHER_APP_KEY
+    key: 'ab9564fd50f2d6d9e627', // Your PUSHER_APP_KEY
     cluster: 'ap1', // Your PUSHER_APP_CLUSTER
     forceTLS: true,
     auth: {

@@ -49,35 +49,24 @@ class PurchaseRequestUpdated implements ShouldBroadcast
     public function broadcastOn()
     {
         $channels = [];
-
-        // Notify admins based on status
+    
         if (in_array($this->statusId, [SUBMITTED_TO_GSS, RECEIVED_BY_GSS, APPROVED_BY_GSS, RETURNED_BY_GSS])) {
-            // Notify all gss_admin users
-            $gssAdmins = \App\Models\UserModel::where('user_role', 'gss_admin')->pluck('id')->toArray();
-            foreach ($gssAdmins as $adminId) {
-                $channels[] = new Channel('notifications.' . $adminId);
-            }
+          
+            $channels[] = new Channel('notifications.gss_admin');
         } elseif (in_array($this->statusId, [SUBMITTED_TO_BUDGET, RECEIVED_BY_BUDGET, APPROVED_BY_BUDGET, RETURNED_BY_BUDGET])) {
-            // Notify all budget_admin users
-            $budgetAdmins = \App\Models\UserModel::where('user_role', 'budget_admin')->pluck('id')->toArray();
-            foreach ($budgetAdmins as $adminId) {
-                $channels[] = new Channel('notifications.' . $adminId);
-            }
-        } elseif (in_array($this->statusId, [SUBMITTED_TO_ORD, RECEIVED_BY_ORD, APPROVED_BY_ORD, RETURNED_BY_ORD])) {
-            // Notify all ord_admin users
-            $ordAdmins = \App\Models\UserModel::where('user_role', 'ord_admin')->pluck('id')->toArray();
-            foreach ($ordAdmins as $adminId) {
-                $channels[] = new Channel('notifications.' . $adminId);
-            }
-        }
 
-        // Always notify the creator and action officer
+            $channels[] = new Channel('notifications.budget_admin');
+        } elseif (in_array($this->statusId, [SUBMITTED_TO_ORD, RECEIVED_BY_ORD, APPROVED_BY_ORD, RETURNED_BY_ORD])) {
+            $channels[] = new Channel('notifications.ord_admin');
+        }
+    
         if ($this->createdById) {
             $channels[] = new Channel('notifications.' . $this->createdById);
         }
         if ($this->actionOfficerId && $this->actionOfficerId != $this->createdById) {
             $channels[] = new Channel('notifications.' . $this->actionOfficerId);
         }
+    
         return array_unique($channels, SORT_REGULAR);
     }
 

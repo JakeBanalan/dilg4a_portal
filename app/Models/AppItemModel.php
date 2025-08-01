@@ -27,6 +27,7 @@ class AppItemModel extends Model
         'remarks',
         'app_year',
         'created_at',
-        'app_status'
+        'app_status',
+        'created_by'
     ];
 }

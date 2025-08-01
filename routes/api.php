@@ -237,6 +237,7 @@ Route::middleware('api')->group(function () {
 
 Route::middleware('api')->group(function () {
     Route::get('viewPurchaseRequest/{id}', [PurchaseRequestController::class, 'viewPurchaseRequest']);
+    Route::get('fetchPurchaseReqData/{prId}', [PurchaseRequestController::class, 'fetchSinglePurchaseRequest']);
 });
 
 Route::middleware('api')->group(function () {
@@ -437,6 +438,7 @@ Route::post('post_add_appItem', [AppItemController::class, 'post_add_appItem']);
 Route::post('app-items', [AppItemController::class, 'post_add_appItem']);
 Route::post('updateAppDataById/{id}',  [AppItemController::class, 'post_update_appItem']);
 Route::post('approveAppItem/{id}',  [AppItemController::class, 'approveAppItem']);
+Route::delete('/app-items/{id}', [AppItemController::class, 'deleteAppItem']);
 Route::post('post_create_ict_request', [RICTUController::class, 'post_create_ict_request']);
 Route::post('post_create_purchaseRequest', [PurchaseRequestController::class, 'post_create_purchaseRequest']);
 Route::post('post_update_purchaseRequest', [PurchaseRequestController::class, 'post_update_purchaseRequest']);

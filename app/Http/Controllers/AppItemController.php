@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AppItemModel;
 use App\Models\UserModel;
+use App\Models\AppItemModel;
 use Illuminate\Http\Request;
+use App\Events\AppItemApproved;
+use App\Events\AppItemRejected;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -125,7 +127,7 @@ class AppItemController extends Controller
             'unit_id' => 'required|integer',
             'category_id' => 'required|integer',
             'app_year' => 'required|integer',
-            'userId' => 'required|integer',
+            'created_by' => 'required|integer|exists:users,id', // Validate created_by as user id
         ]);
 
         $normalizedTitle = strtolower(trim($validated['item_title']));
@@ -137,21 +139,22 @@ class AppItemController extends Controller
             return response()->json(['message' => 'Duplicated Item Title.'], 422);
         }
 
-        // Fetch user
-        $user = UserModel::find($validated['userId']);
-        if (!$user) {
-            return response()->json(['message' => 'User not found.'], 404);
-        }
-
         try {
-            // Save normalized title
+            // Fetch user to get pmo_id
+            $user = UserModel::find($validated['created_by']);
+            if (!$user) {
+                return response()->json(['message' => 'User not found.'], 404);
+            }
+
+            // Save item
             $appItem = new AppItemModel();
-            $appItem->item_title = trim($validated['item_title']); // Save trimmed version
+            $appItem->item_title = trim($validated['item_title']);
             $appItem->unit_id = $validated['unit_id'];
             $appItem->category_id = $validated['category_id'];
             $appItem->app_year = $validated['app_year'];
             $appItem->app_status = 'for approval';
-            $appItem->pmo_id = $user->pmo_id;
+            $appItem->created_by = $validated['created_by']; // Save created_by
+            $appItem->pmo_id = $user->pmo_id; // Still save pmo_id for PMO association
 
             $appItem->save();
 
@@ -224,14 +227,33 @@ class AppItemController extends Controller
             $appItem->update([
                 'sn' => $validated['sn'],
                 'app_status' => 'approve',
-                'mode' => $validated['mode'],
+                'mode' => $validated['mode'] ?? '7', // Default to 'Not Applicable'
             ]);
+
+            event(new AppItemApproved($appItem, $appItem->created_by));
 
             return response()->json(['message' => 'Item approved successfully.']);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['error' => 'Item not found.'], 404);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to approve item.', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteAppItem($id)
+    {
+        try {
+            $appItem = AppItemModel::findOrFail($id);
+            $createdBy = $appItem->created_by;
+            $appItem->delete();
+
+            event(new AppItemRejected($appItem, $createdBy));
+
+            return response()->json(['message' => 'Item rejected and deleted successfully.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Item not found.'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete item.', 'details' => $e->getMessage()], 500);
         }
     }
 }
