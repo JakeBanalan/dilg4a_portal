@@ -205,11 +205,11 @@
                                                                         <td class="prm-cell">
                                                                             <template v-if="pr.abstract_no">
                                                                                 <b
-                                                                                    @click.prevent="viewAOQ(pr.rfq_id, pr.aoq_id)">{{
-                                                                                        pr.abstract_no }}</b>
+                                                                                    @click.prevent="viewAOQ(pr.rfq_id, pr.aoq_id)">
+                                                                                    {{pr.abstract_no }}</b>
                                                                                 <br> ~AOQ Date: {{ pr.abstract_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.rfq_id || pr.stat == 17">
+                                                                            <template v-else-if="pr.rfq_id">
                                                                                 <div class="prm-hover-area">
                                                                                     <div @click.prevent="createAbstract(pr)"
                                                                                         class="badge badge-success hover-badge">
@@ -222,9 +222,9 @@
                                                                                 <b>{{ pr.reso_no }}</b>
                                                                                 <br> ~Reso Date: {{ pr.reso_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.abstract_no || pr.stat == 17">
+                                                                            <template v-else-if="pr.abstract_no">
                                                                                 <div class="prm-hover-area">
-                                                                                    <div
+                                                                                    <div @click.prevent="createReso(pr)"
                                                                                         class="badge badge-success hover-badge">
                                                                                         Create Reso
                                                                                     </div>
@@ -233,12 +233,13 @@
                                                                         </td>
                                                                         <td class="prm-cell">
                                                                             <template v-if="pr.po_no">
-                                                                                <b>{{ pr.po_no }}</b>
+                                                                                <b @click.prevent="viewPO(pr.rfq_id, pr.aoq_id)">{{ pr.po_no }}</b>
                                                                                 <br> ~PO Date: {{ pr.po_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.reso_no || pr.stat == 17">
+                                                                            <template v-else-if="pr.stat == 12">
                                                                                 <div class="prm-hover-area">
-                                                                                    <div
+                                                                                    <!-- <div @click.prevent="createPO(pr)" -->
+                                                                                    <div @click.prevent="createPO(pr)"
                                                                                         class="badge badge-success hover-badge">
                                                                                         Create PO
                                                                                     </div>
@@ -250,7 +251,8 @@
                                                                                 <b>{{ pr.noa_no }}</b>
                                                                                 <br> ~NOA Date: {{ pr.noa_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.po_no || pr.stat == 17">
+                                                                            <template
+                                                                                v-else-if="pr.po_no || pr.stat == 17">
                                                                                 <div class="prm-hover-area">
                                                                                     <div
                                                                                         class="badge badge-success hover-badge">
@@ -264,7 +266,8 @@
                                                                                 <b>{{ pr.ntp_no }}</b>
                                                                                 <br> ~NTP Date: {{ pr.ntp_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.noa_no || pr.stat == 17">
+                                                                            <template
+                                                                                v-else-if="pr.noa_no || pr.stat == 17">
                                                                                 <div class="prm-hover-area">
                                                                                     <div
                                                                                         class="badge badge-success hover-badge">
@@ -301,6 +304,7 @@
         </div>
         <ModalAOQ :visible="aoqvisible" :prData="selectedPR" @close="closeModal" />
         <ModalRFQ :visible="rfqvisible" @close="closeModal" @post="handlePostRFQ" />
+        <ModalPO :visible="po_visible" @close="closeModal" />
 
     </div>
 </template>
@@ -320,6 +324,7 @@ import { Transition } from 'vue';
 import { formatDate } from '../../globalMethods';
 import ModalAOQ from '../procurement/abstract/modal/modal_confirm_abstract.vue';
 import ModalRFQ from '../procurement/rfq/modal/modal_create_rfq.vue';
+import ModalPO from '../procurement/purchase_order/modal/modal_confirm_po.vue';
 
 
 
@@ -341,7 +346,8 @@ export default {
         Transition,
         Pagination,
         ModalAOQ,
-        ModalRFQ
+        ModalRFQ,
+        ModalPO
 
     },
     data() {
@@ -350,6 +356,7 @@ export default {
             purchaseRequests: [],
             aoqvisible: false,
             rfqvisible: false,
+            po_visible: false,
             stats: [],
             division: [
                 { id: 'FAD', name: 'Finance and Administrative Division' },
@@ -358,20 +365,68 @@ export default {
                 { id: 'LGCDD', name: 'Local Government Capacity Development Division' },
             ],
             selectedPR: null,
+            po_no: null,
         }
     },
     mounted() {
         this.loadData();
         this.statbox();
+        this.generatePONo();
     },
     watch: {
     },
     computed: {
     },
     methods: {
+        generatePONo: async function () {
+            try {
+                const response = await axios.get('../../api/generatePurchaseOrderNo');
+
+                // Get current year and month
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+
+                // Extract sequence number from response
+                const sequence = response.data[0]?.abstract || 1; // Fallback to 1 if undefined
+                const paddedSequence = String(sequence).padStart(3, '0');
+
+                // Format PO number
+                this.po_no = `${year}-${month}-${paddedSequence}`;
+                // console.log("Generated PO No:", this.po_no);
+
+            } catch (error) {
+                console.error('Error generating PO number:', error);
+            }
+        },
         createAbstract(pr) {
             this.selectedPR = pr;
             this.aoqvisible = true;
+        },
+        createReso(pr) {
+            this.selectedPR = pr;
+            // this.$router.push({ path: '/procurement/create_reso', query: { pr_id: pr.pr_id } });
+            this.$router.push({ path: '/procurement/resolution' });
+        },
+        createPO(pr) {
+            // this.selectedPR = pr;
+            console.log(pr);
+            // this.po_visible = true;
+            // this.$router.push({ path: '/procurement/purchase-order/1' });
+
+            Swal.fire({
+                title: 'Award Supplier?',
+                text: `Are you sure you want to Proceed with PO Number: ${this.po_no}?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.$router.push({ path: '/procurement/purchase-order/create', query: { id: pr.rfq_id, abstract: pr.aoq_id, po_no: this.po_no} });
+                }
+            });
+
         },
         handlePostRFQ() {
             this.rfqvisible = false;
@@ -384,6 +439,7 @@ export default {
         closeModal() {
             this.aoqvisible = false;
             this.rfqvisible = false;
+            this.po_visible = false;
         },
         statbox() {
             axios.get(`../api/pr_monitoring_stats`)
@@ -405,6 +461,9 @@ export default {
         },
         viewAOQ(rfq_id, aoq_id) {
             this.$router.push({ path: '/procurement/abstract', query: { id: rfq_id, abstract: aoq_id } });
+        },
+        viewPO(rfq_id, aoq_id) {
+            this.$router.push({ path: '/procurement/purchase-order', query: { id: rfq_id, abstract: aoq_id } });
         },
         dateFormat(date) {
             return formatDate(date);

@@ -29,6 +29,7 @@ use App\Http\Controllers\DailyTimeRecordController;
 use App\Http\Controllers\FundSourceController;
 use App\Http\Controllers\SaroController;
 use App\Http\Controllers\ResolutionController;
+use App\Http\Controllers\POController;
 
 use App\Http\Controllers\NTAController;
 use App\Http\Controllers\DisbursementController;
@@ -144,7 +145,7 @@ Route::middleware('api')->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    Route::get('generatePurchaseOrderNo', [PurchaseOrderController::class, 'generatePurchaseOrderNo']);
+    Route::get('generatePurchaseOrderNo', [POController::class, 'generatePurchaseOrderNo']);
 });
 
 Route::middleware('api')->group(function () {
@@ -482,6 +483,9 @@ Route::post('PostUpdateRFQ', [RFQController::class, 'PostUpdateRFQ']);
 
 // R E S O L U T I O N
 Route::post('PostResolution', [ResolutionController::class, 'PostResolution']);
+
+// P U R C H A S E  O R D E R
+Route::post('postPOdata', [POController::class, 'postPOdata']);
 
 //CALENDAR
 //C A L E N D A R

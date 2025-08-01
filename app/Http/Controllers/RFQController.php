@@ -118,7 +118,7 @@ class RFQController extends Controller
                     // 'tbl_rfq.id as RFQ_ID',
                     'pr.id as PR_ID',
                     'tbl_app.item_title',
-                    'tbl_app.code',
+                    // 'tbl_app.code',
                     // 'tbl_app.year',
                     'tbl_app.price',
                     'unit.item_unit_title as unit',

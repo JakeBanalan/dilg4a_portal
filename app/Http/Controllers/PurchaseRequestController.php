@@ -85,6 +85,15 @@ class PurchaseRequestController extends Controller
                         ->selectRaw('DATE_FORMAT(abstract_date, "%b %d, %Y %h:%i %p") as abstract_date')
                         ->value('abstract_date'),
                     'pr_id' => (int)$prId,
+                    'po_id' => DB::table('tbl_purchase_order')->where('rfq_id', $rfq->id)->value('id'),
+                    'po_no' => DB::table('tbl_purchase_order')
+                        ->where('rfq_id', $rfq->id)
+                        ->pluck('po_no')
+                        ->implode(', '),
+                    'po_date' => DB::table('tbl_purchase_order')
+                        ->where('rfq_id', $rfq->id)
+                        ->selectRaw('DATE_FORMAT(po_date, "%b %d, %Y %h:%i %p") as po_date')
+                        ->value('po_date')
                 ];
             }
         }
@@ -114,6 +123,9 @@ class PurchaseRequestController extends Controller
                     'rfq_id' => $row['rfq_id'],
                     'status' => $pr->status,
                     'stat' => $pr->stat,
+                    'po_id' => $row['po_id'],
+                    'po_no' => $row['po_no'],
+                    'po_date' => $row['po_date']
                 ];
             }
         }
@@ -135,6 +147,9 @@ class PurchaseRequestController extends Controller
                     'abstract_date' => null,
                     'status' => $pr->status,
                     'stat' => $pr->stat,
+                    'po_id' => null,
+                    'po_no' => null,
+                    'po_date' => null
                 ];
             }
         }
@@ -614,7 +629,7 @@ class PurchaseRequestController extends Controller
 
             return response()->json(['message' => 'Purchase request updated successfully', 'data' => $purchaseRequest]);
         } catch (\Exception $e) {
-            DB::rollBack();        
+            DB::rollBack();
             return response()->json(['message' => 'Failed to update purchase request', 'error' => $e->getMessage()], 500);
         }
     }

@@ -38,7 +38,8 @@ import create_reso from "../components/procurement/resolution/create_reso.vue";
 import update_reso from "../components/procurement/resolution/update_reso.vue";
 
 // PURCHASE ORDER
-import create_po from "../components/procurement/purchase-order/panel/create.vue";
+import update_po from "../components/procurement/purchase_order/update_po.vue";
+import create_po from "../components/procurement/purchase_order/create_po.vue";
 
 //Finance
 import nta_nca from "../components/finance/accounting/nta.vue";
@@ -1146,7 +1147,7 @@ const routes = [{
             });
         }
     },
-            {
+    {
         path: '/procurement/resolution/update/:id',
         name: 'Update Resolution',
         component: update_reso,
@@ -1175,7 +1176,35 @@ const routes = [{
         }
     },
     {
-        path: '/procurement/purchase-order/:id',
+        path: '/procurement/purchase-order',
+        name: 'Update Purchase Order',
+        component: update_po,
+        meta: {
+            requiresAuth: true
+        },
+        beforeEnter: (to, from, next) => {
+            const token = localStorage.getItem('api_token');
+            axios.get('/api/authenticated', {
+                params: {
+                    api_token: token
+                }
+            }).then(response => {
+                if (response.data.authenticated) {
+                    next();
+                } else {
+                    next({
+                        name: 'Login'
+                    });
+                }
+            }).catch(() => {
+                next({
+                    name: 'Login'
+                });
+            });
+        }
+    },
+    {
+        path: '/procurement/purchase-order/create',
         name: 'Create Purchase Order',
         component: create_po,
         meta: {
@@ -1202,7 +1231,6 @@ const routes = [{
             });
         }
     },
-
     {
         path: '/rictu/ict_ta/index',
         name: 'ICT Technical Assistance',
