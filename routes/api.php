@@ -413,7 +413,8 @@ Route::middleware('api')->group(function () {
     Route::get('fetch_supplier_quote/{id}', [AbstractController::class, 'fetch_supplier_quote']);
 });
 
-Route::get('/fetchResolution/{id}', [ResolutionController::class, 'fetchResolution']);
+Route::get('/fetchResolutionByAbstract/{abstract_id}', [ResolutionController::class, 'fetchResolutionByAbstract']);
+Route::get('/fetchResolution', [ResolutionController::class, 'fetchResolution']);
 
 Route::middleware('api')->group(function () {
     Route::get('fetch-nta', [NTAController::class, 'fetchAll']);
@@ -483,7 +484,8 @@ Route::post('post_create_rfq', [RFQController::class, 'post_create_rfq']);
 Route::post('PostUpdateRFQ', [RFQController::class, 'PostUpdateRFQ']);
 
 // R E S O L U T I O N
-Route::post('PostResolution', [ResolutionController::class, 'PostResolution']);
+Route::post('/PostResolution', [ResolutionController::class, 'store']);
+Route::put('/resolution/{id}', [ResolutionController::class, 'update']);
 
 //CALENDAR
 //C A L E N D A R

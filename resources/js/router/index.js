@@ -1119,7 +1119,7 @@ const routes = [{
         }
     },
     {
-        path: '/procurement/resolution',
+        path: '/procurement/resolution/:id',
         name: 'Create Resolution',
         component: create_reso,
         meta: {

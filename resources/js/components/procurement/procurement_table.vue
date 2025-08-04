@@ -358,7 +358,7 @@
                 </td>
                 <td>
                     <div :class="getBadgeClass(purchaseRequest.status_id)">
-                        {{ purchaseRequest.status || 'Unknown' }}
+                        {{ purchaseRequest.status || 'DRAFT' }}
                     </div>
                 </td>
                 <td>
@@ -533,6 +533,9 @@ export default {
                 8: 'badge-success', // SUBMITTED_TO_ORD
                 9: 'badge-success', // RECEIVED_BY_ORD
                 10: 'badge-success', // APPROVED_BY_ORD
+                11: 'badge-success', // WITH RFQ
+                12: 'badge-success', // AWARDED
+                13: 'badge-success', // wITH PURCHASE ORDER
                 14: 'badge-warning', // RETURNED_BY_GSS
                 15: 'badge-warning', // RETURNED_BY_BUDGET
                 16: 'badge-warning', // RETURNED_BY_ORD
@@ -552,12 +555,15 @@ export default {
                 8: 'SUBMITTED TO ORD',
                 9: 'RECEIVED BY ORD',
                 10: 'APPROVED BY ORD',
+                11: 'WITH RFQ',
+                12: 'AWARDED',
+                13: 'WITH PURCHASE ORDER', // wITH PURCHASE ORDER
                 14: 'RETURNED BY GSS',
                 15: 'RETURNED BY BUDGET',
                 16: 'RETURNED BY ORD',
                 17: 'CANCELLED',
             };
-            return statusMessages[statusId] || 'Unknown';
+            return statusMessages[statusId] || 'DRAFT';
         },
         setupWebSocket() {
             if (!this.userId) {

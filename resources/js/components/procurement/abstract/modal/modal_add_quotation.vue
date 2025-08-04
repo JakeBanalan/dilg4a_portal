@@ -57,7 +57,7 @@
                                                     <td style="text-align:left;">{{ item.description }}</td>
                                                     <td>{{ item.qty }}</td>
                                                     <td>{{ item.unit }}</td>
-                                                    <td>{{ item.abc }}</td>
+                                                    <td>{{ item.unit_cost }}</td>
                                                     <td>{{ item.total_abc }}</td>
                                                     <td><input type="text" v-model="SupplierOffer[item.item_id]"
                                                             class="bottom-border-input"></td>

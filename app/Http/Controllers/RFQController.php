@@ -114,17 +114,17 @@ class RFQController extends Controller
                     'pr_items.pr_id',
                     'pr_items.description',
                     'pr_items.qty',
-                    'pr_items.abc',
+                    'pr_items.unit_cost',
                     // 'tbl_rfq.id as RFQ_ID',
                     'pr.id as PR_ID',
                     'tbl_app.item_title',
-                    'tbl_app.code',
+                    // 'tbl_app.code',
                     // 'tbl_app.year',
-                    'tbl_app.price',
+                    // 'tbl_app.price',
                     'unit.item_unit_title as unit',
                     'unit.*',
                     // 'pmo.pmo_title',
-                    DB::raw('pr_items.abc * pr_items.qty AS total_abc')
+                    DB::raw('pr_items.unit_cost * pr_items.qty AS total_abc')
                 )
                     ->leftJoin('pr', 'pr.id', '=', 'pr_items.pr_id')
                     // ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
@@ -405,14 +405,14 @@ class RFQController extends Controller
                     'pr_items.pr_id',
                     'pr_items.description',
                     'pr_items.qty',
-                    'pr_items.abc',
+                    'pr_items.unit_cost',
                     'pr.id as PR_ID',
                     'tbl_app.item_title',
-                    'tbl_app.code',
-                    'tbl_app.price',
+                    // 'tbl_app.code',
+                    // 'tbl_app.price',
                     'unit.item_unit_title as unit',
                     'unit.*',
-                    DB::raw('pr_items.abc * pr_items.qty AS total_abc')
+                    DB::raw('pr_items.unit_cost * pr_items.qty AS total_abc')
                 )
                     ->leftJoin('pr', 'pr.id', '=', 'pr_items.pr_id')
                     ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')
@@ -549,7 +549,7 @@ class RFQController extends Controller
             $sheet->setCellValueByColumnAndRow(2, $row, $prItems['description']);
             $sheet->setCellValueByColumnAndRow(6, $row, $prItems['qty']);
             $sheet->setCellValueByColumnAndRow(7, $row, $prItems['unit']);
-            $sheet->setCellValueByColumnAndRow(8, $row, '₱ ' . number_format($prItems['abc']));
+            $sheet->setCellValueByColumnAndRow(8, $row, '₱ ' . number_format($prItems['unit_cost']));
             $sheet->setCellValueByColumnAndRow(9, $row, '₱ ' . number_format($prItems['total_abc']));
 
 
@@ -618,8 +618,8 @@ class RFQController extends Controller
          2. Latest Income/Business Tax Return
          3. PhilGEPS Registration No. (Please indicate on the space provided above)
          4. a. Any documents to prove that the signatory of the quotation is authorized representative of the company.
-          b. Photocopy of ID bearing the pictures/ signature of the representatives. 
-        * Please submit your quotation using our official Request for Quotation (RFQ) Form. You can secure a copy of the 
+          b. Photocopy of ID bearing the pictures/ signature of the representatives.
+        * Please submit your quotation using our official Request for Quotation (RFQ) Form. You can secure a copy of the
         RFQ from the Finance and Administrative Division-General Service Section.
         Deadline:
          *Please submit your quotation together with the Eligibility Documents on or before ');
@@ -642,7 +642,7 @@ class RFQController extends Controller
         $underlinedText1->getFont()->setName('Cambria');
 
         // Add the rest of the text (non-underlined) using createTextRun for consistent styling
-        $additionalText = $richText->createTextRun(' through any of the following : 
+        $additionalText = $richText->createTextRun(' through any of the following :
          a. Email us at dilg4a.bac@gmail.com
          b. Deliver on hand at the receiving area of DILG IV-A CALABARZON, Andenson Bldg1. National Highway, Parian, Calamba City, Laguna');
 

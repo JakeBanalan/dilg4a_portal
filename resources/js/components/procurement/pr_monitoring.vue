@@ -209,7 +209,7 @@
                                                                                         pr.abstract_no }}</b>
                                                                                 <br> ~AOQ Date: {{ pr.abstract_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.rfq_id || pr.stat == 17">
+                                                                            <template v-else-if="pr.rfq_id">
                                                                                 <div class="prm-hover-area">
                                                                                     <div @click.prevent="createAbstract(pr)"
                                                                                         class="badge badge-success hover-badge">
@@ -218,13 +218,16 @@
                                                                             </template>
                                                                         </td>
                                                                         <td class="prm-cell">
-                                                                            <template v-if="pr.reso_no">
-                                                                                <b>{{ pr.reso_no }}</b>
-                                                                                <br> ~Reso Date: {{ pr.reso_date }}~
+                                                                            <template v-if="pr.rfq_id">
+                                                                                <b
+                                                                                    @click.prevent="updateReso(pr)" href="#">Done</b>
+                                                                                <br> ~Reso Date: {{ pr.reso_date ||
+                                                                                    'N/A' }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.abstract_no || pr.stat == 17">
+                                                                            <template
+                                                                                v-else-if="pr.abstract_no && pr.rfq_id && pr.aoq_id">
                                                                                 <div class="prm-hover-area">
-                                                                                    <div
+                                                                                    <div @click.prevent="createReso(pr)"
                                                                                         class="badge badge-success hover-badge">
                                                                                         Create Reso
                                                                                     </div>
@@ -236,7 +239,7 @@
                                                                                 <b>{{ pr.po_no }}</b>
                                                                                 <br> ~PO Date: {{ pr.po_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.reso_no || pr.stat == 17">
+                                                                            <template v-else-if="pr.reso_no">
                                                                                 <div class="prm-hover-area">
                                                                                     <div
                                                                                         class="badge badge-success hover-badge">
@@ -250,7 +253,7 @@
                                                                                 <b>{{ pr.noa_no }}</b>
                                                                                 <br> ~NOA Date: {{ pr.noa_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.po_no || pr.stat == 17">
+                                                                            <template v-else-if="pr.po_no">
                                                                                 <div class="prm-hover-area">
                                                                                     <div
                                                                                         class="badge badge-success hover-badge">
@@ -264,7 +267,7 @@
                                                                                 <b>{{ pr.ntp_no }}</b>
                                                                                 <br> ~NTP Date: {{ pr.ntp_date }}~
                                                                             </template>
-                                                                            <template v-else-if="pr.noa_no || pr.stat == 17">
+                                                                            <template v-else-if="pr.noa_no">
                                                                                 <div class="prm-hover-area">
                                                                                     <div
                                                                                         class="badge badge-success hover-badge">
@@ -369,18 +372,26 @@ export default {
     computed: {
     },
     methods: {
+
         createAbstract(pr) {
             this.selectedPR = pr;
             this.aoqvisible = true;
-        },
-        handlePostRFQ() {
-            this.rfqvisible = false;
-            this.loadData();
         },
         createRFQ(pr) {
             this.selectedPR = pr;
             this.rfqvisible = true;
         },
+        createReso(pr) {
+            this.$router.push({
+                path: `/procurement/resolution/${pr.aoq_id}`,
+                query: { rfq_id: pr.rfq_id }
+            });
+        },
+        handlePostRFQ() {
+            this.rfqvisible = false;
+            this.loadData();
+        },
+
         closeModal() {
             this.aoqvisible = false;
             this.rfqvisible = false;
@@ -394,6 +405,12 @@ export default {
                 .catch((error) => {
                     console.error('Error fetching data:', error);
                 });
+        },
+        updateReso(pr) {
+            this.$router.push({
+                path: `/procurement/resolution/${pr.aoq_id}`,
+                query: { rfq_id: pr.rfq_id }
+            });
         },
         viewPR(pr_id) {
             // console.log(pr_id)
@@ -445,15 +462,16 @@ export default {
 
 }
 </script>
-<style>
-/* #hover:hover {
+<style scoped>
+#hover:hover {
     background-color: rgba(5, 152, 135, 0.258);
     cursor: pointer;
-} */
+}
 
 .prm-cell {
     transition: background-color 0.3s ease;
     position: relative;
+    cursor: pointer;
 }
 
 /* Highlight row */

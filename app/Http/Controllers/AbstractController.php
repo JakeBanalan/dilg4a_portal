@@ -470,15 +470,15 @@ class AbstractController extends Controller
                     'pr_items.pr_id',
                     'pr_items.description',
                     'pr_items.qty',
-                    'pr_items.abc',
+                    'pr_items.unit_cost',
                     'pr.id as PR_ID',
                     'tbl_app.item_title',
                     'tbl_app.id',
-                    'tbl_app.code',
-                    'tbl_app.price',
+                    // 'tbl_app.code',
+                    // 'tbl_app.price',
                     'unit.item_unit_title as unit',
                     'unit.*',
-                    DB::raw('pr_items.abc * pr_items.qty AS total_abc')
+                    DB::raw('pr_items.unit_cost * pr_items.qty AS total_abc')
                 )
                     ->leftJoin('pr', 'pr.id', '=', 'pr_items.pr_id')
                     ->leftJoin('mode_of_proc as mode', 'mode.id', '=', 'pr.type')

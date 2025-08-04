@@ -159,7 +159,7 @@
                                                     <td>{{ item.description }}</td>
                                                     <td>{{ item.qty }}</td>
                                                     <td>{{ item.unit }}</td>
-                                                    <td>{{ formatNumber(item.abc) }}</td>
+                                                    <td>{{ formatNumber(item.unit_cost) }}</td>
                                                     <td>{{ item.total_abc }}</td>
                                                     <template v-for="supplier in uniqueSuppliers"
                                                         :key="supplier + '_' + item.supplier_title">
@@ -371,7 +371,8 @@ export default {
                     console.error("RFQ ID is missing.");
                     return;
                 }
-                const rfqRes = await axios.get(`../api/fetchRFQItems/${rfqID}`);
+                const rfqRes = await axios.get(`../../api/fetchRFQItems/${rfqID}`);
+                // console.log(rfqRes)
                 this.rfq_opts = rfqRes.data.map(item => {
                     // Ensure numeric calculation safety
                     item.numeric_total_abc = Number(item.total_abc) || 0;

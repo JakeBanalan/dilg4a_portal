@@ -32,7 +32,7 @@
                             <div class="card mb-4">
                                 <div class="card-body a4-wrapper">
                                     <div>
-                                        <div id="reso-editor" class="form-control p-0 quill-a4"></div>
+                                        <div id="reso-editor" class="form-control"></div>
                                     </div>
                                 </div>
                             </div>
@@ -47,11 +47,6 @@
 <script>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import Quill from 'quill';
-import 'quill/dist/quill.snow.css';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-
 import Navbar from "../../layout/Navbar.vue";
 import Sidebar from "../../layout/Sidebar.vue";
 import FooterVue from "../../layout/Footer.vue";
@@ -69,7 +64,6 @@ export default {
     name: 'Resolution',
     data() {
         return {
-            quill: null,
         };
     },
     components: {
@@ -80,38 +74,9 @@ export default {
         BreadCrumbs,
     },
     mounted() {
-        this.initQuill();
         this.fetchResolutionData(); // Fetch existing resolution data if available
     },
     methods: {
-        initQuill() {
-            const FontAttributor = Quill.import('attributors/class/font');
-            FontAttributor.whitelist = ['times-new-roman', 'sofia', 'slabo', 'roboto', 'inconsolata', 'ubuntu'];
-            Quill.register(FontAttributor, true);
-
-            this.quill = new Quill('#reso-editor', {
-                theme: 'snow',
-                modules: {
-                    toolbar: [
-                        [{ 'font': FontAttributor.whitelist }, { 'size': [] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'script': 'super' }, { 'script': 'sub' }],
-                        [{ 'header': '1' }, { 'header': '2' }, 'blockquote', 'code-block'],
-                        [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
-                        ['direction', { 'align': [] }],
-                        ['link', 'image', 'video', 'formula'],
-                        ['clean']
-                    ]
-                }
-            });
-
-            // Allow clicking anywhere to focus
-            // const editorContainer = document.querySelector('#reso-editor');
-            // editorContainer.addEventListener('click', () => {
-            //     this.quill.focus();
-            // });
-        },
         fetchResolutionData() {
             // Example: fetch saved resolution by ID
             axios.get(`../../../api/fetchResolution/8`)

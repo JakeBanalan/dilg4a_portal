@@ -129,7 +129,7 @@
                                                     <td>{{ item.description }}</td>
                                                     <td>{{ item.qty }}</td>
                                                     <td>{{ item.unit }}</td>
-                                                    <td>{{ formatNumber(item.abc) }}</td>
+                                                    <td>{{ formatNumber(item.unit_cost) }}</td>
                                                     <td>{{ item.total_abc }}</td>
                                                 </tr>
                                             </tbody>
