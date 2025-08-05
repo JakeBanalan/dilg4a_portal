@@ -66,11 +66,11 @@ class PurchaseRequestController extends Controller
             )
             ->get()
             ->keyBy('pr_id');
-    
+
         // Step 2: Get RFQs and expand comma-separated pr_ids, including resolution data
         $rfqs = DB::table('tbl_rfq')->get();
         $rfqExpanded = [];
-    
+
         foreach ($rfqs as $rfq) {
             $prIds = array_filter(array_map('trim', explode(',', $rfq->pr_id)));
             foreach ($prIds as $prId) {
@@ -105,16 +105,16 @@ class PurchaseRequestController extends Controller
                 ];
             }
         }
-    
+
         // Step 3: Track which PRs have RFQ entries
         $final = [];
         $seenPrIds = [];
-    
+
         foreach ($rfqExpanded as $row) {
             if (isset($prs[$row['pr_id']])) {
                 $pr = $prs[$row['pr_id']];
                 $seenPrIds[] = $pr->pr_id;
-    
+
                 $final[] = [
                     'pr_id' => $pr->pr_id,
                     'pr_no' => $pr->pr_no,
@@ -140,7 +140,7 @@ class PurchaseRequestController extends Controller
                 ];
             }
         }
-    
+
         // Step 4: Add PRs that do NOT have any RFQ
         foreach ($prs as $prId => $pr) {
             if (!in_array($prId, $seenPrIds)) {
@@ -167,7 +167,7 @@ class PurchaseRequestController extends Controller
                 ];
             }
         }
-    
+
         return response()->json($final);
     }
 
@@ -359,7 +359,7 @@ class PurchaseRequestController extends Controller
             ->orderBy('pr.id', 'desc')
             ->groupBy('pr.id');
 
-        if (!in_array($user->user_role, ['gss_admin', 'budget_admin','ord_admin'])) {
+        if (!in_array($user->user_role, ['gss_admin', 'budget_admin', 'ord_admin'])) {
             $query->where('pr.action_officer', $user->id);
         }
 
@@ -375,18 +375,24 @@ class PurchaseRequestController extends Controller
     public function viewPurchaseRequest($id)
     {
         $query = PurchaseRequestModel::select(PurchaseRequestModel::raw('
-                pr.id AS `id`,
-                pr.type AS `type`,
-                pr.pr_no AS `pr_no`,
-                pr.action_officer AS `user_id`,
-                users.last_name AS `created_by`,
-                pmo.id AS `office`,
-                pr.purpose AS `particulars`,
-                pr.pr_date AS `pr_date`,
-                pr.target_date AS `target_date`,
-                pr.is_urgent AS `is_urgent`,
-                pr.stat
-            '))
+        pr.id AS `id`,
+        pr.type AS `type`,
+        pr.pr_no AS `pr_no`,
+        pr.action_officer AS `user_id`,
+        users.last_name AS `created_by`,
+        pmo.id AS `office`,
+        pr.purpose AS `particulars`,
+        pr.pr_date AS `pr_date`,
+        pr.target_date AS `target_date`,
+        pr.is_urgent AS `is_urgent`,
+        pr.stat as `stat`, 
+        pr.submitted_date,
+        pr.received_date,
+        pr.submitted_date_budget,
+        pr.submitted_date_gss,
+        pr.submitted_date_ord,
+        pr.updated_at
+    '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')
             ->where('pr.id', $id)
@@ -411,9 +417,41 @@ class PurchaseRequestController extends Controller
             )
             ->get();
 
+        // Construct status history from timestamp fields
+        $statusHistory = [];
+        $statusMap = [
+            ['status_id' => 2, 'timestamp' => $query->submitted_date_gss, 'label' => 'SUBMITTED TO GSS 📤'],
+            ['status_id' => 3, 'timestamp' => $query->updated_at, 'label' => 'RECEIVED BY GSS 👍'],
+            ['status_id' => 4, 'timestamp' => $query->updated_at, 'label' => 'APPROVED BY GSS 👍'],
+            ['status_id' => 5, 'timestamp' => $query->submitted_date_budget, 'label' => 'SUBMITTED TO BUDGET 📤'],
+            ['status_id' => 6, 'timestamp' => $query->updated_at, 'label' => 'RECEIVED BY BUDGET 👍'],
+            ['status_id' => 7, 'timestamp' => $query->updated_at, 'label' => 'APPROVED BY BUDGET 👍'],
+            ['status_id' => 8, 'timestamp' => $query->submitted_date_ord, 'label' => 'SUBMITTED TO ORD 📤'],
+            ['status_id' => 9, 'timestamp' => $query->updated_at, 'label' => 'RECEIVED BY ORD 👍'],
+            ['status_id' => 10, 'timestamp' => $query->updated_at, 'label' => 'APPROVED BY ORD 👍'],
+            ['status_id' => 11, 'timestamp' => $query->updated_at, 'label' => 'WITH RFQ👍'],
+            ['status_id' => 12, 'timestamp' => $query->updated_at, 'label' => 'AWARDED 🎉'],
+        ];
+
+        foreach ($statusMap as $status) {
+            if ($status['timestamp'] && ($query->stat >= $status['status_id']) || $query->stat == $status['status_id']) {
+                $statusHistory[] = [
+                    'status_id' => $status['status_id'],
+                    'changed_at' => $status['timestamp'] ?? $query->updated_at,
+                    'label' => $status['label'],
+                ];
+            }
+        }
+
+        // Sort history by timestamp
+        usort($statusHistory, function ($a, $b) {
+            return strtotime($a['changed_at']) - strtotime($b['changed_at']);
+        });
+
         return response()->json([
             'purchaseRequest' => $query,
-            'prItems' => $prItems
+            'prItems' => $prItems,
+            'statusHistory' => $statusHistory
         ]);
     }
 
@@ -593,15 +631,15 @@ class PurchaseRequestController extends Controller
                 if ($userRole === 'gss_admin' && in_array($currentStat, [RECEIVED_BY_GSS, APPROVED_BY_GSS])) {
                     $newStat = RETURNED_BY_GSS;
                     $purchaseRequest->is_gss_submitted = false;
-                    $purchaseRequest->submitted_date_gss = null;
+                    $purchaseRequest->updated_at = Carbon::now();
                 } elseif ($userRole === 'budget_admin' && in_array($currentStat, [SUBMITTED_TO_BUDGET, RECEIVED_BY_BUDGET, APPROVED_BY_BUDGET])) {
                     $newStat = RETURNED_BY_BUDGET;
                     $purchaseRequest->is_budget_submitted = false;
-                    $purchaseRequest->submitted_date_budget = null;
+                    $purchaseRequest->updated_at = Carbon::now();
                 } elseif ($userRole === 'ord_admin' && in_array($currentStat, [SUBMITTED_TO_ORD, RECEIVED_BY_ORD, APPROVED_BY_ORD])) {
                     $newStat = RETURNED_BY_ORD;
                     $purchaseRequest->is_ord_submitted = false;
-                    $purchaseRequest->submitted_date_ord = null;
+                    $purchaseRequest->updated_at = Carbon::now();
                 } else {
                     return response()->json(['message' => 'Invalid return request for user role or status'], 400);
                 }

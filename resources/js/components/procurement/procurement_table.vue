@@ -347,15 +347,11 @@
                             <font-awesome-icon :icon="['fas', 'undo']" style="margin-left: -3px;" />
                         </button>
                     </div>
-                    <div v-else-if="purchaseRequest.status_id == 12"> <!-- AWARDED -->
+                    <div
+                        v-if="[5, 6, 8, 9, 10, 11, 12, 17].includes(purchaseRequest.status_id) && (role == 'user' || role == 'admin')">
                         <button title="View" type="button" class="btn btn-icon mr-1"
-                            style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id)">
-                            <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
-                        </button>
-                    </div>
-                    <div v-else-if="purchaseRequest.status_id == 17"> <!-- CANCELLED -->
-                        <button disabled title="View" type="button" class="btn btn-icon mr-1"
-                            style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id)">
+                            style="background-color:#059886;color:#fff;" :disabled="purchaseRequest.status_id === 17"
+                            @click="viewPr(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
                         </button>
                     </div>

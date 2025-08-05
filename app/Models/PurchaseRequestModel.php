@@ -35,6 +35,7 @@ class PurchaseRequestModel extends Model
         'submitted_date_budget',
         'submitted_date_gss',
         'submitted_date_ord',
+        'updated_at'
     ];
 
     protected $casts = [

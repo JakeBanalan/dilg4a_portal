@@ -143,125 +143,153 @@
                                                         </button>
                                                     </td>
                                                 </tr>
-
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <!--ADD ITEM MODAL-->
-                        <div class="modal" v-if="addItemModalVisible" id="addEditModal"
-                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
-                            <div class="modal-dialog"
-                                style="margin: auto; position: relative; transform: translateY(15%);">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <div
-                                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
-                                            <img :src="logo" style="width:60px; height:60px;">
-                                        </div>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="container">
-                                            <h1>Add More Item</h1>
-                                            <div class="form-group">
-                                                <label>Item Name <span style="color: red;">*</span></label>
-                                                <v-select :options="availableItems" v-model="addMoreItem"
-                                                    @change="addMoreItemList" label="name">
-                                                    <template slot="option" slot-scope="option">
-                                                        {{ option.name }}
-                                                    </template>
-                                                </v-select>
+                    </div>
+
+                    <!-- Status History Section -->
+                    <div  v-if="(role == 'user' || role == 'admin')" class="row">
+                        <div class="col-md-12 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Status History</h4>
+                                    <div v-if="statusHistory.length" class="timeline">
+                                        <div v-for="(history, index) in statusHistory" :key="index" class="timeline-item">
+                                            <div class="timeline-badge" :class="getStatusBadgeClass(history.status_id)">
+                                                <font-awesome-icon :icon="['fas', 'circle']" />
                                             </div>
-                                            <div class="form-group">
-                                                <label>Unit</label>
-                                                <input type="text" class="form-control" v-model="addMoreItem.unit"
-                                                    readonly>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Quantity <span style="color: red;">*</span></label>
-                                                <input type="number" class="form-control" id="itemQuantity"
-                                                    v-model.number="addMoreItem.qty" min="1"
-                                                    placeholder="Enter quantity">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Unit Cost <span style="color: red;">*</span></label>
-                                                <!-- Renamed from "ABC" -->
-                                                <input type="number" class="form-control" v-model="addMoreItem.price"
-                                                    min="0.01" placeholder="Enter unit cost">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Description <span style="color: red;">*</span></label>
-                                                <textarea rows="1" v-model="addMoreItem.descrip"
-                                                    placeholder="Enter description"></textarea>
+                                            <div class="timeline-panel">
+                                                <div class="timeline-heading">
+                                                    <h5 class="timeline-title">{{ history.label }}</h5>
+                                                    <p><small class="text-muted">{{ formatDateTime(history.changed_at) }}</small></p>
+                                                </div>
+                                                <!-- <div class="timeline-body">
+                                                    <p v-if="history.changed_by">Changed by: {{ history.changed_by }}</p>
+                                                </div> -->
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light"
-                                            @click="closeAddItemModal">Cancel</button>
-                                        <button type="button" class="btn btn-primary" @click="addNewItem">Add More
-                                            Item</button>
+                                    <div v-else class="alert alert-info">
+                                        No status history available.
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!--EDIT ITEM MODAL-->
-                        <div class="modal" v-if="editItemModalVisible" id="viewEditModal"
-                            style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
-                            <div class="modal-dialog"
-                                style=" margin: auto; position: relative; transform: translateY(15%);">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <div
-                                            style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
-                                            <img :src="logo" style="width:60px; height:60px;">
+                    <!-- Add Item Modal -->
+                    <div class="modal" v-if="addItemModalVisible" id="addEditModal"
+                        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
+                        <div class="modal-dialog"
+                            style="margin: auto; position: relative; transform: translateY(15%);">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div
+                                        style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                                        <img :src="logo" style="width:60px; height:60px;">
+                                    </div>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <h1>Add More Item</h1>
+                                        <div class="form-group">
+                                            <label>Item Name <span style="color: red;">*</span></label>
+                                            <v-select :options="availableItems" v-model="addMoreItem"
+                                                @change="addMoreItemList" label="name">
+                                                <template slot="option" slot-scope="option">
+                                                    {{ option.name }}
+                                                </template>
+                                            </v-select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Unit</label>
+                                            <input type="text" class="form-control" v-model="addMoreItem.unit"
+                                                readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Quantity <span style="color: red;">*</span></label>
+                                            <input type="number" class="form-control" id="itemQuantity"
+                                                v-model.number="addMoreItem.qty" min="1"
+                                                placeholder="Enter quantity">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Unit Cost <span style="color: red;">*</span></label>
+                                            <input type="number" class="form-control" v-model="addMoreItem.price"
+                                                min="0.01" placeholder="Enter unit cost">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Description <span style="color: red;">*</span></label>
+                                            <textarea rows="1" v-model="addMoreItem.descrip"
+                                                placeholder="Enter description"></textarea>
                                         </div>
                                     </div>
-                                    <div class="modal-body">
-                                        <div class="container">
-                                            <h1>Edit Item</h1>
-                                            <div class="form-group">
-                                                <label for="editItemName">Item Name</label>
-                                                <v-select :options="availableItems" v-model="editItem" label="name">
-                                                    <template #option="option">
-                                                        {{ option.name }}
-                                                    </template>
-                                                </v-select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="editItemUnit">Unit</label>
-                                                <input type="text" class="form-control" id="editItemUnit"
-                                                    v-model="editItem.unit" readonly>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="editItemQuantity">Quantity</label>
-                                                <input type="number" class="form-control" id="editItemQuantity"
-                                                    v-model="editItem.qty">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="editItemPrice">ABC</label>
-                                                <input type="number" class="form-control" id="editItemPrice"
-                                                    v-model="editItem.unit_cost">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="editItemDescription">Description</label>
-                                                <textarea rows="1" id="editItemDescription"
-                                                    v-model="editItem.descrip"></textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light" @click="closeEdit">Cancel</button>
-                                        <button type="button" class="btn btn-primary" @click="editItemList">Update
-                                            Item</button>
-                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light"
+                                        @click="closeAddItemModal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" @click="addNewItem">Add More
+                                        Item</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
+                    <!-- Edit Item Modal -->
+                    <div class="modal" v-if="editItemModalVisible" id="viewEditModal"
+                        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 900px;">
+                        <div class="modal-dialog"
+                            style=" margin: auto; position: relative; transform: translateY(15%);">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div
+                                        style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                                        <img :src="logo" style="width:60px; height:60px;">
+                                    </div>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <h1>Edit Item</h1>
+                                        <div class="form-group">
+                                            <label for="editItemName">Item Name</label>
+                                            <v-select :options="availableItems" v-model="editItem" label="name">
+                                                <template #option="option">
+                                                    {{ option.name }}
+                                                </template>
+                                            </v-select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editItemUnit">Unit</label>
+                                            <input type="text" class="form-control" id="editItemUnit"
+                                                v-model="editItem.unit" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editItemQuantity">Quantity</label>
+                                            <input type="number" class="form-control" id="editItemQuantity"
+                                                v-model="editItem.qty">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editItemPrice">ABC</label>
+                                            <input type="number" class="form-control" id="editItemPrice"
+                                                v-model="editItem.unit_cost">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editItemDescription">Description</label>
+                                            <textarea rows="1" id="editItemDescription"
+                                                v-model="editItem.descrip"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" @click="closeEdit">Cancel</button>
+                                    <button type="button" class="btn btn-primary" @click="editItemList">Update
+                                        Item</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <FooterVue />
@@ -274,7 +302,7 @@
 import showAddItemModal from "./modal_addItem.vue";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpinner, faCartShopping, faListCheck, faPesoSign, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faCircle } from '@fortawesome/free-solid-svg-icons';
 import dilg_logo from "../../../assets/logo.png";
 import Navbar from "../layout/Navbar.vue";
 import Sidebar from "../layout/Sidebar.vue";
@@ -287,7 +315,7 @@ import vSelect from 'vue-select';
 import axios from "axios";
 import { toast } from "vue3-toastify";
 
-library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave);
+library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faCircle);
 
 export default {
     name: "update_pr",
@@ -321,7 +349,9 @@ export default {
                 pr_no: null,
                 office: null,
                 is_urgent: 0,
+                stat: null,
             },
+            statusHistory: [], // Store status history
             procurementType: [
                 { value: '1', label: 'Catering Services' },
                 { value: '2', label: 'Meals, Venue and Accomodation' },
@@ -358,6 +388,8 @@ export default {
             updatedItems: [],
             isExporting: false,
             isTemporary: [],
+            role: null,
+            userId: null,
         };
     },
     computed: {
@@ -372,7 +404,6 @@ export default {
         isUrgent() {
             return this.purchaseRequestData ? this.purchaseRequestData.is_urgent : 0;
         },
-        // Computed property for pr_date
         formattedPrDate: {
             get() {
                 return this.formatDate(this.purchaseRequestData.pr_date);
@@ -381,7 +412,6 @@ export default {
                 this.purchaseRequestData.pr_date = value;
             },
         },
-        // Computed property for target_date
         formattedTargetDate: {
             get() {
                 return this.formatDate(this.purchaseRequestData.target_date);
@@ -408,29 +438,36 @@ export default {
         formatDate(date) {
             if (!date) return '';
             const d = new Date(date);
-            if (isNaN(d.getTime())) return ''; // Handle invalid dates
+            if (isNaN(d.getTime())) return '';
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         },
-        fetchItems() {
-            axios
-                .get('/api/fetchItems', {
-                    params: {
-                        userId: this.userId,
-                    },
-                })
-                .then(response => {
-                    this.availableItems = response.data || [];
-                })
-                .catch(error => {
-                    console.error('Error fetching items:', error);
-                    this.availableItems = [];
-                });
+        formatDateTime(datetime) {
+            if (!datetime) return '';
+            const d = new Date(datetime);
+            if (isNaN(d.getTime())) return '';
+            return d.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+            });
         },
-        formatNumberWithCommas(number) {
-            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        getStatusBadgeClass(statusId) {
+            const badgeClasses = {
+                2: 'badge-primary', // SUBMITTED TO GSS
+                3: 'badge-info', // RECEIVED BY GSS
+                5: 'badge-primary', // SUBMITTED TO BUDGET
+                6: 'badge-info', // RECEIVED BY BUDGET
+                8: 'badge-primary', // SUBMITTED TO ORD
+                9: 'badge-info', // RECEIVED BY ORD
+                12: 'badge-primary', // AWARDED
+            };
+            return badgeClasses[statusId] || 'badge-warning';
         },
         getStatusName(statusId) {
             const statusMessages = {
@@ -450,20 +487,19 @@ export default {
                 16: 'RETURNED BY ORD',
                 17: 'CANCELLED',
             };
-            return statusMessages[statusId] || 'DRAFT'; // Change 'DRAFT' to 'Unknown' or other default
+            return statusMessages[statusId] || 'DRAFT';
         },
         async fetchPurchaseRequestData() {
             const id = this.$route.query.id;
             axios
                 .get(`../api/viewPurchaseRequest/${id}`)
                 .then(response => {
-                    const { purchaseRequest, prItems } = response.data;
-                    // Format dates and stat before assigning
+                    const { purchaseRequest, prItems, statusHistory } = response.data;
                     this.purchaseRequestData = {
                         ...purchaseRequest,
                         pr_date: this.formatDate(purchaseRequest.pr_date),
                         target_date: this.formatDate(purchaseRequest.target_date),
-                        stat: this.getStatusName(purchaseRequest.stat), // Map stat to status name
+                        stat: this.getStatusName(purchaseRequest.stat),
                     };
                     this.items = prItems.map(item => ({
                         id: item.id,
@@ -475,13 +511,31 @@ export default {
                         unit_cost: item.unit_cost,
                         abc: item.abc,
                     }));
+                    this.statusHistory = statusHistory || [];
                 })
                 .catch(error => {
                     console.error('Error fetching purchase request data:', error);
                     toast.error('Failed to fetch purchase request data.', { autoClose: 1000 });
                 });
         },
-
+        fetchItems() {
+            axios
+                .get('/api/fetchItems', {
+                    params: {
+                        userId: this.userId,
+                    },
+                })
+                .then(response => {
+                    this.availableItems = response.data || [];
+                })
+                .catch(error => {
+                    console.error('Error fetching items:', error);
+                    this.availableItems = [];
+                });
+        },
+        formatNumberWithCommas(number) {
+            return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        },
         showAddItemModal() {
             this.addItemModalVisible = true;
         },
@@ -549,8 +603,8 @@ export default {
                     pr_id: this.$route.query.id,
                     pmo: this.purchaseRequestData.office,
                     type: this.purchaseRequestData.type,
-                    pr_date: this.purchaseRequestData.pr_date, // Already formatted
-                    target_date: this.purchaseRequestData.target_date, // Already formatted
+                    pr_date: this.purchaseRequestData.pr_date,
+                    target_date: this.purchaseRequestData.target_date,
                     purpose: this.purchaseRequestData.particulars,
                     items: this.items.map(item => ({
                         id: item.id,
@@ -653,7 +707,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 select {
     width: 100%;
@@ -698,5 +751,55 @@ input[type="checkbox"]:checked+.custom-checkbox::after {
 #hover:hover {
     background-color: rgba(5, 152, 135, 0.258);
     cursor: pointer;
+}
+
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 20px;
+    width: 4px;
+    background: #ddd;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-badge {
+    position: absolute;
+    left: 12px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.timeline-panel {
+    margin-left: 50px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.timeline-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.timeline-body p {
+    margin: 5px 0;
 }
 </style>
