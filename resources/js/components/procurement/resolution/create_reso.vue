@@ -283,9 +283,6 @@ const fetchResolutionData = async () => {
             }
             abstractId.value = response.data.abstract_id || parseInt(route.params.id);
             rfqId.value = response.data.rfq_id || (route.query.rfq_id ? parseInt(route.query.rfq_id) : null);
-            console.log('Fetched resolution:', resolutionData.value);
-            console.log('Abstract ID:', abstractId.value);
-            console.log('RFQ ID:', rfqId.value);
         }
     } catch (err) {
         console.error('Error fetching resolution:', err.response?.data || err);
@@ -308,7 +305,12 @@ const saveContent = async () => {
             abstract_id: abstractId.value,
             rfq_id: rfqId.value,
         });
-        alert(response.data.message);
+        Swal.fire({
+            icon: "success",
+            title: "Your work has been saved",
+            showConfirmButton: false,
+            timer: 1500
+        });
     } catch (err) {
         console.error('Failed to save resolution:', err.response?.data || err);
         alert('Save failed: ' + (err.response?.data?.message || 'Unknown error'));

@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Models\RFQModel;
 use App\Models\AppItemModel;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\PurchaseRequestModel;
 use App\Models\PurchaseRequestItemModel;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\RichText\RichText;
-use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class RFQController extends Controller
 {
+
     public function generateRFQNo($cur_year = 2025)
     {
         return response()->json(
@@ -204,10 +205,13 @@ class RFQController extends Controller
         ]);
 
         $rfq->save();
-
         foreach ($pr_id_check as $id_check) {
             PurchaseRequestModel::where('id', $id_check)
-                ->update(['stat' => 11]);
+                ->update([
+                    'stat' => 11,
+                    'status' => 'With RFQ'
+                ]);
+                
         }
 
         return response()->json(['message' => 'RFQ created successfully', 'sql_query' => $rfq], 201);

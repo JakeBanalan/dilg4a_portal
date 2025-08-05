@@ -51,26 +51,26 @@ class PurchaseRequestController extends Controller
     {
         // Step 1: Get all PRs and user info
         $prs = DB::table('pr')
-            ->leftJoin('users', 'users.id', '=', 'pr.submitted_by')
+            ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('tbl_status', 'tbl_status.id', '=', 'pr.stat')
             ->select(
                 'pr.id as pr_id',
                 'pr.pr_no',
                 'pr.purpose',
                 'pr.target_date',
-                'pr.submitted_by',
+                'pr.action_officer',
                 'pr.stat',
                 'tbl_status.title as status',
                 DB::raw('DATE_FORMAT(pr.pr_date, "%b %d, %Y %h:%i %p") as pr_date'),
-                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as ferson"),
+                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as ferson")
             )
             ->get()
             ->keyBy('pr_id');
-
-        // Step 2: Get RFQs and expand comma-separated pr_ids
+    
+        // Step 2: Get RFQs and expand comma-separated pr_ids, including resolution data
         $rfqs = DB::table('tbl_rfq')->get();
         $rfqExpanded = [];
-
+    
         foreach ($rfqs as $rfq) {
             $prIds = array_filter(array_map('trim', explode(',', $rfq->pr_id)));
             foreach ($prIds as $prId) {
@@ -93,27 +93,35 @@ class PurchaseRequestController extends Controller
                     'po_date' => DB::table('tbl_purchase_order')
                         ->where('rfq_id', $rfq->id)
                         ->selectRaw('DATE_FORMAT(po_date, "%b %d, %Y %h:%i %p") as po_date')
-                        ->value('po_date')
+                        ->value('po_date'),
+                    // Add resolution data
+                    'reso_no' => DB::table('tbl_resolution')
+                        ->where('rfq_id', $rfq->id)
+                        ->value('reso_no'),
+                    'reso_date' => DB::table('tbl_resolution')
+                        ->where('rfq_id', $rfq->id)
+                        ->selectRaw('DATE_FORMAT(reso_date, "%b %d, %Y %h:%i %p") as reso_date')
+                        ->value('reso_date')
                 ];
             }
         }
-
+    
         // Step 3: Track which PRs have RFQ entries
         $final = [];
         $seenPrIds = [];
-
+    
         foreach ($rfqExpanded as $row) {
             if (isset($prs[$row['pr_id']])) {
                 $pr = $prs[$row['pr_id']];
                 $seenPrIds[] = $pr->pr_id;
-
+    
                 $final[] = [
                     'pr_id' => $pr->pr_id,
                     'pr_no' => $pr->pr_no,
                     'purpose' => $pr->purpose,
                     'pr_date' => $pr->pr_date,
                     'target_date' => $pr->target_date,
-                    'submitted_by' => $pr->submitted_by,
+                    'action_officer' => $pr->action_officer,
                     'ferson' => $pr->ferson,
                     'rfq_no' => $row['rfq_no'],
                     'rfq_date' => $row['rfq_date'],
@@ -125,11 +133,14 @@ class PurchaseRequestController extends Controller
                     'stat' => $pr->stat,
                     'po_id' => $row['po_id'],
                     'po_no' => $row['po_no'],
-                    'po_date' => $row['po_date']
+                    'po_date' => $row['po_date'],
+                    // Include resolution data
+                    'reso_no' => $row['reso_no'],
+                    'reso_date' => $row['reso_date']
                 ];
             }
         }
-
+    
         // Step 4: Add PRs that do NOT have any RFQ
         foreach ($prs as $prId => $pr) {
             if (!in_array($prId, $seenPrIds)) {
@@ -139,7 +150,7 @@ class PurchaseRequestController extends Controller
                     'purpose' => $pr->purpose,
                     'pr_date' => $pr->pr_date,
                     'target_date' => $pr->target_date,
-                    'submitted_by' => $pr->submitted_by,
+                    'action_officer' => $pr->action_officer,
                     'ferson' => $pr->ferson,
                     'rfq_no' => null,
                     'rfq_date' => null,
@@ -149,11 +160,14 @@ class PurchaseRequestController extends Controller
                     'stat' => $pr->stat,
                     'po_id' => null,
                     'po_no' => null,
-                    'po_date' => null
+                    'po_date' => null,
+                    // No resolution data for PRs without RFQ
+                    'reso_no' => null,
+                    'reso_date' => null
                 ];
             }
         }
-
+    
         return response()->json($final);
     }
 

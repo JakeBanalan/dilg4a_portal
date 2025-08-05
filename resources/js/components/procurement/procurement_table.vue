@@ -29,6 +29,16 @@
     background-color: #ffc107;
 }
 
+.badge-ord {
+    color: #fff;
+    background-color: #1133f1;
+}
+
+.badge-budget {
+    color: #fff;
+    background-color: #27c7f8;
+}
+
 /* Modal Styles */
 .modal-backdrop {
     position: fixed;
@@ -337,7 +347,7 @@
                             <font-awesome-icon :icon="['fas', 'undo']" style="margin-left: -3px;" />
                         </button>
                     </div>
-                    <div v-else-if="purchaseRequest.status_id == 10"> <!-- APPROVED_BY_ORD -->
+                    <div v-else-if="purchaseRequest.status_id == 12"> <!-- AWARDED -->
                         <button title="View" type="button" class="btn btn-icon mr-1"
                             style="background-color:#059886;color:#fff;" @click="viewPr(purchaseRequest.id)">
                             <font-awesome-icon :icon="['fas', 'eye']"></font-awesome-icon>
@@ -526,16 +536,15 @@ export default {
                 1: 'badge-success', // DRAFT
                 2: 'badge-submitted_gss', // SUBMITTED_TO_GSS
                 3: 'badge-received_gss', // RECEIVED_BY_GSS
-                4: 'badge-success', // APPROVED_BY_GSS
-                5: 'badge-success', // SUBMITTED_TO_BUDGET
-                6: 'badge-success', // RECEIVED_BY_BUDGET
-                7: 'badge-success', // APPROVED_BY_BUDGET
-                8: 'badge-success', // SUBMITTED_TO_ORD
-                9: 'badge-success', // RECEIVED_BY_ORD
-                10: 'badge-success', // APPROVED_BY_ORD
+                4: 'badge-budget', // APPROVED_BY_GSS
+                5: 'badge-budget', // SUBMITTED_TO_BUDGET
+                6: 'badge-budget', // RECEIVED_BY_BUDGET
+                7: 'badge-budget', // APPROVED_BY_BUDGET
+                8: 'badge-ord', // SUBMITTED_TO_ORD
+                9: 'badge-ord', // RECEIVED_BY_ORD
+                10: 'badge-ord', // APPROVED_BY_ORD
                 11: 'badge-success', // WITH RFQ
                 12: 'badge-success', // AWARDED
-                13: 'badge-success', // wITH PURCHASE ORDER
                 14: 'badge-warning', // RETURNED_BY_GSS
                 15: 'badge-warning', // RETURNED_BY_BUDGET
                 16: 'badge-warning', // RETURNED_BY_ORD
@@ -557,7 +566,6 @@ export default {
                 10: 'APPROVED BY ORD',
                 11: 'WITH RFQ',
                 12: 'AWARDED',
-                13: 'WITH PURCHASE ORDER', // wITH PURCHASE ORDER
                 14: 'RETURNED BY GSS',
                 15: 'RETURNED BY BUDGET',
                 16: 'RETURNED BY ORD',
@@ -576,112 +584,80 @@ export default {
                 return;
             }
 
-            // Subscribe to user-specific channel
-            window.Echo.channel(`notifications.${this.userId}`)
-                .listen('PurchaseRequestUpdated', (e) => {
-                    const { title, body, prId, statusId } = e;
-                    const iconPath = '/images/logo.png';
+            const showNotification = (title, body) => {
+                const iconPath = '/images/logo.png';
 
-                    // Update purchase request in the list
-                    const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
-                    if (prIndex !== -1) {
-                        // Use Vue.set for reactivity
-                        Vue.set(this.purchaseRequests, prIndex, {
-                            ...this.purchaseRequests[prIndex],
-                            status_id: statusId,
-                            status: this.getStatusName(statusId),
-                        });
-                    } else {
-                        // If PR is not in the list, fetch it to add (optional, depending on requirements)
-                        this.refreshData();
-                    }
+                if (!("Notification" in window)) {
+                    window.alert(`${title}: ${body}`);
+                    return;
+                }
 
-                    // Show notification
-                    if (!("Notification" in window)) {
-                        window.alert(`${title}: ${body}`);
-                        return;
-                    }
+                const displayNotification = () => {
+                    const notification = new Notification(title, {
+                        body,
+                        icon: iconPath,
+                    });
+                    notification.onclick = () => {
+                        window.open(`/procurement/index`, '_blank');
+                    };
+                };
 
-                    if (Notification.permission === "granted") {
-                        const notification = new Notification(title, {
-                            body,
-                            icon: iconPath,
-                        });
-                        notification.onclick = () => {
-                            window.open(`/procurement/index`, '_blank');
-                        };
-                    } else if (Notification.permission !== "denied") {
-                        Notification.requestPermission().then(permission => {
-                            if (permission === "granted") {
-                                const notification = new Notification(title, {
-                                    body,
-                                    icon: iconPath,
-                                });
-                                notification.onclick = () => {
-                                    window.open(`/procurement/index`, '_blank');
-                                };
-                            } else {
-                                window.alert(`${title}: ${body}`);
-                            }
-                        }).catch(error => {
+                if (Notification.permission === "granted") {
+                    displayNotification();
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            displayNotification();
+                        } else {
                             window.alert(`${title}: ${body}`);
-                        });
-                    } else {
+                        }
+                    }).catch(() => {
                         window.alert(`${title}: ${body}`);
-                    }
-                })
-                .error((error) => {
+                    });
+                } else {
+                    window.alert(`${title}: ${body}`);
+                }
+            };
+
+            const handlePRUpdate = (e) => {
+                const { title, body, prId, statusId } = e;
+
+                const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
+                if (prIndex !== -1) {
+                    Vue.set(this.purchaseRequests, prIndex, {
+                        ...this.purchaseRequests[prIndex],
+                        status_id: statusId,
+                        status: this.getStatusName(statusId),
+                    });
+                } else {
+                    this.refreshData();
+                }
+
+                // ✅ Show browser notification for any event
+                showNotification(title, body);
+            };
+
+            // 👤 User-specific channel
+            window.Echo.channel(`notifications.${this.userId}`)
+                .listen('PurchaseRequestUpdated', handlePRUpdate)
+                .error(() => {
                     toast.error('Failed to connect to real-time updates.', { autoClose: 2000 });
                 });
 
-            // Subscribe to role-based channels
-            if (this.role === 'gss_admin') {
-                window.Echo.channel('notifications.gss_admin')
-                    .listen('PurchaseRequestUpdated', (e) => {
-                        const { title, body, prId, statusId } = e;
-                        const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
-                        if (prIndex !== -1) {
-                            Vue.set(this.purchaseRequests, prIndex, {
-                                ...this.purchaseRequests[prIndex],
-                                status_id: statusId,
-                                status: this.getStatusName(statusId),
-                            });
-                        } else {
-                            this.refreshData();
-                        }
-                    });
-            } else if (this.role === 'budget_admin') {
-                window.Echo.channel('notifications.budget_admin')
-                    .listen('PurchaseRequestUpdated', (e) => {
-                        const { title, body, prId, statusId } = e;
-                        const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
-                        if (prIndex !== -1) {
-                            Vue.set(this.purchaseRequests, prIndex, {
-                                ...this.purchaseRequests[prIndex],
-                                status_id: statusId,
-                                status: this.getStatusName(statusId),
-                            });
-                        } else {
-                            this.refreshData();
-                        }
-                    });
-            } else if (this.role === 'ord_admin') {
-                window.Echo.channel('notifications.ord_admin')
-                    .listen('PurchaseRequestUpdated', (e) => {
-                        const { title, body, prId, statusId } = e;
-                        const prIndex = this.purchaseRequests.findIndex(pr => pr.id === prId);
-                        if (prIndex !== -1) {
-                            Vue.set(this.purchaseRequests, prIndex, {
-                                ...this.purchaseRequests[prIndex],
-                                status_id: statusId,
-                                status: this.getStatusName(statusId),
-                            });
-                        } else {
-                            this.refreshData();
-                        }
-                    });
+            // 👥 Role-based channel subscriptions
+            const roleChannels = {
+                gss_admin: 'notifications.gss_admin',
+                budget_admin: 'notifications.budget_admin',
+                ord_admin: 'notifications.ord_admin',
+            };
+
+            const channel = roleChannels[this.role];
+            if (channel) {
+                window.Echo.channel(channel)
+                    .listen('PurchaseRequestUpdated', handlePRUpdate);
             }
         },
+
         loadData(filterParams = {}) {
             return axios.post('/api/fetchPurchaseReqData', {
                 user_id: this.userId,

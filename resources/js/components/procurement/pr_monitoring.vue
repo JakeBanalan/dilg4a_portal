@@ -174,8 +174,9 @@
                                                                 <tbody>
                                                                     <tr v-for="pr in purchaseRequests" :key="pr.id">
                                                                         <td class="prm-cell">
-                                                                            <b @click.prevent="viewPR(pr.pr_id)">{{
-                                                                                pr.pr_no }}</b>
+                                                                            <b @click.prevent="viewPR(pr.pr_id)"
+                                                                                class="hyperlink-style">{{
+                                                                                    pr.pr_no }}</b>
                                                                             <br> ~PR Date:{{ pr.pr_date }}~
                                                                         </td>
                                                                         <td class="prm-cell">
@@ -188,8 +189,9 @@
                                                                         </td>
                                                                         <td class="prm-cell">
                                                                             <template v-if="pr.rfq_id">
-                                                                                <b @click.prevent="viewRFQ(pr.rfq_id)">{{
-                                                                                    pr.rfq_no }}</b>
+                                                                                <b @click.prevent="viewRFQ(pr.rfq_id)"
+                                                                                    class="hyperlink-style">{{
+                                                                                        pr.rfq_no }}</b>
                                                                                 <br> ~RFQ Date:{{ pr.rfq_date }}~
                                                                             </template>
                                                                             <template
@@ -204,32 +206,31 @@
                                                                         </td>
                                                                         <td class="prm-cell">
                                                                             <template v-if="pr.abstract_no">
-                                                                                <b
-                                                                                    @click.prevent="viewAOQ(pr.rfq_id, pr.aoq_id)">
-                                                                                    {{pr.abstract_no }}</b>
+                                                                                <b @click.prevent="viewAOQ(pr.rfq_id, pr.aoq_id)"
+                                                                                    class="hyperlink-style">
+                                                                                    {{ pr.abstract_no }}
+                                                                                </b>
                                                                                 <br> ~AOQ Date: {{ pr.abstract_date }}~
                                                                             </template>
                                                                             <template v-else-if="pr.rfq_id">
                                                                                 <div class="prm-hover-area">
                                                                                     <div @click.prevent="createAbstract(pr)"
                                                                                         class="badge badge-success hover-badge">
-                                                                                        Create AOQ</div>
+                                                                                        Create AOQ
+                                                                                    </div>
                                                                                 </div>
                                                                             </template>
                                                                         </td>
                                                                         <td class="prm-cell">
-                                                                            <template v-if="pr.rfq_id">
-                                                                                <b
-                                                                                    @click.prevent="updateReso(pr)" href="#">Done</b>
-                                                                                <br> ~Reso Date: {{ pr.reso_date ||
-                                                                                    'N/A' }}~
+                                                                            <template v-if="pr.reso_no">
+                                                                                <b @click.prevent="updateReso(pr)"
+                                                                                    class="hyperlink-style">{{
+                                                                                        pr.reso_no }}</b>
+                                                                                <br> Reso Date: {{ pr.reso_date || 'N/A'
+                                                                                }}
                                                                             </template>
-<<<<<<< HEAD
                                                                             <template
-                                                                                v-else-if="pr.abstract_no && pr.rfq_id && pr.aoq_id">
-=======
-                                                                            <template v-else-if="pr.abstract_no">
->>>>>>> 3691d0a156668e3c352afe4fe80f6584f5579554
+                                                                                v-else-if="pr.abstract_no && pr.rfq_id && pr.aoq_id && !pr.reso_no">
                                                                                 <div class="prm-hover-area">
                                                                                     <div @click.prevent="createReso(pr)"
                                                                                         class="badge badge-success hover-badge">
@@ -240,16 +241,13 @@
                                                                         </td>
                                                                         <td class="prm-cell">
                                                                             <template v-if="pr.po_no">
-                                                                                <b @click.prevent="viewPO(pr.rfq_id, pr.aoq_id)">{{ pr.po_no }}</b>
-                                                                                <br> ~PO Date: {{ pr.po_date }}~
+                                                                                <b @click.prevent="viewPO(pr.rfq_id, pr.aoq_id, pr.po_id)"
+                                                                                    class="hyperlink-style">{{
+                                                                                        pr.po_no }}</b>
+                                                                                <br> PO Date: {{ pr.po_date }}
                                                                             </template>
-<<<<<<< HEAD
-                                                                            <template v-else-if="pr.reso_no">
-=======
                                                                             <template v-else-if="pr.stat == 12">
->>>>>>> 3691d0a156668e3c352afe4fe80f6584f5579554
                                                                                 <div class="prm-hover-area">
-                                                                                    <!-- <div @click.prevent="createPO(pr)" -->
                                                                                     <div @click.prevent="createPO(pr)"
                                                                                         class="badge badge-success hover-badge">
                                                                                         Create PO
@@ -259,15 +257,11 @@
                                                                         </td>
                                                                         <td class="prm-cell">
                                                                             <template v-if="pr.noa_no">
-                                                                                <b>{{ pr.noa_no }}</b>
+                                                                                <b class="hyperlink-style">{{ pr.noa_no
+                                                                                }}</b>
                                                                                 <br> ~NOA Date: {{ pr.noa_date }}~
                                                                             </template>
-<<<<<<< HEAD
                                                                             <template v-else-if="pr.po_no">
-=======
-                                                                            <template
-                                                                                v-else-if="pr.po_no || pr.stat == 17">
->>>>>>> 3691d0a156668e3c352afe4fe80f6584f5579554
                                                                                 <div class="prm-hover-area">
                                                                                     <div
                                                                                         class="badge badge-success hover-badge">
@@ -278,15 +272,11 @@
                                                                         </td>
                                                                         <td class="prm-cell">
                                                                             <template v-if="pr.ntp_no">
-                                                                                <b>{{ pr.ntp_no }}</b>
+                                                                                <b class="hyperlink-style">{{ pr.ntp_no
+                                                                                }}</b>
                                                                                 <br> ~NTP Date: {{ pr.ntp_date }}~
                                                                             </template>
-<<<<<<< HEAD
                                                                             <template v-else-if="pr.noa_no">
-=======
-                                                                            <template
-                                                                                v-else-if="pr.noa_no || pr.stat == 17">
->>>>>>> 3691d0a156668e3c352afe4fe80f6584f5579554
                                                                                 <div class="prm-hover-area">
                                                                                     <div
                                                                                         class="badge badge-success hover-badge">
@@ -397,9 +387,6 @@ export default {
     computed: {
     },
     methods: {
-<<<<<<< HEAD
-
-=======
         generatePONo: async function () {
             try {
                 const response = await axios.get('../../api/generatePurchaseOrderNo');
@@ -421,17 +408,51 @@ export default {
                 console.error('Error generating PO number:', error);
             }
         },
->>>>>>> 3691d0a156668e3c352afe4fe80f6584f5579554
         createAbstract(pr) {
             this.selectedPR = pr;
             this.aoqvisible = true;
         },
-<<<<<<< HEAD
-=======
-        createReso(pr) {
+        createRFQ(pr) {
             this.selectedPR = pr;
-            // this.$router.push({ path: '/procurement/create_reso', query: { pr_id: pr.pr_id } });
-            this.$router.push({ path: '/procurement/resolution' });
+            this.rfqvisible = true;
+        },
+        createReso(pr) {
+            Swal.fire({
+                title: 'Create Resolution',
+                text: `Are you sure you want to Proceed with Resolution Number: ${pr.abstract_no}?`,
+                showCancelButton: true,
+                confirmButtonText: 'Proceed',
+                cancelButtonText: 'Cancel',
+                icon: 'question',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await axios.post('/api/PostResolution', {
+                            reso_no: pr.abstract_no, // Set reso_no to abstract_no
+                            content: '', // Default empty content, adjust if needed
+                            abstract_id: pr.aoq_id,
+                            rfq_id: pr.rfq_id
+                        });
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: response.data.message || 'Resolution created successfully!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        this.$router.push({
+                            path: `/procurement/resolution/${pr.aoq_id}`,
+                            query: { rfq_id: pr.rfq_id }
+                        });
+                    } catch (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: err.response?.data?.message || 'Failed to create resolution.'
+                        });
+                    }
+                }
+            });
         },
         createPO(pr) {
             // this.selectedPR = pr;
@@ -448,25 +469,10 @@ export default {
                 cancelButtonText: 'No, cancel!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.$router.push({ path: '/procurement/purchase-order/create', query: { id: pr.rfq_id, abstract: pr.aoq_id, po_no: this.po_no} });
+                    this.$router.push({ path: '/procurement/purchase-order/create', query: { id: pr.rfq_id, abstract: pr.aoq_id, po_no: this.po_no } });
                 }
             });
 
-        },
-        handlePostRFQ() {
-            this.rfqvisible = false;
-            this.loadData();
-        },
->>>>>>> 3691d0a156668e3c352afe4fe80f6584f5579554
-        createRFQ(pr) {
-            this.selectedPR = pr;
-            this.rfqvisible = true;
-        },
-        createReso(pr) {
-            this.$router.push({
-                path: `/procurement/resolution/${pr.aoq_id}`,
-                query: { rfq_id: pr.rfq_id }
-            });
         },
         handlePostRFQ() {
             this.rfqvisible = false;
@@ -505,8 +511,15 @@ export default {
         viewAOQ(rfq_id, aoq_id) {
             this.$router.push({ path: '/procurement/abstract', query: { id: rfq_id, abstract: aoq_id } });
         },
-        viewPO(rfq_id, aoq_id) {
-            this.$router.push({ path: '/procurement/purchase-order', query: { id: rfq_id, abstract: aoq_id } });
+        viewPO(rfq_id, aoq_id, po_id) {
+            this.$router.push({
+                path: '/procurement/purchase-order',
+                query: {
+                    id: rfq_id,
+                    abstract: aoq_id,
+                    po_id: po_id || null
+                }
+            });
         },
         dateFormat(date) {
             return formatDate(date);
@@ -520,7 +533,6 @@ export default {
                 .then((response) => {
                     this.purchaseRequests = response.data;
                     this.initializeDataTable();
-                    console.log(this.purchaseRequests);
                 })
                 .catch((error) => {
                     console.error('Error fetching data:', error);
@@ -586,5 +598,22 @@ export default {
 .prm-cell:hover .hover-badge {
     visibility: visible;
     opacity: 1;
+}
+
+.hyperlink-style {
+    color: blue;
+    /* Sets text color to blue */
+    text-decoration: underline;
+    /* Adds underline like a hyperlink */
+    cursor: pointer;
+    /* Changes cursor to hand on hover */
+}
+
+/* Optional: Add hover effect for better UX */
+.hyperlink-style:hover {
+    color: darkblue;
+    /* Darker blue on hover */
+    text-decoration: underline;
+    /* Keeps underline */
 }
 </style>

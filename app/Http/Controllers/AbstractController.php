@@ -3,61 +3,91 @@
 namespace App\Http\Controllers;
 
 use App\Event;
+use Carbon\Carbon;
+use App\Models\RFQModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
 use App\Models\AbstractModel;
-use App\Models\PurchaseRequestItemModel;
-use App\Models\PurchaseRequestModel;
-use App\Models\SupplierQuotationModel;
 use App\Models\SupplierModel;
-use App\Models\RFQModel;
-
-
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\RichText\RichText;
+use Illuminate\Support\Facades\DB;
+use App\Models\PurchaseRequestModel;
+use App\Events\PurchaseRequestUpdated;
+use App\Models\SupplierQuotationModel;
+use App\Models\PurchaseRequestItemModel;
+
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class AbstractController extends Controller
 {
-
-    const STATUS_DRAFT      = 1;
-    const STATUS_RECEIVED   = 2;
-    const STATUS_COMPLETED  = 3;
-    const STATUS_RETURNED   = 4;
-
+    const AWARDED = 12;
     public function PostAbstract(Request $request)
     {
-        // Create and save the abstract
-        $abstract = new AbstractModel([
-            'abstract_no'   => $request->input('abstract_no'),
-            'rfq_id'        => $request->input('rfq_id'),
-            'abstract_date' => Carbon::now()
-        ]);
 
-        $abstract->save();
-
-        // Return response with the newly generated ID
-        return response()->json([
-            'message'      => 'Data saved successfully',
-            'abstract_id'  => $abstract->id, // Return the generated ID
-            'rfq_id'  => $abstract->rfq_id // Return the generated ID
-        ]);
+        $user = UserModel::find($request->input('submitted_by'));
+        $userRole = $user ? $user->user_role : null;
+        try {
+            // Validate request data
+            $validated = $request->validate([
+                'abstract_no' => 'required|string',
+                'rfq_id' => 'required|exists:tbl_rfq,id',
+                'pr_id' => 'required|exists:pr,id',
+            ]);
+    
+            // Create and save the abstract
+            $abstract = new AbstractModel([
+                'abstract_no' => $validated['abstract_no'],
+                'rfq_id' => $validated['rfq_id'],
+                'pr_id' => $validated['pr_id'],
+                'abstract_date' => Carbon::now(),
+            ]);
+    
+            $abstract->save();
+    
+            // Update the Purchase Request
+            $purchaseRequest = PurchaseRequestModel::findOrFail($validated['pr_id']);
+            $purchaseRequest->update([
+                'stat' => self::AWARDED,
+                'status' => 'Awarded',
+                'abstract_no' => $validated['abstract_no'],
+                'abstract_date' => Carbon::now(),
+                'aoq_id' => $abstract->id,
+            ]);
+            event(new PurchaseRequestUpdated(
+                $purchaseRequest->id,
+                $purchaseRequest->stat,
+                $purchaseRequest->pr_no,
+                $request->input('submitted_by'),
+                $userRole,
+                $purchaseRequest->created_by, // Use created_by for createdById
+                $purchaseRequest->action_officer // Use action_officer for actionOfficerId
+            ));
+    
+            // Return response
+            return response()->json([
+                'message' => 'Data saved successfully',
+                'abstract_id' => $abstract->id,
+                'rfq_id' => $abstract->rfq_id,
+                'pr_id' => $abstract->pr_id,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create abstract',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
     public function viewAOQ($id)
     {
         return response()->json(
-            AbstractModel::selectRaw('abstract_no,
+            AbstractModel::selectRaw(
+                'abstract_no,
                  DATE_FORMAT(abstract_date, "%M %d, %Y") as abstract_date,
                  DATE_FORMAT(abstract_date, "%h:%i %p") AS abstract_time'
-                 )
+            )
                 ->where('id', $id)
                 ->get()
         );
@@ -605,7 +635,7 @@ class AbstractController extends Controller
 
             $sheet->getStyle('B' . $row)->getAlignment()->setWrapText(true);
             $sheet->getStyle('B' . $row)->applyFromArray($abstractItemsStyle);
-            $sheet->getStyle('C' . $row.':P'.$row)->applyFromArray($abstractItemsStyle1);
+            $sheet->getStyle('C' . $row . ':P' . $row)->applyFromArray($abstractItemsStyle1);
             $sheet->setCellValue('B' . $row, $prItem['description']);
             $sheet->setCellValue('C' . $row, $prItem['qty']);
             $sheet->setCellValue('D' . $row, $prItem['unit']);

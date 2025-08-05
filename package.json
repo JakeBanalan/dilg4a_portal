@@ -53,11 +53,6 @@
         "popper.js": "^1.16.1",
         "pusher": "^5.2.0",
         "pusher-js": "^8.4.0",
-<<<<<<< HEAD
-=======
-        "quill": "^2.0.3",
-        "quill-better-table": "^1.2.10",
->>>>>>> 3691d0a156668e3c352afe4fe80f6584f5579554
         "router": "^2.0.0",
         "router-link": "^0.0.4",
         "select2": "^4.1.0-rc.0",

@@ -250,6 +250,15 @@ export default {
         this.userId = localStorage.getItem('userId');
     },
     methods: {
+        fetchAOQData() {
+            axios.get(`../../api/viewAOQ/${this.$route.query.abstract}`)
+                .then(res => {
+                    // console.log(res.data)
+                    this.abstract_no = res.data[0].abstract_no;
+                    this.abstract_date = res.data[0].abstract_date;
+                    this.abstract_time = res.data[0].abstract_time;
+                })
+        },
         toggleCellHighlight(rowId, supplier, field) {
             // Toggle highlight: if same supplier is already selected, remove it
             if (this.highlightedCells[rowId] === supplier) {
@@ -329,15 +338,6 @@ export default {
         //     //     }
         //     // });
         // },
-        fetchAOQData() {
-            axios.get(`../../api/viewAOQ/2`)
-                .then(res => {
-                    // console.log(res.data)
-                    this.abstract_no = res.data[0].abstract_no;
-                    this.abstract_date = res.data[0].abstract_date;
-                    this.abstract_time = res.data[0].abstract_time;
-                })
-        },
         formatNumber(value) {
             if (!value) return '0';
             return Number(value).toLocaleString();

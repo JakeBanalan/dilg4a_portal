@@ -17,6 +17,7 @@ const APPROVED_BY_BUDGET = 7;
 const SUBMITTED_TO_ORD = 8;
 const RECEIVED_BY_ORD = 9;
 const APPROVED_BY_ORD = 10;
+const AWARDED = 12;
 const RETURNED_BY_GSS = 14;
 const RETURNED_BY_BUDGET = 15;
 const RETURNED_BY_ORD = 16;
@@ -85,6 +86,7 @@ class PurchaseRequestUpdated implements ShouldBroadcast
             RETURNED_BY_GSS => "Purchase Request #{$this->prNo} returned by GSS.",
             RETURNED_BY_BUDGET => "Purchase Request #{$this->prNo} returned by Budget.",
             RETURNED_BY_ORD => "Purchase Request #{$this->prNo} returned by ORD.",
+            AWARDED => "Purchase Request #{$this->prNo} has been Awarded.",
             CANCELLED => "Purchase Request #{$this->prNo} cancelled.",
         ];
 

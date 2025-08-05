@@ -29,9 +29,10 @@ class ResolutionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'content' => 'required|string',
+            'content' => 'nullable|string', // Changed to nullable
             'abstract_id' => 'required|integer|exists:tbl_abstract,id',
             'rfq_id' => 'nullable|integer|exists:tbl_rfq,id',
+            'reso_no' => 'nullable|string', // Add reso_no validation if not already present
         ]);
 
         if ($validator->fails()) {

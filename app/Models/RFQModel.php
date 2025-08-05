@@ -24,8 +24,11 @@ class RFQModel extends Model
         'mode_id',
         'created_by',
         'updated_by'
-   
+
     ];
+
+    public function purchaseRequest()
+    {
+        return $this->belongsTo(PurchaseRequestModel::class, 'pr_id');
+    }
 }
-
-

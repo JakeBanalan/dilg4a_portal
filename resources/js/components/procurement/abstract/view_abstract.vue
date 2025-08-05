@@ -265,7 +265,7 @@ export default {
             // console.log(this.$route.query.abstract)
             axios.get(`../../api/viewAOQ/${this.$route.query.abstract}`)
                 .then(res => {
-                    console.log(res.data)
+                    // console.log(res.data)
                     this.abstract_no = res.data[0].abstract_no;
                     this.abstract_date = res.data[0].abstract_date;
                     this.abstract_time = res.data[0].abstract_time;
@@ -339,7 +339,7 @@ export default {
                 // Fetch supplier quotations
                 const quoteRes = await axios.get(`../../api/fetch_supplier_quote/${this.$route.query.abstract}`);
                 this.quoteData = quoteRes.data || [];
-                console.log("Quotation Data:", this.quoteRes);
+                // console.log("Quotation Data:", this.quoteRes);
                 // Group by id and sum offers
                 const groupedOffers = this.quoteData.reduce((acc, quote) => {
                     const offerValue = parseFloat(quote.total_offer);

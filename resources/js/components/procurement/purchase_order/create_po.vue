@@ -334,7 +334,7 @@ export default {
         //     // });
         // },
         fetchAOQData() {
-            axios.get(`../../api/viewAOQ/2`)
+            axios.get(`../../api/viewAOQ/${this.$route.query.abstract}`)
                 .then(res => {
                     // console.log(res.data)
                     this.abstract_no = res.data[0].abstract_no;
