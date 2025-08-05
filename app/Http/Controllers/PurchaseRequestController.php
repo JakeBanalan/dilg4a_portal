@@ -384,7 +384,8 @@ class PurchaseRequestController extends Controller
                 pr.purpose AS `particulars`,
                 pr.pr_date AS `pr_date`,
                 pr.target_date AS `target_date`,
-                pr.is_urgent AS `is_urgent`
+                pr.is_urgent AS `is_urgent`,
+                pr.stat
             '))
             ->leftJoin('users', 'users.id', '=', 'pr.action_officer')
             ->leftJoin('pmo', 'pmo.id', '=', 'pr.pmo')

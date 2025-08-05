@@ -5,15 +5,17 @@
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="row justify-content-end" style="margin-right: 20px;">
+                    <div v-if="role === 'user'" class="row justify-content-end" style="margin-right: 20px;">
                         <button type="button" class="btn btn-primary btn-md" @click="exportPurchaseRequest"
                             :disabled="isExporting">
                             <font-awesome-icon :icon="['fas', 'download']" />
                             &nbsp;<b>{{ isExporting ? 'Exporting...' : 'Export' }}</b>
                         </button> &nbsp; &nbsp;
-                        <button type="button" class="btn btn-warning btn-md"
-                            @click="updatePurchaseRequestDetails"><font-awesome-icon :icon="['fas', 'save']" />
-                            &nbsp;<b>Update</b></button>
+                        <button v-if="isUpdateButtonVisible" type="button" class="btn btn-warning btn-md"
+                            @click="updatePurchaseRequestDetails">
+                            <font-awesome-icon :icon="['fas', 'save']" />
+                            &nbsp;<b>Update</b>
+                        </button>
                     </div>
 
                     <br>
@@ -87,7 +89,7 @@
                         <div class="col-md-8 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <button type="button" class="btn btn-primary" style="float: left;"
+                                    <button v-if="role === 'user' && isUpdateButtonVisible" type="button" class="btn btn-primary" style="float: left;"
                                         @click="showAddItemModal"><font-awesome-icon :icon="['fas', 'plus']" /> &nbsp;
                                         Add More Item</button>
                                     <br>
@@ -112,7 +114,7 @@
                                                     <th>Quantity</th>
                                                     <th>Unit Cost</th>
                                                     <th>Total Cost</th>
-                                                    <th>Actions</th>
+                                                    <th v-if="role === 'user' && isUpdateButtonVisible">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -130,7 +132,7 @@
                                                         minimumFractionDigits: 2,
                                                         maximumFractionDigits: 2
                                                     }) }}</td>
-                                                    <td>
+                                                    <td v-if="role === 'user' && isUpdateButtonVisible">
                                                         <button class="btn btn-warning btn-sm"
                                                             @click="EditItemModal(item.id)">
                                                             <font-awesome-icon :icon="['fas', 'pen']" /> &nbsp;Edit
@@ -184,7 +186,8 @@
                                                     placeholder="Enter quantity">
                                             </div>
                                             <div class="form-group">
-                                                <label>Unit Cost <span style="color: red;">*</span></label> <!-- Renamed from "ABC" -->
+                                                <label>Unit Cost <span style="color: red;">*</span></label>
+                                                <!-- Renamed from "ABC" -->
                                                 <input type="number" class="form-control" v-model="addMoreItem.price"
                                                     min="0.01" placeholder="Enter unit cost">
                                             </div>
@@ -358,6 +361,9 @@ export default {
         };
     },
     computed: {
+        isUpdateButtonVisible() {
+            return this.purchaseRequestData.stat !== 'WITH RFQ' && this.purchaseRequestData.stat !== 'AWARDED';
+        },
         grandTotal() {
             return this.items.reduce((sum, item) => {
                 return sum + (item.qty * item.unit_cost);
@@ -426,17 +432,38 @@ export default {
         formatNumberWithCommas(number) {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
-        fetchPurchaseRequestData() {
+        getStatusName(statusId) {
+            const statusMessages = {
+                2: 'SUBMITTED TO GSS',
+                3: 'RECEIVED BY GSS',
+                4: 'APPROVED BY GSS',
+                5: 'SUBMITTED TO BUDGET',
+                6: 'RECEIVED BY BUDGET',
+                7: 'APPROVED BY BUDGET',
+                8: 'SUBMITTED TO ORD',
+                9: 'RECEIVED BY ORD',
+                10: 'APPROVED BY ORD',
+                11: 'WITH RFQ',
+                12: 'AWARDED',
+                14: 'RETURNED BY GSS',
+                15: 'RETURNED BY BUDGET',
+                16: 'RETURNED BY ORD',
+                17: 'CANCELLED',
+            };
+            return statusMessages[statusId] || 'DRAFT'; // Change 'DRAFT' to 'Unknown' or other default
+        },
+        async fetchPurchaseRequestData() {
             const id = this.$route.query.id;
             axios
                 .get(`../api/viewPurchaseRequest/${id}`)
                 .then(response => {
                     const { purchaseRequest, prItems } = response.data;
-                    // Format dates before assigning
+                    // Format dates and stat before assigning
                     this.purchaseRequestData = {
                         ...purchaseRequest,
                         pr_date: this.formatDate(purchaseRequest.pr_date),
                         target_date: this.formatDate(purchaseRequest.target_date),
+                        stat: this.getStatusName(purchaseRequest.stat), // Map stat to status name
                     };
                     this.items = prItems.map(item => ({
                         id: item.id,
@@ -454,6 +481,7 @@ export default {
                     toast.error('Failed to fetch purchase request data.', { autoClose: 1000 });
                 });
         },
+
         showAddItemModal() {
             this.addItemModalVisible = true;
         },
