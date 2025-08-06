@@ -38,14 +38,22 @@ const CANCELLED = 17;
 class PurchaseRequestController extends Controller
 {
     public function pr_monitoring_stats()
-    {
-        return response()->json([
-            'total_pr' => PurchaseRequestModel::count(),
-            'total_rfq' => RFQModel::count(),
-            'total_aoq' => AbstractModel::count(),
-            'completed_pr' => PurchaseRequestModel::count(),
-        ]);
-    }
+{
+    // Get the ID for 'Awarded' status
+    $awardedStatusId = DB::table('tbl_status')
+        ->where('title', 'Awarded')
+        ->value('id');
+
+    return response()->json([
+        // Only count PRs that are not yet Awarded
+        'total_pr' => PurchaseRequestModel::where('stat', '!=', $awardedStatusId)->count(),
+        // Count PRs that are already Awarded
+        'completed_pr' => PurchaseRequestModel::where('stat', $awardedStatusId)->count(),
+        'total_rfq' => RFQModel::count(),
+        'total_aoq' => AbstractModel::count(),
+    ]);
+}
+
 
     public function fetchPRMonitor()
     {
@@ -385,7 +393,7 @@ class PurchaseRequestController extends Controller
         pr.pr_date AS `pr_date`,
         pr.target_date AS `target_date`,
         pr.is_urgent AS `is_urgent`,
-        pr.stat as `stat`, 
+        pr.stat as `stat`,
         pr.submitted_date,
         pr.received_date,
         pr.submitted_date_budget,

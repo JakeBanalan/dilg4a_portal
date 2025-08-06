@@ -145,7 +145,6 @@ library.add(faList, faDownload, faFileExport, faPrint);
 const LICENSE_KEY = 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NTUyMTU5OTksImp0aSI6IjQ4MjE5NTQ5LWY5ZmQtNGRiYS1hZjEzLTJmOGMyZDgxMGRlZSIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6ImI1MzkxOGY2In0.o9oP7VEOUGH3jKcM_Nr2PA_x5fulDeMD3XzBhjAX0VWVcg29jdWnBP4u8R45a0hy0XfGwXPCqcwF1Ger7B59NA';
 
 const route = useRoute();
-const router = useRouter();
 const editor = ClassicEditor;
 const editorData = ref('');
 const editorWordCountElement = ref(null);
@@ -369,50 +368,131 @@ const printContent = () => {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
-    }).replace(/(\d{1,2}:\d{2})\s*([AP]M)/i, '$1 $2 PST'); // Updated to "August 01, 2025, 01:55 PM PST"
+    }).replace(/(\d{1,2}:\d{2})\s*([AP]M)/i, '$1 $2 PST');
 
     const content = `
-        <html>
-            <head>
-                <title>Print Resolution - ${abstractId.value || 'Unknown'}</title>
-                <style>
-                    body {
-                        font-family: 'Times New Roman', serif;
-                        padding: 0;
-                        margin: 0;
-                        font-size: 12pt;
-                    }
-                    p, h1, h2, h3, h4, h5, h6 {
-                        margin: 1rem 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                    }
-                    .content {
-                        width: 100%;
-                        box-sizing: border-box;
-                        padding-top: 0; /* Handled by @page top margin */
-                    }
-                    @media print {
-                        body { margin: 0; }
-                        .content { padding: 0 0.75in; } /* Matches page side margins */
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="content">
-                    ${editorData.value}
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <title>BAC Resolution</title>
+        <style>
+            @page {
+                size: A4;
+            }
+
+            @media print {
+                body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                header {
+                    position:fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    font-size: 14px;
+                    background-color: white;
+                }
+
+                footer {
+                    position:fixed;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    height: 0.5in; /* Footer height */
+                    padding: 0 1in;
+                    font-size: 13px;
+                    font-style: italic;
+                    text-align: justify;
+                     background-color: white;
+                }
+            }
+
+            .content {
+                padding: 0 1in;
+                margin-top: 120px;
+            }
+
+            body {
+                font-family: "Times New Roman", Times, serif;
+                background: white;
+                margin: 0;
+            }
+
+            header {
+                font-size: 14px;
+            }
+
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                line-height: 1.4;
+            }
+
+            .header-left, .header-right {
+                width: 45%;
+            }
+
+            .header-right em {
+                font-style: italic;
+            }
+
+            .double-line {
+                border-top: 1px solid black;
+                margin: 5px 0;
+            }
+
+            .below-double-line {
+                border-top: 1px solid black;
+                margin: 5px 0;
+            }
+        </style>
+        </head>
+        <body>
+
+        <header>
+            <div class="header-container">
+                <div class="header-left">
+                <div>Standard Form Number: SF-GOOD-48</div>
+                <div>Revised on: May 24, 2004</div>
                 </div>
-            </body>
+                <div class="header-right">
+                <div><strong><em>DILG Region IV A (CALABARZON)</em></strong></div>
+                <div><em>Project Reference Number:</em> _________________________</div>
+                <div><em>Location of the Project:</em> __________________________</div>
+                <div><em>Name of the Project:</em> _____________________________</div>
+                </div>
+            </div>
+            <div class="double-line"></div>
+            <div class="below-double-line"></div>
+        </header>
+
+        <div class="content">
+            ${editorData.value}
+        </div>
+
+        <footer>
+        If the BAC determines that the bidder with the Lowest Calculated Bid passes all the criteria for post-qualification, it shall declare the said bidder as the bidder with the Lowest Calculated Responsive Bid, and the head of the Procuring Entity concerned shall award the contract to the said bidder. (IRR-A Section 34.3) The TWG, with the assistance of the Secretariat, if necessary, shall prepare the BAC Resolution declaring the LCRB.
+        </footer>
+
+        </body>
         </html>
-    `;
+        `;
 
     const printWindow = window.open('', '_blank');
     if (!printWindow) return alert('Failed to open print window.');
-
     printWindow.document.open();
     printWindow.document.write(content);
     printWindow.document.close();
     printWindow.focus();
+    // Close the tab after print dialog is closed
+    printWindow.onafterprint = () => {
+        printWindow.close();
+    };
     printWindow.print();
 };
 
