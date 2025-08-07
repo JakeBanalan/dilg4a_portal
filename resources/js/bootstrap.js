@@ -27,7 +27,8 @@ window.Pusher = Pusher;
 // window.Pusher.logToConsole = true;
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: '29d53f8816252d29de52', // Your PUSHER_APP_KEY
+    key: process.env.MIX_PUSHER_APP_KEY, // Your PUSHER_APP_KEY
+    // key: '29d53f8816252d29de52',
     cluster: 'ap1', // Your PUSHER_APP_CLUSTER
     forceTLS: true,
     auth: {

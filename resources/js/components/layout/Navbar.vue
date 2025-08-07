@@ -276,10 +276,11 @@ export default {
         handleAdminNotification(data, notificationTitle, iconColor, iconClass, requesterId) {
             // Only handle notifications meant for this admin (avoid duplicate processing)
             if (data.requester_id !== requesterId) {
+
                 const notification = {
                     id: data.id,
                     title: `${notificationTitle} from ${data.name}`,
-                    iconColor: `../../../../assets/images/logo.png`,
+                    iconColor: `/images/logo.png`,
                     icon: iconClass,
                     time: new Date().toLocaleString(),
                     redirectUrl: "/rictu/ict_ta/index"
@@ -299,7 +300,7 @@ export default {
                 const notification = {
                     id: data.id,
                     title: `${notificationTitle} by ${data.receiverName}`,
-                    iconColor: `../../../../assets/images/logo.png`,
+                    iconColor: `/images/logo.png`,
                     icon: iconClass,
                     time: new Date().toLocaleString()
                 };
