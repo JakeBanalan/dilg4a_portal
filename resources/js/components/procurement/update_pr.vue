@@ -5,7 +5,7 @@
             <Sidebar />
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div v-if="role === 'user'" class="row justify-content-end" style="margin-right: 20px;">
+                    <div class="row justify-content-end" style="margin-right: 20px;">
                         <button type="button" class="btn btn-primary btn-md" @click="exportPurchaseRequest"
                             :disabled="isExporting">
                             <font-awesome-icon :icon="['fas', 'download']" />
@@ -89,7 +89,7 @@
                         <div class="col-md-8 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <button v-if="role === 'user' && isUpdateButtonVisible" type="button" class="btn btn-primary" style="float: left;"
+                                    <button v-if="isUpdateButtonVisible" type="button" class="btn btn-primary" style="float: left;"
                                         @click="showAddItemModal"><font-awesome-icon :icon="['fas', 'plus']" /> &nbsp;
                                         Add More Item</button>
                                     <br>
@@ -114,7 +114,7 @@
                                                     <th>Quantity</th>
                                                     <th>Unit Cost</th>
                                                     <th>Total Cost</th>
-                                                    <th v-if="role === 'user' && isUpdateButtonVisible">Actions</th>
+                                                    <th v-if="isUpdateButtonVisible">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -132,7 +132,7 @@
                                                         minimumFractionDigits: 2,
                                                         maximumFractionDigits: 2
                                                     }) }}</td>
-                                                    <td v-if="role === 'user' && isUpdateButtonVisible">
+                                                    <td v-if="isUpdateButtonVisible">
                                                         <button class="btn btn-warning btn-sm"
                                                             @click="EditItemModal(item.id)">
                                                             <font-awesome-icon :icon="['fas', 'pen']" /> &nbsp;Edit
@@ -152,7 +152,7 @@
                     </div>
 
                     <!-- Status History Section -->
-                    <div  v-if="(role == 'user' || role == 'admin')" class="row">
+                    <div  class="row">
                         <div class="col-md-12 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">

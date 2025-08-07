@@ -13,13 +13,12 @@
                         <font-awesome-icon :icon="['fas', 'list']"></font-awesome-icon>&nbsp; Purchase Request List
                     </p>
                     <div class="box-tools">
-                        <button v-if="this.role == 'admin' || this.role == 'user'" @click="toCreatePR()" type="button"
+                        <button @click="toCreatePR()" type="button"
                             class="btn btn-outline-primary btn-fw btn-icon-text">
                             Create PR
                         </button>
 
-                        <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="toggleCard()"
-                            v-if="this.role == 'admin' || this.role == 'user' || this.role == 'gss_admin' || this.role == 'budget_admin'">
+                        <button class="btn btn-outline-primary btn-fw btn-icon-text mx-2" @click="toggleCard()">
                             Advanced Search
                         </button>
 
