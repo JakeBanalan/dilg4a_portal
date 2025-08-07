@@ -348,7 +348,7 @@
                         </button>
                     </div>
                     <div
-                        v-if="[2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 17].includes(purchaseRequest.status_id) && (role == 'user' || role == 'admin')">
+                        v-if="[2, 3, 5, 6, 8, 9, 10, 11, 12, 17].includes(purchaseRequest.status_id) && (role == 'user' || role == 'admin')">
                         <button title="View" type="button" class="btn btn-icon mr-1"
                             style="background-color:#059886;color:#fff;" :disabled="purchaseRequest.status_id === 17"
                             @click="viewPr(purchaseRequest.id)">
