@@ -169,7 +169,7 @@ export default {
                 },
                 {
                     link: '',
-                    name: 'Human Resource',
+                    name: 'HR Section',
                     tooltip: 'Human Resource',
                     icon: 'users',
                     class: 'menu-icon-custom',
@@ -180,7 +180,7 @@ export default {
                 },
                 {
                     link: '',
-                    name: 'Procurement',
+                    name: 'GSS Section',
                     tooltip: 'General Service Section',
                     icon: 'cart-shopping',
                     class: 'menu-icon-custom',

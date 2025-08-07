@@ -462,8 +462,8 @@ export default {
                 { label: 'Dashboard', value: '/dashboard' },
                 { label: 'Calendar', value: '/calendar/index' },
                 {
-                    label: 'Procurement',
-                    value: 'procurement',
+                    label: 'GSS Section',
+                    value: 'gss_section',
                     children: [
                         { label: 'PPMP', value: '/procurement/PPMP' },
                         { label: 'Purchase Request', value: '/procurement/index' },
@@ -488,7 +488,7 @@ export default {
                     ],
                 },
                 {
-                    label: 'Human Resource',
+                    label: 'HR Section',
                     value: 'human_resource',
                     children: [
                         { label: 'Daily Time Record', value: '/human_resource/daily_time_record/index' },
@@ -496,8 +496,8 @@ export default {
                     ],
                 },
                 {
-                    label: 'Finance',
-                    value: 'finance',
+                    label: 'Finance Section',
+                    value: 'finance_section',
                     children: [
                         {
                             label: 'Budget',
@@ -605,7 +605,7 @@ export default {
             }
         },
         createUser() {
-            this.$router.push("/settings/create");       
+            this.$router.push("/settings/create");
         },
         UpdateUser(id) {
             this.$router.push({ path: `/settings/update/${id}` });

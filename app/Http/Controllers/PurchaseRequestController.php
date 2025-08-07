@@ -225,7 +225,7 @@ class PurchaseRequestController extends Controller
     public function fetchPurchaseReqData(Request $request)
     {
         $page = $request->query('page', 1);
-        $itemsPerPage = $request->query('itemsPerPage', 50); // Reduced default for performance
+        $itemsPerPage = $request->query('itemsPerPage', 1000000);
 
         $userId = $request->input('user_id');
         $user = UserModel::find($userId);
@@ -310,7 +310,7 @@ class PurchaseRequestController extends Controller
             $query->where('status.title', 'like', '%' . $status . '%');
         }
 
-        if (!in_array($user->user_role, ['gss_admin', 'budget_admin', 'ord_admin'])) {
+        if (!in_array($user->user_role, ['gss_admin', 'budget_admin', 'ord_admin','admin'])) {
             $query->where('pr.action_officer', $user->id);
         }
 
