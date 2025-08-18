@@ -559,7 +559,7 @@ Route::middleware('api')->group(function () {
 });
 
 Route::prefix('daily-time-records')->group(function () {
-    Route::get('/', [DailyTimeRecordController::class, 'index']);
+    Route::get('/all', [DailyTimeRecordController::class, 'getAllRecords']); // Add this line
     Route::get('/user/{userId}', [DailyTimeRecordController::class, 'getByUser']);
     Route::put('/user/{userId}', [DailyTimeRecordController::class, 'updateByUser']);
     Route::post('/import', [DailyTimeRecordController::class, 'import']);
@@ -568,7 +568,6 @@ Route::prefix('daily-time-records')->group(function () {
     Route::delete('/{id}', [DailyTimeRecordController::class, 'destroy']);
     Route::get('/{id}', [DailyTimeRecordController::class, 'show']);
     Route::get('/export-user/{userId}', [DailyTimeRecordController::class, 'exportUser']);
-
 });
 
 Route::middleware('api')->group(function () {

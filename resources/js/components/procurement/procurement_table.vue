@@ -711,8 +711,7 @@ export default {
             });
         },
         onPageChange(page) {
-            this.currentPage = page;
-            this.refreshData();
+            this.currentPage = page;          
         },
         viewPr(pr_id) {
             this.$router.push({ path: '/procurement/update_pr', query: { id: pr_id } });

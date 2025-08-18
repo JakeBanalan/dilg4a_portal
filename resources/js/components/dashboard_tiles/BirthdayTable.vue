@@ -184,15 +184,16 @@
                                     <thead>
                                         <tr>
                                             <th style="text-align: left;">Name</th>
-                                            <th  style="text-align: left;">Birthdate</th>
+                                            <th style="text-align: left;">Birthdate</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr v-for="user in users" :key="user.id">
-                                            <td @click="launchConfetti(user.name)" style="cursor: pointer; text-align: left;">
+                                            <td @click="launchConfetti(user.name)"
+                                                style="cursor: pointer; text-align: left;">
                                                 <font-awesome-icon :icon="['fas', 'gift']" />&nbsp; {{ user.name }}
                                             </td>
-                                            <td  style="text-align: left;">{{ user.birthdate }}</td>
+                                            <td style="text-align: left;">{{ user.birthdate }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -235,6 +236,14 @@ export default {
                         const currentMonth = new Date().getMonth();
                         return birthdate.getMonth() === currentMonth;
                     });
+
+                    // Sort users by birthdate (day of month) - earliest to latest
+                    this.users.sort((a, b) => {
+                        const dateA = new Date(a.birthdate);
+                        const dateB = new Date(b.birthdate);
+                        return dateA.getDate() - dateB.getDate();
+                    });
+
                     this.users.forEach(user => {
                         const birthdate = new Date(user.birthdate);
                         user.age = Math.floor((new Date() - birthdate) / 31536000000);

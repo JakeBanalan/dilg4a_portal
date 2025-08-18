@@ -66,7 +66,13 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="record in filteredRecords" :key="record.id">
+                                        <tr v-if="isLoading">
+                                            <td colspan="3" class="text-center">Loading...</td>
+                                        </tr>
+                                        <tr v-else-if="paginatedRecords.length === 0">
+                                            <td colspan="3" class="text-center">No records available</td>
+                                        </tr>
+                                        <tr v-else v-for="record in paginatedRecords" :key="record.id">
                                             <td style="font-size: 12pt;">{{ record.name }}</td>
                                             <td style="font-size: 12pt;">
                                                 {{ formatDate(record.date_generated) }}
@@ -78,16 +84,14 @@
                                                 </button>
                                             </td>
                                         </tr>
-                                        <tr v-if="filteredRecords.length === 0">
-                                            <td colspan="5" class="text-center">No records available</td>
-                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                             <br />
 
-                            <Pagination :total="pagination.total" :currentPage="pagination.current_page"
-                                :itemsPerPage="pagination.per_page" @pageChange="fetchRecords" />
+                            <!-- Updated Pagination -->
+                            <Pagination :total="totalFilteredRecords" :currentPage="currentPage"
+                                :itemsPerPage="itemsPerPage" @pageChange="handlePageChange" />
                             <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
                         </div>
                     </div>
@@ -338,20 +342,23 @@ import BreadCrumbs from "../../dashboard_tiles/BreadCrumbs.vue";
 import Pagination from "../../procurement/Pagination.vue";
 import axios from "axios";
 import _ from 'lodash';
+
 export default {
     name: "DailyTimeRecords",
     components: { Navbar, Sidebar, FooterVue, BreadCrumbs, Pagination },
     data() {
         return {
-            records: [],
-            pagination: { total: 0, current_page: 1 },
+            // Change from records to allRecords for storing all data
+            allRecords: [],
+            currentPage: 1,
+            itemsPerPage: 10,
+            isLoading: false,
             file: null,
             uploading: false,
             uploadProgress: 0,
             exporting: false,
             exportProgress: 0,
             fileName: "",
-            monthlyRecords: [],
             searchQuery: "",
             date_from: '',
             date_to: '',
@@ -375,74 +382,95 @@ export default {
                 { value: '14', label: 'LUCENA CITY' },
                 { value: '15', label: 'ORD' },
             ],
-
             monthOptions: {
-                1: 'January',
-                2: 'February',
-                3: 'March',
-                4: 'April',
-                5: 'May',
-                6: 'June',
-                7: 'July',
-                8: 'August',
-                9: 'September',
-                10: 'October',
-                11: 'November',
-                12: 'December'
+                1: 'January', 2: 'February', 3: 'March', 4: 'April',
+                5: 'May', 6: 'June', 7: 'July', 8: 'August',
+                9: 'September', 10: 'October', 11: 'November', 12: 'December'
             },
             yearOptions: []
         };
     },
+    
     computed: {
+        // Filter records based on search query
         filteredRecords() {
-            return this.records.filter(record =>
+            if (!this.searchQuery.trim()) {
+                return this.allRecords;
+            }
+            return this.allRecords.filter(record =>
                 record.name.toLowerCase().includes(this.searchQuery.toLowerCase())
             );
         },
-
-
+        
+        // Get total count of filtered records
+        totalFilteredRecords() {
+            return this.filteredRecords.length;
+        },
+        
+        // Get records for current page (client-side pagination)
+        paginatedRecords() {
+            const start = (this.currentPage - 1) * this.itemsPerPage;
+            const end = start + this.itemsPerPage;
+            return this.filteredRecords.slice(start, end);
+        },
+        
+        // Updated showing entries message
         showingEntriesMessage() {
-            const currentPage = this.pagination.current_page || 1;
-            const itemsPerPage = this.pagination.per_page || 10;
-            const total = this.pagination.total || 0;
-
-            const start = total > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
-            const end = Math.min(start + itemsPerPage - 1, total);
-
+            const total = this.totalFilteredRecords;
+            if (total === 0) return 'Showing 0 to 0 of 0 entries';
+            
+            const start = (this.currentPage - 1) * this.itemsPerPage + 1;
+            const end = Math.min(start + this.itemsPerPage - 1, total);
             return `Showing ${start} to ${end} of ${total} entries`;
         }
     },
 
     methods: {
-        fetchRecords(page = 1, search = '') {
-            // Sanitize search query to prevent malicious input
-            const sanitizedSearch = search.replace(/[^a-zA-Z0-9\s]/g, '').trim();
-
-            axios
-                .get(`/api/daily-time-records`, {
-                    params: { page, search: sanitizedSearch },
+        // New method to load all records at once
+        async loadAllRecords() {
+            this.isLoading = true;
+            try {
+                const response = await axios.get('/api/daily-time-records/all', {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('api_token')}`, // Include authorization token
+                        Authorization: `Bearer ${localStorage.getItem('api_token')}`,
                     },
-                })
-                .then(response => {
-                    // Validate response structure
-                    if (response.data && response.data.data && Array.isArray(response.data.data)) {
-                        this.records = response.data.data;
-                        this.pagination = response.data;
-                    } else {
-                        console.error('Unexpected response format:', response.data);
-                        alert('Failed to fetch records. Please try again later.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching records:', error.response || error);
-                    alert('An error occurred while fetching records. Please try again later.');
                 });
+
+                if (response.data && Array.isArray(response.data)) {
+                    this.allRecords = response.data;                    
+                } else {
+                    console.error('Unexpected response format:', response.data);
+                    alert('Failed to fetch records. Please try again later.');
+                }
+            } catch (error) {
+                console.error('Error fetching records:', error.response || error);
+                alert('An error occurred while fetching records. Please try again later.');
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // Handle page changes without API calls
+        handlePageChange(page) {
+            this.currentPage = page;
+            // No API call needed - pagination handled client-side
+        },
+
+        // Keep the old fetchRecords method for compatibility but make it call loadAllRecords
+        fetchRecords(page = 1, search = '') {
+            // For backward compatibility, but we'll load all data
+            if (page === 1 && search === '') {
+                this.loadAllRecords();
+            } else {
+                // If it's a search, just update the search query
+                if (search !== this.searchQuery) {
+                    this.searchQuery = search;
+                }
+                this.currentPage = page;
+            }
         },
 
         viewRecordDetails(userId) {
-            // Ensure userId is a valid number before navigating
             if (!Number.isInteger(userId)) {
                 alert('Invalid user ID.');
                 return;
@@ -451,7 +479,6 @@ export default {
         },
 
         openMonthlyRecordsTab() {
-            // Open the monthly records tab securely
             window.open("/human_resource/daily_time_record/monthly", "_blank");
         },
 
@@ -482,7 +509,8 @@ export default {
             this.file = file;
             this.fileName = file.name;
         },
-        importDTR() {
+
+        async importDTR() {
             if (!this.file) {
                 alert("Please select a file to upload.");
                 return;
@@ -500,30 +528,33 @@ export default {
             this.uploading = true;
             this.uploadProgress = 0;
 
-            axios.post("/api/daily-time-records/import", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${localStorage.getItem('api_token')}`, // Include authorization token
-                },
-                onUploadProgress: progressEvent => {
-                    if (progressEvent.total > 0) {
-                        this.uploadProgress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            try {
+                await axios.post("/api/daily-time-records/import", formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${localStorage.getItem('api_token')}`,
+                    },
+                    onUploadProgress: progressEvent => {
+                        if (progressEvent.total > 0) {
+                            this.uploadProgress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                        }
                     }
-                }
-            })
-                .then(() => {
-                    alert("DTR imported successfully!");
-                    location.reload();
-                })
-                .catch(error => {
-                    console.error("Error importing DTR:", error.response || error);
-                    alert("Failed to import DTR. Please try again later.");
-                })
-                .finally(() => {
-                    this.uploading = false;
-                    this.uploadProgress = 0;
                 });
+                
+                alert("DTR imported successfully!");
+                // Reload data after import
+                await this.loadAllRecords();
+                
+            } catch (error) {
+                console.error("Error importing DTR:", error.response || error);
+                alert("Failed to import DTR. Please try again later.");
+            } finally {
+                this.uploading = false;
+                this.uploadProgress = 0;
+            }
         },
+
+        // Keep your existing exportMultipleDTR method
         exportMultipleDTR() {
             if (!this.exportOffice || !this.exportMonth || !this.exportYear) {
                 alert("Please complete all fields.");
@@ -590,6 +621,7 @@ export default {
                     this.exportProgress = 0;
                 });
         },
+
         formatDate(date) {
             if (!date) return '-';
             const d = new Date(date);
@@ -599,24 +631,29 @@ export default {
                 day: 'numeric'
             });
         },
-
-
     },
+
     watch: {
+        // Reset to first page when search changes, no API call needed
         searchQuery: _.debounce(function (newQuery) {
-            this.fetchRecords(1, newQuery);
+            this.currentPage = 1;
         }, 400),
+
         exportYear(newYear) {
-            this.exportMonth = ''; // Reset month if year changes
+            this.exportMonth = '';
         },
 
         exportOffice(newOffice) {
-            this.exportYear = '';  // Reset year if office changes
-            this.exportMonth = ''; // Also reset month just to be safe
+            this.exportYear = '';
+            this.exportMonth = '';
         },
     },
-    mounted() {
-        this.fetchRecords();
+
+    async mounted() {
+        // Load all records on component mount
+        await this.loadAllRecords();
+        
+        // Generate year options
         const currentYear = new Date().getFullYear();
         for (let i = 0; i < 5; i++) {
             this.yearOptions.push(currentYear - i);
@@ -625,33 +662,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
-/* .modal-dialog {
-
-    vertical-align: middle;
-
-}
-
-
-.blockquote {
-    padding: 10px 20px;
-    margin: 0 0 20px;
-    font-size: 17.5px;
-    border-left: 0px;
-}
-
-.blockquote-custom-icon-task {
-    width: 75px;
-    height: 75px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: -18px;
-    background-color: white;
-    color: #4cae4c;
-    left: 44%;
-} */
+/* Your existing styles */
 </style>

@@ -22,6 +22,32 @@ use PhpOffice\PhpSpreadsheet\RichText\RichText;
 
 class DailyTimeRecordController extends Controller
 {
+
+    public function getAllRecords(Request $request)
+    {
+        try {
+            // Use the same logic as index method but without pagination
+            $query = UserModel::whereHas('dailyTimeRecords');
+
+            $users = $query->select('id', 'first_name', 'last_name')->get();
+
+            $users->transform(function ($user) {
+                $user->name = $user->first_name . ' ' . $user->last_name;
+                $user->date_generated = DailyTimeRecord::where('user_id', $user->id)
+                    ->orderBy('date_generated', 'desc')
+                    ->value('date_generated');
+                return $user;
+            });
+
+            return response()->json($users);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch records',
+                'details' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10);
