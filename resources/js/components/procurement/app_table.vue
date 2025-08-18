@@ -108,6 +108,7 @@ export default {
             ],
             isRejectModalVisible: false,
             selectedRejectAppId: null,
+            dataTable: null,
         };
     },
     mounted() {
@@ -122,16 +123,18 @@ export default {
     },
     methods: {
         initializeTable(data) {
-            if (!data || !Array.isArray(data)) {
+            if (!Array.isArray(data)) {
                 toast.error('Invalid data format for table.', { autoClose: 1500 });
                 return;
             }
-            if ($.fn.DataTable.isDataTable('#app_table')) {
-                const table = $('#app_table').DataTable();
-                table.clear().rows.add(data).draw();
+
+            if (this.dataTable) {
+                // ✅ Just refresh rows
+                this.dataTable.clear().rows.add(data).draw();
             } else {
-                $('#app_table').DataTable({
-                    data: data,
+                // ✅ Initialize only once
+                this.dataTable = $('#app_table').DataTable({
+                    data,
                     columns: [
                         { data: 'sn', defaultContent: '' },
                         { data: 'item_category_title', defaultContent: '' },
@@ -159,12 +162,12 @@ export default {
                                 if (this.role === 'gss_admin') {
                                     const disabled = data.app_status === 'approve' ? 'disabled' : '';
                                     buttons += `
-                                        <button class="btn btn-success approve-btn" data-id="${data.app_id}" ${disabled}>
-                                            <i class="fas fa-check"></i> Approve
-                                        </button>
-                                        <button class="btn btn-danger reject-btn" data-id="${data.app_id}" ${disabled}>
-                                            <i class="fas fa-trash"></i> Reject
-                                        </button>`;
+                  <button class="btn btn-success approve-btn" data-id="${data.app_id}" ${disabled}>
+                    <i class="fas fa-check"></i> Approve
+                  </button>
+                  <button class="btn btn-danger reject-btn" data-id="${data.app_id}" ${disabled}>
+                    <i class="fas fa-trash"></i> Reject
+                  </button>`;
                                 }
                                 return buttons;
                             }
@@ -176,6 +179,8 @@ export default {
                     },
                 });
             }
+
+            // Rebind buttons each time rows change
             this.rebindButtons();
         },
         rebindButtons() {
@@ -235,73 +240,45 @@ export default {
                     toast.error(err.response?.data?.error || 'Failed to reject item.', { autoClose: 1500 });
                 });
         },
+        showNotification(title, body, iconPath) {
+            if (Notification.permission === 'granted') {
+                const n = new Notification(title, { body, icon: iconPath });
+                n.onclick = () => window.open(`${window.location.origin}/procurement/PPMP`, '_blank');
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        this.showNotification(title, body, iconPath);
+                    }
+                }).catch(err => console.error('Notification permission error:', err));
+            }
+        },
         listenForEvents() {
+            const channel = window.Echo.channel('app-item');
+
+            // 🔑 Prevent multiple bindings
+            channel.stopListening('AppItemApproved')
+                .stopListening('AppItemRejected');
+
             const iconPath = `${window.location.origin}/images/logo.png`;
 
-            window.Echo.channel('app-item')
-                .listen('AppItemApproved', (e) => {
-                    if (Number(e.user_id) === Number(this.userId)) {
-                        toast.success(`Your item "${e.item_title}" has been approved.`, { autoClose: 3000 });
-                        // Browser notification
-                        if (Notification.permission === 'granted') {
-                            const notification = new Notification('Item Approved', {
-                                body: `Your item "${e.item_title}" has been approved.`,
-                                icon: iconPath
-                            });
-                            notification.onclick = () => {
-                                window.open(`${window.location.origin}/procurement/PPMP`, '_blank');
-                            };
-                        } else if (Notification.permission !== 'denied') {
-                            Notification.requestPermission().then(permission => {
-                                if (permission === 'granted') {
-                                    const notification = new Notification('Item Approved', {
-                                        body: `Your item "${e.item_title}" has been approved.`,
-                                        icon: iconPath
-                                    });
-                                    notification.onclick = () => {
-                                        window.open(`${window.location.origin}/procurement/PPMP`, '_blank');
-                                    };
-                                }
-                            }).catch(error => {
-                                console.error('Error requesting notification permission:', error);
-                            });
-                        }
+            channel.listen('AppItemApproved', (e) => {
+                if (+e.user_id === +this.userId) {
+                    toast.success(`Your item "${e.item_title}" has been approved.`, { autoClose: 3000 });
+                    this.showNotification('Item Approved', `Your item "${e.item_title}" has been approved.`, iconPath);
+                    this.$emit('refresh');
+                }
+            });
 
-                        this.$emit('refresh');
-                    }
-                })
-                .listen('AppItemRejected', (e) => {
-                    if (Number(e.user_id) === Number(this.userId)) {
-                        toast.error(`Your item "${e.item_title}" has been rejected.`, { autoClose: 3000 });
-                        // Browser notification
-                        if (Notification.permission === 'granted') {
-                            const notification = new Notification('Item Rejected', {
-                                body: `Your item "${e.item_title}" has been rejected.`,
-                                icon: iconPath
-                            });
-                            notification.onclick = () => {
-                                window.open(`${window.location.origin}/procurement/PPMP`, '_blank');
-                            };
-                        } else if (Notification.permission !== 'denied') {
-                            Notification.requestPermission().then(permission => {
-                                if (permission === 'granted') {
-                                    const notification = new Notification('Item Rejected', {
-                                        body: `Your item "${e.item_title}" has been rejected.`,
-                                        icon: iconPath
-                                    });
-                                    notification.onclick = () => {
-                                        window.open(`${window.location.origin}/procurement/PPMP`, '_blank');
-                                    };
-                                }
-                            }).catch(error => {
-                                console.error('Error requesting notification permission:', error);
-                            });
-                        }
-
-                        this.$emit('refresh');
-                    }
-                });
+            channel.listen('AppItemRejected', (e) => {
+                if (+e.user_id === +this.userId) {
+                    toast.error(`Your item "${e.item_title}" has been rejected.`, { autoClose: 3000 });
+                    this.showNotification('Item Rejected', `Your item "${e.item_title}" has been rejected.`, iconPath);
+                    this.$emit('refresh');
+                }
+            });
         },
+
+
     }
 };
 </script>
