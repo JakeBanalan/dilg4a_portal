@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .card-title {
     color: #059886;
 }

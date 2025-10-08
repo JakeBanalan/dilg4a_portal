@@ -1,6 +1,18 @@
-<style>
+<style scoped>
 .btn-align-right {
     margin-left: 70px;
+}
+/* Mobile tweaks */
+@media (max-width: 991px) {
+    .btn-group[style] {
+        float: none !important;
+        margin-top: 10px !important;
+    }
+    .btn-group .btn {
+        margin-bottom: 6px;
+    }
+    .table { font-size: 12px; }
+    .table td, .table th { white-space: nowrap; }
 }
 </style>
 <template>
@@ -131,6 +143,7 @@
                                             :icon="['fas', 'list']"></font-awesome-icon>&nbsp;Purchase Request Item
                                         Details
                                     </h5>
+                                    <div class="table-responsive">
                                     <table class="table table-striped table-bordered">
                                         <thead>
                                             <tr>
@@ -156,6 +169,7 @@
                                             </tr>
                                         </tbody>
                                     </table>
+                                    </div>
 
 
 

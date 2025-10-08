@@ -819,7 +819,12 @@ class PurchaseRequestController extends Controller
             $sheet->getStyle('F' . $row)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
             $sheet->getStyle('F' . $row)->getFont()->setBold(false);
 
+            // Auto-adjust row height based on content
             $sheet->getRowDimension($row)->setRowHeight(-1);
+            
+            // Ensure the cell can wrap text and auto-size
+            $sheet->getStyle('C' . $row)->getAlignment()->setWrapText(true);
+            $sheet->getStyle('C' . $row)->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP);
 
             $totalAmount += $amount;
             $row++;

@@ -1,5 +1,6 @@
 <template>
     <div>
+        <div class="table-responsive">
         <table class="table table-striped table-bordered">
             <thead>
                 <tr role="row">
@@ -59,6 +60,7 @@
                 </tr>
             </tbody>
         </table>
+        </div>
 
         <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
 
@@ -374,5 +376,15 @@ td {
 
 th {
     text-align: center;
+}
+
+/* Improve mobile usability */
+@media (max-width: 991px) {
+    .table {
+        font-size: 12px;
+    }
+    .table td, .table th {
+        white-space: nowrap;
+    }
 }
 </style>

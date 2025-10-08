@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .navbar {
     background-color: black;
 }
@@ -27,6 +27,22 @@
 
 .bg-info {
     background-color: #17a2b8;
+}
+
+/* Mobile layout: logo to the right, toggles/menus to the left */
+@media (max-width: 991px) {
+    .navbar {
+        display: flex;
+        flex-direction: row;
+    }
+    .navbar .navbar-menu-wrapper {
+        order: 1;
+        justify-content: flex-start !important;
+    }
+    .navbar .navbar-brand-wrapper {
+        order: 2;
+        margin-left: auto;
+    }
 }
 </style>
 <template>
@@ -114,7 +130,7 @@
                 </li>
             </ul>
             <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-                data-toggle="offcanvas">
+                data-toggle="offcanvas" @click="toggleOffcanvas">
                 <span class="icon-menu"></span>
             </button>
         </div>
@@ -151,6 +167,12 @@ export default {
         toggleSidebar() {
             const body = document.querySelector('body');
             body.classList.toggle('sidebar-icon-only');
+        },
+        toggleOffcanvas() {
+            const sidebar = document.querySelector('.sidebar-offcanvas');
+            if (sidebar) {
+                sidebar.classList.toggle('active');
+            }
         },
         async initializeUserData() {
             if (!localStorage.getItem('api_token')) {

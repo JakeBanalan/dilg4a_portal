@@ -148,10 +148,25 @@
         max-width: 90%;
         margin: 1rem auto;
     }
+    
+}
+/* Mobile tweaks */
+@media (max-width: 991px) {
+    .btn-group[style] {
+        float: none !important;
+        margin-top: 10px !important;
+    }
+    .btn-group .btn {
+        margin-bottom: 6px;
+    }
+    .table { font-size: 12px; }
+    .table td, .table th { white-space: nowrap; }
+    /* add breathing room below header buttons */
+    .pr-table { margin-top: 12px; }
 }
 </style>
 <template>
-    <table id="pr_id" class="table table-striped table-bordered mb-3">
+    <table id="pr_id" class="table table-striped table-bordered mb-3 pr-table">
         <thead>
             <tr role="row">
                 <th style="width: 4px;">ACTION</th>

@@ -118,7 +118,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="item in items" :key="item.id">
+                                                <tr v-for="item in items" :key="item.id" class="clickable-row" @click="showDescriptionModal(item)">
                                                     <td>{{ item.stockno }}</td>
                                                     <td>{{ item.unit }}</td>
                                                     <td>{{ item.name }}</td>
@@ -132,7 +132,7 @@
                                                         minimumFractionDigits: 2,
                                                         maximumFractionDigits: 2
                                                     }) }}</td>
-                                                    <td v-if="isUpdateButtonVisible">
+                                                    <td v-if="isUpdateButtonVisible" @click.stop>
                                                         <button class="btn btn-warning btn-sm"
                                                             @click="EditItemModal(item.id)">
                                                             <font-awesome-icon :icon="['fas', 'pen']" /> &nbsp;Edit
@@ -291,6 +291,78 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Item Description Modal -->
+                    <div class="modal" v-if="descriptionModalVisible" id="descriptionModal"
+                        style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 5px; z-index: 1050; display: block; background-color: transparent; overflow-y: auto; width: 1200px;">
+                        <div class="modal-dialog"
+                            style="margin: auto; position: relative; transform: translateY(15%);">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div
+                                        style="width: 75px; height: 75px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: -18px; background-color: white; color: #4cae4c; left: 45%;">
+                                        <img :src="logo" style="width:60px; height:60px;">
+                                    </div>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <h1>Item Description</h1>
+                                        <div v-if="selectedItemForDescription" class="item-details">
+                                            <div class="form-group">
+                                                <label><strong>Stock Number:</strong></label>
+                                                <p>{{ selectedItemForDescription.stockno }}</p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><strong>Item Name:</strong></label>
+                                                <p>{{ selectedItemForDescription.name }}</p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><strong>Unit:</strong></label>
+                                                <p>{{ selectedItemForDescription.unit }}</p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><strong>Quantity:</strong></label>
+                                                <p>{{ selectedItemForDescription.qty }}</p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><strong>Unit Cost:</strong></label>
+                                                <p>₱{{ selectedItemForDescription.unit_cost?.toLocaleString('en-US', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                }) }}</p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><strong>Total Cost:</strong></label>
+                                                <p>₱{{ selectedItemForDescription.abc?.toLocaleString('en-US', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                }) }}</p>
+                                            </div>
+                                            <div class="form-group">
+                                                <label><strong>Description:  <button v-if="selectedItemForDescription.descrip" type="button" class="btn btn-sm btn-outline-secondary copy-btn" @click="copyDescriptionToClipboard">
+                                                    <font-awesome-icon :icon="['fas', 'copy']" /> Copy to Clipboard
+                                                </button></strong></label>
+                                               
+                                                <div class="description-content">
+                                                    <div v-if="selectedItemForDescription.descrip">
+                                                        <div class="description-bullets" ref="descriptionContent">
+                                                            <div v-for="(line, index) in getDescriptionLines(selectedItemForDescription.descrip)" :key="index" class="bullet-item">
+                                                                • {{ line }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <p v-else>No description available.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" @click="closeDescriptionModal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <FooterVue />
             </div>
@@ -302,7 +374,7 @@
 import showAddItemModal from "./modal_addItem.vue";
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faCircle, faCopy } from '@fortawesome/free-solid-svg-icons';
 import dilg_logo from "../../../assets/logo.png";
 import Navbar from "../layout/Navbar.vue";
 import Sidebar from "../layout/Sidebar.vue";
@@ -315,7 +387,7 @@ import vSelect from 'vue-select';
 import axios from "axios";
 import { toast } from "vue3-toastify";
 
-library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faCircle);
+library.add(faSpinner, faCartShopping, faListCheck, faPesoSign, faSave, faCircle, faCopy);
 
 export default {
     name: "update_pr",
@@ -338,6 +410,8 @@ export default {
             modalVisible: false,
             addItemModalVisible: false,
             editItemModalVisible: false,
+            descriptionModalVisible: false,
+            selectedItemForDescription: null,
             status: null,
             abc: 0,
             purchaseRequestData: {
@@ -583,6 +657,43 @@ export default {
             this.editItemModalVisible = false;
             this.editItem = {};
         },
+        showDescriptionModal(item) {
+            this.selectedItemForDescription = item;
+            this.descriptionModalVisible = true;
+        },
+        closeDescriptionModal() {
+            this.descriptionModalVisible = false;
+            this.selectedItemForDescription = null;
+        },
+        getDescriptionLines(description) {
+            if (!description) return [];
+            
+            // Split by common delimiters and clean up
+            const lines = description
+                .split(/[;\n\r•\-\*]/) // Split by semicolon, newline, carriage return, bullet points, dashes, asterisks
+                .map(line => line.trim()) // Remove leading/trailing whitespace
+                .filter(line => line.length > 0); // Remove empty lines
+            
+            // If no delimiters found, return the original description as a single item
+            return lines.length > 0 ? lines : [description];
+        },
+        async copyDescriptionToClipboard() {
+            if (!this.selectedItemForDescription || !this.selectedItemForDescription.descrip) {
+                return;
+            }
+
+            try {
+                // Get the formatted description text
+                const lines = this.getDescriptionLines(this.selectedItemForDescription.descrip);
+                const formattedText = lines.map(line => `• ${line}`).join('\n');
+                
+                // Copy to clipboard
+                await navigator.clipboard.writeText(formattedText);
+                toast.success('Description copied to clipboard!', { autoClose: 500 });
+            } catch (error) {
+                toast.error('Failed to copy to clipboard', { autoClose: 500 });
+            }
+        },
         editItemList() {
             const qty = Number(this.editItem.qty);
             if (this.editItem.id && qty > 0) {
@@ -801,5 +912,68 @@ input[type="checkbox"]:checked+.custom-checkbox::after {
 
 .timeline-body p {
     margin: 5px 0;
+}
+
+.clickable-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+    background-color: #f8f9fa;
+}
+
+.item-details .form-group {
+    margin-bottom: 15px;
+}
+
+.item-details label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.item-details p {
+    margin: 0;
+    padding: 8px 12px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+}
+
+.description-content {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e9ecef;
+    padding: 12px;
+}
+
+.description-bullets {
+    margin: 0;
+    padding-left: 0;
+}
+
+.bullet-item {
+    margin-bottom: 8px;
+    line-height: 1.4;
+    color: #333;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+.bullet-item:last-child {
+    margin-bottom: 0;
+}
+
+.copy-btn {
+    margin-bottom: 10px;
+    float: right;
+}
+
+.copy-btn:hover {
+    background-color: #6c757d;
+    color: white;
 }
 </style>
