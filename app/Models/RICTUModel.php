@@ -17,6 +17,7 @@ class RICTUModel extends Model
         'control_no',
         'request_by',
         'request_date',
+        'take_survey',
         'css_link',
         'office_id',
         'request_type_category_id',

@@ -46,6 +46,8 @@
 
 <script>
 import Pusher from 'pusher-js';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 export default {
     name: 'ICTDashboard',
@@ -54,6 +56,7 @@ export default {
         return {
             userId: null,
             role: null,
+            canSubmit: true,
             pusher: null,
             channels: [],
             ictStats: {
@@ -86,16 +89,41 @@ export default {
     },
 
     mounted() {
-        this.initializeData();
-        this.setupPusherConnection();
+           this.initializeData();
+           this.setupPusherConnection();
+           // Listen for survey-taken event to update canSubmit immediately
+           window.addEventListener('survey-taken', this.handleSurveyTaken);
     },
 
     beforeUnmount() {
         this.cleanupPusherConnection();
+        window.removeEventListener('survey-taken', this.handleSurveyTaken);
     },
 
     methods: {
+        handleSurveyTaken() {
+            // Re-check pending survey status
+            if (this.userId) {
+                axios.get(`/api/userHasPendingSurvey/${this.userId}`)
+                    .then(res => {
+                        this.canSubmit = !res.data.hasPendingSurvey;
+                    })
+                    .catch(err => {
+                        console.error('Error checking pending surveys:', err);
+                    });
+            }
+        },
         navigateToCreateRequest() {
+            // Prevent navigation if user has pending surveys
+            if (!this.canSubmit) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Pending Survey(s)',
+                    text: 'Please complete the pending survey(s) before submitting a new request.',
+                    confirmButtonText: 'OK',
+                });
+                return;
+            }
             this.$router.replace({ path: '/rictu/ict_ta/create' });
         },
 
@@ -105,6 +133,16 @@ export default {
                 this.fetchAdminData();
             } else {
                 this.fetchUserData();
+                // check if user has pending survey
+                if (this.userId) {
+                    axios.get(`/api/userHasPendingSurvey/${this.userId}`)
+                        .then(res => {
+                            this.canSubmit = !res.data.hasPendingSurvey;
+                        })
+                        .catch(err => {
+                            console.error('Error checking pending surveys:', err);
+                        });
+                }
             }
         },
 

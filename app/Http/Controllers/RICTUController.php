@@ -91,6 +91,7 @@ class RICTUController extends Controller
             tbl_technicalassistance.remarks AS remarks,
              tbl_technicalassistance.ict_officer_remarks AS ict_officer_remarks,
             cl.link AS css_link,
+            tbl_technicalassistance.take_survey AS take_survey,
             p.pmo_title AS office,
             itr.request_type AS request_type,
             c.TITLE AS sub_request_type,
@@ -139,6 +140,7 @@ class RICTUController extends Controller
                 tbl_technicalassistance.completed_date,
                 tbl_technicalassistance.remarks,
                 cl.link AS css_link,
+                tbl_technicalassistance.take_survey AS take_survey,
                 p.pmo_title AS office,
                 itr.request_type,
                 c.TITLE AS sub_request_type,
@@ -218,6 +220,7 @@ class RICTUController extends Controller
             tbl_technicalassistance.completed_date AS completed_date,
             tbl_technicalassistance.remarks AS remarks,
             cl.link AS css_link,
+            tbl_technicalassistance.take_survey AS take_survey,
             p.pmo_title AS office,
             itr.request_type AS request_type,
             c.TITLE AS sub_request_type,
@@ -245,6 +248,40 @@ class RICTUController extends Controller
         $ict = $ictQuery->paginate($itemsPerPage, ['*'], 'page', $page);
 
         return response()->json($ict);
+    }
+
+    /**
+     * Mark a survey as taken for a given ICT request id
+     */
+    public function markTakeSurvey(Request $request)
+    {
+        $id = $request->input('id');
+        if (!$id) {
+            return response()->json(['error' => 'Missing id'], 400);
+        }
+
+        $ict = RICTUModel::find($id);
+        if (!$ict) {
+            return response()->json(['error' => 'Request not found'], 404);
+        }
+
+        $ict->take_survey = 1;
+        $ict->save();
+
+        return response()->json(['message' => 'Survey marked as taken']);
+    }
+
+    /**
+     * Check whether the user has any completed requests with take_survey = 0
+     */
+    public function userHasPendingSurvey($userId)
+    {
+        $count = RICTUModel::where('request_by', $userId)
+            ->where('status_id', self::STATUS_COMPLETED)
+            ->where('take_survey', 0)
+            ->count();
+
+        return response()->json(['hasPendingSurvey' => $count > 0, 'count' => $count]);
     }
 
 

@@ -42,7 +42,12 @@
                     </td>
                     <td style="white-space:normal;">{{ ict_data.remarks }}</td>
                     <td>
-                        <SurveyLinkButton v-if="ict_data.status === 'Completed'" :css-link="ict_data.css_link" />
+                        <SurveyLinkButton
+                            v-if="ict_data.status === 'Completed'"
+                            :css-link="ict_data.css_link"
+                            :disabled="ict_data.take_survey == 1"
+                            @clicked="markSurveyTaken(ict_data)"
+                        />
                         <template v-else>~</template>
                     </td>
                     <td>{{ formatDate(ict_data.started_date) }}</td>
@@ -217,8 +222,8 @@ export default {
             } else if (role === 'budget_admin') {
                 this.load_ict_perUser_request(status);
             }else if (role === 'ord_admin') {
-                this.load_ict_perUser_request(status); 
-            } 
+                this.load_ict_perUser_request(status);
+            }
             else if (role === 'user') {
                 this.load_ict_perUser_request(status);
             } else {
@@ -363,6 +368,22 @@ export default {
                 });
             } finally {
                 this.isReceiving = false;
+            }
+        },
+
+        async markSurveyTaken(item) {
+            if (!item || !item.id) return;
+
+            try {
+                await axios.post('/api/markTakeSurvey', { id: item.id });
+                // update local state so button becomes disabled
+                item.take_survey = 1;
+                toast.success('Thank you for completing the survey!', { autoClose: 2000 });
+                    // Notify dashboard to re-check pending survey status
+                    window.dispatchEvent(new CustomEvent('survey-taken'));
+            } catch (error) {
+                console.error('Error marking survey taken:', error);
+                toast.error('Failed to mark survey as taken', { autoClose: 2000 });
             }
         }
     }

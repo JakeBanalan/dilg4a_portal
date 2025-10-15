@@ -261,6 +261,10 @@ Route::middleware('api')->group(function () {
     Route::get('getICTData/{id}', [RICTUController::class, 'getICTData']);
 });
 Route::middleware('api')->group(function () {
+    Route::post('markTakeSurvey', [RICTUController::class, 'markTakeSurvey']);
+    Route::get('userHasPendingSurvey/{userId}', [RICTUController::class, 'userHasPendingSurvey']);
+});
+Route::middleware('api')->group(function () {
     Route::get('getUserDetails/{id}', [UserManagementController::class, 'getUserDetails']);
 });
 Route::middleware('api')->group(function () {
