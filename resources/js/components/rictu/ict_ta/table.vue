@@ -1,70 +1,67 @@
 <template>
     <div>
         <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr role="row">
-                    <th rowspan="2" style="width:6%">ACTIONS</th>
-                    <th rowspan="2" style="width:5%">STATUS</th>
-                    <th rowspan="2" style="width:10%">ICT TECHNICAL ASSISTANCE REFERENCE NO.</th>
-                    <th rowspan="2" style="width:10%">ISSUE/CONCERN</th>
-                    <th rowspan="2" style="width:6%">SURVEY LINK</th>
-                    <th colspan="2" scope="colgroup" style="text-align:center">RECEIVED</th>
-                    <th rowspan="2" style="width:10%">NAME OF THE END-USER</th>
-                    <th rowspan="2" style="width:5%">OFFICE/SERVICE/<br>BUREAU<br>DIVISION/SECTION/UNIT</th>
-                    <th rowspan="2" style="width:10%">TECHNICAL PERSONNEL ASSIGNED</th>
-                    <th colspan="2" scope="colgroup">COMPLETED</th>
-                    <th rowspan="2" style="width:5%">TYPE OF REQUEST</th>
-                </tr>
-                <tr role="row">
-                    <th scope="col">DATE</th>
-                    <th scope="col">TIME</th>
-                    <th scope="col">DATE</th>
-                    <th scope="col">TIME</th>
-                </tr>
-            </thead>
-            <tbody
-                v-if="(role === 'admin' || role === 'user' || role === 'gss_admin' || role === 'budget_admin' || role === 'ord_admin') && displayedItems.length > 0">
-                <tr v-for="ict_data in displayedItems" :key="ict_data.id">
-                    <td>
-                        <ActionButtons :role="role" :status="ict_data.status" :id="ict_data.id" :user-id="user_id"
-                            :ict-personnel-id="ict_data.ict_personnel_id" @view="view_ict_form" @open-modal="openModal"
-                            @receive-request="received_request" :is-receiving="isReceiving" />
-                    </td>
-                    <td>{{ ict_data.status }}</td>
-                    <td>
-                        <a href="#" v-if="role === 'admin'" @click.prevent="pdf_form(ict_data.id)">
-                            <b>{{ ict_data.control_no }}</b>
-                        </a>
-                        <b v-else>{{ ict_data.control_no }}</b>
-                        <br>
-                        <i>~Request Date: {{ formatDate(ict_data.request_date) }}~</i>
-                    </td>
-                    <td style="white-space:normal;">{{ ict_data.remarks }}</td>
-                    <td>
-                        <SurveyLinkButton
-                            v-if="ict_data.status === 'Completed'"
-                            :css-link="ict_data.css_link"
-                            :disabled="ict_data.take_survey == 1"
-                            @clicked="markSurveyTaken(ict_data)"
-                        />
-                        <template v-else>~</template>
-                    </td>
-                    <td>{{ formatDate(ict_data.started_date) }}</td>
-                    <td>{{ formatTime(ict_data.started_date) }}</td>
-                    <td>{{ ucwords(ict_data.requested_by) }}</td>
-                    <td>{{ ict_data.office }}</td>
-                    <td>{{ ict_data.ict_personnel }}</td>
-                    <td>{{ formatDate(ict_data.completed_date) }}</td>
-                    <td>{{ formatTime(ict_data.completed_date) }}</td>
-                    <td>
-                        <span class="badge badge-success">
-                            {{ ict_data.request_type }} - {{ ict_data.sub_request_type }}
-                        </span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr role="row">
+                        <th rowspan="2" style="width:6%">ACTIONS</th>
+                        <th rowspan="2" style="width:5%">STATUS</th>
+                        <th rowspan="2" style="width:10%">ICT TECHNICAL ASSISTANCE REFERENCE NO.</th>
+                        <th rowspan="2" style="width:10%">ISSUE/CONCERN</th>
+                        <th rowspan="2" style="width:6%">SURVEY LINK</th>
+                        <th colspan="2" scope="colgroup" style="text-align:center">RECEIVED</th>
+                        <th rowspan="2" style="width:10%">NAME OF THE END-USER</th>
+                        <th rowspan="2" style="width:5%">OFFICE/SERVICE/<br>BUREAU<br>DIVISION/SECTION/UNIT</th>
+                        <th rowspan="2" style="width:10%">TECHNICAL PERSONNEL ASSIGNED</th>
+                        <th colspan="2" scope="colgroup">COMPLETED</th>
+                        <th rowspan="2" style="width:5%">TYPE OF REQUEST</th>
+                    </tr>
+                    <tr role="row">
+                        <th scope="col">DATE</th>
+                        <th scope="col">TIME</th>
+                        <th scope="col">DATE</th>
+                        <th scope="col">TIME</th>
+                    </tr>
+                </thead>
+                <tbody
+                    v-if="(role === 'admin' || role === 'user' || role === 'gss_admin' || role === 'budget_admin' || role === 'ord_admin') && displayedItems.length > 0">
+                    <tr v-for="ict_data in displayedItems" :key="ict_data.id">
+                        <td>
+                            <ActionButtons :role="role" :status="ict_data.status" :id="ict_data.id" :user-id="user_id"
+                                :ict-personnel-id="ict_data.ict_personnel_id" @view="view_ict_form"
+                                @open-modal="openModal" @receive-request="received_request"
+                                :is-receiving="isReceiving" />
+                        </td>
+                        <td>{{ ict_data.status }}</td>
+                        <td>
+                            <a href="#" v-if="role === 'admin'" @click.prevent="pdf_form(ict_data.id)">
+                                <b>{{ ict_data.control_no }}</b>
+                            </a>
+                            <b v-else>{{ ict_data.control_no }}</b>
+                            <br>
+                            <i>~Request Date: {{ formatDate(ict_data.request_date) }}~</i>
+                        </td>
+                        <td style="white-space:normal;">{{ ict_data.remarks }}</td>
+                        <td>
+                            <SurveyLinkButton v-if="ict_data.status === 'Completed'" :css-link="ict_data.css_link"
+                                :disabled="ict_data.take_survey == 1" @clicked="markSurveyTaken(ict_data)" />
+                            <template v-else>~</template>
+                        </td>
+                        <td>{{ formatDate(ict_data.started_date) }}</td>
+                        <td>{{ formatTime(ict_data.started_date) }}</td>
+                        <td>{{ ucwords(ict_data.requested_by) }}</td>
+                        <td>{{ ict_data.office }}</td>
+                        <td>{{ ict_data.ict_personnel }}</td>
+                        <td>{{ formatDate(ict_data.completed_date) }}</td>
+                        <td>{{ formatTime(ict_data.completed_date) }}</td>
+                        <td>
+                            <span class="badge badge-success">
+                                {{ ict_data.request_type }} - {{ ict_data.sub_request_type }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="mb-2" style="font-weight: 500;">{{ showingEntriesMessage }}</div>
@@ -221,7 +218,7 @@ export default {
                 this.load_ict_perUser_request(status);
             } else if (role === 'budget_admin') {
                 this.load_ict_perUser_request(status);
-            }else if (role === 'ord_admin') {
+            } else if (role === 'ord_admin') {
                 this.load_ict_perUser_request(status);
             }
             else if (role === 'user') {
@@ -379,8 +376,9 @@ export default {
                 // update local state so button becomes disabled
                 item.take_survey = 1;
                 toast.success('Thank you for completing the survey!', { autoClose: 2000 });
-                    // Notify dashboard to re-check pending survey status
-                    window.dispatchEvent(new CustomEvent('survey-taken'));
+                this.refreshData();
+                // Notify dashboard to re-check pending survey status
+                window.dispatchEvent(new CustomEvent('survey-taken'));
             } catch (error) {
                 console.error('Error marking survey taken:', error);
                 toast.error('Failed to mark survey as taken', { autoClose: 2000 });
@@ -404,7 +402,9 @@ th {
     .table {
         font-size: 12px;
     }
-    .table td, .table th {
+
+    .table td,
+    .table th {
         white-space: nowrap;
     }
 }
