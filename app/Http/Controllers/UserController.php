@@ -91,7 +91,14 @@ class UserController extends Controller
         pmo.id as pmo_id,
         DATE_FORMAT(users.birthdate, "%M %d %Y") as birthdate,
         CONCAT(users.last_name," ", users.first_name," ",users.middle_name)  as name,
-        users.email as email
+        users.email as email,
+        EXISTS (
+            SELECT 1
+            FROM tbl_technicalassistance ta
+            WHERE ta.request_by = users.id
+            AND ta.status_id = 3
+            AND ta.take_survey = 0
+        ) as has_pending_survey
         ')
             ->leftJoin('pr', 'pr.action_officer', '=', 'users.id')
             ->leftJoin('pmo', 'pmo.id', '=', 'users.pmo_id')
@@ -99,6 +106,13 @@ class UserController extends Controller
             ->distinct('users.id'); // Use distinct to remove duplicates
 
         $allUsers = $query->get(); // Use get() to retrieve all results
+
+        // Convert the has_pending_survey field from string/integer to boolean
+        $allUsers->transform(function($user) {
+            $user->has_pending_survey = (bool)$user->has_pending_survey;
+            return $user;
+        });
+
         return response()->json($allUsers);
     }
 

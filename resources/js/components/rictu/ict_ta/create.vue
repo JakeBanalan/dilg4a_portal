@@ -261,6 +261,11 @@ img {
                                                     :close-on-select="true" :clear-on-select="false"
                                                     :preserve-search="true" placeholder="Select Acceptance"
                                                     :disabled="!isEditMode" @input="updateAcceptance" />
+                                                <div v-if="role === 'admin'" class="mt-2" style="font-size: 13px; color: #d9534f;">
+                                                    <span>
+                                                        <strong>Note:</strong> If the user you are looking for is not in the list, they need to complete their pending survey before they can be selected for acceptance.
+                                                    </span>
+                                                </div>
                                             </div>
 
                                             <div class="col-lg-6">
@@ -413,7 +418,9 @@ export default {
             return this.ict_personnel ?? []; // ✅ Ensures it's always an array
         },
         acceptanceOptions() {
-            return this.allUsers.map(user => ({ id: user.id, name: user.name, pmo_id: user.pmo_id }));
+            return this.allUsers
+                .filter(user => !user.has_pending_survey)
+                .map(user => ({ id: user.id, name: user.name, pmo_id: user.pmo_id }));
         }
 
     },
