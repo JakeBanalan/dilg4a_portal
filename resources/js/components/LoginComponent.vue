@@ -11,17 +11,16 @@
                     </button>
                     <div class="collapse navbar-collapse pull-right" :class="{ 'show': isNavbarOpen }"
                         id="navbarCollapse">
-                        <form @submit.prevent="loginUser">
-                            <div class="form-group">
+                        <form @submit.prevent="loginUser" class="nav-login-form">
+                            <div class="form-group nav-input">
                                 <input type="text" v-model="form.username" class="form-control form-control-lg"
-                                    id="exampleInputEmail1" placeholder="Username" style="font-family:'Poppins'">
+                                    id="exampleInputEmail1" placeholder="Username">
                             </div>
-                            <div class="form-group ml-2">
+                            <div class="form-group nav-input">
                                 <input type="password" v-model="form.password" class="form-control form-control-lg"
-                                    id="exampleInputPassword1" placeholder="Password"
-                                    style="font-family:'Poppins';height: 40px;">
+                                    id="exampleInputPassword1" placeholder="Password">
                             </div>
-                            <div>
+                            <div class="nav-action">
                                 <button type="submit" class="btn_submit">SIGN IN</button>
                             </div>
                         </form>
@@ -244,6 +243,61 @@ nav input[type="submit"] {
 
 .header-margin {
     margin-top: 205px;
+}
+
+/* Responsive adjustments for navbar login form and header */
+.nav-login-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.nav-login-form .nav-input {
+    display: flex;
+}
+.nav-login-form .nav-input input {
+    min-width: 200px;
+}
+.nav-action {
+    display: flex;
+    align-items: center;
+}
+
+/* Mobile: stack inputs and make controls full-width */
+@media (max-width: 767.98px) {
+    .nav-login-form {
+        flex-direction: column;
+        width: 100%;
+        padding: 10px 0;
+    }
+    .nav-login-form .nav-input {
+        width: 100%;
+    }
+    .nav-login-form .nav-input input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .nav-action {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+    .nav-action .btn_submit {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    /* Reduce header button size and reset margin on small screens */
+    .custom-btn {
+        font-size: 14pt;
+        padding: 6px 10px;
+        margin-left: 0 !important;
+        top: 0 !important;
+    }
+
+    .header-margin {
+        margin-top: 120px;
+        text-align: center;
+    }
 }
 
 .typing-text {
