@@ -59,6 +59,17 @@ input[type="text"] {
     box-sizing: border-box;
     padding: 0px 10px;
 }
+input[type="password"] {
+    width: 100%;
+    height: 40px;
+    border: none;
+    outline: 0;
+    border-radius: 5px;
+    border: 1px solid #cbced4;
+    gap: 20px;
+    box-sizing: border-box;
+    padding: 0px 10px;
+}
 
 nav form {
     display: flex;
@@ -193,6 +204,7 @@ nav input[type="submit"] {
     margin-left: 10px;
     line-height: 1;
     font-weight: 400;
+    margin-bottom: 24px;
     height: 40px;
     border-radius: 5px;
     font-family: 'Poppins';
