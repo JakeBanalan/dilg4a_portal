@@ -449,7 +449,6 @@ export default {
             const userId = localStorage.getItem('userId');
             const requestData = {
                 created_by: userId,
-                pr_no: this.purchase_no,
                 pmo: this.prData.pmo,
                 type: this.prData.pr_type,
                 pr_date: this.prData.pr_date,
@@ -496,7 +495,18 @@ export default {
                 })
                 .catch((error) => {
                     console.error('Error creating purchase request:', error);
-                    this.showToastError('Error creating purchase request!');
+
+                    // Handle duplicate PR number error (409 Conflict)
+                    if (error.response && error.response.status === 409) {
+                        this.showToastError('This PR number is already taken. Refreshing page for new number...');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000);
+                    } else if (error.response && error.response.data && error.response.data.message) {
+                        this.showToastError(error.response.data.message);
+                    } else {
+                        this.showToastError('Error creating purchase request!');
+                    }
                 });
         },
 

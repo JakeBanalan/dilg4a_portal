@@ -32,10 +32,10 @@
                         </button>
                       </div>
                     </div>
-  
+
                     <div class="table-responsive">
                       <!-- Advanced Filter Card -->
-                      <div class="card card-animation" v-if="isCardVisible">
+                      <div class="card card-animation" v-show="isCardVisible">
                         <div class="card-body">
                           <div class="card-title">
                             <h4>
@@ -82,6 +82,15 @@
                               <input type="date" class="form-control" v-model="filterParams.end_date" />
                             </div>
                             <div class="col-lg-3">
+                              <label style="font-size: 0.875rem;">Month</label>
+                              <select class="form-control" v-model="filterParams.selected_month">
+                                <option :value="null">All</option>
+                                <option v-for="(month, idx) in monthOptions" :key="idx" :value="idx + 1">
+                                  {{ month }}
+                                </option>
+                              </select>
+                            </div>
+                            <div class="col-lg-3">
                               <label style="font-size: 0.875rem;">Quarterly</label>
                               <multiselect
                                 deselect-label="Can't remove this value"
@@ -120,14 +129,19 @@
                               </div>
                             </div>
                           </div>
-  
+
                           <button
                             type="button"
                             class="btn btn-outline-primary btn-fw btn-icon-text"
                             style="float:right;"
+                            :disabled="isFiltering"
                             @click="filter"
                           >
-                            Filter
+                            <span v-if="isFiltering">
+                              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                              Filtering...
+                            </span>
+                            <span v-else>Filter</span>
                           </button>
                           <button
                             type="button"
@@ -139,7 +153,7 @@
                           </button>
                         </div>
                       </div>
-                      
+
                       <!-- ICT Table Component -->
                       <ICTTable ref="ICTTable" />
                     </div>
@@ -150,42 +164,43 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Export Modal -->
       <modal-export :visible="modalVisible" @close="closeModal" />
     </div>
   </template>
-  
+
   <style src="vue-multiselect/dist/vue-multiselect.css"></style>
   <style scoped>
   .card-animation {
     transition: height 0.5s ease-in-out;
   }
-  
+
   h5 {
     color: #059886 !important;
     --bs-text-opacity: 1;
   }
-  
+
   .router-class:hover {
     color: #059886 !important;
   }
   </style>
-  
+
   <script>
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faList, faSearch, faSquarePollVertical, faUserGear } from '@fortawesome/free-solid-svg-icons';
-  
+
   library.add(faSearch, faList, faSquarePollVertical, faUserGear);
-  
+
   import Navbar from '../../layout/Navbar.vue';
   import Sidebar from '../../layout/Sidebar.vue';
   import ICTTable from './table.vue';
   import Multiselect from 'vue-multiselect';
   import StatBoard from './stat_board';
   import ModalExport from '../modal/modal_generate_report.vue';
-  
+
+  import _ from 'lodash';
   export default {
     name: 'ICTTechnicalAssistance',
     components: {
@@ -197,13 +212,13 @@
       StatBoard,
       'modal-export': ModalExport
     },
-    
+
     data() {
       return {
         role: null,
         modalVisible: false,
         isCardVisible: false,
-        
+        isFiltering: false,
         // Group all filter parameters in one object
         filterParams: {
           control_no: '',
@@ -213,9 +228,9 @@
           ict_personnel: '',
           selected_pmo: null,
           selected_quarter: null,
-          selected_status: { label: 'All', value: 6 }
+          selected_status: { label: 'All', value: 6 },
+          selected_month: null
         },
-        
         // Options for dropdowns
         quarterOptions: [
           { label: '1st Quarter', value: 1 },
@@ -223,7 +238,6 @@
           { label: '3rd Quarter', value: 3 },
           { label: '4th Quarter', value: 4 }
         ],
-        
         pmoOptions: [
           { label: "ORD", value: "ORD" },
           { label: "LGMED", value: "LGMED" },
@@ -236,40 +250,43 @@
           { label: "RIZAL", value: "RIZAL" },
           { label: "LUCENA CITY", value: "LUCENA CITY" }
         ],
-        
         statusOptions: [
           { label: 'All', value: 6 },
           { label: 'Draft', value: 1 },
           { label: 'Received', value: 2 },
           { label: 'Completed', value: 3 },
           { label: 'Rated', value: 4 }
+        ],
+        monthOptions: [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
         ]
       };
     },
-    
+
     created() {
       this.role = localStorage.getItem('user_role');
     },
-    
+
     methods: {
       toggleCard() {
         this.isCardVisible = !this.isCardVisible;
       },
-      
+
       openModal() {
         this.modalVisible = true;
       },
-      
+
       closeModal() {
         this.modalVisible = false;
       },
-      
-      filter() {
+
+      filter: _.debounce(function() {
         if (!this.$refs.ICTTable) {
           console.error('ICTTable reference not found');
           return;
         }
-        
+        this.isFiltering = true;
         // Extract values from the filter parameters
         const status = this.filterParams.selected_status?.value || 6;
         const controlNo = this.filterParams.control_no || null;
@@ -279,7 +296,7 @@
         const endDate = this.filterParams.end_date || null;
         const pmo = this.filterParams.selected_pmo?.value || null;
         const quarter = this.filterParams.selected_quarter?.value || null;
-        
+        const month = this.filterParams.selected_month || null;
         // Extract year from dates if available
         let year = null;
         if (startDate) {
@@ -287,21 +304,22 @@
         } else if (endDate) {
           year = new Date(endDate).getFullYear();
         }
-        
         // Call the table component's load method with the filter parameters
         this.$refs.ICTTable.load_ict_request(
-          status, 
-          controlNo, 
-          requestedBy, 
-          startDate, 
-          endDate, 
-          pmo, 
-          ictPersonnel, 
-          year, 
-          quarter
+          status,
+          controlNo,
+          requestedBy,
+          startDate,
+          endDate,
+          pmo,
+          ictPersonnel,
+          year,
+          quarter,
+          month
         );
-      },
-      
+        setTimeout(() => { this.isFiltering = false; }, 600); // Simulate loading state
+      }, 400),
+
       resetFilter() {
         // Reset all filter parameters
         this.filterParams = {
@@ -312,9 +330,9 @@
           ict_personnel: '',
           selected_pmo: null,
           selected_quarter: null,
-          selected_status: { label: 'All', value: 6 }
+          selected_status: { label: 'All', value: 6 },
+          selected_month: null
         };
-        
         // Reset table and reload data
         if (this.$refs.ICTTable) {
           this.$refs.ICTTable.currentPage = 1;

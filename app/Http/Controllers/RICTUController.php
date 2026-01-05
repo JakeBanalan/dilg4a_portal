@@ -125,6 +125,7 @@ class RICTUController extends Controller
         $pmo = $request->query('pmo');
         $year = $request->query('year', date('Y'));
         $quarter = $request->query('quarter');
+            $month = $request->query('month');
 
         $ictQuery = DB::table('tbl_technicalassistance')
             ->select(DB::raw('
@@ -177,6 +178,9 @@ class RICTUController extends Controller
             ->when($quarter, fn($q) =>
                 $q->whereBetween('tbl_technicalassistance.started_date', $this->getQuarterDateRange($quarter, $year))
             )
+                ->when($month, fn($q) =>
+                    $q->whereMonth('tbl_technicalassistance.started_date', $month)
+                )
             ->orderByDesc('tbl_technicalassistance.control_no');
 
         $ict = ($itemsPerPage == -1)

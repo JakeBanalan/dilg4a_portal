@@ -28,7 +28,7 @@
                                         </div>
                                         <div class="card-body scrollable-card-body">
                                             <div class="row">
-                                                <div class="col-md-6" v-for="(event, i) in filteredHolidays" :key="i">
+                                                <div class="col-md-6" v-for="event in filteredHolidays" :key="event.id || event.title">
                                                     <div class="d-flex align-items-center pb-3 pt-3 border-bottom">
                                                         <div class="move-calendar ms-3">
                                                             <span style="display: inline-block;">
@@ -68,7 +68,7 @@
                                                 <p class="card-title">Upcoming Office Events - {{ currentMonth }}</p>
                                             </div>
                                             <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                                                v-for="(events, i) in filteredAlloffices" :key="i">
+                                                v-for="events in filteredAlloffices" :key="events.id || events.title">
                                                 <div class="move-calendar ms-3">
                                                     <span style="display: inline-block;">
                                                         <time class="icon">
@@ -99,7 +99,7 @@
                                                 <p class="card-title">My Personal Events - {{ currentMonth }}</p>
                                             </div>
                                             <div class="d-flex align-items-center pb-3 pt-3 border-bottom"
-                                                v-for="(myEvents, i) in filteredPersonalEvents" :key="i">
+                                                v-for="myEvents in filteredPersonalEvents" :key="myEvents.id || myEvents.title">
                                                 <div class="move-calendar ms-3">
                                                     <span style="display: inline-block;">
                                                         <time class="icon">

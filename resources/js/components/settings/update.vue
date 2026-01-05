@@ -318,9 +318,11 @@ export default {
         this.user_id = this.$route.params.id;
     },
     mounted() {
-        this.getUserDetails();
+        // Load selectable data first so v-models can bind correctly
+        this.getOffice().then(() => {
+            this.getUserDetails();
+        });
         this.getPosition();
-        this.getOffice();
         // this.ValidatedOP();
         this.getCityMun();
     },
@@ -380,15 +382,18 @@ export default {
                 })
         },
         getOffice() {
-            axios.get(`../../api/getOffice`)
+            return axios.get(`../../api/getOffice`)
                 .then((response) => {
-                    this.OptsOffice = response.data
-                    // this.OptsOffice = response.data.map(item => ({
-                    //     value: item.id,
-                    //     label: item.office
-                    // }));
-                    // console.log(this.OptsOffice)
+                    // Normalize office options to use id + office for label
+                    this.OptsOffice = response.data.map(item => ({
+                        id: item.id,
+                        office: item.office
+                    }));
 
+                    // If user data was already loaded with a numeric office id, bind it now
+                    if (this.data.office && typeof this.data.office === 'number') {
+                        this.data.office = this.OptsOffice.find(o => Number(o.id) === Number(this.data.office)) || '';
+                    }
                 }).catch(error => {
                     return null;
                 })
@@ -479,7 +484,7 @@ export default {
 
 
                     // Set office and province with null checks
-                    this.data.office = userOfficeId ? this.OptsOffice.find(office => office.value === userOfficeId) : '';
+                    this.data.office = userOfficeId ? this.OptsOffice.find(office => Number(office.id) === Number(userOfficeId)) || userOfficeId : '';
                     this.data.province = provID ? this.Optsprovince.find(province => province.value === provID) : '';
                     this.data.employment_status = EmploymentID ? this.emp_status.find(emp_status => emp_status.value === EmploymentID) : '';
                     // this.data.division = DivisionID ? this.Optsdivision.find(Optsdivision => Optsdivision.value === DivisionID) : '';

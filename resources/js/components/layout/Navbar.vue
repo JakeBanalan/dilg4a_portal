@@ -150,7 +150,13 @@ export default {
             userId: '',
             loading: true,
             pusher: null,
-            channels: [] // Store channel references to properly unsubscribe later
+            channels: [], // Store channel references to properly unsubscribe later
+            pusherInitialized: false // Prevent multiple instances
+        }
+    },
+    computed: {
+        notificationCount() {
+            return this.notifications.length;
         }
     },
     created() {
@@ -198,13 +204,26 @@ export default {
         },
 
         initializePusher() {
-            // Initialize Pusher with error handling
+            // Prevent multiple initializations
+            if (this.pusherInitialized) {
+                if (this.pusher && this.pusher.connection && this.pusher.connection.state !== 'disconnected') {
+                    return;
+                }
+                // If pusher is disconnected, clean up and allow re-init
+                this.cleanPusher();
+            }
+            this.pusherInitialized = true;
             try {
                 this.pusher = new Pusher('29d53f8816252d29de52', {
                     cluster: 'ap1',
-                    // Add proper error handling
                     enabledTransports: ['ws', 'wss'],
                     disabledTransports: []
+                });
+
+                // Track connection state
+                this.pusher.connection.bind('state_change', (states) => {
+                    this.pusherStatus = states.current;
+                    console.log('Pusher connection state:', states.current);
                 });
 
                 this.pusher.connection.bind('error', (err) => {
@@ -236,10 +255,10 @@ export default {
             this.subscribeToChannel('received-ta-channel', 'received-ict-ta', 'Your Request has been Received', 'bg-info', 'ti-info', '/rictu/ict_ta/index');
         },
 
-        clearSingleNotification(notificationId) {
-            // Prevent event bubbling and safely remove notification
-            this.notifications = this.notifications.filter(notification => notification.id !== notificationId);
-            this.$forceUpdate();
+        onClearSingleNotification(notificationId) {
+            // Use Vue's reactivity helpers for array updates
+            const idx = this.notifications.findIndex(n => n.id === notificationId);
+            if (idx !== -1) this.notifications.splice(idx, 1);
         },
 
         async logout() {
@@ -272,10 +291,12 @@ export default {
                 // Store channel reference for cleanup
                 this.channels.push({ name: channelName, channel });
 
-                channel.bind(eventName, (data) => {
-                    // Handle notifications differently based on user role
+                // Debounce notification handler to avoid UI thrashing
+                const debouncedHandler = this._debouncedHandlers?.[eventName] || (this._debouncedHandlers = this._debouncedHandlers || {}, this._debouncedHandlers[eventName] = this.debounce((data) => {
                     this.handleNotificationEvent(data, channelName, eventName, notificationTitle, iconColor, iconClass, requesterId);
-                });
+                }, 200));
+
+                channel.bind(eventName, debouncedHandler);
 
                 // Handle subscription errors
                 channel.bind('pusher:subscription_error', (status) => {
@@ -410,21 +431,41 @@ export default {
 
         cleanPusher() {
             if (this.pusher) {
-                this.channels.forEach(channel => {
-                    this.pusher.unsubscribe(channel);
+                this.channels.forEach(channelObj => {
+                    if (channelObj && channelObj.name) {
+                        try {
+                            this.pusher.unsubscribe(channelObj.name);
+                        } catch (e) {
+                            // Ignore errors if already unsubscribed
+                        }
+                    }
                 });
 
                 // Only disconnect if not already disconnecting or closed
                 const state = this.pusher.connection.state;
                 if (state === 'connected' || state === 'connecting') {
-                    this.pusher.disconnect();
+                    try {
+                        this.pusher.disconnect();
+                    } catch (e) {
+                        // Ignore errors if already disconnected
+                    }
                 }
 
                 // Clean up references
                 this.pusher = null;
                 this.channels = [];
+                this.pusherInitialized = false;
             }
-        }
+        },
+
+        // Simple debounce utility
+        debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        },
 
     }
 }

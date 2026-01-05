@@ -72,7 +72,7 @@ class QMSController extends Controller
         return response()->json($ProcessOwner);
     }
 
-        public function fetchProvinceUser($id)
+    public function fetchProvinceUser($id)
     {
         $ProcessOwner = UserModel::select(
             'users.id',
@@ -111,7 +111,7 @@ class QMSController extends Controller
 
         return response()->json($POprocessOwner);
 
-        //to change db structure from single row per qop to 6 row per qop and bind the to tbl_province loop upon creating qop 
+        //to change db structure from single row per qop to 6 row per qop and bind the to tbl_province loop upon creating qop
         //and hide depending on the selected coverage
 
         //still use user id as reference to the user
@@ -236,7 +236,7 @@ class QMSController extends Controller
 
         $createdId = $postQP->id;
 
-        $pmoIds = [10, 11, 9, 13, 12, 14];
+        $pmoIds = [5, 10, 11, 9, 13, 12, 14];
 
         foreach ($pmoIds as $pmoId) {
             $po_process_owner = new POProcessOwnerModel([
@@ -342,6 +342,8 @@ class QMSController extends Controller
                 $q->where('tbl_qop.office', 'LIKE', '%LGCDD%');
             } elseif (in_array($userOffice1, ['CAVITE', 'LAGUNA', 'BATANGAS', 'RIZAL', 'QUEZON', 'LUCENA CITY'])) {
                 $q->where('qcoverage.coverage', 'LIKE', '%Province%');
+            } elseif (in_array($userOffice1, ['FAD', 'FAD'])) {
+                $q->where('tbl_qop.office', 'LIKE', '%FAD%');
             }
 
             // OR: if user is the process owner
@@ -1039,11 +1041,11 @@ class QMSController extends Controller
         $fetchProcessOwner = QPModel::select('id', 'process_owner')
             ->whereRaw('FIND_IN_SET(?, REPLACE(process_owner, " ", ""))', [str_replace(' ', '', $userFName)])
             ->get();
-            
-            $matchedUser = null;
+
+        $matchedUser = null;
 
         if ($fetchProcessOwner->isEmpty()) {
-            
+
             //For Provincial Process Owner
             $fetchQOPR = QOPRModel::select(
                 'tbl_qop_report.id',

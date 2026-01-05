@@ -69,7 +69,7 @@
                         <div class="col-md-12 grid-margin mb-4 stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <p class="card-title">PPMP for F.Y {{ currentYear }}</p>
+                                    <p class="card-title">{{ userOffice ? '' + userOffice : '' }} - PPMP for F.Y {{ currentYear }} </p>
                                     <div class="box-tools">
                                         <button @click="addAppItem()" type="button"
                                             class="btn btn-primary btn-icon-text">
@@ -148,6 +148,7 @@ export default {
         return {
             currentYear: new Date().getFullYear(),
             role: '',
+            userOffice: '',
             isModalVisible: false,
             selectedAppId: null,
             userId: null,
@@ -334,6 +335,7 @@ export default {
     created() {
         this.role = localStorage.getItem('user_role');
         this.userId = localStorage.getItem('userId');
+        this.fetchUserOffice();
         this.fetchAppData();
     },
     components: {
@@ -353,6 +355,20 @@ export default {
     methods: {
         addAppItem() {
             this.$router.push("/procurement/add_app_item");
+        },
+        async fetchUserOffice() {
+            try {
+                if (!this.userId) {
+                    console.error('User ID is missing');
+                    return;
+                }
+                const response = await axios.get(`/api/fetchUser/${this.userId}`);
+                if (response.data && response.data.pmo_title) {
+                    this.userOffice = response.data.pmo_title;
+                }
+            } catch (error) {
+                console.error('Error fetching user office:', error);
+            }
         },
         async fetchAppData(appYear = null) {
             try {

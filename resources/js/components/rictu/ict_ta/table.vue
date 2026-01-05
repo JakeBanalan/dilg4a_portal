@@ -24,7 +24,7 @@
                     </tr>
                 </thead>
                 <tbody
-                    v-if="(role === 'admin' || role === 'user' || role === 'gss_admin' || role === 'budget_admin' || role === 'ord_admin') && displayedItems.length > 0">
+                    v-if="allowedRoles.includes(role) && displayedItems.length > 0">
                     <tr v-for="ict_data in displayedItems" :key="ict_data.id">
                         <td>
                             <ActionButtons :role="role" :status="ict_data.status" :id="ict_data.id" :user-id="user_id"
@@ -43,8 +43,19 @@
                         </td>
                         <td style="white-space:normal;">{{ ict_data.remarks }}</td>
                         <td>
-                            <SurveyLinkButton v-if="ict_data.status === 'Completed'" :css-link="ict_data.css_link"
-                                :disabled="ict_data.take_survey == 1" @clicked="markSurveyTaken(ict_data)" />
+                            <template v-if="ict_data.status === 'Completed'">
+                                <SurveyLinkButton
+                                    v-if="ict_data.css_link"
+                                    :css-link="ict_data.css_link"
+                                    :disabled="ict_data.take_survey == 1"
+                                    @clicked="markSurveyTaken(ict_data)"
+                                />
+                                <template v-else>
+                                    <button class="btn btn-warning btn-sm" @click="noSurveyLinkAlert()">
+                                        No Survey Link
+                                    </button>
+                                </template>
+                            </template>
                             <template v-else>~</template>
                         </td>
                         <td>{{ formatDate(ict_data.started_date) }}</td>
@@ -115,7 +126,9 @@ export default {
             request_type: null,
             sub_request_type: null,
             isReceiving: false,
-            pusherChannels: []
+            pusherChannels: [],
+            isLoading: false,
+            dateCache: {}
         };
     },
 
@@ -139,6 +152,10 @@ export default {
             const start = this.ict_data.length ? (this.currentPage - 1) * this.itemsPerPage + 1 : 0;
             const end = Math.min(start + this.itemsPerPage - 1, this.totalRecords);
             return `Showing ${start} to ${end} of ${this.totalRecords} entries`;
+        },
+
+        allowedRoles() {
+            return ['admin', 'user', 'gss_admin', 'budget_admin', 'ord_admin'];
         }
     },
 
@@ -214,14 +231,7 @@ export default {
         fetchRequests(role, status) {
             if (role === 'admin') {
                 this.load_ict_request(status);
-            } else if (role === 'gss_admin') {
-                this.load_ict_perUser_request(status);
-            } else if (role === 'budget_admin') {
-                this.load_ict_perUser_request(status);
-            } else if (role === 'ord_admin') {
-                this.load_ict_perUser_request(status);
-            }
-            else if (role === 'user') {
+            } else if (role === 'gss_admin' || role === 'budget_admin' || role === 'ord_admin' || role === 'user') {
                 this.load_ict_perUser_request(status);
             } else {
                 console.error('Unknown role');
@@ -241,12 +251,18 @@ export default {
         formatTime(date) {
             if (!date || date === '0000-00-00') return null;
 
+            // Use cache to avoid repeated formatting
+            const cacheKey = `time_${date}`;
+            if (this.dateCache[cacheKey]) return this.dateCache[cacheKey];
+
             try {
-                return new Date(date).toLocaleString('en-US', {
+                const formatted = new Date(date).toLocaleString('en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false
                 });
+                this.dateCache[cacheKey] = formatted;
+                return formatted;
             } catch (error) {
                 console.error('Date formatting error:', error);
                 return null;
@@ -256,21 +272,28 @@ export default {
         formatDate(date) {
             if (!date || date === '0000-00-00') return null;
 
+            // Use cache to avoid repeated formatting
+            const cacheKey = `date_${date}`;
+            if (this.dateCache[cacheKey]) return this.dateCache[cacheKey];
+
             try {
-                return new Date(date).toLocaleString('en-US', {
+                const formatted = new Date(date).toLocaleString('en-US', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'
                 });
+                this.dateCache[cacheKey] = formatted;
+                return formatted;
             } catch (error) {
                 console.error('Date formatting error:', error);
                 return null;
             }
         },
 
-        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = new Date().getFullYear(), quarter = null) {
+        load_ict_request(status, controlNo = null, requestedBy = null, startDate = null, endDate = null, pmo = null, ictPersonnel = null, year = new Date().getFullYear(), quarter = null, month = null) {
             const url = status ? `../../api/fetch_ict_request/${status}` : `../../api/fetch_ict_request`;
             this.currentPage = 1;
+            this.isLoading = true;
 
             const params = {
                 ...(controlNo && { control_no: controlNo }),
@@ -281,30 +304,42 @@ export default {
                 ...(ictPersonnel && { ict_personnel: ictPersonnel }),
                 ...(year && { year }),
                 ...(quarter && { quarter }),
+                ...(month && { month }),
             };
 
             axios.get(url, { params })
                 .then(response => {
                     this.ict_data = response.data.data || [];
+                    // Clear date cache when new data arrives
+                    this.dateCache = {};
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                     this.ict_data = [];
                     toast.error('Failed to load requests', { autoClose: 2000 });
+                })
+                .finally(() => {
+                    this.isLoading = false;
                 });
         },
 
         load_ict_perUser_request(status) {
             const url = `../../api/fetch_ict_perUser/${status || 6}/${this.user_id}`;
+            this.isLoading = true;
 
             axios.get(url)
                 .then(response => {
                     this.ict_data = response.data.data || [];
+                    // Clear date cache when new data arrives
+                    this.dateCache = {};
                 })
                 .catch(error => {
                     console.error('Error fetching user data:', error);
                     this.ict_data = [];
                     toast.error('Failed to load your requests', { autoClose: 2000 });
+                })
+                .finally(() => {
+                    this.isLoading = false;
                 });
         },
 
@@ -370,7 +405,10 @@ export default {
 
         async markSurveyTaken(item) {
             if (!item || !item.id) return;
-
+            if (!item.css_link) {
+                this.noSurveyLinkAlert();
+                return;
+            }
             try {
                 await axios.post('/api/markTakeSurvey', { id: item.id });
                 // update local state so button becomes disabled
@@ -382,6 +420,19 @@ export default {
             } catch (error) {
                 console.error('Error marking survey taken:', error);
                 toast.error('Failed to mark survey as taken', { autoClose: 2000 });
+            }
+        },
+
+        noSurveyLinkAlert() {
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'No Survey Link Available',
+                    text: 'No survey link is available for this request. Please contact the admin.',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                alert('No survey link is available for this request. Please contact the admin.');
             }
         }
     }

@@ -469,7 +469,17 @@ class PurchaseRequestController extends Controller
             DB::beginTransaction();
             $purchaseRequest = new PurchaseRequestModel();
 
-            $purchaseRequest->pr_no = $request->input('pr_no');
+            // Generate PR number inside transaction to ensure uniqueness
+            $cur_year = date('Y');
+            $prCount = PurchaseRequestModel::whereYear('date_added', $cur_year)
+                ->lockForUpdate()  // Lock to prevent race conditions
+                ->count() + 1;
+            
+            $month = str_pad(date('m'), 2, '0', STR_PAD_LEFT);
+            $formattedSequence = str_pad($prCount, 5, '0', STR_PAD_LEFT);
+            $generatedPrNo = "{$cur_year}-{$month}-{$formattedSequence}";
+
+            $purchaseRequest->pr_no = $generatedPrNo;
             $purchaseRequest->pmo = $request->input('pmo');
             $purchaseRequest->type = $request->input('type');
             $purchaseRequest->pr_date = $request->input('pr_date');
@@ -517,9 +527,22 @@ class PurchaseRequestController extends Controller
             DB::commit();
 
             return response()->json(['message' => 'Purchase request and items created successfully']);
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollback();
+            
+            // Check if it's a duplicate PR number error
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false || strpos($e->getMessage(), 'UNIQUE constraint') !== false) {
+                return response()->json([
+                    'message' => 'This PR number already exists. Please refresh the page and try again.',
+                    'error' => 'duplicate_pr_no',
+                    'action' => 'refresh'
+                ], 409);
+            }
+            
+            return response()->json(['message' => 'Database error: ' . $e->getMessage()], 500);
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['message' => 'Failed to create purchase request and items'], 500);
+            return response()->json(['message' => 'Failed to create purchase request and items: ' . $e->getMessage()], 500);
         }
     }
 
