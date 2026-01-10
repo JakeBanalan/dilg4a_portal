@@ -18,7 +18,7 @@ use App\Http\Controllers\HomeController;
 Route::get('/', [HomeController::class,'index']);
 
 
-Route::post('login',[UserController::class,'login']);
+// Route::post('login',[UserController::class,'login']);
 
 
 //this line solved the 404 not found in vue js
